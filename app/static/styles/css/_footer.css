@@ -1,0 +1,16 @@
+.footer__container {
+  border-radius: 15px;
+  padding: 52px 100px;
+  background-color: white;
+  margin-top: 50px;
+  margin-bottom: 25px;
+}
+
+.footer__wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+
+}

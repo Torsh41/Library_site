@@ -1,0 +1,44 @@
+.form__container {
+  padding: 50px 50px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.form__wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.form__label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 26px;
+}
+
+/* .form__label:not(:last-child) {
+  margin-bottom: 26px;
+} */
+
+.form__help {
+  max-width: 510px;
+  margin-top: 20px;
+  margin-bottom: 0;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+}
+
+.form__input {
+  padding: 18px 18px;
+  width: 519px;
+  border-radius: 20px;
+}
+
+.form__btn {
+  margin-top: 38px;
+}

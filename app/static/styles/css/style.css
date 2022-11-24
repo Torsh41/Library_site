@@ -1,0 +1,95 @@
+@import url('_fonts.css');
+@import url('_variables.css');
+@import url(_header.css);
+@import url(_main.css);
+@import url(_about.css);
+@import url(_contacts.css);
+@import url(_footer.css);
+@import url(_form.css);
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  font-size: var(--default-fs);
+  line-height: var(--default-lh);
+  color: var(--black);
+  background-color: #F5F5F5;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+}
+
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+  max-width: var(--container-max-width);
+}
+
+
+.list-reset {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sub {
+  font-weight: var(--regular);
+  font-size: 48px;
+  line-height: 59px;
+  color: var(--black);
+}
+
+.btn {
+  padding: 20px 38px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  font-size: var(--default-fs);
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.2s linear;
+}
+
+.btn-reset {
+  background-color: transparent;
+}
+
+
+

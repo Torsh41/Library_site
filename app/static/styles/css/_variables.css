@@ -1,0 +1,29 @@
+:root {
+
+  /* Container */
+  --container-max-width: 1270px;
+  --container-padding: 50px;
+
+  /* Color */
+  --dark: #333;
+  --white: #fff;
+  --black: #000;
+  --orange: #FF9900;
+  --focus: #FFB84D;
+  --active: #E1670E;
+  --gray: #666666;
+  --footer: #CACACA;
+  ;
+
+
+
+  /* Fonts */
+  --regular: 400;
+  --medium: 500;
+  --semibold: 600;
+  --bold: 700;
+  --extrabold: 800;
+
+  --default-fs: 16px;
+  --default-lh: 32px;
+}

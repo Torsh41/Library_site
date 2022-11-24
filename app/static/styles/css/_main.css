@@ -1,0 +1,104 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 540px;
+  margin-bottom: 25px;
+}
+
+.main__top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin-top: 21px;
+
+}
+
+.main__bottom-item {
+  display: inline-block;
+  font-size: 18px;
+
+}
+
+.main__bottom-item:not(:last-child) {
+  margin-right: 25px;
+}
+
+.main__title {
+  margin-top: 0;
+  margin-bottom: 21px;
+  font-size: 48px;
+  line-height: 48px;
+  font-weight: var(--regular);
+}
+
+.main__span {
+  margin-bottom: 30px;
+  font-size: 36px;
+}
+
+.main__bottom-item {
+  font-size: 20px;
+  line-height: 23px;
+}
+
+/* Стилизация страницы поиска книг */
+
+
+
+.main__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main__form-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.main__form-input {
+  width: 500px;
+  border: none;
+  background-color: transparent;
+
+}
+
+.main__form-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 13px;
+  border-radius: 20px;
+  background-color: var(--white);
+  cursor: pointer;
+}
+
+.main__form-icon {
+  margin-right: 10px;
+}
+
+.main__form-select {
+  padding: 13px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.main__form-select:not(:last-child) {
+  margin-right: 20px;
+}
+
+.main__form-btn {
+  margin-top: 30px;
+}
