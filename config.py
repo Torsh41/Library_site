@@ -1,12 +1,13 @@
 import os
 
-
 basedir = os.path.abspath(os.path.dirname(__file__))
-
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_RECORD_QUERIES = True
+    MAX_CONTENT_LENGTH = 1024 * 1024
+    #SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     '''
     MAIL_HOSTNAME = 'localhost'
     #MAIL_SERVER = 'smtp.mail.ru'#os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')

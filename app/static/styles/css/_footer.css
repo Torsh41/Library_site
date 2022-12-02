@@ -1,9 +1,12 @@
+.footer {
+  padding-top: 50px;
+  padding-bottom: 25px;
+}
+
 .footer__container {
   border-radius: 15px;
   padding: 52px 100px;
   background-color: white;
-  margin-top: 50px;
-  margin-bottom: 25px;
 }
 
 .footer__wrap {

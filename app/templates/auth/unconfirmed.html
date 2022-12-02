@@ -1,18 +1,64 @@
-{% block title %}Magic Book Keeper - Confirm your account{% endblock %}
 
-{% block page_content %}
-<div class="page-header">
-    <h1>
-        Hello, {{ current_user.username }}!
-    </h1>
-    <h3>You have not confirmed your account yet.</h3>
-    <p>
-        Before you can access this site you need to confirm your account.
-        Check your inbox, you should have received an email with a confirmation link.
-    </p>
-    <p>
-        Need another confirmation email?
-        <a href="{{ url_for('auth.resend_confirmation') }}">Click here</a>
-    </p>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Завершите регистрацию</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}">
+    <link rel="icon" href="img/favicon.svg">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__container container">
+            <a class="header__logo" href="{{url_for('main.index')}}">
+                <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="main">
+            <div class="main__container container">
+
+                <div class="main__top">
+
+                    <h1 class="main__title">Hello, {{ current_user.username }}! </h1>
+
+                    <span class="main__span-confrim">You have not confirmed your account yet.</span>
+
+                    <span class="main__span-confrim">Before you can access this site you need to confirm your account.
+                        Check your inbox, you should have received an email with a confirmation link.</span>
+
+                    <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+                    </svg>
+                </div>
+
+                <div class="main__bottom">
+                    <p class="main__bottom-item">
+                        Need another confirmation email?
+                        <a class="main__link-confirm" href="{{ url_for('auth.resend_confirmation') }}">Click here</a>
+                    </p>
+
+                </div>
+
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer__container container">
+            <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -3,21 +3,21 @@ from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
 from ..begin_to_app import database
 from ..models import User
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, ChangePasswordForm
 from app.email import send_email
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
     #if request.method == "POST":
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data.lower()).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user)#, form.remember_me.data)
             return redirect(url_for('main.index')) #request.args.get('next') or
         
-        flash('Wrong username or password.')
-            
+        flash('Wrong username or password.')    
     return render_template('auth/authorization.html', form=form)
 
 
@@ -38,8 +38,9 @@ def register():
             flash('Password must have 6 symbols or more.')
             return render_template('auth/registraton.html', form=form)
         
-        user = User(username=form.username.data, email=form.email.data,
+        user = User(username=form.username.data, email=form.email.data.lower(),
         password=form.password.data)
+        user.default_ava()
         user.check_admin()
         database.session.add(user)
         database.session.commit()
@@ -47,7 +48,7 @@ def register():
         send_email(user.email, 'Confirm Your Account',
         'auth/email/confirm', user=user, token=token)
         flash('A confirmation email has been sent to you by email.')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('auth.login'))
     return render_template('auth/registraton.html', form=form)
 
 
@@ -57,6 +58,7 @@ def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
+        database.session.commit()
         flash('You have confirmed your account. Thanks!')
     else:
         flash('The confirmation link is invalid or has expired.')
@@ -67,14 +69,16 @@ def confirm(token):
 def before_request():
     if current_user.is_authenticated \
     and not current_user.confirmed \
-    and request.endpoint[:5] != 'auth.':
+    and request.endpoint \
+    and request.blueprint != 'auth' \
+    and request.endpoint != 'static':
         return redirect(url_for('auth.unconfirmed'))
 
 
 @auth.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
-        return redirect('main.index')
+        return redirect(url_for('main.index'))
     return render_template('auth/unconfirmed.html')
 
 
@@ -87,3 +91,24 @@ def resend_confirmation():
     flash('A new confirmation email has been sent to you by email.')
     return redirect(url_for('main.index'))
     
+
+@auth.route('/password_change', methods=['GET', 'POST'])
+#@login_required
+def change_password():
+    #if current_user.is_anonymous:
+        #return redirect(url_for('main.index'))
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data.lower()).first()
+        if user:
+            current_user.password = form.password.data
+            database.session.add(current_user)
+            database.session.commit()
+            flash('Your password has been updated.')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('You are not registred user, do it!')
+            return redirect(url_for('main.index'))
+        #else:
+            #flash('Invalid password.')
+    return render_template('auth/change_password.html', form=form)

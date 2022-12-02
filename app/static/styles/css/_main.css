@@ -102,3 +102,15 @@
 .main__form-btn {
   margin-top: 30px;
 }
+
+/*Unconfrimed.html*/
+
+.main__span-confrim {
+  font-size: 24px;
+  line-height: 24px;
+}
+
+.main__link-confirm {
+  font-weight: 600;
+  color: brown;
+}

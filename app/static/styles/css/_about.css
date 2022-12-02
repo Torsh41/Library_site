@@ -13,3 +13,8 @@
   justify-content: center;
 
 }
+
+.about__text {
+  width: 100%;
+  text-align: center;
+}

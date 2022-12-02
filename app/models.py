@@ -1,10 +1,10 @@
-from email.policy import default
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from .init import database, login_manager
+from .init import database, login_manager, application
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app, url_for
 from datetime import datetime
+
 
 #отношение один ко многим, User->Cataloge - один к одному
 
@@ -13,8 +13,9 @@ class User(UserMixin, database.Model):
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.String(64), unique=True, index=True)
     username = database.Column(database.String(64), unique=True)
-    city = database.Column(database.Text, default=False)
-    gender = database.Column(database.Boolean, default=False)
+    avatar = database.Column(database.LargeBinary, default=False)
+    city = database.Column(database.String(64), default=False)
+    gender = database.Column(database.String(4), default=False)
     age = database.Column(database.Integer, default=False)
     about_me = database.Column(database.Text, default=False)
     password_hash = database.Column(database.String(128))
@@ -55,8 +56,12 @@ class User(UserMixin, database.Model):
     def check_admin(self):
         if current_app.config['FLASKY_ADMIN'] == self.email:
             self.is_admin = True
-     
-         
+            
+    def default_ava(self):
+        with application.open_resource(application.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
+            self.avatar = f.read()
+      
+    
 class Book(database.Model):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
