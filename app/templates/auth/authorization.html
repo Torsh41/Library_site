@@ -64,17 +64,34 @@
 
     <section class="form">
       <div class="form__container container">
-        
         <form class="form__wrap" action="" method="post">
           {{form.hidden_tag()}}
           <label  class="form__label">
            <span class="form__span">Ваш email</span>
+           {% if form.email.errors %}
            {{form.email(class="form__input", placeholder='Введите email')}} 
+           <span> 
+            {% for msg in form.email.errors %}
+            {{ msg }}
+            {% endfor %}
+           </span>
+           {% else %}
+           {{form.email(class="form__input", placeholder='Введите email')}} 
+           {% endif %}
           </label> 
 
           <label  class="form__label">
            <span class="form__span">Ваш пароль</span>
+           {% if form.password.errors %}
            {{form.password(class="form__input", placeholder='Введите пароль')}}
+           <span> 
+            {% for msg in form.password.errors %}
+            {{ msg }}
+            {% endfor %}
+           </span>
+           {% else %}
+           {{form.password(class="form__input", placeholder='Введите пароль')}}
+           {% endif %}
           </label>
 
           <button class="btn form__btn ">Войти</button>

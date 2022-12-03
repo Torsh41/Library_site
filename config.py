@@ -5,7 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_RECORD_QUERIES = True
+    #SQLALCHEMY_RECORD_QUERIES = True
     MAX_CONTENT_LENGTH = 1024 * 1024
     #SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     '''

@@ -1,0 +1,24 @@
+<!--Форма создания списка-->
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Создание списка</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}"/>
+  <link rel="icon" href="img/favicon.svg">
+</head>
+  <body>
+    <div class="container list__input-form">
+      <form action="" class="list__form" method="post">
+        <label class="form__label">
+        <input type="text" name="list_name" class="form__input" placeholder="Введите название списка.." required>
+        </label>
+        <button class="form__btn">Добавить</button>
+      </form>
+    </div>
+  </body>
+</html>

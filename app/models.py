@@ -6,7 +6,7 @@ from flask import current_app, url_for
 from datetime import datetime
 
 
-#отношение один ко многим, User->Cataloge - один к одному
+#отношение один ко многим
 
 class User(UserMixin, database.Model):
     __tablename__ = "users"
@@ -22,7 +22,7 @@ class User(UserMixin, database.Model):
     books = database.relationship('Book', backref='user')
     grades = database.relationship('BookGrade', backref='user')
     comments = database.relationship('Comment', backref='user')
-    cataloge = database.relationship('Cataloge', backref='user', uselist=False)
+    catalogues = database.relationship('Cataloge', backref='user')#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
     is_admin = database.Column(database.Boolean, default=False)
     

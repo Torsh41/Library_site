@@ -33,11 +33,7 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit(): 
-    #if request.method == "POST":
-        if len(form.password.data) < 6:
-            flash('Password must have 6 symbols or more.')
-            return render_template('auth/registraton.html', form=form)
-        
+    #if request.method == "POST": 
         user = User(username=form.username.data, email=form.email.data.lower(),
         password=form.password.data)
         user.default_ava()
