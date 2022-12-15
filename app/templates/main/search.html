@@ -31,7 +31,11 @@
             </a>
             <ul class="nav__sublist list-reset">
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              {% if current_user.is_anonymous %}
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+              {% else %}
+              <li class="nav__subitem"><a class="nav__link" href="#">Регистрация</a></li>
+              {% endif %}
               {% if current_user.is_authenticated %}
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username, _external=True)}}">Личный кабинет</a></li>
               {% else %}
@@ -76,8 +80,7 @@
                   </clipPath>
                 </defs>
               </svg>
-
-              <input type="text" class="main__form-input" placeholder="Введите название книги или автора..">
+              <input type="text" name="search_result" class="main__form-input" placeholder="Введите название книги или автора..">
             </label>
 
             <div class="main__form-wrap">
@@ -96,18 +99,59 @@
                 <option>Пункт 1</option>
                 <option>Пункт 2</option>
               </select>
-
-
             </div>
 
             <button class="main__form-btn btn">Найти</button>
-
           </form>
         </div>
-
       </div>
     </section>
+<!--Найденные книги -->
+{% if search_result and search_result != 404 %}
+<section class="list">
+  <div class="container list__container">
+    <div class="list__wrap">
+      <h2 class="list__title title">Вот, что мы нашли</h2> 
+      
+      {% if flag %}
+      {% for book in search_result %}
+      <ul class="list__books list-reset">
 
+        <!--Найденные книги по секциям-->
+ 
+        <li class="list__book">
+          <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
+          <select class="list__select">
+            
+          </select>
+        </li>
+      </ul>
+      {% endfor %}
+      {% else %}
+      <ul class="list__books list-reset">
+
+        <!--Найденная книга по названию-->
+ 
+        <li class="list__book">
+          <a href="{{url_for('main.book_page', name=search_result.name)}}" class="list__link">Книга: {{ search_result.name }}</a>
+          <select class="list__select">
+            
+          </select>
+        </li>
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% elif search_result == 404 %}
+<section class="list">
+  <div class="container list__container">
+    <div class="list__wrap">
+      <h2 class="list__title title">Ничего не найдено</h2> 
+    </div>
+  </div>
+</section>
+{% endif %}
     <section id="1" class="about">
       <div class="about__container container">
         <div class="about__wrap">

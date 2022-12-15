@@ -1,0 +1,99 @@
+.book {
+  padding-top: 25px;
+  padding-bottom: 50px;
+}
+
+.book__container {
+  padding: 52px 100px;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.book__top {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
+
+.book__image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 322px;
+  height: 322px;
+  background-color: #EFF6F2;
+
+}
+
+.book__info {
+  padding: 50px;
+  width: calc(800 / 1270 * 100%);
+  height: 322px;
+  background-color: #EFF6F2;
+  border-radius: 20px;
+}
+
+.book__bottom {
+  padding: 50px;
+  width: 100%;
+  height: 322px;
+  background-color: #EFF6F2;
+  border-radius: 20px;
+}
+
+.book__text {
+  margin-top: 0;
+}
+
+.book__select {
+  margin-top: 280px;
+}
+
+.book__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.book__marks {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.book__mark:not(:last-child) {
+  margin-right: 20px;
+}
+
+.book__link {
+  color: #E9E9E9;
+  transition: color 0.2s linear;
+}
+.book__star {
+  fill: #E9E9E9;
+  transition: fill 0.2s linear;
+}
+
+.book__link:hover {
+  color: gold;
+}
+
+.book__star:hover {
+  fill: gold;
+}
+
+.book__link {
+  color: gold;
+}
+
+.book__star::active {
+  fill: gold;
+}

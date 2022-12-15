@@ -12,7 +12,7 @@ class User(UserMixin, database.Model):
     __tablename__ = "users"
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.String(64), unique=True, index=True)
-    username = database.Column(database.String(64), unique=True)
+    username = database.Column(database.String(64), unique=True, index=True)
     avatar = database.Column(database.LargeBinary, default=False)
     city = database.Column(database.String(64), default=False)
     gender = database.Column(database.String(4), default=False)
@@ -65,21 +65,25 @@ class User(UserMixin, database.Model):
 class Book(database.Model):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(64), unique=True)
+    isbn = database.Column(database.String(64), unique=False)
+    name = database.Column(database.String(64), unique=True, index=True)
     author = database.Column(database.String(64), unique=False)
-    description = database.Column(database.Text(), unique=True)
-    date = database.Column(database.Date(), unique=False)
+    publishing_house = database.Column(database.String(64), unique=False)
+    description = database.Column(database.Text(), unique=False)
+    release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
-    genre = database.Column(database.String(64), unique=False)
+    genre = database.Column(database.Text(), unique=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+    catalogue_items = database.relationship('Item', backref='book')
+    grades = database.relationship('BookGrade', backref='book')
     
 
 class BookGrade(database.Model):
     __tablename__ = "grades"
     id = database.Column(database.Integer, primary_key=True)
-    bookname = database.Column(database.String(64))
     grade = database.Column(database.Integer)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id')) 
+    book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
 
 
 class Comment(database.Model):
@@ -97,7 +101,7 @@ class Comment(database.Model):
 class Cataloge(database.Model):
     __tablename__ = "catalogues"
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(64), unique=True)
+    name = database.Column(database.String(64), unique=False, index=True)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     items = database.relationship('Item', backref='cataloge', cascade = "all, delete, delete-orphan")
 
@@ -105,11 +109,12 @@ class Cataloge(database.Model):
 class Item(database.Model):
     __tablename__ = "items"
     id = database.Column(database.Integer, primary_key=True)
-    read = database.Column(database.String(64), unique=False, default=None) #прочитано 
-    read_in_process = database.Column(database.String(64), unique=False, default=None) #читаю
-    planning = database.Column(database.String(64), unique=False, default=None) #планирую
-    abandoned = database.Column(database.String(64), unique=False, default=None) #заброшено 
+    read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено 
+    #read_in_process = database.Column(database.String(64), unique=False, default=None) #читаю
+    #planning = database.Column(database.String(64), unique=False, default=None) #планирую
+    #abandoned = database.Column(database.String(64), unique=False, default=None) #заброшено 
     cataloge_id = database.Column(database.Integer, database.ForeignKey('catalogues.id')) 
+    book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
     
     
 @login_manager.user_loader

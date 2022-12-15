@@ -1,7 +1,10 @@
+.contacts {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
 .contacts__container {
   padding: 52px 100px;
-  margin-top: 25px;
-  margin-bottom: 25px;
   border-radius: 15px;
   background-color: white;
 }

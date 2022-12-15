@@ -1,5 +1,5 @@
 .list {
-  padding-top: 50px;
+  padding-top: 25px;
   padding-bottom: 25px;
 }
 
@@ -84,4 +84,9 @@
 
 .list__select {
   margin-top: 80px;
+}
+
+.list__text {
+  margin-top: 0;
+  font-size: 30px;
 }

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавить новую книгу</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}"/>
+  <link rel="icon" href="img/favicon.svg">
+</head>
+
+<body>
+  <header class="header">
+    <div class="header__container container">
+      <a class="header__logo" href="{{url_for('main.index')}}">
+        <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+      </a>
+
+      <nav class="nav header__nav">
+        <ul class="nav__list list-reset">
+          <li class="nav__item"><a class="nav__link" href="#">Меню
+              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="black" />
+                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="black" />
+                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="black" />
+              </svg>
+
+            </a>
+            <ul class="nav__sublist list-reset">
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="main">
+      <div class="main__container container">
+
+        <div class="main__top">
+
+          <h1 class="main__title">Заполните форму</h1>
+
+          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+          </svg>
+
+        </div>
+
+        {% if current_user.is_authenticated  %}
+        <div class="main__bottom">
+          <a class="main__bottom-item" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a>
+        </div>
+        {% endif %}
+
+      </div>
+    </section>
+
+    <section class="form">
+      <div class="form__container container">
+        <form class="form__wrap" action="" method="post">
+          {{form.hidden_tag()}}
+          <label class="form__label">
+            <span class="form__span">ISBN</span>
+            {% if form.isbn.errors %}
+            <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
+            {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
+            <span> 
+              {% for msg in form.isbn.errors %}
+              {{ msg }}
+              {% endfor %}
+            </span>
+            {% else %}
+            {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
+            {% endif %}
+          </label>
+
+          <label class="form__label">
+            <span class="form__span">Название</span>
+            {% if form.name.errors %}
+            <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
+            {{form.name(class="form__input", placeholder="Введите название книги")}}
+            <span> 
+              {% for msg in form.name.errors %}
+              {{ msg }}
+              {% endfor %}
+            </span>
+            {% else %}
+            {{form.name(class="form__input", placeholder="Введите название книги")}}
+            {% endif %}
+          </label>
+
+          <label class="form__label">
+            <span class="form__span">Автор</span>
+            {% if form.author.errors %}
+            <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
+            {{form.author(class="form__input", placeholder="Иванов Иван Иванович")}}
+            <span> 
+              {% for msg in form.author.errors %}
+              {{ msg }}
+              {% endfor %}
+            </span>
+            {% else %}
+            {{form.author(class="form__input", placeholder="Иванов Иван Иванович")}}
+            {% endif %}
+          </label>
+
+          <label class="form__label">
+            <span class="form__span">Издательство</span>
+            {% if form.publishing_house.errors %}
+            <!--<input type="text" class="form__input" placeholder="Введите издательство" required>-->
+            {{form.publishing_house(class="form__input", placeholder="Введите издательство")}}
+            <span> 
+              {% for msg in form.publishing_house.errors %}
+              {{ msg }}
+              {% endfor %}
+            </span>
+            {% else %}
+            {{form.publishing_house(class="form__input", placeholder="Введите издательство")}}
+            {% endif %}
+          </label>
+
+          <label class="form__label">
+            <span class="form__span">Описание</span>
+            {% if form.description.errors %}
+            {{form.description(class="form__input", placeholder="Описание книги..")}}
+            <span> 
+              {% for msg in form.description.errors %}
+              {{ msg }}
+              {% endfor %}
+            </span>
+            {% else %}
+            {{form.description(class="form__input", placeholder="Описание книги..")}}
+            {% endif %}
+            <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
+          </label>
+
+          <label class="form__label">
+            <span class="form__span">Дата выхода</span>
+            {% if form.release_date.errors %}
+            {{form.release_date(class="form__input")}}
+            <span> 
+              {% for msg in form.release_date.errors %}
+              {{ msg }}
+              {% endfor %}
+            </span>
+            {% else %}
+            {{form.release_date(class="form__input")}}
+            {% endif %}
+            <!--<input type="date" class="form__input" required>-->
+          </label>
+
+          <label class="form__label">
+            <span class="form__span">Количество глав</span>
+            {% if form.chapters_count.errors %}
+            {{form.chapters_count(class="form__input", placeholder="Введите количество глав")}}
+            <span> 
+              {% for msg in form.chapters_count.errors %}
+              {{ msg }}
+              {% endfor %}
+            </span>
+            {% else %}
+            {{form.chapters_count(class="form__input", placeholder="Введите количество глав")}}
+            {% endif %}
+            <!--<input type="number" class="form__input" min="2" placeholder="Введите количество глав" required>-->
+          </label>
+
+          <label class="form__label">
+            <span class="form__span">Жанры</span>
+            <div class="form__genre-wrap">
+              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="ужасы">ужасы</a>
+              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="мистика">мистика</a>
+              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="детектив">детектив</a>
+              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="фантастика">фантастика</a>
+              <!--<a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
+              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
+              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
+              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
+              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>-->
+            </div>
+          </label>
+
+          <!--<button class="form__btn btn">Добавить книгу в базу</button>-->
+          {{form.submit(class="form__btn btn")}}
+        </form>
+
+        <a class="form__exit-btn" href="{{url_for('personal.person', username=current_user.username)}}">Вернуться в личный кабинет</a>
+      </div>
+    </section>
+
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+    </div>
+  </footer>
+
+</body>
+
+</html>

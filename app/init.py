@@ -4,6 +4,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask import Flask
+from flask_migrate import Migrate
 
 
 application = Flask(__name__, template_folder='templates')
@@ -14,3 +15,4 @@ bootstrap = Bootstrap4()
 mail = Mail()
 moment = Moment()
 database = SQLAlchemy()
+migrate = Migrate(application, database)

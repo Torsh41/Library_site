@@ -1,7 +1,14 @@
+.form {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
 .form__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 50px 50px;
-  margin-top: 25px;
-  margin-bottom: 25px;
   border-radius: 15px;
   background-color: white;
 }
@@ -41,4 +48,21 @@
 
 .form__btn {
   margin-top: 38px;
+}
+
+.form__genre-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: 519px;
+}
+
+.form__genre:not(:nth-child(6n)) {
+  margin-right: 20px;
+}
+
+.form__exit-btn {
+  margin-top: 50px;
+  border-bottom: 1px solid var(--black);
 }

@@ -7,7 +7,7 @@ from ..models import User
 
 class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Email('Неверный email адрес.')])
-    username = StringField('Username', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
+    username = StringField('Username', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0,
 'Логин содержит только буквы, цифры, точки или символы подчеркивания.')])
     password = PasswordField('Password', validators=[DataRequired('Поля не должны быть пустыми.'), EqualTo('password2', message='Пароли должны совпадать.'), Length(6, 20, message='Пароль должен быть от 6 до 20 символов включительно.')])
     password2 = PasswordField('Confirm password', validators=[DataRequired('Поля не должны быть пустыми.')])
