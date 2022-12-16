@@ -152,12 +152,14 @@
             {% for item in cataloge_value.items %}
             <li class="list__book">
               <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link">Книга: {{ item.book.name }}</a>
-              <select class="list__select">
+              <a href="#" class="list__link">Состояние чтения: {{ item.read_state }}</a>
+              
+              <!--<select class="list__select">
                 <option value="">Планирую</option>
                 <option value="">Читаю</option>
                 <option value="">Заброшено</option>
                 <option value="">Прочитано</option>
-              </select>
+              </select>-->
             </li>
             {% endfor %}
           </ul>

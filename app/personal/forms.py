@@ -16,7 +16,7 @@ class EditProfileForm(FlaskForm):
     
     
 def validate_list_name(form, field): 
-    catalogues = Cataloge.query.filter_by(name=field.data).all()
+    catalogues = Cataloge.query.filter_by(name=str(field.data).strip().lower()).all()
     for value in catalogues:
         if value.user == current_user:
             raise ValidationError('У вас уже есть список с таким названием.')
@@ -29,7 +29,7 @@ class AddListForm(FlaskForm):
             
             
 def validate_bookname(form, field):
-    if Book.query.filter_by(name=field.data).first():
+    if Book.query.filter_by(name=str(field.data).strip().lower()).first():
         raise ValidationError('Данное название книги уже находится в общей базе.')
 
 

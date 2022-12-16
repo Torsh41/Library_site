@@ -76,6 +76,7 @@ class Book(database.Model):
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     catalogue_items = database.relationship('Item', backref='book')
     grades = database.relationship('BookGrade', backref='book')
+    comments = database.relationship('Comment', backref='book', lazy='dynamic')
     
 
 class BookGrade(database.Model):
@@ -92,9 +93,9 @@ class Comment(database.Model):
     body = database.Column(database.Text)
  #body_html = database.Column(database.Text)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
- #disabled = database.Column(database.Boolean)
+    #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
- #post_id = database.Column(db.Integer, db.ForeignKey('posts.id'))
+    book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
 
 
 #lists and items models

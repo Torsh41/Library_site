@@ -84,20 +84,23 @@
             </label>
 
             <div class="main__form-wrap">
-              <select name="" id="" class="main__form-select">
-                <option >Жанр</option>
-                <option>Пункт 1</option>
-                <option>Пункт 2</option>
+              <select name="genre" id="" class="main__form-select">
+                <option value="">Жанр</option>
+                <option value="ужасы">ужасы</option>
+                <option value="мистика">мистика</option>
+                <option value="детектив">детектив</option>
+                <option value="фантастика">фантастика</option>
               </select>
-              <select name="" id="" class="main__form-select">
+              <!--<select name="" id="" class="main__form-select">
                 <option>Тэги</option>
                 <option>Пункт 1</option>
                 <option>Пункт 2</option>
-              </select>
-              <select name="" id="" class="main__form-select">
-                <option >Год издания</option>
-                <option>Пункт 1</option>
-                <option>Пункт 2</option>
+              </select>-->
+              <select name="release_date" id="" class="main__form-select">
+                <option value="">Дата издания</option>
+                {% for date in date_list %}
+                  <option value="{{ date }}">{{ date }}</option>
+                {% endfor %}
               </select>
             </div>
 
@@ -121,9 +124,11 @@
  
         <li class="list__book">
           <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-          <select class="list__select">
+          <h1>Автор: {{ book.author }}</h1>
+          
+          <!--<select class="list__select">
             
-          </select>
+          </select>-->
         </li>
       </ul>
       {% endfor %}
@@ -134,9 +139,10 @@
  
         <li class="list__book">
           <a href="{{url_for('main.book_page', name=search_result.name)}}" class="list__link">Книга: {{ search_result.name }}</a>
-          <select class="list__select">
+          <h1>Автор: {{ search_result.author }}</h1>
+          <!--<select class="list__select">
             
-          </select>
+          </select>-->
         </li>
       </ul>
       {% endif %}

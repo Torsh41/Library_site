@@ -44,7 +44,7 @@ def edit(username):
 def add_list(username):
     form = AddListForm()
     if form.validate_on_submit():
-        cataloge = Cataloge(name=form.list_name.data, user=current_user._get_current_object())
+        cataloge = Cataloge(name=str(form.list_name.data).strip().lower(), user=current_user._get_current_object())
         database.session.add(cataloge)
         database.session.commit()
         return redirect(url_for('.person', username=username))
@@ -59,9 +59,9 @@ def add_new_book(username):
         genre = request.form.getlist('genres')
         genre_ = ''
         for value in genre:
-            genre_ += str(value) + '  '
+            genre_ += str(value) + ' '
             
-        book = Book(isbn=form.isbn.data, name=str(form.name.data).strip(), author=str(form.author.data).strip(), publishing_house=str(form.publishing_house.data).strip(), \
+        book = Book(isbn=form.isbn.data, name=str(form.name.data).strip().lower(), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
                     description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data, \
                     genre=genre_, user=current_user._get_current_object())
         database.session.add(book)
@@ -70,17 +70,18 @@ def add_new_book(username):
     return render_template('personal/add_book.html', form=form)
 
 
-@personal.route('/<username>/add-book-in-list/<book_id>')
+@personal.route('/<username>/add-book-in-list/<book_id>', methods=['POST'])
 @login_required
 def add_book_in_list_tmp(username, book_id):
+    read_state = request.form.get('read_state')
     user = User.query.filter_by(username=username).first()
     catalogues = Cataloge.query.filter_by(user_id=user.id).all()
-    return render_template('personal/user_page_add_book.html', username=username, book_id=book_id, catalogues=catalogues)
+    return render_template('personal/user_page_add_book.html', username=username, book_id=book_id, catalogues=catalogues, read_state=read_state)
 
 
-@personal.route('/<username>/add-book-in-list/<list_id>/<book_id>', methods=['GET', 'POST'])
+@personal.route('/<username>/add-book-in-list/<list_id>/<book_id>/<read_state>', methods=['GET', 'POST'])
 @login_required
-def add_book_in_list(username, list_id, book_id):
+def add_book_in_list(username, list_id, book_id, read_state):
     cataloge = Cataloge.query.filter_by(id=list_id).first()
     book = Book.query.filter_by(id=book_id).first()
     flag = False
@@ -90,7 +91,7 @@ def add_book_in_list(username, list_id, book_id):
                 flag = True
                 
     if flag is False: 
-        item = Item(read_state='unknown', book=book, cataloge=cataloge)     
+        item = Item(read_state=str(read_state), book=book, cataloge=cataloge)     
         database.session.add(item)
         database.session.commit()
     return redirect(url_for('.person', username=username))
