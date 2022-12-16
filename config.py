@@ -26,9 +26,9 @@ class Config:
     MAIL_USE_TLS = False#True
     MAIL_USERNAME = 'leokazantsev19@gmail.com' #(os.environ.get('MAIL_USERNAME'))
     MAIL_PASSWORD = 'qctetuaboxunlvkv' #os.environ.get('MAIL_PASSWORD')
-    FLASKY_MAIL_SUBJECT_PREFIX = '[Magic Book Keeper]' 
-    FLASKY_MAIL_SENDER = 'MBK Admin <MBK@example.com>' #<flasky@example.com>
-    FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN') #will array from three elements
+    MBK_MAIL_SUBJECT_PREFIX = '[Magic Book Keeper]' 
+    MBK_MAIL_SENDER = 'MBK Admin <MBK@example.com>' #<flasky@example.com>
+    MBK_ADMIN = os.environ.get('MBK_ADMIN') #will array from three elements
     
     @staticmethod
     def init_app(app):
