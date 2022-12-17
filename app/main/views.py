@@ -63,18 +63,18 @@ def book_page(name):
     book = Book.query.filter_by(name=name).first()
     #form = CommentForm()
     #if form.validate_on_submit():
-    if request.method == 'POST':
+    if request.method == 'POST' and request.form.get('comment'):
         comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
         database.session.add(comment)
         database.session.commit()
         return redirect(url_for('.book_page', name=book.name, page=-1))
     
-    #page = request.args.get('page', 1, type=int)
-    #if page == -1:
-        #page = (book.comments.count() - 1) / 10 + 1
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = round((book.comments.count() - 1) / 10 + 1, 1)
     
-    #pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=10, error_out=False)
-    #comments = pagination.items
+    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=10, error_out=False)
+    comments = pagination.items
     
     if current_user.is_authenticated:
         book_grade_for_cur_user = BookGrade.query.filter_by(user=current_user._get_current_object(), book=book).first()
@@ -89,7 +89,7 @@ def book_page(name):
         grade_count += 1
     if grade_count:    
         fin_grade = round(fin_grade / grade_count, 1)
-    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, book_grade_for_cur_user=book_grade_for_cur_user)#, comments=comments, pagination=pagination)
+    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, book_grade_for_cur_user=book_grade_for_cur_user, comments=comments, pagination=pagination)
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 
@@ -100,4 +100,13 @@ def give_grade(username, book_id, grade):
     database.session.add(grade)
     database.session.commit()
     return redirect(url_for('main.book_page', name=book.name))
-    
+
+
+@main.route('/<username>/delete-comment/<comment_id>')  
+@login_required
+def comment_delete(username, comment_id):
+    comment = Comment.query.filter_by(id=comment_id).first()
+    book = comment.book
+    database.session.delete(comment)
+    database.session.commit()
+    return redirect(url_for('main.book_page', name=book.name, page=request.args.get('page', type=int))) 

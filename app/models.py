@@ -22,7 +22,7 @@ class User(UserMixin, database.Model):
     books = database.relationship('Book', backref='user')
     grades = database.relationship('BookGrade', backref='user')
     comments = database.relationship('Comment', backref='user')
-    catalogues = database.relationship('Cataloge', backref='user')#, uselist=False)
+    catalogues = database.relationship('Cataloge', backref='user', lazy='dynamic')#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
     is_admin = database.Column(database.Boolean, default=False)
     
@@ -76,7 +76,7 @@ class Book(database.Model):
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     catalogue_items = database.relationship('Item', backref='book')
     grades = database.relationship('BookGrade', backref='book')
-    comments = database.relationship('Comment', backref='book', lazy='dynamic')
+    comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade = "all, delete, delete-orphan")
     
 
 class BookGrade(database.Model):

@@ -18,8 +18,13 @@ def avatar(username):
 @login_required
 def person(username):
     user = User.query.filter_by(username=username).first()
-    catalogues = Cataloge.query.filter_by(user_id=user.id).all()
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues)
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = round((user.catalogues.count() - 1) / 2 + 1, 1)
+        
+    pagination = user.catalogues.order_by().paginate(page, per_page=2, error_out=False)
+    catalogues = pagination.items
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len)
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -47,7 +52,7 @@ def add_list(username):
         cataloge = Cataloge(name=str(form.list_name.data).strip().lower(), user=current_user._get_current_object())
         database.session.add(cataloge)
         database.session.commit()
-        return redirect(url_for('.person', username=username))
+        return redirect(url_for('.person', username=username, page=request.args.get('page')))
     return render_template('personal/add_list.html', form=form)
 
 
@@ -96,3 +101,10 @@ def add_book_in_list(username, list_id, book_id, read_state):
         database.session.commit()
     return redirect(url_for('.person', username=username))
 
+
+@personal.route('/<username>/delete-list/<list_id>')
+def list_delete(username, list_id):
+    cataloge = Cataloge.query.filter_by(id=list_id).first()
+    database.session.delete(cataloge)
+    database.session.commit()
+    return redirect(url_for('personal.person', username=username, page=request.args.get('page', type=int))) 

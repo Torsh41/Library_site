@@ -139,7 +139,7 @@
  
         <li class="list__book">
           <a href="{{url_for('main.book_page', name=search_result.name)}}" class="list__link">Книга: {{ search_result.name }}</a>
-          <h1>Автор: {{ search_result.author }}</h1>
+          <a href="#" class="list__link">Автор: {{ search_result.author }}</a>
           <!--<select class="list__select">
             
           </select>-->

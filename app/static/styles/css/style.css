@@ -9,6 +9,7 @@
 @import url(_profile.css);
 @import url(_lists.css);
 @import url(_book.css);
+@import url(_comments.css);
 
 html {
   box-sizing: border-box;
