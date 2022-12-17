@@ -103,6 +103,7 @@ def add_book_in_list(username, list_id, book_id, read_state):
 
 
 @personal.route('/<username>/delete-list/<list_id>')
+@login_required
 def list_delete(username, list_id):
     cataloge = Cataloge.query.filter_by(id=list_id).first()
     database.session.delete(cataloge)
