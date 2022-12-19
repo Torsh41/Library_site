@@ -88,23 +88,15 @@ def resend_confirmation():
     return redirect(url_for('main.index'))
     
 
-@auth.route('/password_change', methods=['GET', 'POST'])
-#@login_required
+@auth.route('/password-change', methods=['GET', 'POST'])
 def change_password():
-    #if current_user.is_anonymous:
-        #return redirect(url_for('main.index'))
     form = ChangePasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user:
-            current_user.password = form.password.data
-            database.session.add(current_user)
+            user.password = form.password.data
+            database.session.add(user)
             database.session.commit()
             flash('Your password has been updated.')
             return redirect(url_for('auth.login'))
-        else:
-            flash('You are not registred user, do it!')
-            return redirect(url_for('main.index'))
-        #else:
-            #flash('Invalid password.')
     return render_template('auth/change_password.html', form=form)

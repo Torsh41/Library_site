@@ -21,10 +21,15 @@ def validate_list_name(form, field):
         if value.user == current_user:
             raise ValidationError('У вас уже есть список с таким названием.')
         
-        
+
+def  validate_lists_count(form, field):
+    if len(current_user.catalogues.all()) > 5:
+        raise ValidationError('Различных списков может быть не больше 6.')
+    
+         
 class AddListForm(FlaskForm):
     list_name = StringField('ListName', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Название списка должно содержать только буквы и пробелы.'), validate_list_name])
+    'Название списка должно содержать только буквы и пробелы.'), validate_list_name, validate_lists_count])
     submit = SubmitField('Добавить')
             
             

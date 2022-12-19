@@ -83,6 +83,10 @@
               <input type="text" name="search_result" class="main__form-input" placeholder="Введите название книги или автора..">
             </label>
 
+            <div>
+            <span class="form__help">Для просмотра всех книг введите слово все</span>
+            </div>
+
             <div class="main__form-wrap">
               <select name="genre" id="" class="main__form-select">
                 <option value="">Жанр</option>
@@ -109,22 +113,24 @@
         </div>
       </div>
     </section>
+
+
 <!--Найденные книги -->
 {% if search_result and search_result != 404 %}
+<div> Всего результатов: {{ len(search_result) }} </div>
 <section class="list">
   <div class="container list__container">
     <div class="list__wrap">
       <h2 class="list__title title">Вот, что мы нашли</h2> 
       
-      {% if flag %}
       {% for book in search_result %}
       <ul class="list__books list-reset">
 
-        <!--Найденные книги по секциям-->
+        <!--Найденные книги-->
  
         <li class="list__book">
           <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-          <h1>Автор: {{ book.author }}</h1>
+          <a href="#" class="list__link">Автор: {{ book.author }}</a>
           
           <!--<select class="list__select">
             
@@ -132,20 +138,6 @@
         </li>
       </ul>
       {% endfor %}
-      {% else %}
-      <ul class="list__books list-reset">
-
-        <!--Найденная книга по названию-->
- 
-        <li class="list__book">
-          <a href="{{url_for('main.book_page', name=search_result.name)}}" class="list__link">Книга: {{ search_result.name }}</a>
-          <a href="#" class="list__link">Автор: {{ search_result.author }}</a>
-          <!--<select class="list__select">
-            
-          </select>-->
-        </li>
-      </ul>
-      {% endif %}
     </div>
   </div>
 </section>

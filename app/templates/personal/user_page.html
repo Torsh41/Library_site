@@ -197,16 +197,22 @@
                 <option value="">Заброшено</option>
                 <option value="">Прочитано</option>
               </select>-->
-              <a class="list__book-delete-btn" href="#">Удалить книгу из списка</a>
+              <a class="list__book-delete-btn" href="{{url_for('personal.item_delete', username=current_user.username, item_id=item.id, page=pagination.page)}}">Удалить книгу из списка</a>
             </li>
             {% endfor %}
           </ul>
             <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
               <line y1="0.5" x2="461" y2="0.5" stroke="black" />
             </svg>
-
+            {% if pagination %}
+            {% if len(pagination.items) < 2 %}
+            <a class="list__delete-btn" href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page - 1)}}">Удалить список</a>
+            {% else %}
             <a class="list__delete-btn" href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page)}}">Удалить список</a>
-
+            {% endif %}
+            {% else %}
+            <a class="list__delete-btn" href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=1)}}">Удалить список</a>
+            {% endif %}
             <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
               <line y1="0.5" x2="461" y2="0.5" stroke="black" />
             </svg>

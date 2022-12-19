@@ -36,7 +36,7 @@ class LoginForm(FlaskForm):
     
 
 class ChangePasswordForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Email('Неверный email адрес.')])
-    password = PasswordField('New password', validators=[DataRequired('Поля не должны быть пустыми.'), EqualTo('password2', message='Пароли должны совпадать.')])
+    email = StringField('Email', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Email('Неверный email адрес.'), validate_user])
+    password = PasswordField('New password', validators=[DataRequired('Поля не должны быть пустыми.'), EqualTo('password2', message='Пароли должны совпадать.'), Length(6, 20, message='Пароль должен быть от 6 до 20 символов включительно.')])
     password2 = PasswordField('Confirm new password', validators=[DataRequired('Поля не должны быть пустыми.')])
     submit = SubmitField('Update Password')

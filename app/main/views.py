@@ -21,15 +21,40 @@ def searching():
             date_list.append(book.release_date)
         
     if request.method == 'POST':
-        search_result = Book.query.filter_by(name=str(request.form.get('search_result')).strip().lower()).first()#, release_date=request.form.get('release_date')).first()
-        flag = False
-        if not search_result:
-            search_result = Book.query.filter_by(author=str(request.form.get('search_result')).strip().lower()).all()#, release_date=request.form.get('release_date')).all()
-            flag = True
+        result = str(request.form.get('search_result')).strip().lower()
+        if result == 'все':
+            search_result = books
+        else:
+            release_date = request.form.get('release_date')
+            if result and not release_date:
+                search_result = Book.query.filter_by(name=result).first()
+                search_result_ = Book.query.filter_by(author=result).all()
+                
+            elif result and release_date:
+                search_result = Book.query.filter_by(name=result, release_date=release_date).first()
+                search_result_ = Book.query.filter_by(author=result, release_date=release_date).all()
+                
+            elif not result and release_date:
+                search_result = Book.query.filter_by(release_date=release_date).first()
+                search_result_ = Book.query.filter_by(release_date=release_date).all()
+            
+            elif not result and not release_date:
+                search_result = None
+                search_result_ = []
+                
+            search_result_.append(search_result)
+            search_result_fin = [] 
+            [search_result_fin.append(value) for value in search_result_ if value not in search_result_fin]
+            fin_result = list()
+            for each in search_result_fin:
+                if each:
+                    fin_result.append(each)
+            search_result = fin_result
             if not search_result:
                 search_result = 404
-        return render_template('main/search.html', search_result=search_result, flag=flag, date_list=date_list)
-    return render_template('main/search.html', search_result=0, date_list=date_list)
+                
+        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len)
+    return render_template('main/search.html', search_result=0, date_list=date_list, len=len)
 
 
 @main.route('/book-page/<name>', methods=['GET', 'POST'])

@@ -19,9 +19,6 @@ def avatar(username):
 def person(username):
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
-    if page == -1:
-        page = round((user.catalogues.count() - 1) / 2 + 1, 1)
-        
     pagination = user.catalogues.order_by().paginate(page, per_page=2, error_out=False)
     catalogues = pagination.items
     return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len)
@@ -107,5 +104,14 @@ def add_book_in_list(username, list_id, book_id, read_state):
 def list_delete(username, list_id):
     cataloge = Cataloge.query.filter_by(id=list_id).first()
     database.session.delete(cataloge)
+    database.session.commit()
+    return redirect(url_for('personal.person', username=username, page=request.args.get('page', type=int))) 
+
+
+@personal.route('/<username>/delete-item/<item_id>')
+@login_required
+def item_delete(username, item_id):
+    item = Item.query.filter_by(id=item_id).first()
+    database.session.delete(item)
     database.session.commit()
     return redirect(url_for('personal.person', username=username, page=request.args.get('page', type=int))) 

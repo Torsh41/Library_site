@@ -92,7 +92,7 @@
            {% else %}
            {{form.username(class="form__input", placeholder='Введите логин')}}
            {% endif %}
-           <span class="form__help">Имена пользователей должны состоять только из букв, цифр, точек или знаков подчеркивания</span> 
+           <span class="form__help">Логин содержит только буквы, цифры, точки или символы подчеркивания.</span> 
           </label>
 
           <label  class="form__label">
@@ -107,7 +107,7 @@
            {% else %}
            {{form.password(class="form__input", placeholder='Введите пароль')}}
            {% endif %}
-           <span class="form__help">Пароль должен состоять из шести символов или более</span>
+           <span class="form__help">Пароль должен быть от 6 до 20 символов включительно.</span>
           </label>
 
           <label  class="form__label">

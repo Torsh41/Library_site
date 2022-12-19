@@ -74,9 +74,9 @@ class Book(database.Model):
     count_of_chapters = database.Column(database.Integer, unique=False)
     genre = database.Column(database.Text(), unique=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
-    catalogue_items = database.relationship('Item', backref='book')
-    grades = database.relationship('BookGrade', backref='book')
-    comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade = "all, delete, delete-orphan")
+    catalogue_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
+    grades = database.relationship('BookGrade', backref='book', cascade="all, delete, delete-orphan")
+    comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
 
 class BookGrade(database.Model):
@@ -91,7 +91,6 @@ class Comment(database.Model):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.Text)
- #body_html = database.Column(database.Text)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -104,7 +103,7 @@ class Cataloge(database.Model):
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(64), unique=False, index=True)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
-    items = database.relationship('Item', backref='cataloge', cascade = "all, delete, delete-orphan")
+    items = database.relationship('Item', backref='cataloge', cascade="all, delete, delete-orphan")
 
 
 class Item(database.Model):
