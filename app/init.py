@@ -1,4 +1,3 @@
-from flask_bootstrap import Bootstrap4
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -11,7 +10,6 @@ application = Flask(__name__, template_folder='templates')
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
-bootstrap = Bootstrap4()
 mail = Mail()
 moment = Moment()
 database = SQLAlchemy()
