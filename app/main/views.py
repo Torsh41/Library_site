@@ -88,7 +88,7 @@ def book_page(name):
         grade_count += 1
     if grade_count:    
         fin_grade = round(fin_grade / grade_count, 1)
-    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, book_grade_for_cur_user=book_grade_for_cur_user, comments=comments, pagination=pagination)
+    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, book_grade_for_cur_user=book_grade_for_cur_user, comments=comments, pagination=pagination, len=len)
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 

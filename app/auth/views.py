@@ -11,11 +11,10 @@ from app.email import send_email
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-    #if request.method == "POST":
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user)#, form.remember_me.data)
-            return redirect(url_for('main.index')) #request.args.get('next') or
+            return redirect(url_for('personal.person', username=current_user.username))
         
         flash('Wrong username or password.')    
     return render_template('auth/authorization.html', form=form)
@@ -33,7 +32,6 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit(): 
-    #if request.method == "POST": 
         user = User(username=form.username.data, email=form.email.data.lower(),
         password=form.password.data)
         user.default_ava()
