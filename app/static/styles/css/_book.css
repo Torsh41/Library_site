@@ -9,6 +9,10 @@
   background-color: white;
 }
 
+.book__title {
+  text-align: center;
+}
+
 .book__top {
   display: flex;
   flex-wrap: wrap;

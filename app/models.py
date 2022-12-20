@@ -54,7 +54,7 @@ class User(UserMixin, database.Model):
         return check_password_hash(self.password_hash, password)
     
     def check_admin(self):
-        if current_app.config['FLASKY_ADMIN'] == self.email:
+        if current_app.config['MBK_ADMIN'] == self.email:
             self.is_admin = True
             
     def default_ava(self):
