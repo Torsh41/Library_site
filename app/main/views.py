@@ -3,7 +3,6 @@ from app.init import database
 from app.models import User, BookGrade, Book, Comment
 from flask import render_template, request, redirect, url_for
 from app.main.sort import sorting
-#from app.main.forms import CommentForm
 from flask_login import current_user, login_required
 
 
@@ -60,8 +59,6 @@ def searching():
 @main.route('/book-page/<name>', methods=['GET', 'POST'])
 def book_page(name):
     book = Book.query.filter_by(name=name).first()
-    #form = CommentForm()
-    #if form.validate_on_submit():
     if request.method == 'POST' and request.form.get('comment'):
         comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
         database.session.add(comment)

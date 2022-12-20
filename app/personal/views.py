@@ -90,12 +90,17 @@ def add_book_in_list(username, list_id, book_id, read_state):
     if cataloge:
         for item_ in cataloge.items:
             if book.name == item_.book.name:
+                item_for_replace = item_
                 flag = True
+                break
                 
-    if flag is False: 
-        item = Item(read_state=str(read_state), book=book, cataloge=cataloge)     
-        database.session.add(item)
+    if flag: 
+        database.session.delete(item_for_replace)
         database.session.commit()
+       
+    item = Item(read_state=str(read_state), book=book, cataloge=cataloge)     
+    database.session.add(item)
+    database.session.commit()
     return redirect(url_for('.person', username=username))
 
 
