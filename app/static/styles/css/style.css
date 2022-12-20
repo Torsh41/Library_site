@@ -95,5 +95,14 @@ a {
   background-color: transparent;
 }
 
+.pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
 
-
+.pagination__item:not(:last-child) {
+  margin-right: 20px;
+}
