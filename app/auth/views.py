@@ -16,7 +16,7 @@ def login():
             login_user(user)#, form.remember_me.data)
             return redirect(url_for('personal.person', username=current_user.username))
         
-        flash('Wrong username or password.')    
+        #не правильное имя пользователя или пароль   
     return render_template('auth/authorization.html', form=form)
 
 
@@ -24,7 +24,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.')
+    #выход был осуществлен 
     return redirect(url_for('main.index'))
 
 
@@ -41,7 +41,7 @@ def register():
         token = user.generate_confirmation_token()
         send_email(user.email, 'Confirm Your Account',
         'auth/email/confirm', user=user, token=token)
-        flash('A confirmation email has been sent to you by email.')
+        #письмо с подтверждением было выслано на ваш аккаунт
         return redirect(url_for('auth.login'))
     return render_template('auth/registraton.html', form=form)
 
@@ -53,9 +53,8 @@ def confirm(token):
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
         database.session.commit()
-        flash('You have confirmed your account. Thanks!')
-    else:
-        flash('The confirmation link is invalid or has expired.')
+        #вы подтвердили аккаунт
+    #ссылка подтверждения не верна либо просрочена
     return redirect(url_for('main.index'))
 
 
@@ -82,7 +81,7 @@ def resend_confirmation():
     token = current_user.generate_confirmation_token()
     send_email(current_user.email, 'Confirm Your Account',
                'auth/email/confirm', user=current_user, token=token)
-    flash('A new confirmation email has been sent to you by email.')
+    #новое письмо с подтверждением было выслано на ваш аккаунт
     return redirect(url_for('main.index'))
     
 
@@ -95,6 +94,6 @@ def change_password():
             user.password = form.password.data
             database.session.add(user)
             database.session.commit()
-            flash('Your password has been updated.')
+            #ваш пароль обновлен
             return redirect(url_for('auth.login'))
     return render_template('auth/change_password.html', form=form)
