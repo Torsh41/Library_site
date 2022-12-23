@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaField, DateField
 from wtforms.validators import DataRequired, Length, Regexp, NumberRange
 from wtforms import ValidationError
-from ..models import Book, Cataloge, User
+from ..models import Book, Cataloge
 from flask_login import current_user
 
 

@@ -1,6 +1,6 @@
 from . import main
 from app.init import database
-from app.models import User, BookGrade, Book, Comment
+from app.models import BookGrade, Book, Comment
 from flask import render_template, request, redirect, url_for
 from app.main.sort import sorting
 from flask_login import current_user, login_required
