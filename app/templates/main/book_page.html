@@ -65,6 +65,7 @@
 
         <div class="main__bottom">
           <a class="main__bottom-item" href="#">Средняя оценка - {{ fin_grade }}</a>
+          <a class="main__bottom-item" href="#"> Всего оценок: {{ grade_count }} </a>
           <!--Пример: Средняя оценка - 4.5 из 5-->
         </div>
 
@@ -112,8 +113,8 @@
             <!--описание книги текстом-->
           </div>
 
-          <!--Если авторизированный пользователь еще не давал свою оценку-->
-          {% if current_user.is_authenticated and not book_grade_for_cur_user %}
+          <!--Если авторизированный пользователь -->
+          {% if current_user.is_authenticated %}
           <div class="book__footer">
             <h2 class="book__title title">Поставьте оценку</h2>
             <!--если пользователь уже оставлял свою оценку "Ваша оценка"-->
@@ -170,13 +171,9 @@
                 </a></li>
             </ul>
           </div>
-          {% elif not current_user.is_authenticated %}
+          {% else %}
           <div class="book__footer">
             <h2 class="book__title title">Ставить оценки могут только авторизованные пользователи.</h2>
-          </div>
-          {% elif current_user.is_authenticated and book_grade_for_cur_user%}
-          <div class="book__footer">
-            <h2 class="book__title title">Вы уже поставили этой книге оценку.</h2>
           </div>
           {% endif %}
         </div>

@@ -72,10 +72,10 @@ def book_page(name):
     pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=10, error_out=False)
     comments = pagination.items
     
-    if current_user.is_authenticated:
-        book_grade_for_cur_user = BookGrade.query.filter_by(user=current_user._get_current_object(), book=book).first()
-    else:
-        book_grade_for_cur_user = 0
+    #if current_user.is_authenticated:
+        #book_grade_for_cur_user = BookGrade.query.filter_by(user=current_user._get_current_object(), book=book).first()
+    #else:
+        #book_grade_for_cur_user = 0
     
     fin_grade = 0
     grade_count = 0
@@ -85,13 +85,18 @@ def book_page(name):
         grade_count += 1
     if grade_count:    
         fin_grade = round(fin_grade / grade_count, 1)
-    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, book_grade_for_cur_user=book_grade_for_cur_user, comments=comments, pagination=pagination, len=len)
+    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, grade_count=grade_count)   #book_grade_for_cur_user=book_grade_for_cur_user
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 
 @login_required
 def give_grade(username, book_id, grade):
     book = Book.query.filter_by(id=book_id).first()
+    previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
+    if previous_grade:
+        database.session.delete(previous_grade)
+        database.session.commit()
+            
     grade = BookGrade(grade=grade, user=current_user, book=book)
     database.session.add(grade)
     database.session.commit()
