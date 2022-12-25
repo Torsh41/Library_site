@@ -26,7 +26,7 @@ class User(UserMixin, database.Model):
     confirmed = database.Column(database.Boolean, default=False)
     is_admin = database.Column(database.Boolean, default=False)
     
-    def generate_confirmation_token(self, expiration=36000):
+    def generate_confirmation_token(self, expiration=1800): #30 минут
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'confirm': self.id})
     

@@ -59,7 +59,7 @@ def searching():
 @main.route('/book-page/<name>', methods=['GET', 'POST'])
 def book_page(name):
     book = Book.query.filter_by(name=name).first()
-    if request.method == 'POST' and request.form.get('comment'):
+    if request.method == 'POST' and request.form.get('comment') and current_user.is_authenticated:
         comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
         database.session.add(comment)
         database.session.commit()

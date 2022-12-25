@@ -7,7 +7,6 @@ from app.models import User, Cataloge, Book, Item
 
 
 @personal.route('/<username>/edit-profile/edit-avatar')
-@login_required
 def avatar(username):
     user = User.query.filter_by(username=username).first()
     avatar = make_response(user.avatar)
