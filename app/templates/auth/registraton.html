@@ -11,8 +11,8 @@
   <link rel="icon" href="img/favicon.svg">
 </head>
 
-<body>
-  <header class="header">
+<body class="image-1" >
+  <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
         <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
@@ -23,16 +23,16 @@
           <li class="nav__item"><a class="nav__link" href="#">Меню
               <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="black" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="black" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="black" />
+                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
+                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
+                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
               </svg>
 
             </a>
             <ul class="nav__sublist list-reset">
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li>
+              <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
             </ul>
           </li>
         </ul>
@@ -41,7 +41,7 @@
   </header>
 
   <main>
-    <section class="main">
+    <section class="main style-1">
       <div class="main__container container">
 
         <div class="main__top">
@@ -49,7 +49,7 @@
           <h1 class="main__title">Регистрация</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
           </svg>
 
         </div>
@@ -62,7 +62,7 @@
       </div>
     </section>
   
-    <section class="form">
+    <section class="form background-book_page">
       <div class="form__container container">
         <form class="form__wrap" action="" method="post">
           {{form.hidden_tag()}}

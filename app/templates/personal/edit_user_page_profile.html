@@ -11,8 +11,8 @@
   <link rel="icon" href="img/favicon.svg">
 </head>
 
-<body>
-  <header class="header">
+<body class="image-3">
+  <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
         <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
@@ -42,7 +42,7 @@
   </header>
 
   <main>
-    <section class="main">
+    <section class="main style-1">
       <div class="main__container container">
 
         <div class="main__top">
@@ -51,7 +51,7 @@
           <!--Hello, имя пользователя!-->
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
           </svg>
 
         </div>
@@ -65,39 +65,42 @@
       </div>
     </section>
 
-    <section class="profile">
-      <div class="profile__container container">
-        <form class="profile__form" enctype="multipart/form-data" method="post"> <!--Вопрос по поводу enctype(action?)-->
-          {{form.hidden_tag()}}
-          <span class="profile__span">Фото профиля</span>
-          <div class="profile__image">
-            <!--Тут добавленная фотка пользователем-->
-            <input type="file" name="avatar" multiple accept="image/*,image/jpeg">
-          </div>
-          {{form.city(class="profile__input", placeholder="Введите город..")}}
-          
-          <label class="profile__info">
-            <span class="profile__span">Пол:</span>
-            <select name="gender" id="" class="profile__select">
-              <option value="муж">муж</option>
-              <option value="жен">жен</option>
-            </select>
-          </label>
-
-          {{form.age(class="profile__input", placeholder="Введите возраст..")}}
-          {{form.description(class="profile__text", rows="5", placeholder="Расскажите о себе..")}}
-          {{form.submit(class="profile__edit-btn")}}
-        </form>
-       
-        <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <line y1="0.5" x2="461" y2="0.5" stroke="black" />
-        </svg>
-      
-        <a class="profile__exit" href="{{url_for('personal.person', username=current_user.username)}}">Отмена</a>
-       
-      </div>
-
-    </section>
+    <div class="background-book_page">
+      <section class="profile">
+        <div class="profile__container container">
+          <form class="profile__form" enctype="multipart/form-data" method="post"> <!--Вопрос по поводу enctype(action?)-->
+            {{form.hidden_tag()}}
+            <span class="profile__span">Фото профиля</span>
+            <div class="profile__image profile__image-edit">
+              <!--Тут добавленная фотка пользователем-->
+              <input class="profile__foto" type="file" name="avatar" multiple accept="image/*,image/jpeg">
+            </div>
+            {{form.city(class="profile__input", placeholder="Введите город..")}}
+            
+            <label class="profile__info">
+              <span class="profile__span">Пол:</span>
+              <select name="gender" id="" class="profile__select">
+                <option value="муж">муж</option>
+                <option value="жен">жен</option>
+              </select>
+            </label>
+  
+            {{form.age(class="profile__input", placeholder="Введите возраст..")}}
+            {{form.description(class="profile__text", rows="5", placeholder="Расскажите о себе..")}}
+            {{form.submit(class="profile__edit-btn")}}
+          </form>
+         
+          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+          </svg>
+        
+          <a class="profile__exit" href="{{url_for('personal.person', username=current_user.username)}}">Отмена</a>
+         
+        </div>
+  
+      </section>
+    </div>
+    
 
 
   </main>

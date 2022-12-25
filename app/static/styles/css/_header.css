@@ -20,12 +20,35 @@
   margin-right: 0;
 }
 
+.nav__item {
+  color: #E9E6C3;;
+}
+
+.nav__subitem {
+  color: #2E3033;
+}
+
 .nav__link {
   display: block;
   padding: 10px 15px;
   text-decoration: none;
   outline: none;
   transition: .5s linear;
+}
+
+.nav__link:hover {
+  background-color: #FFC464;
+}
+
+.nav__link:focus {
+  background-color: #B98E4B;
+
+  outline: none;
+}
+
+.nav__link:active {
+  background-color: #E5C085;
+
 }
 
 .nav__fa {
@@ -54,7 +77,7 @@
 .header__nav .nav__sublist {
   visibility: hidden;
   opacity: 0;
-  background: #BAD78B;
+  background: #E9E6C3;
 }
 
 .header__nav .nav__list .nav__item:hover .nav__sublist {
