@@ -1,12 +1,14 @@
 .footer {
   padding-top: 50px;
   padding-bottom: 25px;
+  background-color: #E9E6C3;
 }
 
 .footer__container {
-  border-radius: 15px;
+  /* border-radius: 15px;
   padding: 52px 100px;
-  background-color: white;
+  background-color: white; */
+
 }
 
 .footer__wrap {
@@ -14,6 +16,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: #2E3033;
 
+}
 
+.footer-down {
+  margin-top: 20px;
 }

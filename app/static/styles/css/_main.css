@@ -32,27 +32,45 @@
 .main__bottom-item {
   display: inline-block;
   font-size: 18px;
-
 }
 
 .main__bottom-item:not(:last-child) {
   margin-right: 40px;
 }
 
+.main__bottom-item:hover {
+  font-weight: 600;
+
+}
+
+.main__bottom-item:focus {
+  text-decoration-line: underline;
+  text-decoration-color : #E5C085;
+  color: #E5C085;
+}
+
+.main__bottom-item:active {
+  text-decoration-line: underline;
+  color: #F5F5DC;
+  text-decoration-color : #F5F5DC;
+}
+
 .main__title {
   margin-top: 0;
   text-align: center;
   margin-bottom: 21px;
-  max-width: 800px;
+  max-width: 900px;
   font-size: 48px;
   line-height: 48px;
   font-weight: var(--regular);
-
+  font-family: 'Montaga';
+  text-transform: uppercase;
 }
 
 .main__span {
   margin-bottom: 30px;
   font-size: 36px;
+  font-family: 'Montaga';
 }
 
 .main__bottom-item {
@@ -80,7 +98,21 @@
   width: 500px;
   border: none;
   background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s linear;
+}
 
+.main__form-label:hover {
+  background-color: #E9E6C3;
+}
+
+.main__form-input:focus {
+  border: none;
+  outline: none;
+}
+
+.main__form-label:active {
+  background-color: #E9E6C3;
 }
 
 .main__form-label {
@@ -91,6 +123,7 @@
   border-radius: 20px;
   background-color: var(--white);
   cursor: pointer;
+  background-color: #F5F5DC;
 }
 
 .main__form-icon {
@@ -102,14 +135,49 @@
   border: none;
   border-radius: 20px;
   cursor: pointer;
+  background-color: #F5F5DC;
 }
 
 .main__form-select:not(:last-child) {
   margin-right: 20px;
 }
 
+.main__form-select:hover {
+  background-color: #E9E6C3;
+}
+
+.main__form-select:focus {
+  outline: none;
+}
+
+.main__form-select:active {
+  background-color: #E9E6C3;
+}
+
 .main__form-btn {
+  width: 210px;
   margin-top: 30px;
+  background-color: #FCDCA9;
+  border: 2px solid #2E3033;
+  text-align: center;
+}
+
+.main__form-btn:hover {
+  background-color: #FFC464;
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+}
+
+.main__form-btn:focus {
+  background-color: #FFC464;
+  border: 2px solid #B98E4B;
+  outline: none;
+}
+
+.main__form-btn:active {
+  background-color: #E5C085;
+  border: 2px solid #2E3033;
+  text-decoration-line: none;
 }
 
 /*Unconfrimed.html*/
@@ -125,7 +193,29 @@
 }
 
 .main__btn {
+  width: 300px;
   margin-top: 70px;
-  border: 1px solid var(--black);
-  background-color: #EFF6F2;
+  color: #2E3033;
+  background-color: #FCDCA9;
+  border: 2px solid #2E3033;
+  text-align: center;
+}
+
+
+.main__btn:hover {
+  background-color: #FFC464;
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+}
+
+.main__btn:focus {
+  background-color: #FFC464;
+  border: 2px solid #B98E4B;
+  outline: none;
+}
+
+.main__btn:active {
+  background-color: #E5C085;
+  border: 2px solid #2E3033;
+  text-decoration-line: none;
 }

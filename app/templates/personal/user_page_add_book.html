@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Личный кабинет</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}"/>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
 </head>
 
-<body>
-  <header class="header">
+<body class="image-2">
+  <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
         <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
@@ -23,16 +23,16 @@
           <li class="nav__item"><a class="nav__link" href="#">Меню
               <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="black" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="black" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="black" />
+                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
+                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
+                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
               </svg>
 
             </a>
             <ul class="nav__sublist list-reset">
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li>
+              <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
             </ul>
           </li>
@@ -42,7 +42,7 @@
   </header>
 
   <main>
-    <section class="main">
+    <section class="main style-1">
       <div class="main__container container">
 
         <div class="main__top">
@@ -51,7 +51,7 @@
           <!--Hello, имя пользователя!-->
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
           </svg>
 
         </div>
@@ -62,26 +62,31 @@
       </div>
     </section>
 
-    <!--место для списков-->
-    {% if not catalogues %}
-    <section class="list">
-      <div class="container list__container">
-        <div class="list__wrap">
-         У вас пока нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.
+    <div class="background-book_page">
+      <!--место для списков-->
+      {% if not catalogues %}
+      <section class="list__list">
+        <div class="container lists__catalog">
+          <div class="list__wrap">
+            У вас пока нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.
+          </div>
         </div>
-      </div>
-    </section>
-    {% else %}
-    {% for cataloge_value in catalogues %}
-    <section class="list">
-      <div class="container list__container">
-        <div class="list__wrap">         
-          <a class="title list__name" href="{{url_for('personal.add_book_in_list', username=current_user.username, list_id=cataloge_value.id, book_id=book_id, read_state=read_state)}}">{{ cataloge_value.name }}</a>  
+      </section>
+      {% else %}
+      {% for cataloge_value in catalogues %}
+      <section class="list__list">
+        <div class="container lists__catalog">
+          <div class="list__wrap ">
+            <a class="title list__name"
+              href="{{url_for('personal.add_book_in_list', username=current_user.username, list_id=cataloge_value.id, book_id=book_id, read_state=read_state)}}">{{
+              cataloge_value.name }}</a>
+          </div>
         </div>
-      </div>
-    </section>
-    {% endfor %}
-    {% endif %}
+      </section>
+      {% endfor %}
+      {% endif %}
+    </div>
+
   </main>
 
   <footer class="footer">
@@ -91,4 +96,5 @@
   </footer>
 
 </body>
+
 </html>

@@ -1,12 +1,12 @@
 .list {
   padding-top: 50px;
-  padding-bottom: 25px;
+  padding-bottom: 50px;
 }
 
 .list__container {
   padding: 52px 100px;
   border-radius: 15px;
-  background-color: white;
+  background-color: #F5F5DC;
 }
 
 .lists__create {
@@ -17,8 +17,27 @@
   width: 400px;
   height: 129px;
   padding: 50px 50px;
-  background-color: white;
+  background-color: #F5F5DC;
   border-radius: 20px;
+  transition: background-color 0.2s linear;
+  cursor: pointer;
+}
+
+.lists__create:hover {
+  background-color: #E9E6C3;
+
+}
+
+.lists__create:focus {
+  background-color: #FFC464;
+  border: 2px solid #B98E4B;
+  outline: none;
+}
+
+.lists__create:active {
+  background-color: #E5C085;
+  border: 2px solid #2E3033;
+  text-decoration-line: none;
 }
 
 .lists__btn {
@@ -27,7 +46,7 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  font-size: 22px;
+  font-size: 20px;
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -48,21 +67,56 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  position: relative;
   width: 322px;
   height: 322px;
   margin-bottom: 48px;
-  background-color: #EFF6F2;
+  background-color: #E9E6C3;
+
+  /* background-image: url(../img/book.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; */
+}
+
+.list__add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
 }
 
 .list__book:not(:nth-child(3n)){
   margin-right: 48px;
 }
 
+.list__book-set {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.list__book-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 322px;
+  min-height: 40px;
+  padding: 30px;
+  background: rgba(243, 226, 187, 0.5);
+
+
+}
+
 .list__title {
   display: flex;
   justify-content: center;
   margin-bottom: 40px;
+  font-weight: 400;
 }
 
 .list__name {
@@ -71,6 +125,7 @@
   font-size: 24px;
   font-weight: bold;
 }
+
 .list__results {
   display: flex;
   justify-content: center;
@@ -114,4 +169,77 @@
 
 .list__pagination {
   margin-bottom: 20px;
+}
+
+.list__list {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+
+.lists__catalog {
+  padding: 52px 100px;
+  width: 500px;
+  border-radius: 15px;
+  background-color: #E9E6C3;
+  cursor: pointer;
+}
+
+.lists__catalog:hover {
+  background-color: #FFC464;
+}
+
+.lists__catalog:focus {
+  background-color: #FFC464;
+  border: 2px solid #B98E4B;
+  outline: none;
+}
+
+.lists__catalog:active {
+  background-color: #E5C085;
+  border: 2px solid #2E3033;
+  text-decoration-line: none;
+}
+
+
+.list__book-delete-btn:hover {
+  font-weight: 600;
+}
+
+.list__book-delete-btn:focus {
+  font-weight: 600;
+
+}
+
+.list__book-delete-btn:active {
+  font-weight: 600;
+}
+
+
+.list__delete-btn:hover {
+  font-weight: 600;
+}
+
+.list__delete-btn:focus {
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+}
+
+.list__delete-btn:active {
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+}
+
+.list__link-book:hover {
+  font-weight: 600;
+}
+
+.list__link-book:focus {
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+}
+
+.list__link-book:active {
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
 }

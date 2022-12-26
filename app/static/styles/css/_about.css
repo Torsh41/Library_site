@@ -1,12 +1,12 @@
 .about {
-  padding-top: 25px;
+  padding-top: 0;
   padding-bottom: 25px;
 }
 
 .about__container {
   padding: 52px 100px;
   border-radius: 15px;
-  background-color: white;
+  background-color: #E9E6C3;
 }
 
 .about__wrap {
