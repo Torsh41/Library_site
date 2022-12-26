@@ -1,6 +1,6 @@
 .form {
   padding-top: 25px;
-  padding-bottom: 25px;
+  padding-bottom: 50px;
 }
 
 .form__container {
@@ -10,7 +10,7 @@
   justify-content: center;
   padding: 50px 50px;
   border-radius: 15px;
-  background-color: white;
+  background-color: #F5F5DC;
 }
 
 .form__wrap {
@@ -44,10 +44,48 @@
   padding: 18px 18px;
   width: 519px;
   border-radius: 20px;
+  border: none;
+  background-color: #E9E6C3;
+  resize: none;
+  cursor: pointer;
+}
+
+.form__input:hover {
+  background-color: #FFC464;
+}
+
+.form__input:focus {
+  border: none;
+  outline: none;
+}
+
+.form__input:active {
+  background-color: #E5C085;
 }
 
 .form__btn {
+  width: 300px;
   margin-top: 38px;
+  background-color: #FCDCA9;
+  border: none;
+}
+
+.form__btn:hover {
+  background-color: #FFC464;
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+}
+
+.form__btn:focus {
+  background-color: #FFC464;
+  border: 2px solid #B98E4B;
+  outline: none;
+}
+
+.form__btn:active {
+  background-color: #E5C085;
+  border: 2px solid #2E3033;
+  text-decoration-line: none;
 }
 
 .form__genre-wrap {
@@ -65,4 +103,33 @@
 .form__exit-btn {
   margin-top: 50px;
   border-bottom: 1px solid var(--black);
+}
+
+.form__forget:hover {
+  font-weight: 600;
+}
+
+.form__forget:focus {
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+
+}
+
+.form__forget:active {
+  text-decoration-line: underline;
+  text-decoration-color: #2E3033;
+}
+
+
+.form__exit-btn:hover {
+  font-weight: 600;
+}
+
+.form__exit-btn:focus {
+  font-weight: 600;
+
+}
+
+.form__exit-btn:active {
+  font-weight: 600;
 }

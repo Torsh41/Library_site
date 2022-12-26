@@ -1,12 +1,12 @@
 .book {
-  padding-top: 25px;
+  padding-top: 0;
   padding-bottom: 50px;
 }
 
 .book__container {
   padding: 52px 100px;
   border-radius: 15px;
-  background-color: white;
+  background-color: #F5F5DC;
 }
 
 .book__title {
@@ -26,35 +26,69 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  position: relative;
   width: 322px;
   height: 322px;
-  background-color: #EFF6F2;
-
+  background-color: #E9E6C3;
 }
 
+.book__image-set {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book__set {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 322px;
+  min-height: 40px;
+  padding: 30px;
+  background: rgba(243, 226, 187, 0.5);
+}
+
+
 .book__info {
+  display: flex;
+  align-items: center;
+  justify-content: left;
   padding: 50px;
   width: calc(800 / 1270 * 100%);
   height: 322px;
-  background-color: #EFF6F2;
+  margin-top: 0;
+  background-color: #E9E6C3;
   border-radius: 20px;
+}
+
+.book__list {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: flex-start;
 }
 
 .book__bottom {
   padding: 50px;
   width: 100%;
   height: 322px;
-  background-color: #EFF6F2;
+  background-color: #E9E6C3;
   border-radius: 20px;
 }
 
 .book__text {
   margin-top: 0;
+  font-weight: 700;
 }
 
 .book__select {
-  margin-top: 280px;
+  background-color: transparent;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .book__footer {
@@ -81,6 +115,7 @@
   color: #E9E9E9;
   transition: color 0.2s linear;
 }
+
 .book__star {
   fill: #E9E9E9;
   transition: fill 0.2s linear;
@@ -100,4 +135,33 @@
 
 .book__star::active {
   fill: gold;
+}
+
+.book__state {
+  color: var(--white);
+  cursor: pointer;
+}
+
+.book__done {
+  background-color: #5E8368;
+}
+
+.book__read {
+  background-color: #9E6262;
+}
+
+.book__fuck {
+  background-color: #B6B0AB;
+}
+
+.book__plan {
+  background-color: #CCD78B;
+}
+
+.book__error {
+  font-size: 16px;
+  font-weight: 300;
+  border-top:  1px solid var(--black);
+  border-bottom: 1px solid var(--black);
+  text-align: center;
 }

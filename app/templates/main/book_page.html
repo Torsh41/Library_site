@@ -12,8 +12,8 @@
   <link rel="icon" href="img/favicon.svg">
 </head>
 
-<body>
-  <header class="header">
+<body class="image-3">
+  <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
         <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
@@ -24,9 +24,9 @@
           <li class="nav__item"><a class="nav__link" href="#">Меню
               <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="black" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="black" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="black" />
+                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
+                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
+                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
               </svg>
 
             </a>
@@ -37,13 +37,14 @@
               {% endif %}
               {% if current_user.is_authenticated %}
               <li class="nav__subitem"><a class="nav__link"
+                 
                   href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
               {% else %}
               <li class="nav__subitem"><a class="nav__link"
                 href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li>
+              <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
             </ul>
           </li>
         </ul>
@@ -52,14 +53,14 @@
   </header>
 
   <main>
-    <section class="main">
+    <section class="main style-1">
       <div class="main__container container">
 
         <div class="main__top">
           <h1 class="main__title">{{book.name}}</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
           </svg>
         </div>
 
@@ -71,41 +72,52 @@
 
       </div>
     </section>
-
-    <form action="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id)}}"
+    
+    <div class="background-book_page">
+      <form action="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id)}}"
       method="post">
       <section class="book">
         <div class="book__container container">
           <div class="book__top">
             <div class="book__image">
-              <!--Тут фотка книги-->
 
-              <!--Выборка доступна только авторизированным пользователям-->
-              {% if current_user.is_authenticated %}
-              <select name="read_state" class="book__select">
-                <option value="Планирую">Планирую</option>
-                <option value="Читаю">Читаю</option>
-                <option value="Заброшено">Заброшено</option>
-                <option value="Прочитано">Прочитано</option>
-              </select>
-              {% else %}
-              <div class="book__footer">
-                <h2 class="book__title title">Выбор состояния чтения книги доступен только авторизованным пользователям.
-                </h2>
+              <!--Тут вместо аваатара обложка книги-->
+              <img class="book__image-set" src="{{url_for('personal.avatar', username=current_user.username)}}">
+
+              <div class="book__set">
+                <!--Выборка доступна только авторизированным пользователям-->
+                {% if current_user.is_authenticated %}
+                <select name="read_state" class="book__select">
+                  <option class="book__state book__plan" value="Планирую">Планирую</option>
+                  <option class="book__state book__read" value="Читаю">Читаю</option>
+                  <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                  <option class="book__state book__done" value="Прочитано">Прочитано</option>
+                </select>
+                {% else %}
+                
+                  <h2 class="book__error">Выбор состояния чтения книги доступен только авторизованным пользователям.</h2>
+                
+                {% endif %}
               </div>
-              {% endif %}
+
             </div>
+
+            
 
             <div class="book__info">
-              <!--характеристики книги текстом-->
-              <br>ISBN: {{ book.isbn }}
-              <br>автор: {{ book.author }}
-              <br>издательство: {{ book.publishing_house }}
-              <br>дата выпуска: {{ book.release_date}}
-              <br>количество глав: {{ book.count_of_chapters }}
-              <br>жанр: {{ str(book.genre) }}
+              <ul class="book__list list-reset">
+                <!--характеристики книги текстом-->
+                <li class="book__list-element"><b>ISBN:</b> {{ book.isbn }}</li>
+                <li class="book__list-element"><b>Автор:</b> {{ book.author }}</li>
+                <li class="book__list-element"><b>Издательство:</b> {{ book.publishing_house }}</li>
+                <li class="book__list-element"><b>Дата выпуска:</b> {{ book.release_date}}</li>
+                <li class="book__list-element"><b>Количество глав:</b> {{ book.count_of_chapters }}</li>
+                <li class="book__list-element"><b>Жанр:</b> {{ str(book.genre) }}</li>
+              </ul>
             </div>
           </div>
+
+          
 
           <div class="book__bottom">
             <p class="book__text">Описание</p>
@@ -149,8 +161,8 @@
                   </svg>
 
                 </a></li>
-              <li class="book__mark"><a
-                  href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=4)}}"
+              <li class="book__mark">
+                <a href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=4)}}"
                   class="book__link">
                   <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -158,7 +170,8 @@
                       d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
                   </svg>
 
-                </a></li>
+                </a>
+              </li>
               <li class="book__mark"><a
                   href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=5)}}"
                   class="book__link">
@@ -211,7 +224,7 @@
 
           <label class="comments__label">
             <span class="comments__span">Ваш комментарий</span>
-            <textarea type="text" name="comment" class="comments__textarea" rows="5"
+            <textarea type="text" name="comment" class="comments__textarea" rows="7"
               placeholder="Введите свой комментарий.."></textarea>
           </label>
 
@@ -219,7 +232,7 @@
         </form>
         {% else %}
         <div class="book__footer">
-          <h2 class="book__title title">Оставлять комментарии могут только авторизованные пользователи.</h2>
+          <h2 class="book__error">Оставлять комментарии могут только авторизованные пользователи.</h2>
         </div>
         {% endif %}
 
@@ -245,18 +258,18 @@
               {% if comment.user.username == current_user.username %}
               <a class="comments__command" href="#">Редактировать</a>
               {% if pagination %}
-              {% if len(pagination.items) < 2 %}
-              <a class="comments__command"
-                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}">Удалить</a>
-              {% else %}
-              <a class="comments__command"
-                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page)}}">Удалить</a>
-              {% endif %} 
-              {% else %}
-              <a class="comments__command"
-                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}">Удалить</a>
-              {% endif %}
-              {% endif %}
+              {% if len(pagination.items) < 2 %} <a class="comments__command"
+                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}">
+                Удалить</a>
+                {% else %}
+                <a class="comments__command"
+                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page)}}">Удалить</a>
+                {% endif %}
+                {% else %}
+                <a class="comments__command"
+                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}">Удалить</a>
+                {% endif %}
+                {% endif %}
 
             </div>
           </li>
@@ -270,6 +283,8 @@
 
       </div>
     </section>
+    </div>
+    
   </main>
 
   <footer class="footer">
