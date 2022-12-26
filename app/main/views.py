@@ -1,9 +1,16 @@
 from . import main
 from app.init import database
 from app.models import BookGrade, Book, Comment
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, make_response
 from app.main.sort import sorting
 from flask_login import current_user, login_required
+
+
+@main.route('/<name>/get-cover')
+def cover(name):
+    book = Book.query.filter_by(name=name).first()
+    cover = make_response(book.cover)
+    return cover
 
 
 @main.route('/')
@@ -23,6 +30,8 @@ def searching():
         result = str(request.form.get('search_result')).strip().lower()
         if result == 'все':
             search_result = books
+            if not search_result:
+                search_result = 404
         else:
             release_date = request.form.get('release_date')
             if result and not release_date:

@@ -136,7 +136,7 @@
 
               <li class="list__book">
                 <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
-                  <img class="list__book-set" src="{{url_for('personal.avatar', username=current_user.username)}}" alt="">
+                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
                 </a>
                 
 

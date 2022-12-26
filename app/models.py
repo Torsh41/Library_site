@@ -65,6 +65,7 @@ class User(UserMixin, database.Model):
 class Book(database.Model):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
+    cover = database.Column(database.LargeBinary, default=False)
     isbn = database.Column(database.String(64), unique=False)
     name = database.Column(database.String(64), unique=True, index=True)
     author = database.Column(database.String(64), unique=False)
@@ -77,6 +78,10 @@ class Book(database.Model):
     catalogue_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
     grades = database.relationship('BookGrade', backref='book', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
+    
+    def default_cover(self):
+        with application.open_resource(application.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
+            self.cover = f.read()
     
 
 class BookGrade(database.Model):

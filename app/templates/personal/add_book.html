@@ -70,8 +70,13 @@
 
     <section class="form background-book_page">
       <div class="form__container container">
-        <form class="form__wrap" action="" method="post">
+        <form class="form__wrap" enctype="multipart/form-data" method="post">
           {{form.hidden_tag()}}
+            <span class="form__span">Обложка книги</span>
+            <div class="profile__image profile__image-edit">
+              <!--Тут получаем обложку для книги-->
+              <input class="profile__foto" type="file" name="cover" multiple accept="image/*,image/jpeg">
+            </div>
           <label class="form__label">
             <span class="form__span">ISBN</span>
             {% if form.isbn.errors %}

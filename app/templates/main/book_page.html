@@ -84,8 +84,8 @@
           <div class="book__top">
             <div class="book__image">
 
-              <!--Тут вместо аваатара обложка книги-->
-              <img class="book__image-set" src="{{url_for('personal.avatar', username=current_user.username)}}">
+              <!--Тут обложка книги-->
+              <img class="book__image-set" src="{{url_for('main.cover', name=book.name)}}">
 
               <div class="book__set">
                 <!--Выборка доступна только авторизированным пользователям-->

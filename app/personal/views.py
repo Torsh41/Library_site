@@ -62,9 +62,13 @@ def add_new_book(username):
         for value in genre:
             genre_ += str(value) + ' '
             
-        book = Book(isbn=form.isbn.data, name=str(form.name.data).strip().lower(), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
+        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower(), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
                     description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data, \
                     genre=genre_, user=current_user._get_current_object())
+        
+        if not book.cover:
+            book.default_cover()
+            
         database.session.add(book)
         database.session.commit()
         return redirect(url_for('.person', username=username))
