@@ -80,12 +80,7 @@ def book_page(name):
     
     pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=10, error_out=False)
     comments = pagination.items
-    
-    #if current_user.is_authenticated:
-        #book_grade_for_cur_user = BookGrade.query.filter_by(user=current_user._get_current_object(), book=book).first()
-    #else:
-        #book_grade_for_cur_user = 0
-    
+      
     fin_grade = 0
     grade_count = 0
     grades = BookGrade.query.filter_by(book=book).all()    
