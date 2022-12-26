@@ -127,6 +127,7 @@ a {
 }
 
 .image-1 {
+  /* position: relative; */
   background-image: url(../img/fon_image-1.jpg);
   background-repeat: no-repeat;
   background-position: top center;

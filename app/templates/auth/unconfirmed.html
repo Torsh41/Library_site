@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -9,14 +8,18 @@
     <title>Завершите регистрацию</title>
     <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}">
-    <link rel="icon" href="img/favicon.svg">
+    <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <header class="header">
         <div class="header__container container">
             <a class="header__logo" href="{{url_for('main.index')}}">
-                <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+                <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+                    alt="Логотип MAGIC BOOK KEEPER">
             </a>
         </div>
     </header>
