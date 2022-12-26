@@ -18,7 +18,8 @@
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
-        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
+        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+          alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
       <nav class="nav header__nav">
@@ -83,12 +84,20 @@
             <h2 class="about__title title">О нас</h2>
 
             <p class="about__text">
-              Hello
+              MBK - это удобный поисковик, в котором переплетаются такие возможности, как добаление разнообразных книг в
+              общую библиотеку, так и поиск уже существующих.
+              На нашем сайте Вы можете вести собственную библиотеку в своём профиле.
+              <br>MBK позволит Вам не только прочитать всю доступную информацию о книге, но и ознакомиться с отзывами к ней
+              от других читателей, а также оставить свой.
+              Если Вы обнаружите ошибку в работе сайта, или недостоверную информацию по книге, или у Вас будут
+              предложения по улучшению данного проекта, то свяжитесь с нами в следующих соцсетях: 
             </p>
 
-            <div class="about__icons">
-
-            </div>
+            <ul class="about__icons list-reset">
+               <li class="about__icon"><a href="https://vk.com/public217965443" class="about__icon-link" target="_blank"><img src="{{url_for('static', filename='styles/img/vk.svg')}}" alt="VK" class="about__icon-photo"></a></li>
+               <li class="about__icon"><a href="t.me/headhuntersweb (https://t.me/headhuntersweb)" class="about__icon-link" target="_blank"><img src="{{url_for('static', filename='styles/img/telegram.svg')}}" alt="Telegram" class="about__icon-photo"></a></li>
+               <li class="about__icon"><a href="https://github.com/SimpleMaking/Library_site" class="about__icon-link" target="_blank"><img src="{{url_for('static', filename='styles/img/github.svg')}}" alt="Github" class="about__icon-photo"></a></li>
+            </ul>
 
           </div>
 
