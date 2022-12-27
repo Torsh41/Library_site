@@ -114,10 +114,7 @@ class Cataloge(database.Model):
 class Item(database.Model):
     __tablename__ = "items"
     id = database.Column(database.Integer, primary_key=True)
-    read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено 
-    #read_in_process = database.Column(database.String(64), unique=False, default=None) #читаю
-    #planning = database.Column(database.String(64), unique=False, default=None) #планирую
-    #abandoned = database.Column(database.String(64), unique=False, default=None) #заброшено 
+    read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено  
     cataloge_id = database.Column(database.Integer, database.ForeignKey('catalogues.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
     

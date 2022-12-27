@@ -7,7 +7,7 @@ from app.models import User, Cataloge, Book, Item
 
 
 @personal.route('/<username>/edit-profile/edit-avatar')
-def avatar(username):
+async def avatar(username):
     user = User.query.filter_by(username=username).first()
     avatar = make_response(user.avatar)
     return avatar
@@ -15,7 +15,7 @@ def avatar(username):
     
 @personal.route('/<username>')
 @login_required
-def person(username):
+async def person(username):
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
     pagination = user.catalogues.order_by().paginate(page, per_page=2, error_out=False)
@@ -25,7 +25,7 @@ def person(username):
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
 @login_required
-def edit(username):
+async def edit(username):
     form = EditProfileForm()
     if form.validate_on_submit():  
         if request.files['avatar']:
@@ -42,7 +42,7 @@ def edit(username):
 
 @personal.route('/<username>/add-list', methods=['GET', 'POST'])
 @login_required
-def add_list(username):
+async def add_list(username):
     form = AddListForm()
     if form.validate_on_submit():
         cataloge = Cataloge(name=str(form.list_name.data).strip().lower(), user=current_user._get_current_object())
@@ -54,7 +54,7 @@ def add_list(username):
 
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
-def add_new_book(username):
+async def add_new_book(username):
     form = AddNewBookForm()
     if form.validate_on_submit():
         genre = request.form.getlist('genres')
@@ -77,7 +77,7 @@ def add_new_book(username):
 
 @personal.route('/<username>/add-book-in-list/<book_id>', methods=['POST'])
 @login_required
-def add_book_in_list_tmp(username, book_id):
+async def add_book_in_list_tmp(username, book_id):
     read_state = request.form.get('read_state')
     user = User.query.filter_by(username=username).first()
     catalogues = Cataloge.query.filter_by(user_id=user.id).all()
@@ -86,7 +86,7 @@ def add_book_in_list_tmp(username, book_id):
 
 @personal.route('/<username>/add-book-in-list/<list_id>/<book_id>/<read_state>', methods=['GET', 'POST'])
 @login_required
-def add_book_in_list(username, list_id, book_id, read_state):
+async def add_book_in_list(username, list_id, book_id, read_state):
     cataloge = Cataloge.query.filter_by(id=list_id).first()
     book = Book.query.filter_by(id=book_id).first()
     flag = False
@@ -109,7 +109,7 @@ def add_book_in_list(username, list_id, book_id, read_state):
 
 @personal.route('/<username>/delete-list/<list_id>')
 @login_required
-def list_delete(username, list_id):
+async def list_delete(username, list_id):
     cataloge = Cataloge.query.filter_by(id=list_id).first()
     database.session.delete(cataloge)
     database.session.commit()
@@ -118,7 +118,7 @@ def list_delete(username, list_id):
 
 @personal.route('/<username>/delete-item/<item_id>')
 @login_required
-def item_delete(username, item_id):
+async def item_delete(username, item_id):
     item = Item.query.filter_by(id=item_id).first()
     database.session.delete(item)
     database.session.commit()
