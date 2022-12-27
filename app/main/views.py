@@ -19,7 +19,7 @@ def index():
  
 
 @main.route('/search', methods=['GET', 'POST'])
-async def searching():
+def searching():
     books = Book.query.all()
     date_list = list()
     for book in books:
