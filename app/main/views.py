@@ -7,19 +7,19 @@ from flask_login import current_user, login_required
 
 
 @main.route('/<name>/get-cover')
-async def cover(name):
+def cover(name):
     book = Book.query.filter_by(name=name).first()
     cover = make_response(book.cover)
     return cover
 
 
 @main.route('/')
-async def index():
+def index():
     return render_template('main/index.html')
  
 
 @main.route('/search', methods=['GET', 'POST'])
-async def searching():
+def searching():
     books = Book.query.all()
     date_list = list()
     for book in books:
@@ -66,7 +66,7 @@ async def searching():
 
 
 @main.route('/book-page/<name>', methods=['GET', 'POST'])
-async def book_page(name):
+def book_page(name):
     book = Book.query.filter_by(name=name).first()
     if request.method == 'POST' and request.form.get('comment') and current_user.is_authenticated:
         comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
@@ -94,7 +94,7 @@ async def book_page(name):
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 
 @login_required
-async def give_grade(username, book_id, grade):
+def give_grade(username, book_id, grade):
     book = Book.query.filter_by(id=book_id).first()
     previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
     if previous_grade:
@@ -109,7 +109,7 @@ async def give_grade(username, book_id, grade):
 
 @main.route('/<username>/delete-comment/<comment_id>')  
 @login_required
-async def comment_delete(username, comment_id):
+def comment_delete(username, comment_id):
     comment = Comment.query.filter_by(id=comment_id).first()
     book = comment.book
     database.session.delete(comment)
