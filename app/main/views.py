@@ -25,7 +25,7 @@ def searching():
     for book in books:
         if not book.release_date in date_list:
             date_list.append(book.release_date)
-        
+    
     if request.method == 'POST':
         result = str(request.form.get('search_result')).strip().lower()
         if result == 'все':
@@ -35,12 +35,12 @@ def searching():
         else:
             release_date = request.form.get('release_date')
             if result and not release_date:
-                search_result = Book.query.filter_by(name=result).first()
-                search_result_ = Book.query.filter_by(author=result).all()
+                search_result = Book.query.filter(Book.name.like("%{}%".format(result))).first()
+                search_result_ = Book.query.filter(Book.author.like("%{}%".format(result))).all()
                 
             elif result and release_date:
-                search_result = Book.query.filter_by(name=result, release_date=release_date).first()
-                search_result_ = Book.query.filter_by(author=result, release_date=release_date).all()
+                search_result = Book.query.filter(Book.name.like("%{}%".format(result)), release_date=release_date).first()
+                search_result_ = Book.query.filter(Book.author.like("%{}%".format(result)), release_date=release_date).all()
                 
             elif not result and release_date:
                 search_result = Book.query.filter_by(release_date=release_date).first()
