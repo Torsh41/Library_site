@@ -34,23 +34,28 @@ def searching():
                 search_result = 404
         else:
             release_date = request.form.get('release_date')
-            if result and not release_date:
-                search_result = Book.query.filter(Book.name.like("%{}%".format(result))).first()
-                search_result_ = Book.query.filter(Book.author.like("%{}%".format(result))).all()
-                
-            elif result and release_date:
-                search_result = Book.query.filter(Book.name.like("%{}%".format(result)), release_date=release_date).first()
-                search_result_ = Book.query.filter(Book.author.like("%{}%".format(result)), release_date=release_date).all()
-                
-            elif not result and release_date:
-                search_result = Book.query.filter_by(release_date=release_date).first()
-                search_result_ = Book.query.filter_by(release_date=release_date).all()
+            genre = request.form.get('genre')
             
-            elif not result and not release_date:
+            if genre:
+                search_result = None
+                search_result_ = Book.query.filter(Book.genre.like("%{}%".format(genre))).all()
+            
+            elif release_date:
+                search_result = None
+                search_result_ = Book.query.filter_by(release_date=release_date).all()
+                
+            elif result:
+                search_result = Book.query.filter(Book.name.like("%{}%".format(result))).all()
+                search_result_ = Book.query.filter(Book.author.like("%{}%".format(result))).all()
+                       
+            else:
                 search_result = None
                 search_result_ = []
-                
-            search_result_.append(search_result)
+            
+            if search_result:
+                for cur_res in search_result:
+                    search_result_.append(cur_res)
+        
             search_result_fin = [] 
             [search_result_fin.append(value) for value in search_result_ if value not in search_result_fin]
             fin_result = list()
