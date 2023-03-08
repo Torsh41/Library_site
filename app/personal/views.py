@@ -15,12 +15,12 @@ def avatar(username):
     
 @personal.route('/<username>')
 @login_required
-def person(username):
+def person(username, flag=False):
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
     pagination = user.catalogues.order_by().paginate(page, per_page=2, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len)
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag)
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -71,7 +71,7 @@ def add_new_book(username):
             
         database.session.add(book)
         database.session.commit()
-        return redirect(url_for('.person', username=username))
+        return redirect(url_for('.person', username=username, flag=True))
     return render_template('personal/add_book.html', form=form)
 
 

@@ -13,9 +13,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <link charset="utf-8" rel="stylesheet" href="{{url_for('static', filename='styles/css/smoke-pure.css')}}" />
+  <script src="{{ url_for('static', filename='js/add_book_js.js')}}"></script>
 </head>
 
-<body class="image-3">
+<body class="image-3" onload="book_added();">
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
