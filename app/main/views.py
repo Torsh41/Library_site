@@ -6,6 +6,22 @@ from app.main.sort import sorting
 from flask_login import current_user, login_required
 
 
+months_dict = {
+        1:'января',
+        2:'февраля',
+        3:'марта',
+        4:'апреля',
+        5:'мая',
+        6:'июня',
+        7:'июля',
+        8:'августа',
+        9:'сентября',
+        10:'октября',
+        11:'ноября',
+        12:'декабря'
+}
+
+
 @main.route('/<name>/get-cover')
 def cover(name):
     book = Book.query.filter_by(name=name).first()
@@ -72,6 +88,7 @@ def searching():
 
 @main.route('/book-page/<name>', methods=['GET', 'POST'])
 def book_page(name):
+    global months_dict
     book = Book.query.filter_by(name=name).first()
     if request.method == 'POST' and request.form.get('comment') and current_user.is_authenticated:
         comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
@@ -85,7 +102,6 @@ def book_page(name):
     
     pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=10, error_out=False)
     comments = pagination.items
-      
     fin_grade = 0
     grade_count = 0
     grades = BookGrade.query.filter_by(book=book).all()    
@@ -94,7 +110,7 @@ def book_page(name):
         grade_count += 1
     if grade_count:    
         fin_grade = round(fin_grade / grade_count, 1)
-    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, grade_count=grade_count)   #book_grade_for_cur_user=book_grade_for_cur_user
+    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, grade_count=grade_count, months_dict=months_dict) 
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 
