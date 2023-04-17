@@ -1,9 +1,9 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from .init import database, login_manager, application
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, url_for
-from datetime import datetime
+from datetime import datetime, timedelta
+from jose import jwt
 
 
 #отношение один ко многим
@@ -26,18 +26,28 @@ class User(UserMixin, database.Model):
     confirmed = database.Column(database.Boolean, default=False)
     is_admin = database.Column(database.Boolean, default=False)
     
-    def generate_confirmation_token(self, expiration=1800): #30 минут
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'confirm': self.id})
+    def generate_confirmation_token(self): #30 минут время действия токена
+        now = datetime.utcnow()
+        payload = {
+            'iat': 0,
+            'ref': 0,
+            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'scope': 'access_token',
+            'user': self.username,
+        }
+        access_token = jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm=current_app.config['JWT_ALGORITHM'])
+        return access_token
     
     def confirm(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=current_app.config['JWT_ALGORITHM'])
         except:
             return False
-        if data.get('confirm') != self.id:
+            
+        user_data = payload.get('user')
+        if user_data != self.username:
             return False
+        
         self.confirmed = True
         database.session.add(self)
         return True

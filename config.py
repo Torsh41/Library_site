@@ -3,12 +3,14 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'I am Mister Max'
+    SECRET_KEY = 'I am number one'
+    JWT_SECRET_KEY = os.environ.get('SECRET_KEY') or 'I am Mister Max'
+    JWT_ALGORITHM = 'HS256'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     #SQLALCHEMY_RECORD_QUERIES = True
     MAX_CONTENT_LENGTH = 1024 * 1024
     #SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-   
+    JWT_EXPIRATION = 1800
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465#587
     MAIL_USE_SSL = True#False

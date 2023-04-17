@@ -7,5 +7,5 @@ application = create_app(os.getenv('FLASK_CONFIG') or 'default')
     #database.create_all()
 
 if __name__ == '__main__':    
-    application.run(debug=True, port=8000, host='127.0.0.1')
+    application.run(debug=True, host='0.0.0.0')
  
