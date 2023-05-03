@@ -4,8 +4,9 @@ from app.models import BookGrade, Book, Comment
 from flask import render_template, request, redirect, url_for, make_response
 from app.main.sort import sorting
 from flask_login import current_user, login_required
-
-
+ITEMS_COUNT = 5
+cur_search_result:dict
+page_count = 1
 months_dict = {
         1:'января',
         2:'февраля',
@@ -38,10 +39,11 @@ def index():
 def searching():
     books = Book.query.all()
     date_list = list()
-    for book in books:
-        if not book.release_date in date_list:
-            date_list.append(book.release_date)
-    
+    if books:
+        for book in books:
+            if not book.release_date in date_list:
+                date_list.append(book.release_date)
+   
     if request.method == 'POST':
         result = str(request.form.get('search_result')).strip().lower()
         if result == 'все':
@@ -81,9 +83,36 @@ def searching():
             search_result = fin_result
             if not search_result:
                 search_result = 404
-                
-        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len)
-    return render_template('main/search.html', search_result=0, date_list=date_list, len=len)
+                global page_count 
+                page_count = None
+            else:
+                if len(search_result) > ITEMS_COUNT:
+                    # pages_count = int(len(search_result) / ITEMS_COUNT)
+                    # if len(search_result) % ITEMS_COUNT > 0:
+                    #     pages_count += 1
+                    global cur_search_result; global page_count; counter = 0; temp_arr = list()
+                    cur_search_result = dict(); page_count = 1
+                    for elem in search_result:
+                        counter += 1
+                        temp_arr.append(elem)
+                        if counter % ITEMS_COUNT == 0:
+                            cur_search_result[page_count] = temp_arr
+                            page_count += 1
+                            temp_arr = list()
+                            
+                    if counter % ITEMS_COUNT > 0:
+                        cur_search_result[page_count] = temp_arr  
+                    search_result = cur_search_result[1]
+        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len, page_count=page_count, page=1, range=range)
+    
+    elif page := request.args.get('page'):
+        page = int(page)
+        global cur_search_result; global page_count
+        search_result = cur_search_result[page]
+        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len, page_count=page_count, page=page, range=range)
+    
+    global page_count
+    return render_template('main/search.html', search_result=0, date_list=date_list, len=len, page_count=page_count)
 
 
 @main.route('/book-page/<name>', methods=['GET', 'POST'])

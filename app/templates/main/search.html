@@ -1,3 +1,4 @@
+{% import "search_macro.html" as macros %}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -149,6 +150,9 @@
 
               {% endfor %}
             </ul>
+          </div>
+          <div class="list__pagination pagination">
+            {{ macros.pagination_widget('main.searching', fragment='#search_results', page_count=page_count, range=range) }}
           </div>
         </div>
       </section>
