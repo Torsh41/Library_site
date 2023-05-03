@@ -72,7 +72,7 @@
       <section class="list__list">
         <div class="container lists__catalog">
           <div class="list__wrap">
-            У вас пока нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.
+            <a class="title list__name" href="{{url_for('personal.person', username=current_user.username)}}">У вас пока нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.</a>
           </div>
         </div>
       </section>
