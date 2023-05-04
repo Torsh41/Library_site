@@ -1,4 +1,4 @@
-{% macro pagination_widget(endpoint='main.searching', fragment='#search_results', page_count=page_count, range=range) %}
+{% macro pagination_widget(page_count, range, endpoint='main.searching', fragment='#search_results') %}
 <ul class="pagination__list list-reset">
     {% for p in range(1, page_count + 1) %}
             <li class="pagination__item active">

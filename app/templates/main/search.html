@@ -1,3 +1,4 @@
+{% import "search_macro.html" as macros %}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -144,11 +145,13 @@
                   <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
                   <a href="#" class="list__link">Автор: {{ book.author }}</a>
                 </div>
-
               </li>
 
               {% endfor %}
             </ul>
+          </div>
+          <div class="list__pagination pagination">
+            {{ macros.pagination_widget(page_count=page_count, range=range) }}
           </div>
         </div>
       </section>

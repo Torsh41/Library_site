@@ -127,8 +127,33 @@ class Item(database.Model):
     read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено  
     cataloge_id = database.Column(database.Integer, database.ForeignKey('catalogues.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
+
+
+class SearchResult(database.Model):
+    __tablename__ = "search_results"
+    id = database.Column(database.Integer, primary_key=True)
+    cover = database.Column(database.LargeBinary, default=False)
+    isbn = database.Column(database.String(64), unique=False)
+    name = database.Column(database.String(64), unique=True, index=True)
+    author = database.Column(database.String(64), unique=False)
+    publishing_house = database.Column(database.String(64), unique=False)
+    description = database.Column(database.Text(), unique=False)
+    release_date = database.Column(database.Date(), unique=False)
+    count_of_chapters = database.Column(database.Integer, unique=False)
+    genre = database.Column(database.Text(), unique=False)
+    def __init__(self, book):
+        self.id = book.id
+        self.cover = book.cover
+        self.isbn = book.isbn
+        self.name = book.name
+        self.author = book.author
+        self.publishing_house = book.publishing_house
+        self.description = book.description
+        self.release_date = book.release_date
+        self.count_of_chapters = book.count_of_chapters
+        self.genre = book.genre
     
-    
+        
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
