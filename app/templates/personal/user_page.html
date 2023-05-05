@@ -13,9 +13,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <link charset="utf-8" rel="stylesheet" href="{{url_for('static', filename='styles/css/smoke-pure.css')}}" />
+  <script src="{{ url_for('static', filename='js/add_book_js.js')}}"></script>
 </head>
 
-<body class="image-3">
+<body class="image-3" onload="book_added();">
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
@@ -174,8 +176,13 @@
             </svg>
           </a>
         </div>
+<<<<<<< HEAD
         </section>
         {% endif %}
+=======
+      </section>
+      {% endif %}
+>>>>>>> 60228e73d2c52701532101920eac6059884800a9
   
         <!--место для списков-->
         {% for cataloge_value in catalogues %}
@@ -206,7 +213,7 @@
                 {% for item in cataloge_value.items %}
                 <li class="list__book">
                   <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__book-set">
-                    <img class="list__book-set" src="{{url_for('personal.avatar', username=current_user.username)}}" alt="">
+                    <img class="list__book-set" src="{{url_for('main.cover', name=item.book.name)}}" alt="">
                   </a>
                   
 

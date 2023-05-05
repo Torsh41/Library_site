@@ -34,6 +34,7 @@
             </a>
             <ul class="nav__sublist list-reset">
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
               <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
@@ -71,7 +72,7 @@
       <section class="list__list">
         <div class="container lists__catalog">
           <div class="list__wrap">
-            У вас пока нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.
+            <a class="title list__name" href="{{url_for('personal.person', username=current_user.username)}}">У вас пока нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.</a>
           </div>
         </div>
       </section>

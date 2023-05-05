@@ -15,12 +15,12 @@ def avatar(username):
     
 @personal.route('/<username>')
 @login_required
-def person(username):
+def person(username, flag=False):
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
     pagination = user.catalogues.order_by().paginate(page, per_page=2, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len)
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag)
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -62,12 +62,16 @@ def add_new_book(username):
         for value in genre:
             genre_ += str(value) + ' '
             
-        book = Book(isbn=form.isbn.data, name=str(form.name.data).strip().lower(), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
+        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower(), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
                     description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data, \
                     genre=genre_, user=current_user._get_current_object())
+        
+        if not book.cover:
+            book.default_cover()
+            
         database.session.add(book)
         database.session.commit()
-        return redirect(url_for('.person', username=username))
+        return redirect(url_for('.person', username=username, flag=True))
     return render_template('personal/add_book.html', form=form)
 
 

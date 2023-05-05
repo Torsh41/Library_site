@@ -1,9 +1,9 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from .init import database, login_manager, application
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, url_for
-from datetime import datetime
+from datetime import datetime, timedelta
+from jose import jwt
 
 
 #отношение один ко многим
@@ -26,18 +26,28 @@ class User(UserMixin, database.Model):
     confirmed = database.Column(database.Boolean, default=False)
     is_admin = database.Column(database.Boolean, default=False)
     
-    def generate_confirmation_token(self, expiration=1800): #30 минут
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'confirm': self.id})
+    def generate_confirmation_token(self): #30 минут время действия токена
+        now = datetime.utcnow()
+        payload = {
+            'iat': 0,
+            'ref': 0,
+            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'scope': 'access_token',
+            'user': self.username,
+        }
+        access_token = jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm=current_app.config['JWT_ALGORITHM'])
+        return access_token
     
     def confirm(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=current_app.config['JWT_ALGORITHM'])
         except:
             return False
-        if data.get('confirm') != self.id:
+            
+        user_data = payload.get('user')
+        if user_data != self.username:
             return False
+        
         self.confirmed = True
         database.session.add(self)
         return True
@@ -65,6 +75,7 @@ class User(UserMixin, database.Model):
 class Book(database.Model):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
+    cover = database.Column(database.LargeBinary, default=False)
     isbn = database.Column(database.String(64), unique=False)
     name = database.Column(database.String(64), unique=True, index=True)
     author = database.Column(database.String(64), unique=False)
@@ -77,6 +88,10 @@ class Book(database.Model):
     catalogue_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
     grades = database.relationship('BookGrade', backref='book', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
+    
+    def default_cover(self):
+        with application.open_resource(application.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
+            self.cover = f.read()
     
 
 class BookGrade(database.Model):
@@ -109,14 +124,36 @@ class Cataloge(database.Model):
 class Item(database.Model):
     __tablename__ = "items"
     id = database.Column(database.Integer, primary_key=True)
-    read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено 
-    #read_in_process = database.Column(database.String(64), unique=False, default=None) #читаю
-    #planning = database.Column(database.String(64), unique=False, default=None) #планирую
-    #abandoned = database.Column(database.String(64), unique=False, default=None) #заброшено 
+    read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено  
     cataloge_id = database.Column(database.Integer, database.ForeignKey('catalogues.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
+
+
+class SearchResult(database.Model):
+    __tablename__ = "search_results"
+    id = database.Column(database.Integer, primary_key=True)
+    cover = database.Column(database.LargeBinary, default=False)
+    isbn = database.Column(database.String(64), unique=False)
+    name = database.Column(database.String(64), unique=True, index=True)
+    author = database.Column(database.String(64), unique=False)
+    publishing_house = database.Column(database.String(64), unique=False)
+    description = database.Column(database.Text(), unique=False)
+    release_date = database.Column(database.Date(), unique=False)
+    count_of_chapters = database.Column(database.Integer, unique=False)
+    genre = database.Column(database.Text(), unique=False)
+    def __init__(self, book):
+        self.id = book.id
+        self.cover = book.cover
+        self.isbn = book.isbn
+        self.name = book.name
+        self.author = book.author
+        self.publishing_house = book.publishing_house
+        self.description = book.description
+        self.release_date = book.release_date
+        self.count_of_chapters = book.count_of_chapters
+        self.genre = book.genre
     
-    
+        
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)

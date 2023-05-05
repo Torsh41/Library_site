@@ -8,7 +8,7 @@
     {% for p in pagination.iter_pages() %}
         {% if p %}
             <li class="pagination__item active">
-                <a href="{{ url_for(endpoint, page = p, name=book_name) }}{{ fragment }}">{{ p }}</a>
+                <a href="{{ url_for(endpoint, page=p, name=book_name) }}{{ fragment }}">{{ p }}</a>
             </li>
         {% else %}
         <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
