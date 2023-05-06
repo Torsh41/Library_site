@@ -38,3 +38,23 @@
 .about__icon:not(:last-child) {
   margin-right: 20px;
 }
+
+/* Категории */
+
+.about__cat-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.about__cat-elem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 200px;
+  border-radius: 20px;
+  background-color: bisque;
+  margin-bottom: 40px;
+}

@@ -120,6 +120,7 @@
       </section>
   
       <!--Кнопка все время присутствует на странице пользователя-->
+
       {% if pagination %}
       {% if len(pagination.items) < 2 %} 
       <section class="list">
@@ -175,8 +176,13 @@
             </svg>
           </a>
         </div>
+<<<<<<< HEAD
+        </section>
+        {% endif %}
+=======
       </section>
       {% endif %}
+>>>>>>> 60228e73d2c52701532101920eac6059884800a9
   
         <!--место для списков-->
         {% for cataloge_value in catalogues %}
