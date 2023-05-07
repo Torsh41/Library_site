@@ -94,12 +94,11 @@
             </div>
 
             <div class="main__form-wrap">
-              <select name="genre" id="" class="main__form-select">
-                <option class="main__form-option" value="">Жанр</option>
-                <option class="main__form-option" value="ужасы">ужасы</option>
-                <option class="main__form-option" value="мистика">мистика</option>
-                <option class="main__form-option" value="детектив">детектив</option>
-                <option class="main__form-option" value="фантастика">фантастика</option>
+              <select name="category" id="" class="main__form-select">
+                <option class="main__form-option" value="">Категории</option>
+                {% for category in categories %}
+                  <option class="main__form-option" value="{{ category.name }}">{{ category.name }}</option>
+                {% endfor %}
               </select>
               <select name="release_date" id="" class="main__form-select">
                 <option value="">Дата издания</option>

@@ -75,10 +75,9 @@
     <section id="1" class="about">
       <div class="about__container container">
         <ul class="about__cat-list list-reset">
-          <li class="about__cat-elem"><a href="{{url_for('main.category', name='МХТП')}}" class="about__book-link">МХТП</a></li>
-          <li class="about__cat-elem"><a href="{{url_for('main.category', name='Программирование')}}" class="about__book-link">Программирование</a></li>
-          <li class="about__cat-elem"><a href="{{url_for('main.category', name='Инженерная графика')}}" class="about__book-link">Инженерная графика</a></li>
-          <li class="about__cat-elem"><a href="{{url_for('main.category', name='ПАХТ')}}" class="about__book-link">ПАХТ</a></li>
+          {% for category in categories %}
+            <li class="about__cat-elem"><a href="{{url_for('main.category', name=category.name)}}" class="about__book-link">{{ category.name }}</a></li>
+          {% endfor %}
         </ul>
       </div>
     </section>

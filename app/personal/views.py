@@ -23,7 +23,7 @@ def avatar(username):
 def person(username, flag=False):
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
-    pagination = user.catalogues.order_by().paginate(page, per_page=2, error_out=False)
+    pagination = user.cataloges.order_by().paginate(page, per_page=2, error_out=False)
     catalogues = pagination.items
     return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag)
 
@@ -61,8 +61,6 @@ def add_list(username):
 @login_required
 def add_new_book(username):
     categories = Category.query.all()
-    if not categories:
-        categories = []
     form = AddNewBookForm()
     if form.validate_on_submit():
         category = Category.query.filter_by(name=str(request.form.get('category'))).first()

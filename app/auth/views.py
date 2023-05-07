@@ -43,11 +43,12 @@ def register():
         user.check_admin()
         database.session.add(user)
         database.session.commit()
+        login_user(user)
         token = user.generate_confirmation_token()
         send_email(user.email, 'Confirm Your Account',
         'auth/email/confirm', user=user, token=token)
         #письмо с подтверждением было выслано на ваш аккаунт
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('main.index'))
     return render_template('auth/registraton.html', form=form)
 
 

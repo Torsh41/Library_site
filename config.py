@@ -1,8 +1,10 @@
 import os
+from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
+    REMEMBER_COOKIE_DURATION = timedelta(seconds=10)
     SECRET_KEY = 'I am number one'
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY') or 'I am Mister Max'
     JWT_ALGORITHM = 'HS256'

@@ -1,6 +1,6 @@
 from . import main
 from app.init import database
-from app.models import BookGrade, Book, Comment, SearchResult
+from app.models import BookGrade, Book, Comment, SearchResult, Category
 from flask import render_template, request, redirect, url_for, make_response
 from app.main.sort import sorting
 from flask_login import current_user, login_required
@@ -39,6 +39,7 @@ def index():
 def searching():
     page_count = 1
     books = Book.query.all()
+    categories = Category.query.all()
     date_list = list()
     if books:
         for book in books:
@@ -53,11 +54,10 @@ def searching():
                 search_result = 404
         else:
             release_date = request.form.get('release_date')
-            genre = request.form.get('genre')
-            
-            if genre:
+            category = request.form.get('category')
+            if category:
                 search_result = None
-                search_result_ = Book.query.filter(Book.genre.like("%{}%".format(genre))).all()
+                search_result_ = Book.query.filter(Category.name.like("%{}%".format(category))).all()
             
             elif release_date:
                 search_result = None
@@ -103,7 +103,7 @@ def searching():
                     search_result = search_result[:ITEMS_COUNT] 
                 else:
                     page_count = 1
-        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len, page_count=page_count, page=1, range=range)
+        return render_template('main/search.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range)
     
     elif page := request.args.get('page', None, type=int):
         cur_result = SearchResult.query.all()
@@ -120,9 +120,9 @@ def searching():
         if counter % ITEMS_COUNT > 0:
             search_result[page_count] = temp_arr
         search_result = search_result[page]
-        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len, page_count=page_count, page=page, range=range)
+        return render_template('main/search.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range)
     
-    return render_template('main/search.html', search_result=0, date_list=date_list, len=len)
+    return render_template('main/search.html', search_result=0, date_list=date_list, categories=categories, len=len)
 
 
 @main.route('/book-page/<name>', methods=['GET', 'POST'])
@@ -179,7 +179,8 @@ def comment_delete(username, comment_id):
 
 @main.route('/categories', methods=['GET'])
 def categories():
-    return render_template('main/categories.html')
+    categories = Category.query.all()
+    return render_template('main/categories.html', categories=categories)
 
 
 @main.route('/categories/category/<name>', methods=['GET'])
