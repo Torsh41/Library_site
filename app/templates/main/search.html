@@ -45,8 +45,7 @@
               <li class="nav__subitem"><a class="nav__link"
                 href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="#">Категории</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
               <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
             </ul>
           </li>
@@ -102,11 +101,6 @@
                 <option class="main__form-option" value="детектив">детектив</option>
                 <option class="main__form-option" value="фантастика">фантастика</option>
               </select>
-              <!--<select name="" id="" class="main__form-select">
-                <option>Тэги</option>
-                <option>Пункт 1</option>
-                <option>Пункт 2</option>
-              </select>-->
               <select name="release_date" id="" class="main__form-select">
                 <option value="">Дата издания</option>
                 {% for date in date_list %}

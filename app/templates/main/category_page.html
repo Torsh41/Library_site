@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Соответствующая категория</title> <!-- Название категории-->
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/style.css">
+  <title>{{ name }}</title> <!-- Название категории-->
+  <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
 </head>
 
@@ -30,11 +30,19 @@
 
             </a>
             <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="index.html">Главная</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="registraton.html">Регистрация</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="authorization.html">Личный кабинет</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="search.html">Поиск книг</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="categories.html">Категории</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              {% if current_user.is_anonymous %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+              {% endif %}
+              {% if current_user.is_authenticated %}
+              <li class="nav__subitem"><a class="nav__link"
+                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              {% else %}
+              <li class="nav__subitem"><a class="nav__link"
+                href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+              {% endif %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
             </ul>
           </li>
         </ul>
@@ -47,7 +55,7 @@
       <div class="main__container container">
 
         <div class="main__top">
-          <span class="main__span">Название категории</span>
+          <span class="main__span">{{ name }}</span>
           <h1 class="main__title">Поиск книги</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -78,13 +86,13 @@
 
             <div class="main__form-wrap">
               <select name="" id="" class="main__form-select">
-                <option >Автор</option>
+                <option>Автор</option>
                 <option>Пункт 1</option>
                 <option>Пункт 2</option>
               </select>
 
               <select name="" id="" class="main__form-select">
-                <option >Год издания</option>
+                <option>Год издания</option>
                 <option>Пункт 1</option>
                 <option>Пункт 2</option>
               </select>
@@ -106,7 +114,6 @@
       <div class="container list__container">
         <div class="list__wrap">
           <h2 class="list__title title">Вот, что есть в данной категории</h2>
-          <!-- <span class="list__results"> Всего результатов: {{ len(search_result) }} </span> -->
           <ul class="list__books list-reset">
 
 
@@ -127,7 +134,6 @@
           </ul>
         </div>
         <div class="list__pagination pagination">
-          <!-- {{ macros.pagination_widget(page_count=page_count, range=range) }} -->
         </div>
       </div>
     </section>

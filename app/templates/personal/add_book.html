@@ -183,18 +183,16 @@
           </label>
 
           <label class="form__label">
-            <span class="form__span">Жанры</span>
+            <span class="form__span">Категории</span>
             <div class="form__genre-wrap">
-              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="ужасы">ужасы</a>
-              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="мистика">мистика</a>
-              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="детектив">детектив</a>
-              <a class="form__genre"><input type="checkbox" name="genres" class="form__checkbox" value="фантастика">фантастика</a>
-              <!--<a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
-              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
-              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
-              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>
-              <a class="form__genre"><input type="checkbox" class="form__checkbox" value="ужасы" required>Ужасы</a>-->
-            </div>
+              {% for index in range(len(categories)) %}
+                {% if index == 0 %}
+                  <a class="form__genre"><input type="radio" name="category" class="form__checkbox" value="{{ categories[index].name }}" checked>{{ categories[index].name }}</a>
+                {% else %}
+                  <a class="form__genre"><input type="radio" name="category" class="form__checkbox" value="{{ categories[index].name }}">{{ categories[index].name }}</a>
+                {% endif %}
+              {% endfor %}
+            </div> 
           </label>
 
           <!--<button class="form__btn btn">Добавить книгу в базу</button>-->

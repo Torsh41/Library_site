@@ -149,7 +149,7 @@ def book_page(name):
         grade_count += 1
     if grade_count:    
         fin_grade = round(fin_grade / grade_count, 1)
-    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, grade_count=grade_count, months_dict=months_dict) 
+    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, grade_count=grade_count, months_dict=months_dict) 
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 
@@ -175,3 +175,13 @@ def comment_delete(username, comment_id):
     database.session.delete(comment)
     database.session.commit()
     return redirect(url_for('main.book_page', name=book.name, page=request.args.get('page', type=int))) 
+
+
+@main.route('/categories', methods=['GET'])
+def categories():
+    return render_template('main/categories.html')
+
+
+@main.route('/categories/category/<name>', methods=['GET'])
+def category(name):
+    return render_template('main/category_page.html', name=name)

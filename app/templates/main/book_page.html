@@ -115,7 +115,7 @@
                 <li class="book__list-element"><b>Издательство:</b> {{ book.publishing_house }}</li>
                 <li class="book__list-element"><b>Дата выпуска:</b> {{ book.release_date}}</li>
                 <li class="book__list-element"><b>Количество глав:</b> {{ book.count_of_chapters }}</li>
-                <li class="book__list-element"><b>Жанр:</b> {{ str(book.genre) }}</li>
+                <li class="book__list-element"><b>Категория:</b> {{ book.category.name }}</li>
               </ul>
             </div>
           </div>

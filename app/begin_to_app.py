@@ -17,7 +17,7 @@ def create_app(config_name):
   database.init_app(application)
   with application.app_context():
     database.create_all()
-    
-  # здесь выполняется подключение маршрутов и
-  # нестандартных страниц с сообщениями об ошибках
+      
+    # здесь выполняется подключение маршрутов и
+    # нестандартных страниц с сообщениями об ошибках
   return application

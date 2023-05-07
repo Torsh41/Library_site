@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Просмотр категорий</title>
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
 </head>
 
@@ -30,11 +30,18 @@
 
             </a>
             <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="index.html">Главная</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="registraton.html">Регистрация</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="authorization.html">Личный кабинет</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="search.html">Поиск книг</a></li>
-
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              {% if current_user.is_anonymous %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+              {% endif %}
+              {% if current_user.is_authenticated %}
+              <li class="nav__subitem"><a class="nav__link"
+                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              {% else %}
+              <li class="nav__subitem"><a class="nav__link"
+                href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+              {% endif %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
             </ul>
           </li>
         </ul>
@@ -68,10 +75,10 @@
     <section id="1" class="about">
       <div class="about__container container">
         <ul class="about__cat-list list-reset">
-          <li class="about__cat-elem"><a href="category_page.html" class="about__book-link">МХТП</a></li>
-          <li class="about__cat-elem"><a href="category_page.html" class="about__book-link">Программирование</a></li>
-          <li class="about__cat-elem"><a href="category_page.html" class="about__book-link">Инженерная графика</a></li>
-          <li class="about__cat-elem"><a href="category_page.html" class="about__book-link">ПАХТ</a></li>
+          <li class="about__cat-elem"><a href="{{url_for('main.category', name='МХТП')}}" class="about__book-link">МХТП</a></li>
+          <li class="about__cat-elem"><a href="{{url_for('main.category', name='Программирование')}}" class="about__book-link">Программирование</a></li>
+          <li class="about__cat-elem"><a href="{{url_for('main.category', name='Инженерная графика')}}" class="about__book-link">Инженерная графика</a></li>
+          <li class="about__cat-elem"><a href="{{url_for('main.category', name='ПАХТ')}}" class="about__book-link">ПАХТ</a></li>
         </ul>
       </div>
     </section>

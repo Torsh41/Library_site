@@ -3,7 +3,12 @@ from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, request, make_response
 from .forms import EditProfileForm, AddListForm, AddNewBookForm
 from ..begin_to_app import database
-from app.models import User, Cataloge, Book, Item
+from app.models import User, Cataloge, Book, Item, Role, Category
+
+
+@personal.app_context_processor
+def inject_roles():
+    return dict(Role=Role)
 
 
 @personal.route('/<username>/edit-profile/edit-avatar')
@@ -55,16 +60,15 @@ def add_list(username):
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
 def add_new_book(username):
+    categories = Category.query.all()
+    if not categories:
+        categories = []
     form = AddNewBookForm()
     if form.validate_on_submit():
-        genre = request.form.getlist('genres')
-        genre_ = ''
-        for value in genre:
-            genre_ += str(value) + ' '
-            
+        category = Category.query.filter_by(name=str(request.form.get('category'))).first()
         book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower(), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
                     description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data, \
-                    genre=genre_, user=current_user._get_current_object())
+                    category=category, user=current_user._get_current_object())
         
         if not book.cover:
             book.default_cover()
@@ -72,7 +76,7 @@ def add_new_book(username):
         database.session.add(book)
         database.session.commit()
         return redirect(url_for('.person', username=username, flag=True))
-    return render_template('personal/add_book.html', form=form)
+    return render_template('personal/add_book.html', form=form, categories=categories, range=range, len=len)
 
 
 @personal.route('/<username>/add-book-in-list/<book_id>', methods=['POST'])

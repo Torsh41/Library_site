@@ -33,6 +33,8 @@ def register():
     if current_user.is_authenticated:
         User.query.filter_by(id=current_user.id).delete()
         database.session.commit()
+        logout_user()
+        
     form = RegistrationForm()
     if form.validate_on_submit(): 
         user = User(username=form.username.data, email=form.email.data.lower(),
