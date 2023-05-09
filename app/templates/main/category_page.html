@@ -1,3 +1,4 @@
+{% import "search_macro.html" as macros %}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -41,7 +42,6 @@
               <li class="nav__subitem"><a class="nav__link"
                 href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
             </ul>
           </li>
@@ -81,22 +81,24 @@
                 </defs>
               </svg>
 
-              <input type="text" class="main__form-input" placeholder="Введите название книги или автора..">
+              <input type="text" class="main__form-input" name="search_result" placeholder="Введите название книги или автора..">
             </label>
-
+            <div>
+              <span class="form__help">Для просмотра всех книг из данной категории введите слово все</span>
+            </div>
+          
+            <div>
+              <span class="form__help">Для просмотра всех книг введите *</span>
+            </div>
+            
             <div class="main__form-wrap">
-              <select name="" id="" class="main__form-select">
-                <option>Автор</option>
-                <option>Пункт 1</option>
-                <option>Пункт 2</option>
+             
+              <select name="release_date" id="" class="main__form-select">
+                <option>Дата издания</option>
+                {% for date in date_list %}
+                  <option value="{{ date }}">{{ date }}</option>
+                {% endfor %}
               </select>
-
-              <select name="" id="" class="main__form-select">
-                <option>Год издания</option>
-                <option>Пункт 1</option>
-                <option>Пункт 2</option>
-              </select>
-
 
             </div>
 
@@ -110,25 +112,48 @@
 
 
     <!--Информация о книгах сразу при переходе пользователя на эту страницу-->
+    {% if search_result and search_result != 404 %}
     <section class="list">
       <div class="container list__container">
         <div class="list__wrap">
           <h2 class="list__title title">Вот, что есть в данной категории</h2>
+          <span class="list__results"> Всего результатов: {{ len(search_result) }} </span>
           <ul class="list__books list-reset">
 
-
-            <li class="list__book">
-              <a href="" class="list__book-set">
-                <img class="list__book-set" src="" alt="">
-              </a>
+            {% for book in search_result %}
 
 
-              <div class="list__book-wrap">
-                <a href="" class="list__link">Книга: </a>
-                <a href="#" class="list__link">Автор: </a>
-              </div>
-            </li>
+              <!--Найденные книги-->
 
+              <li class="list__book">
+                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
+                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
+                </a>
+                
+
+                <div class="list__book-wrap">
+                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
+                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
+                </div>
+              </li>
+
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="list__pagination pagination">
+            {{ macros.pagination_widget(page_count=page_count, range=range, name=name) }}
+          </div>
+        </div>
+      </section>
+      {% elif search_result == 404 %}
+      <section class="list">
+        <div class="container list__container">
+          <div class="list__wrap">
+            <h2 class="list__title title">Ничего не найдено</h2>
+          </div>
+        </div>
+      </section>
+      {% endif %}
 
 
           </ul>

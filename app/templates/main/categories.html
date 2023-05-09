@@ -41,7 +41,6 @@
               <li class="nav__subitem"><a class="nav__link"
                 href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
             </ul>
           </li>
         </ul>
@@ -76,7 +75,7 @@
       <div class="about__container container">
         <ul class="about__cat-list list-reset">
           {% for category in categories %}
-            <li class="about__cat-elem"><a href="{{url_for('main.category', name=category.name)}}" class="about__book-link">{{ category.name }}</a></li>
+            <li class="about__cat-elem"><a href="{{url_for('main.search_by_category', name=category.name)}}" class="about__book-link">{{ category.name }}</a></li>
           {% endfor %}
         </ul>
       </div>

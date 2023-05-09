@@ -35,96 +35,6 @@ def index():
     return render_template('main/index.html')
  
 
-@main.route('/search', methods=['GET', 'POST'])
-def searching():
-    page_count = 1
-    books = Book.query.all()
-    categories = Category.query.all()
-    date_list = list()
-    if books:
-        for book in books:
-            if not book.release_date in date_list:
-                date_list.append(book.release_date)
-   
-    if request.method == 'POST':
-        result = str(request.form.get('search_result')).strip().lower()
-        if result == 'все':
-            search_result = books
-            if not search_result:
-                search_result = 404
-        else:
-            release_date = request.form.get('release_date')
-            category = request.form.get('category')
-            if category:
-                search_result = None
-                search_result_ = Book.query.filter(Category.name.like("%{}%".format(category))).all()
-            
-            elif release_date:
-                search_result = None
-                search_result_ = Book.query.filter_by(release_date=release_date).all()
-                
-            elif result:
-                search_result = Book.query.filter(Book.name.like("%{}%".format(result))).all()
-                search_result_ = Book.query.filter(Book.author.like("%{}%".format(result))).all()
-                       
-            else:
-                search_result = None
-                search_result_ = []
-            
-            if search_result:
-                for cur_res in search_result:
-                    search_result_.append(cur_res)
-        
-            search_result_fin = [] 
-            [search_result_fin.append(value) for value in search_result_ if value not in search_result_fin]
-            fin_result = list()
-            for each in search_result_fin:
-                if each:
-                    fin_result.append(each)
-            search_result = fin_result
-            if not search_result:
-                search_result = 404
-                page_count = None
-                
-        if search_result != 404:
-                old_books_result = SearchResult.query.all()
-                if old_books_result:
-                    for elem in old_books_result:
-                        database.session.delete(elem)
-                    database.session.commit()
-                for book in search_result:
-                    book_for_cur_result = SearchResult(book)
-                    database.session.add(book_for_cur_result)
-                database.session.commit()
-                if len(search_result) > ITEMS_COUNT:
-                    page_count = int(len(search_result) / ITEMS_COUNT)
-                    if len(search_result) % ITEMS_COUNT > 0:
-                        page_count += 1
-                    search_result = search_result[:ITEMS_COUNT] 
-                else:
-                    page_count = 1
-        return render_template('main/search.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range)
-    
-    elif page := request.args.get('page', None, type=int):
-        cur_result = SearchResult.query.all()
-        page_count = 1; temp_arr = list(); search_result = dict(); counter = 0
-        for book in cur_result:
-            counter += 1
-            temp_arr.append(book)
-            if counter % ITEMS_COUNT == 0:
-                search_result[page_count] = copy.copy(temp_arr)
-                page_count += 1
-                temp_arr = list()
-        if page < 0 or page > page_count:
-            return render_template('main/search.html', search_result=0, date_list=date_list, len=len)
-        if counter % ITEMS_COUNT > 0:
-            search_result[page_count] = temp_arr
-        search_result = search_result[page]
-        return render_template('main/search.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range)
-    
-    return render_template('main/search.html', search_result=0, date_list=date_list, categories=categories, len=len)
-
-
 @main.route('/book-page/<name>', methods=['GET', 'POST'])
 def book_page(name):
     global months_dict
@@ -183,6 +93,90 @@ def categories():
     return render_template('main/categories.html', categories=categories)
 
 
-@main.route('/categories/category/<name>', methods=['GET'])
-def category(name):
-    return render_template('main/category_page.html', name=name)
+@main.route('/category/<name>/search', methods=['GET', 'POST'])
+def search_by_category(name):
+    page_count = 1
+    books = Book.query.filter(Category.name.like("%{}%".format(name))).all()
+    categories = Category.query.all()
+    date_list = list()
+    if books:
+        for book in books:
+            if not book.release_date in date_list:
+                date_list.append(book.release_date)
+   
+    if request.method == 'POST':
+        result = str(request.form.get('search_result')).strip().lower()
+        if result == 'все':
+            search_result = books
+            if not search_result:
+                search_result = 404
+        elif result == '*':
+            search_result = Book.query.all()
+            if not search_result:
+                search_result = 404
+        else:
+            release_date = request.form.get('release_date') 
+            if release_date:
+                search_result = None
+                search_result_ = Book.query.filter_by(release_date=release_date).all()
+                
+            elif result:
+                search_result = Book.query.filter(Book.name.like("%{}%".format(result))).all()
+                search_result_ = Book.query.filter(Book.author.like("%{}%".format(result))).all()
+                       
+            else:
+                search_result = None
+                search_result_ = []
+            
+            if search_result:
+                for cur_res in search_result:
+                    search_result_.append(cur_res)
+        
+            search_result_fin = [] 
+            [search_result_fin.append(value) for value in search_result_ if value not in search_result_fin]
+            fin_result = list()
+            for each in search_result_fin:
+                if each:
+                    fin_result.append(each)
+            search_result = fin_result
+            if not search_result:
+                search_result = 404
+                page_count = None
+                
+        if search_result != 404:
+                old_books_result = SearchResult.query.all()
+                if old_books_result:
+                    for elem in old_books_result:
+                        database.session.delete(elem)
+                    database.session.commit()
+                for book in search_result:
+                    book_for_cur_result = SearchResult(book)
+                    database.session.add(book_for_cur_result)
+                database.session.commit()
+                if len(search_result) > ITEMS_COUNT:
+                    page_count = int(len(search_result) / ITEMS_COUNT)
+                    if len(search_result) % ITEMS_COUNT > 0:
+                        page_count += 1
+                    search_result = search_result[:ITEMS_COUNT] 
+                else:
+                    page_count = 1
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range, name=name)
+    
+    elif page := request.args.get('page', None, type=int):
+        cur_result = SearchResult.query.all()
+        page_count = 1; temp_arr = list(); search_result = dict(); counter = 0
+        for book in cur_result:
+            counter += 1
+            temp_arr.append(book)
+            if counter % ITEMS_COUNT == 0:
+                search_result[page_count] = copy.copy(temp_arr)
+                page_count += 1
+                temp_arr = list()
+        if page < 0 or page > page_count:
+            return render_template('main/category_page.html', search_result=0, date_list=date_list, len=len)
+        if counter % ITEMS_COUNT > 0:
+            search_result[page_count] = temp_arr
+        search_result = search_result[page]
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name)
+    
+    return render_template('main/category_page.html', search_result=0, date_list=date_list, categories=categories, len=len)
