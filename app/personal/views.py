@@ -82,11 +82,15 @@ def add_new_book(username):
 @personal.route('/<username>/add-book-in-list/<book_id>', methods=['GET', 'POST'])
 @login_required
 def add_book_in_list_tmp(username, book_id):
+    list_id = request.args.get('list_id', None, type=int)
     if request.form:
         read_state = request.form.get('read_state')
     else:
         read_state = "Читаю"
     user = User.query.filter_by(username=username).first()
+    if list_id:
+        return redirect(url_for('.add_book_in_list', username=username, list_id=list_id, book_id=book_id, read_state=read_state))
+    
     catalogues = Cataloge.query.filter_by(user_id=user.id).all()
     return render_template('personal/user_page_add_book.html', username=username, book_id=book_id, catalogues=catalogues, read_state=read_state)
 

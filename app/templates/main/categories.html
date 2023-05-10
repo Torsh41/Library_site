@@ -75,7 +75,7 @@
       <div class="about__container container">
         <ul class="about__cat-list list-reset">
           {% for category in categories %}
-            <li class="about__cat-elem"><a href="{{url_for('main.search_by_category', name=category.name)}}" class="about__book-link">{{ category.name }}</a></li>
+            <li class="about__cat-elem"><a href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}" class="about__book-link">{{ category.name }}</a></li>
           {% endfor %}
         </ul>
       </div>

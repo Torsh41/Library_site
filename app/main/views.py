@@ -89,12 +89,14 @@ def comment_delete(username, comment_id):
 
 @main.route('/categories', methods=['GET'])
 def categories():
+    list_id = request.args.get('list_id', None, type=int)
     categories = Category.query.all()
-    return render_template('main/categories.html', categories=categories)
+    return render_template('main/categories.html', categories=categories, list_id=list_id)
 
 
 @main.route('/category/<name>/search', methods=['GET', 'POST'])
 def search_by_category(name):
+    list_id = request.args.get('list_id', None, type=int)
     page_count = 1
     books = Book.query.filter(Category.name.like("%{}%".format(name))).all()
     categories = Category.query.all()
@@ -160,7 +162,7 @@ def search_by_category(name):
                     search_result = search_result[:ITEMS_COUNT] 
                 else:
                     page_count = 1
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range, name=name)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range, name=name, list_id=list_id)
     
     elif page := request.args.get('page', None, type=int):
         cur_result = SearchResult.query.all()
@@ -177,6 +179,6 @@ def search_by_category(name):
         if counter % ITEMS_COUNT > 0:
             search_result[page_count] = temp_arr
         search_result = search_result[page]
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name, list_id=list_id)
     
     return render_template('main/category_page.html', search_result=0, date_list=date_list, categories=categories, len=len)
