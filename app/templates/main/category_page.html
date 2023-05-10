@@ -132,8 +132,11 @@
                 
 
                 <div class="list__book-wrap">
+                  {% if current_user.is_authenticated %}
+                  <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id)}}" class="list__link">Добавить в список</a>
+                  {% endif %}
                   <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
+                  <span class="list__link">Автор: {{ book.author }}</span>
                 </div>
               </li>
 

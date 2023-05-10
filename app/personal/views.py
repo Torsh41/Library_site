@@ -21,11 +21,12 @@ def avatar(username):
 @personal.route('/<username>')
 @login_required
 def person(username, flag=False):
+    form = AddListForm()
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
     pagination = user.cataloges.order_by().paginate(page, per_page=2, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag)
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag, form=form)
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -45,7 +46,7 @@ def edit(username):
     return render_template('personal/edit_user_page_profile.html', form=form)
 
 
-@personal.route('/<username>/add-list', methods=['GET', 'POST'])
+@personal.route('/<username>/add-list', methods=['POST'])
 @login_required
 def add_list(username):
     form = AddListForm()
@@ -54,7 +55,8 @@ def add_list(username):
         database.session.add(cataloge)
         database.session.commit()
         return redirect(url_for('.person', username=username, page=request.args.get('page')))
-    return render_template('personal/add_list.html', form=form)
+    
+    # return redirect(url_for('.person', username=username))
 
 
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
@@ -77,10 +79,13 @@ def add_new_book(username):
     return render_template('personal/add_book.html', form=form, categories=categories, range=range, len=len)
 
 
-@personal.route('/<username>/add-book-in-list/<book_id>', methods=['POST'])
+@personal.route('/<username>/add-book-in-list/<book_id>', methods=['GET', 'POST'])
 @login_required
 def add_book_in_list_tmp(username, book_id):
-    read_state = request.form.get('read_state')
+    if request.form:
+        read_state = request.form.get('read_state')
+    else:
+        read_state = "Читаю"
     user = User.query.filter_by(username=username).first()
     catalogues = Cataloge.query.filter_by(user_id=user.id).all()
     return render_template('personal/user_page_add_book.html', username=username, book_id=book_id, catalogues=catalogues, read_state=read_state)
