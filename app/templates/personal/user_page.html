@@ -39,7 +39,6 @@
       width: 100%;
     }
     .formPopup {
-      display: none;
       position: fixed;
       left: 45%;
       top: 5%;
@@ -188,10 +187,9 @@
       </section>
   
       {% if pagination %}
-      {% if len(pagination.items) < 2 %} 
       <section class="loginPopup">
-        <div class="formPopup" id="popupForm">
-          <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=pagination.pages)}}" method="post">
+        <div class="formPopup" id="popupForm" style="display: {{ display }}">
+          <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=pagination.page)}}" method="post">
             {{form.hidden_tag()}}
             <label class="form__label">
               {% if form.list_name.errors %}
@@ -212,30 +210,7 @@
           </form>
         </div>
         {% else %}
-        <div class="formPopup" id="popupForm">
-          <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=pagination.pages + 1)}}" method="post">
-            {{form.hidden_tag()}}
-            <label class="form__label">
-              {% if form.list_name.errors %}
-              <!--<input type="text" name="list_name" class="form__input" placeholder="Введите название списка..">-->
-              {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
-              <span>
-                {% for msg in form.list_name.errors %}
-                {{ msg }}
-                {% endfor %}
-              </span>
-              {% else %}
-              {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
-              {% endif %}
-            </label>
-            <!-- <button class="form__btn">Добавить</button>-->
-            {{form.submit(class="form__btn btn")}}
-            <button type="button" class="btn cancel" onclick="closeForm()">Отменить</button>
-          </form>
-        </div>
-        {% endif %}
-        {% else %}
-        <div class="formPopup" id="popupForm">
+        <div class="formPopup" id="popupForm" style="display: {{ display }}">
           <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=1)}}" method="post">
             {{form.hidden_tag()}}
             <label class="form__label">

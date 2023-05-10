@@ -1,8 +1,8 @@
-{% macro pagination_widget(page_count, range, name, endpoint='main.search_by_category', fragment='#search_results') %}
+{% macro pagination_widget(page_count, range, name, list_id, endpoint='main.search_by_category', fragment='#search_results') %}
 <ul class="pagination__list list-reset">
     {% for p in range(1, page_count + 1) %}
             <li class="pagination__item active">
-                <a href="{{ url_for(endpoint, name=name, page=p) }}{{ fragment }}">{{ p }}</a>
+                <a href="{{ url_for(endpoint, name=name, page=p, list_id=list_id) }}{{ fragment }}">{{ p }}</a>
             </li>
     {% endfor %}
 </ul>

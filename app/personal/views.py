@@ -4,6 +4,7 @@ from flask import render_template, redirect, url_for, request, make_response
 from .forms import EditProfileForm, AddListForm, AddNewBookForm
 from ..begin_to_app import database
 from app.models import User, Cataloge, Book, Item, Role, Category
+LISTS_COUNT = 2
 
 
 @personal.app_context_processor
@@ -24,9 +25,9 @@ def person(username, flag=False):
     form = AddListForm()
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
-    pagination = user.cataloges.order_by().paginate(page, per_page=2, error_out=False)
+    pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag, form=form)
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag, form=form, display="none")
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -54,10 +55,18 @@ def add_list(username):
         cataloge = Cataloge(name=str(form.list_name.data).strip().lower(), user=current_user._get_current_object())
         database.session.add(cataloge)
         database.session.commit()
-        return redirect(url_for('.person', username=username, page=request.args.get('page')))
-    
-    # return redirect(url_for('.person', username=username))
-
+        user = User.query.filter_by(username=username).first()
+        user_cataloges = user.cataloges.all()
+        page = int(len(user_cataloges) / 2)
+        if len(user_cataloges) % 2 > 0:
+            page += 1
+        return redirect(url_for('.person', username=username, page=page))
+    user = User.query.filter_by(username=username).first()
+    page = request.args.get('page', 1, type=int)
+    pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+    catalogues = pagination.items
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=True, form=form, display="block")
+  
 
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
