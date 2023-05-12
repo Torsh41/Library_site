@@ -22,12 +22,13 @@ def avatar(username):
 @personal.route('/<username>')
 @login_required
 def person(username, flag=False):
+    add_book_form = AddNewBookForm()
     form = AddListForm()
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
     pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag, form=form, display="none")
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag, form=form, add_book_form=add_book_form, display="none")
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -61,11 +62,12 @@ def add_list(username):
         if len(user_cataloges) % 2 > 0:
             page += 1
         return redirect(url_for('.person', username=username, page=page))
+    categories = Category.query.all()
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
     pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=True, form=form, display="block")
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, categories=categories, len=len, form=form, display="block")
   
 
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])

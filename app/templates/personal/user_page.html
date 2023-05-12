@@ -34,12 +34,13 @@
       position: fixed;
     }
     .loginPopup {
-      position: relative;
+      position: absolute;
       text-align: center;
       width: 100%;
     }
     .formPopup {
       position: fixed;
+      cursor: move;
       left: 45%;
       top: 5%;
       transform: translate(-50%, 5%);
@@ -185,10 +186,12 @@
           <!--Выход из аккаунта-->
         </div>
       </section>
-  
+    
+
+      <!-- Добавление списка -->
       {% if pagination %}
-      <section class="loginPopup">
-        <div class="formPopup" id="popupForm" style="display: {{ display }}">
+      <section class="loginPopup" id="popupForm" style="display: {{ display }}">
+        <div class="formPopup">
           <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=pagination.page)}}" method="post">
             {{form.hidden_tag()}}
             <label class="form__label">
@@ -209,8 +212,10 @@
             <button type="button" class="btn cancel" onclick="closeForm()">Отменить</button>
           </form>
         </div>
-        {% else %}
-        <div class="formPopup" id="popupForm" style="display: {{ display }}">
+      </section>
+      {% else %}
+      <section class="loginPopup" id="popupForm" style="display: {{ display }}">
+        <div class="formPopup">
           <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=1)}}" method="post">
             {{form.hidden_tag()}}
             <label class="form__label">
