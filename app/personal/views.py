@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, request, make_response
 from .forms import EditProfileForm, AddListForm, AddNewBookForm
 from ..begin_to_app import database
-from app.models import User, Cataloge, Book, Item, Role, Category
+from app.models import User, Cataloge, Book, Item, Role, Category, Comment
 LISTS_COUNT = 2
 
 
@@ -58,8 +58,8 @@ def add_list(username):
         database.session.commit()
         user = User.query.filter_by(username=username).first()
         user_cataloges = user.cataloges.all()
-        page = int(len(user_cataloges) / 2)
-        if len(user_cataloges) % 2 > 0:
+        page = int(len(user_cataloges) / LISTS_COUNT)
+        if len(user_cataloges) % LISTS_COUNT > 0:
             page += 1
         return redirect(url_for('.person', username=username, page=page))
     categories = Category.query.all()

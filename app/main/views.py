@@ -1,11 +1,14 @@
 from . import main
 from app.init import database
-from app.models import BookGrade, Book, Comment, SearchResult, Category
+from app.models import BookGrade, Book, Comment, SearchResult, Category, User
 from flask import render_template, request, redirect, url_for, make_response
 from app.main.sort import sorting
 from flask_login import current_user, login_required
 import copy
+
+
 ITEMS_COUNT = 5
+COMMENTS_COUNT = 10
 
 months_dict = {
         1:'января',
@@ -47,9 +50,9 @@ def book_page(name):
     
     page = request.args.get('page', 1, type=int)
     if page == -1:
-        page = round((book.comments.count() - 1) / 10 + 1, 1)
+        page = round((book.comments.count() - 1) / COMMENTS_COUNT + 1, 1)
     
-    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=10, error_out=False)
+    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=COMMENTS_COUNT, error_out=False)
     comments = pagination.items
     fin_grade = 0
     grade_count = 0
@@ -59,7 +62,24 @@ def book_page(name):
         grade_count += 1
     if grade_count:    
         fin_grade = round(fin_grade / grade_count, 1)
-    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, grade_count=grade_count, months_dict=months_dict) 
+   
+    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=grade_count, months_dict=months_dict, display="none") 
+
+
+@main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
+@login_required
+def edit_comment(username, comment_id, book_name):
+    # user = User.query.filter_by(username=username).first()
+    # book = Book.query.filter_by(name=book_name).first()
+    comment = Comment.query.filter_by(id=comment_id).first()
+    comment.body = request.form.get('newComment')
+    # comment.book = book
+    # comment.user = user
+    database.session.add(comment)
+    database.session.commit()
+    page = request.args.get('page')
+    return redirect(url_for('main.book_page', name=book_name, page=page))
+   
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 

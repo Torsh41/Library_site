@@ -13,6 +13,73 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/edit_comment.js')}}"></script> 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    .openBtn {
+      display: flex;
+      justify-content: left;
+    }
+    .openButton {
+      border: none;
+      border-radius: 5px;
+      background-color: #1c87c9;
+      color: white;
+      padding: 14px 20px;
+      cursor: pointer;
+      position: fixed;
+    }
+    .loginPopup {
+      position: absolute;
+      text-align: center;
+      width: 100%;
+    }
+    .formPopup {
+      position: fixed;
+      left: 45%;
+      top: 5%;
+      transform: translate(-50%, 5%);
+      border: 3px solid #999999;
+      z-index: 9;
+    }
+    .formContainer {
+      max-width: 300px;
+      padding: 20px;
+      background-color: #fff;
+    }
+    .formContainer input[type=text],
+    .formContainer input[type=password] {
+      width: 100%;
+      padding: 15px;
+      margin: 5px 0 20px 0;
+      border: none;
+      background: #eee;
+    }
+    .formContainer input[type=text]:focus,
+    .formContainer input[type=password]:focus {
+      background-color: #ddd;
+      outline: none;
+    }
+    .formContainer .btn {
+      padding: 12px 20px;
+      border: none;
+      background-color: #8ebf42;
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+    .formContainer .cancel {
+      background-color: #cc0000;
+    }
+    .formContainer .btn:hover,
+    .openButton:hover {
+      opacity: 1;
+    }
+  </style>
 </head>
 
 <body class="image-3">
@@ -239,8 +306,7 @@
         </div>
         {% endif %}
 
-
-
+        
         <!--Здесь список оставленных комментариев-->
         <ul class="comments__info list-reset">
           {% for comment in comments %}
@@ -267,9 +333,24 @@
             <div class="comments__commands">
 
               {% if comment.user.username == current_user.username %}
-              <a class="comments__command" href="#">Редактировать</a>
-              {% if pagination %}
-              {% if len(pagination.items) < 2 %} <a class="comments__command"
+              <section class="loginPopup" id="{{ comment.id }}" style="display: {{ display }}">
+                <div class="formPopup">
+                  <h2 class="comments__title title">Редактирование комментария</h2>
+                  <form class="formContainer" action="{{url_for('main.edit_comment', username=current_user.username, comment_id=comment.id, book_name=book.name, page=pagination.page)}}" method="post">
+          
+                    <label class="comments__label">
+                      <span class="comments__span">Ваш комментарий</span>
+                      <textarea type="text" class="comments__textarea" id="{{ comment.id }}field" rows="5" name="newComment" placeholder="введите новый комментарий..." required></textarea>
+                    </label>
+          
+                    <button class="comments__btn btn">Изменить</button>
+                    <button type="button" class="btn cancel" onclick="closeEditCommentForm('{{ comment.id }}')">Отменить</button>
+                  </form>
+                </div>
+              </section>
+              <a class="comments__command" onclick="edit('{{ comment.body }}', '{{ comment.id }}')">Редактировать</a>
+                {% if pagination %}
+                {% if len(pagination.items) < 2 %} <a class="comments__command"
                 href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}">
                 Удалить</a>
                 {% else %}
@@ -280,7 +361,7 @@
                 <a class="comments__command"
                   href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}">Удалить</a>
                 {% endif %}
-                {% endif %}
+              {% endif %}
 
             </div>
           </li>
