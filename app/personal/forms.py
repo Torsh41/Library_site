@@ -30,9 +30,8 @@ def  validate_lists_count(form, field):
 class AddListForm(FlaskForm):
     list_name = StringField('ListName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название списка должно содержать только буквы и пробелы.'), validate_list_name, validate_lists_count])
-    submit = SubmitField('Добавить')
-            
-            
+   
+                  
 def validate_bookname(form, field):
     if Book.query.filter_by(name=str(field.data).strip().lower()).first():
         raise ValidationError('Данное название книги уже находится в общей базе.')

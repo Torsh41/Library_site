@@ -7,9 +7,8 @@ from flask_login import current_user, login_required
 import copy
 
 
-ITEMS_COUNT = 5
+SEARCH_ITEMS_COUNT = 6
 COMMENTS_COUNT = 10
-
 months_dict = {
         1:'января',
         2:'февраля',
@@ -175,11 +174,11 @@ def search_by_category(name):
                     book_for_cur_result = SearchResult(book)
                     database.session.add(book_for_cur_result)
                 database.session.commit()
-                if len(search_result) > ITEMS_COUNT:
-                    page_count = int(len(search_result) / ITEMS_COUNT)
-                    if len(search_result) % ITEMS_COUNT > 0:
+                if len(search_result) > SEARCH_ITEMS_COUNT:
+                    page_count = int(len(search_result) / SEARCH_ITEMS_COUNT)
+                    if len(search_result) % SEARCH_ITEMS_COUNT > 0:
                         page_count += 1
-                    search_result = search_result[:ITEMS_COUNT] 
+                    search_result = search_result[:SEARCH_ITEMS_COUNT] 
                 else:
                     page_count = 1
         return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range, name=name, list_id=list_id)
@@ -190,15 +189,19 @@ def search_by_category(name):
         for book in cur_result:
             counter += 1
             temp_arr.append(book)
-            if counter % ITEMS_COUNT == 0:
+            if counter % SEARCH_ITEMS_COUNT == 0:
                 search_result[page_count] = copy.copy(temp_arr)
                 page_count += 1
                 temp_arr = list()
-        if page < 0 or page > page_count:
-            return render_template('main/category_page.html', search_result=0, date_list=date_list, len=len)
-        if counter % ITEMS_COUNT > 0:
+                
+        if counter % SEARCH_ITEMS_COUNT > 0:
             search_result[page_count] = temp_arr
-        search_result = search_result[page]
+        else:
+            page_count -= 1
+        try:
+            search_result = search_result[page]
+        except:
+            return render_template('main/category_page.html', search_result=0, date_list=date_list, len=len)
         return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name, list_id=list_id)
     
     return render_template('main/category_page.html', search_result=0, date_list=date_list, categories=categories, len=len)

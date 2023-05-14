@@ -14,8 +14,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
   <link charset="utf-8" rel="stylesheet" href="{{url_for('static', filename='styles/css/smoke-pure.css')}}" />
-  <script src="{{ url_for('static', filename='js/add_book_js.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/add_book_list_js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/personal/add_book_js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/personal/add_book_list_js.js')}}"></script>
+  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script> 
   <style>
     * {
       box-sizing: border-box;
@@ -40,7 +42,6 @@
     }
     .formPopup {
       position: fixed;
-      cursor: move;
       left: 45%;
       top: 5%;
       transform: translate(-50%, 5%);
@@ -207,8 +208,7 @@
               {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
               {% endif %}
             </label>
-            <!-- <button class="form__btn">Добавить</button>-->
-            {{form.submit(class="form__btn btn")}}
+            <button class="comments__btn btn" id="add_list">Добавить</button>
             <button type="button" class="btn cancel" onclick="closeForm()">Отменить</button>
           </form>
         </div>
@@ -220,7 +220,7 @@
             {{form.hidden_tag()}}
             <label class="form__label">
               {% if form.list_name.errors %}
-              <!--<input type="text" name="list_name" class="form__input" placeholder="Введите название списка..">-->
+            
               {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
               <span>
                 {% for msg in form.list_name.errors %}
@@ -231,13 +231,13 @@
               {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
               {% endif %}
             </label>
-            <!-- <button class="form__btn">Добавить</button>-->
-            {{form.submit(class="form__btn btn")}}
+            <button class="comments__btn btn" id="add_list">Добавить</button>
             <button type="button" class="btn cancel" onclick="closeForm()">Отменить</button>
           </form>
         </div>
       </section>
       {% endif %}
+      <script>scroll('add_list')</script>
 
       <!--Кнопка все время присутствует на странице пользователя-->
       <section class="list">
