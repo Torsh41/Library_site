@@ -356,16 +356,16 @@
               <a class="comments__command" onclick="edit('{{ comment.body }}', '{{ comment.id }}')">Редактировать</a>
                 {% if pagination %}
                 {% if len(pagination.items) < 2 %} <a class="comments__command"
-                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}">Удалить</a>
+                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}" id="{{ comment.id }}del">Удалить</a>
                 {% else %}
                 <a class="comments__command"
-                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page)}}">Удалить</a>
+                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page)}}" id="{{ comment.id }}del">Удалить</a>
                 {% endif %}
                 {% else %}
                 <a class="comments__command"
-                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}">Удалить</a>
+                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}" id="{{ comment.id }}del">Удалить</a>
                 {% endif %}
-      
+                <script>scroll({{ comment.id }} + 'del')</script>
               {% endif %}
 
             </div>

@@ -313,7 +313,7 @@
   
               {% if pagination %}
               {% if len(pagination.items) < 2 %} <a class="list__delete-btn"
-                href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page - 1)}}">
+                href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page - 1)}}" id="{{cataloge_value.id}}del_list">
                 <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line y1="0.5" x2="461" y2="0.5" stroke="black" />
                 </svg>
@@ -324,14 +324,15 @@
                 </a>
                 {% else %}
                 <a class="list__delete-btn"
-                  href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page)}}">Удалить
+                  href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page)}}" id="{{cataloge_value.id}}del_list">Удалить
                   список</a>
                 {% endif %}
                 {% else %}
                 <a class="list__delete-btn"
-                  href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=1)}}">Удалить
+                  href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=1)}}" id="{{cataloge_value.id}}del_list">Удалить
                   список</a>
                 {% endif %}
+                <script>scroll({{ cataloge_value.id }} + 'del_list')</script>
             </div>
           </div>
         </section>
