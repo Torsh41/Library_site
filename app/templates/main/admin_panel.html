@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin dashboard</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/favicon.svg">
+</head>
+
+<body>
+  <header class="header">
+    <div class="header__container container">
+      <a class="header__logo" href="index.html">
+        <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+      </a>
+
+      <div class="header__admin admin">
+        <a href="#" class="admin__link">
+          <div class="admin__set">
+            <img src="img/default_avatar.jpg" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
+          </div>
+          Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
+        </a>
+      </div>
+
+      <!-- <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
+
+                {% if (comment.user.username == current_user.username) and current_user.is_authenticated %}
+                  </div>
+                  <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">{{ comment.user.username }}</a>
+                  </div>
+                {% else %}
+                  </div>
+                  <a class="comments__link">{{ comment.user.username }}</a>
+                  </div>
+                {% endif %} -->
+
+
+
+    </div>
+  </header>
+
+  <main>
+    <section class="main">
+      <div class="main__container container">
+
+        <div class="main__top">
+
+          <h1 class="main__title">Hello, </h1>
+          <!--Hello, имя пользователя!-->
+
+          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+          </svg>
+
+        </div>
+
+        <nav class="nav header__nav">
+          <ul class="nav__admin-list list-reset">
+            <li class="nav__admin-item">
+              <a href="" class="nav__admin-link">Список пользователей</a>
+
+            </li>
+            <li class="nav__admin-item">
+
+              <a href="" class="nav__admin-link">Список категорий книг</a>
+
+            </li>
+            <li class="nav__admin-item">
+
+              <a href="" class="nav__admin-link">Настройки</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+
+
+    <!--При нажатии на кнопку списка пользователей открывается этот блок-->
+    <section class="users">
+      <div class="users__container container">
+        <h2 class="users__title">Список пользователей</h2>
+
+        <form class="list__form" action="" method="post">
+
+          <label class="list__form-label">
+            <svg class="list__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_6_94)">
+                <path
+                  d="M25.5 24.5556L18.1443 17.4723M18.1443 17.4723C19.9088 15.7732 21 13.426 21 10.8333C21 5.64801 16.6349 1.44446 11.25 1.44446C5.86523 1.44446 1.5 5.64801 1.5 10.8333C1.5 16.0188 5.86523 20.2222 11.25 20.2222C13.9424 20.2222 16.3798 19.1714 18.1443 17.4723Z"
+                  stroke="#768298" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </g>
+              <defs>
+                <clipPath id="clip0_6_94">
+                  <rect width="27" height="26" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+            <input type="text" name="search_result" class="list__form-input" placeholder="Введите имя пользователя..">
+          </label>
+
+
+          <button class="list__btn-search ">Найти</button>
+        </form>
+
+
+        <ul class="users__list list-reset">
+          <li class="users__item">
+            <a href="#" class="users__link">
+              <div class="users__set">
+                <img src="img/default_avatar.jpg" alt="" class="users__img"> <!--Фото админа из его личного кабинета-->
+              </div>
+              Элеонора <!--Имя админа и ссылка обратно в личный кабинет-->
+            </a>
+
+            <button class="users__btn">Удалить пользователя</button>
+          </li>
+
+          <li class="users__item">
+            <a href="#" class="users__link">
+              <div class="users__set">
+                <img src="img/default_avatar.jpg" alt="" class="users__img"> <!--Фото админа из его личного кабинета-->
+              </div>
+              gggggggggggggggggggggggggggggggggggggg <!--Имя админа и ссылка обратно в личный кабинет-->
+            </a>
+
+            <button class="users__btn">Удалить пользователя</button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="category">
+      <div class="category__container container">
+        <h2 class="list__title title">Cписок категорий</h2>
+        <ul class="category__list list-reset">
+          <a href="#" class="category__book-link">
+            <li class="category__elem">
+              <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_139_2)">
+                  <rect x="35" width="8" height="78" fill="#D9D9D9" />
+                  <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_139_2">
+                    <rect width="78" height="78" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+            </li>
+          </a>
+
+          <li class="category__elem"><a href="#" class="category__book-link">МХТП</a>
+            <button class="category__btn">Удалить категорию</button>
+          </li>
+          <li class="category__elem"><a href="#" class="category__book-link">Программирование</a>
+            <button class="category__btn">Удалить категорию</button>
+          </li>
+          <li class="category__elem"><a href="#" class="category__book-link">Инженерная графика</a>
+            <button class="category__btn">Удалить категорию</button>
+          </li>
+          <li class="category__elem"><a href="#" class="category__book-link">ПАХТ</a>
+            <button class="category__btn">Удалить категорию</button>
+          </li>
+
+        </ul>
+      </div>
+    </section>
+
+
+    <!--При нажатии на кнопку соответствующей категории-->
+    <section class="list">
+      <div class="container list__container">
+        <div class="list__wrap">
+          <h2 class="list__title title">Книги в категории " "</h2> <!--Название категории-->
+
+          <form class="list__form" action="" method="post">
+
+            <label class="list__form-label">
+              <svg class="list__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_6_94)">
+                  <path
+                    d="M25.5 24.5556L18.1443 17.4723M18.1443 17.4723C19.9088 15.7732 21 13.426 21 10.8333C21 5.64801 16.6349 1.44446 11.25 1.44446C5.86523 1.44446 1.5 5.64801 1.5 10.8333C1.5 16.0188 5.86523 20.2222 11.25 20.2222C13.9424 20.2222 16.3798 19.1714 18.1443 17.4723Z"
+                    stroke="#768298" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_6_94">
+                    <rect width="27" height="26" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+              <input type="text" name="search_result" class="list__form-input"
+                placeholder="Введите название книги или автора..">
+            </label>
+
+
+            <button class="list__btn-search ">Найти</button>
+          </form>
+
+          <ul class="list__books list-reset">
+            <!-- {% for book in search_result %} -->
+
+
+            <!--Найденные книги-->
+            <a href="" class="list__link">
+              <li class="list__book list__add">
+                <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_139_2)">
+                    <rect x="35" width="8" height="78" fill="#D9D9D9" />
+                    <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_139_2">
+                      <rect width="78" height="78" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+
+              </li>
+            </a>
+
+            <li class="list__book">
+              <div class="list__top">
+                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
+                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt=""> <!--Перекидываем на страницу книги-->
+                </a>
+
+
+                <div class="list__book-wrap">
+                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
+                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
+                </div>
+              </div>
+
+
+              <button class="list__btn">Удалить книгу</button>
+              <div class="list__show">
+                <span class="list__act">Показать оценку</span>
+                <span class="list__mark">Оценка</span>
+              </div>
+            </li>
+
+            <li class="list__book">
+              <div class="list__top">
+                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
+                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
+                </a>
+
+
+                <div class="list__book-wrap">
+                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
+                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
+                </div>
+              </div>
+
+              <button class="list__btn">Удалить книгу</button>
+              <div class="list__show">
+                <span class="list__act">Показать оценку</span>
+                <span class="list__mark">Оценка</span>
+              </div>
+            </li>
+
+
+            <!-- {% endfor %} -->
+          </ul>
+        </div>
+        <!-- <div class="list__pagination pagination">
+          {{ macros.pagination_widget(page_count=page_count, range=range) }}
+        </div> -->
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+    </div>
+  </footer>
+
+</body>
+
+</html>

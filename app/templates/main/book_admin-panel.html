@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ваш выбор</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/favicon.svg">
+</head>
+
+<body>
+  <header class="header">
+    <div class="header__container container">
+      <a class="header__logo" href="index.html">
+        <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+      </a>
+
+      <div class="header__admin admin">
+        <a href="admin_panel.html" class="admin__back">Вернуться назад</a>
+
+        <a href="#" class="admin__link">
+          <div class="admin__set">
+            <img src="img/default_avatar.jpg" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
+          </div>
+          Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
+        </a>
+
+
+      </div>
+
+
+
+
+    </div>
+  </header>
+
+  <main>
+    <section class="main">
+      <div class="main__container container">
+
+        <div class="main__top">
+
+          <h1 class="main__title">Название выбранной книги</h1>
+
+          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+          </svg>
+
+        </div>
+
+        <div class="main__bottom">
+          <a class="main__bottom-item" href="#">Средняя оценка - </a> <!--Пример: Средняя оценка - 4.5 из 5-->
+        </div>
+
+      </div>
+    </section>
+
+    <section class="book">
+      <div class="book__container container">
+        <div class="book__top">
+          <div class="book__image">
+            <!--Тут фотка книги-->
+
+            <!--Выборка доступна только авторизированным пользователям-->
+            
+          </div>
+
+          <div class="book__info">
+            <!--характеристики книги текстом-->
+          </div>
+        </div>
+
+        <div class="book__bottom">
+          <p class="book__text">Описание</p>
+          <!--описание книги текстом-->
+
+
+        </div>
+
+      </div>
+    </section>
+
+
+
+    <!--Блок комментирования книги-->
+    <section class="comments">
+      <div class="comments__container container">
+        <h2 class="comments__title title">Комментарии</h2>
+
+
+        <!--Здесь список оставленных комментариев-->
+        <ul class="comments__info list-reset">
+
+          <!--Элемент - комментарий-->
+          <li class="comments__comment">
+            <div class="comments__top">
+              <div class="comments__image">
+                <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
+                <!--Тут добавленная фотка пользователем-->
+
+              </div>
+              <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">Леонард</a>
+            </div>
+
+            <p class="comments__text">Книга супер </p> <!--Тут коммент введенный пользователем-->
+
+            <div class="comments__list">
+
+              <a class="comments__command" href="#">Удалить</a>
+
+            </div>
+          </li>
+
+          <li class="comments__comment">
+            <div class="comments__top">
+              <div class="comments__image">
+                <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
+                <!--Тут добавленная фотка пользователем-->
+
+              </div>
+              <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">Леонард</a>
+            </div>
+
+            <p class="comments__text">Книга супер </p> <!--Тут коммент введенный пользователем-->
+
+            <div class="comments__list">
+
+              <a class="comments__command" href="#">Удалить</a>
+
+            </div>
+          </li>
+        </ul>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+    </div>
+  </footer>
+</body>
+
+</html>

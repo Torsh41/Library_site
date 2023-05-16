@@ -4,7 +4,7 @@
 }
 
 .list__container {
-  padding: 52px 52px;
+  padding: 52px 100px;
   border-radius: 15px;
   background-color: #F5F5DC;
 }
@@ -61,7 +61,7 @@
 .list__books {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -75,6 +75,7 @@
   height: 322px;
   margin-bottom: 48px;
   background-color: #E9E6C3;
+  margin-right: 50px;
 
   /* background-image: url(../img/book.jpg);
   background-repeat: no-repeat;
@@ -250,4 +251,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+
+.list__book:nth-child(3n) {
+  margin-right: 0;
 }
