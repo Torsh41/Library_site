@@ -163,7 +163,8 @@ def search_by_category(name):
             if not search_result:
                 search_result = 404
                 page_count = None
-                
+            all_search_result = search_result
+            
         if search_result != 404:
                 old_books_result = SearchResult.query.all()
                 if old_books_result:
@@ -181,7 +182,7 @@ def search_by_category(name):
                     search_result = search_result[:SEARCH_ITEMS_COUNT] 
                 else:
                     page_count = 1
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range, name=name, list_id=list_id)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range, name=name, list_id=list_id, all_search_result=all_search_result)
     
     elif page := request.args.get('page', None, type=int):
         cur_result = SearchResult.query.all()
@@ -202,6 +203,6 @@ def search_by_category(name):
             search_result = search_result[page]
         except:
             return render_template('main/category_page.html', search_result=0, date_list=date_list, len=len)
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name, list_id=list_id)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name, list_id=list_id, all_search_result=cur_result)
     
     return render_template('main/category_page.html', search_result=0, date_list=date_list, categories=categories, len=len)
