@@ -19,7 +19,8 @@
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
-        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
+        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+          alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
       <nav class="nav header__nav">
@@ -40,11 +41,9 @@
               {% endif %}
               {% if current_user.is_authenticated %}
               <li class="nav__subitem"><a class="nav__link"
-                 
                   href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
               {% else %}
-              <li class="nav__subitem"><a class="nav__link"
-                href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.searching')}}">Поиск книг</a></li>
               <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
@@ -75,227 +74,230 @@
 
       </div>
     </section>
-    
+
     <div class="background-book_page">
       <form action="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id)}}"
-      method="post">
-      <section class="book">
-        <div class="book__container container">
-          <div class="book__top">
-            <div class="book__image">
+        method="post">
+        <section class="book">
+          <div class="book__container container">
+            <div class="book__top">
+              <div class="book__image">
 
-              <!--Тут обложка книги-->
-              <img class="book__image-set" src="{{url_for('main.cover', name=book.name)}}">
+                <!--Тут обложка книги-->
+                <img class="book__image-set" src="{{url_for('main.cover', name=book.name)}}">
 
-              <div class="book__set">
-                <!--Выборка доступна только авторизированным пользователям-->
-                {% if current_user.is_authenticated %}
-                <select name="read_state" class="book__select">
-                  <option class="book__state book__plan" value="Планирую">Планирую</option>
-                  <option class="book__state book__read" value="Читаю">Читаю</option>
-                  <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
-                  <option class="book__state book__done" value="Прочитано">Прочитано</option>
-                </select>
-                {% else %}
-                
-                  <h2 class="book__error">Выбор состояния чтения книги доступен только авторизованным пользователям.</h2>
-                
-                {% endif %}
+                <div class="book__set">
+                  <!--Выборка доступна только авторизированным пользователям-->
+                  {% if current_user.is_authenticated %}
+                  <select name="read_state" class="book__select">
+                    <option class="book__state book__plan" value="Планирую">Планирую</option>
+                    <option class="book__state book__read" value="Читаю">Читаю</option>
+                    <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                    <option class="book__state book__done" value="Прочитано">Прочитано</option>
+                  </select>
+                  {% else %}
+
+                  <h2 class="book__error">Выбор состояния чтения книги доступен только авторизованным пользователям.
+                  </h2>
+
+                  {% endif %}
+                </div>
+
               </div>
 
+
+
+              <div class="book__info">
+                <ul class="book__list list-reset">
+                  <!--характеристики книги текстом-->
+                  <li class="book__list-element"><b>ISBN:</b> {{ book.isbn }}</li>
+                  <li class="book__list-element"><b>Автор:</b> {{ book.author }}</li>
+                  <li class="book__list-element"><b>Издательство:</b> {{ book.publishing_house }}</li>
+                  <li class="book__list-element"><b>Дата выпуска:</b> {{ book.release_date}}</li>
+                  <li class="book__list-element"><b>Количество глав:</b> {{ book.count_of_chapters }}</li>
+                  <li class="book__list-element"><b>Жанр:</b> {{ str(book.genre) }}</li>
+                </ul>
+              </div>
             </div>
 
-            
 
-            <div class="book__info">
-              <ul class="book__list list-reset">
-                <!--характеристики книги текстом-->
-                <li class="book__list-element"><b>ISBN:</b> {{ book.isbn }}</li>
-                <li class="book__list-element"><b>Автор:</b> {{ book.author }}</li>
-                <li class="book__list-element"><b>Издательство:</b> {{ book.publishing_house }}</li>
-                <li class="book__list-element"><b>Дата выпуска:</b> {{ book.release_date}}</li>
-                <li class="book__list-element"><b>Количество глав:</b> {{ book.count_of_chapters }}</li>
-                <li class="book__list-element"><b>Жанр:</b> {{ str(book.genre) }}</li>
+
+            <div class="book__bottom">
+              <p class="book__text">Описание</p>
+              {{ book.description }}
+              <!--описание книги текстом-->
+            </div>
+
+            <!--Если авторизированный пользователь -->
+            {% if current_user.is_authenticated %}
+            <div class="book__footer">
+              <h2 class="book__title title">Поставьте оценку</h2>
+              <!--если пользователь уже оставлял свою оценку "Ваша оценка"-->
+              <!---->
+              <ul class="book__marks list-reset">
+                <li class="book__mark"><a
+                    href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=1)}}"
+                    class="book__link">
+                    <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
+                    </svg>
+                  </a></li>
+                <li class="book__mark"><a
+                    href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=2)}}"
+                    class="book__link">
+                    <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
+                    </svg>
+
+                  </a></li>
+                <li class="book__mark"><a
+                    href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=3)}}"
+                    class="book__link">
+                    <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
+                    </svg>
+
+                  </a></li>
+                <li class="book__mark">
+                  <a href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=4)}}"
+                    class="book__link">
+                    <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
+                    </svg>
+
+                  </a>
+                </li>
+                <li class="book__mark"><a
+                    href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=5)}}"
+                    class="book__link">
+                    <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
+                    </svg>
+
+                  </a></li>
               </ul>
             </div>
+            {% else %}
+            <div class="book__footer">
+              <h2 class="book__title title">Ставить оценки могут только авторизованные пользователи.</h2>
+            </div>
+            {% endif %}
           </div>
+        </section>
 
-          
+        <!--Кнопка доступна только авторизированным пользователям-->
 
-          <div class="book__bottom">
-            <p class="book__text">Описание</p>
-            {{ book.description }}
-            <!--описание книги текстом-->
-          </div>
+        <!--После нажатия кнопки - открываются созданные пользователем в своем лк списки, пользователь выбирает в какой свой список добавить -->
+        {% if current_user.is_authenticated %}
+        <div class="container lists__create">
+          <button class="lists__btn">Добавить в список
+            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_139_2)">
+                <rect x="35" width="8" height="78" fill="#D9D9D9" />
+                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
+              </g>
+              <defs>
+                <clipPath id="clip0_139_2">
+                  <rect width="78" height="78" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </button>
+        </div>
+        {% endif %}
+      </form>
 
-          <!--Если авторизированный пользователь -->
+
+      <!--Блок комментирования книги-->
+      <section class="comments">
+        <div class="comments__container container">
+          <h2 class="comments__title title">Комментарии</h2>
           {% if current_user.is_authenticated %}
-          <div class="book__footer">
-            <h2 class="book__title title">Поставьте оценку</h2>
-            <!--если пользователь уже оставлял свою оценку "Ваша оценка"-->
-            <!---->
-            <ul class="book__marks list-reset">
-              <li class="book__mark"><a
-                  href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=1)}}"
-                  class="book__link">
-                  <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
-                  </svg>
-                </a></li>
-              <li class="book__mark"><a
-                  href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=2)}}"
-                  class="book__link">
-                  <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
-                  </svg>
+          <form class="comments__form" action="" method="post">
 
-                </a></li>
-              <li class="book__mark"><a
-                  href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=3)}}"
-                  class="book__link">
-                  <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
-                  </svg>
+            <label class="comments__label">
+              <span class="comments__span">Ваш комментарий</span>
+              <textarea type="text" name="comment" class="comments__textarea" rows="7"
+                placeholder="Введите свой комментарий.."></textarea>
+            </label>
 
-                </a></li>
-              <li class="book__mark">
-                <a href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=4)}}"
-                  class="book__link">
-                  <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
-                  </svg>
-
-                </a>
-              </li>
-              <li class="book__mark"><a
-                  href="{{url_for('main.give_grade', username=current_user.username, book_id=book.id, grade=5)}}"
-                  class="book__link">
-                  <svg class="book__star" width="22" height="22" viewBox="0 0 14 14" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M13.6962 6.37199C13.9717 6.10343 14.069 5.70928 13.9501 5.34288C13.831 4.97648 13.5207 4.71492 13.1394 4.65942L9.74958 4.16687C9.60521 4.14584 9.48046 4.05529 9.41598 3.92437L7.90048 0.853009C7.73032 0.507914 7.38494 0.293457 7.00004 0.293457C6.61542 0.293457 6.27004 0.507914 6.09988 0.853009L4.5841 3.92465C4.51962 4.05557 4.39459 4.14612 4.25022 4.16715L0.860391 4.6597C0.479414 4.71492 0.168802 4.97676 0.0496586 5.34316C-0.069204 5.70956 0.0280727 6.10371 0.303643 6.37227L2.75631 8.76298C2.86087 8.86502 2.90881 9.01192 2.88414 9.15545L2.30553 12.5313C2.25422 12.8284 2.33216 13.1174 2.52447 13.3454C2.82331 13.7005 3.34501 13.8088 3.76215 13.5895L6.79371 11.9955C6.92042 11.9291 7.07993 11.9297 7.20637 11.9955L10.2382 13.5895C10.3857 13.6672 10.5429 13.7064 10.7052 13.7064C11.0016 13.7064 11.2825 13.5747 11.4756 13.3454C11.6682 13.1174 11.7459 12.8279 11.6946 12.5313L11.1157 9.15545C11.091 9.01164 11.1389 8.86502 11.2435 8.76298L13.6962 6.37199Z" />
-                  </svg>
-
-                </a></li>
-            </ul>
-          </div>
+            <button class="comments__btn btn">Отправить</button>
+          </form>
           {% else %}
           <div class="book__footer">
-            <h2 class="book__title title">Ставить оценки могут только авторизованные пользователи.</h2>
+            <h2 class="book__error">Оставлять комментарии могут только авторизованные пользователи.</h2>
           </div>
           {% endif %}
+
+
+
+          <!--Здесь список оставленных комментариев-->
+          <ul class="comments__info list-reset">
+            {% for comment in comments %}
+            <!--Элемент - комментарий-->
+            <li class="comments__comment">
+              <div class="comments__top">
+                <div class="comments__image">
+                  <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
+                  <!--Тут добавленная фотка пользователем-->
+                  {% if (comment.user.username == current_user.username) and current_user.is_authenticated %}
+                </div>
+                <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">{{
+                  comment.user.username }}</a>
+              </div>
+              {% else %}
         </div>
-      </section>
+        <a class="comments__link">{{ comment.user.username }}</a>
+    </div>
+    {% endif %}
 
-      <!--Кнопка доступна только авторизированным пользователям-->
+    <p class="comments__link">{{ str(comment.timestamp.date().day) + " " + months_dict[comment.timestamp.date().month] +
+      " " + str(comment.timestamp.date().year) }}</p>
 
-      <!--После нажатия кнопки - открываются созданные пользователем в своем лк списки, пользователь выбирает в какой свой список добавить -->
-      {% if current_user.is_authenticated %}
-      <div class="container lists__create">
-        <button class="lists__btn">Добавить в список
-          <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g clip-path="url(#clip0_139_2)">
-              <rect x="35" width="8" height="78" fill="#D9D9D9" />
-              <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
-            </g>
-            <defs>
-              <clipPath id="clip0_139_2">
-                <rect width="78" height="78" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
-        </button>
-      </div>
-      {% endif %}
-    </form>
+    <p class="comments__text">{{ comment.body }}</p> <!--Тут коммент введенный пользователем-->
 
+    <div class="comments__commands">
 
-    <!--Блок комментирования книги-->
-    <section class="comments">
-      <div class="comments__container container">
-        <h2 class="comments__title title">Комментарии</h2>
-        {% if current_user.is_authenticated %}
-        <form class="comments__form" action="" method="post">
-
-          <label class="comments__label">
-            <span class="comments__span">Ваш комментарий</span>
-            <textarea type="text" name="comment" class="comments__textarea" rows="7"
-              placeholder="Введите свой комментарий.."></textarea>
-          </label>
-
-          <button class="comments__btn btn">Отправить</button>
-        </form>
+      {% if comment.user.username == current_user.username %}
+      <a class="comments__command" href="#">Редактировать</a>
+      {% if pagination %}
+      {% if len(pagination.items) < 2 %} <a class="comments__command"
+        href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}">
+        Удалить</a>
         {% else %}
-        <div class="book__footer">
-          <h2 class="book__error">Оставлять комментарии могут только авторизованные пользователи.</h2>
-        </div>
+        <a class="comments__command"
+          href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page)}}">Удалить</a>
+        {% endif %}
+        {% else %}
+        <a class="comments__command"
+          href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}">Удалить</a>
+        {% endif %}
         {% endif %}
 
+    </div>
+    </li>
+    {% endfor %}
+    </ul>
+    {% if pagination %}
+    <div class="list__pagination pagination">
+      {{ macros.pagination_widget(pagination, 'main.book_page', fragment='#comments', book_name=book.name) }}
+    </div>
+    {% endif %}
 
-
-        <!--Здесь список оставленных комментариев-->
-        <ul class="comments__info list-reset">
-          {% for comment in comments %}
-          <!--Элемент - комментарий-->
-          <li class="comments__comment">
-            <div class="comments__top">
-              <div class="comments__image">
-                <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
-                <!--Тут добавленная фотка пользователем-->
-                {% if (comment.user.username == current_user.username) and current_user.is_authenticated %}
-                  </div>
-                  <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">{{ comment.user.username }}</a>
-                  </div>
-                {% else %}
-                  </div>
-                  <a class="comments__link">{{ comment.user.username }}</a>
-                  </div>
-                {% endif %}
-                  
-                <p class="comments__link">{{ str(comment.timestamp.date().day) + " " + months_dict[comment.timestamp.date().month] + " " + str(comment.timestamp.date().year) }}</p>
-              
-            <p class="comments__text">{{ comment.body }}</p> <!--Тут коммент введенный пользователем-->
-
-            <div class="comments__commands">
-
-              {% if comment.user.username == current_user.username %}
-              <a class="comments__command" href="#">Редактировать</a>
-              {% if pagination %}
-              {% if len(pagination.items) < 2 %} <a class="comments__command"
-                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}">
-                Удалить</a>
-                {% else %}
-                <a class="comments__command"
-                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page)}}">Удалить</a>
-                {% endif %}
-                {% else %}
-                <a class="comments__command"
-                  href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}">Удалить</a>
-                {% endif %}
-                {% endif %}
-
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-        {% if pagination %}
-        <div class="list__pagination pagination">
-          {{ macros.pagination_widget(pagination, 'main.book_page', fragment='#comments', book_name=book.name) }}
-        </div>
-        {% endif %}
-
-      </div>
+    </div>
     </section>
     </div>
-    
+
   </main>
 
   <footer class="footer">
