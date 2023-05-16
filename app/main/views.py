@@ -1,12 +1,14 @@
 from . import main
 from app.init import database
-from app.models import BookGrade, Book, Comment, SearchResult
+from app.models import BookGrade, Book, Comment, SearchResult, Category, User
 from flask import render_template, request, redirect, url_for, make_response
 from app.main.sort import sorting
 from flask_login import current_user, login_required
 import copy
-ITEMS_COUNT = 5
 
+
+SEARCH_ITEMS_COUNT = 6
+COMMENTS_COUNT = 10
 months_dict = {
         1:'января',
         2:'февраля',
@@ -35,10 +37,88 @@ def index():
     return render_template('main/index.html')
  
 
-@main.route('/search', methods=['GET', 'POST'])
-def searching():
+@main.route('/book-page/<name>', methods=['GET', 'POST'])
+def book_page(name):
+    global months_dict
+    book = Book.query.filter_by(name=name).first()
+    if request.method == 'POST' and request.form.get('comment') and current_user.is_authenticated:
+        comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
+        database.session.add(comment)
+        database.session.commit()
+        return redirect(url_for('.book_page', name=book.name, page=-1))
+    
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = round((book.comments.count() - 1) / COMMENTS_COUNT + 1, 1)
+    
+    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=COMMENTS_COUNT, error_out=False)
+    comments = pagination.items
+    fin_grade = 0
+    grade_count = 0
+    grades = BookGrade.query.filter_by(book=book).all()    
+    for value in grades:
+        fin_grade += value.grade
+        grade_count += 1
+    if grade_count:    
+        fin_grade = round(fin_grade / grade_count, 1)
+   
+    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=grade_count, months_dict=months_dict, display="none") 
+
+
+@main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
+@login_required
+def edit_comment(username, comment_id, book_name):
+    # user = User.query.filter_by(username=username).first()
+    # book = Book.query.filter_by(name=book_name).first()
+    comment = Comment.query.filter_by(id=comment_id).first()
+    comment.body = request.form.get('newComment')
+    # comment.book = book
+    # comment.user = user
+    database.session.add(comment)
+    database.session.commit()
+    page = request.args.get('page')
+    return redirect(url_for('main.book_page', name=book_name, page=page))
+   
+
+
+@main.route('/<username>/give-grade/<book_id>/<grade>') 
+@login_required
+def give_grade(username, book_id, grade):
+    book = Book.query.filter_by(id=book_id).first()
+    previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
+    if previous_grade:
+        database.session.delete(previous_grade)
+        database.session.commit()
+            
+    grade = BookGrade(grade=grade, user=current_user, book=book)
+    database.session.add(grade)
+    database.session.commit()
+    return redirect(url_for('main.book_page', name=book.name))
+
+
+@main.route('/<username>/delete-comment/<comment_id>')  
+@login_required
+def comment_delete(username, comment_id):
+    comment = Comment.query.filter_by(id=comment_id).first()
+    book = comment.book
+    database.session.delete(comment)
+    database.session.commit()
+    return redirect(url_for('main.book_page', name=book.name, page=request.args.get('page', type=int))) 
+
+
+@main.route('/categories', methods=['GET'])
+def categories():
+    list_id = request.args.get('list_id', None, type=int)
+    categories = Category.query.all()
+    return render_template('main/categories.html', categories=categories, list_id=list_id)
+
+
+@main.route('/category/<name>/search', methods=['GET', 'POST'])
+def search_by_category(name):
+    list_id = request.args.get('list_id', None, type=int)
     page_count = 1
-    books = Book.query.all()
+    books = Book.query.filter(Category.name.like("%{}%".format(name))).all()
+    categories = Category.query.all()
     date_list = list()
     if books:
         for book in books:
@@ -51,15 +131,13 @@ def searching():
             search_result = books
             if not search_result:
                 search_result = 404
+        elif result == '*':
+            search_result = Book.query.all()
+            if not search_result:
+                search_result = 404
         else:
-            release_date = request.form.get('release_date')
-            genre = request.form.get('genre')
-            
-            if genre:
-                search_result = None
-                search_result_ = Book.query.filter(Book.genre.like("%{}%".format(genre))).all()
-            
-            elif release_date:
+            release_date = request.form.get('release_date') 
+            if release_date:
                 search_result = None
                 search_result_ = Book.query.filter_by(release_date=release_date).all()
                 
@@ -96,14 +174,14 @@ def searching():
                     book_for_cur_result = SearchResult(book)
                     database.session.add(book_for_cur_result)
                 database.session.commit()
-                if len(search_result) > ITEMS_COUNT:
-                    page_count = int(len(search_result) / ITEMS_COUNT)
-                    if len(search_result) % ITEMS_COUNT > 0:
+                if len(search_result) > SEARCH_ITEMS_COUNT:
+                    page_count = int(len(search_result) / SEARCH_ITEMS_COUNT)
+                    if len(search_result) % SEARCH_ITEMS_COUNT > 0:
                         page_count += 1
-                    search_result = search_result[:ITEMS_COUNT] 
+                    search_result = search_result[:SEARCH_ITEMS_COUNT] 
                 else:
                     page_count = 1
-        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len, page_count=page_count, page=1, range=range)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=1, range=range, name=name, list_id=list_id)
     
     elif page := request.args.get('page', None, type=int):
         cur_result = SearchResult.query.all()
@@ -111,67 +189,19 @@ def searching():
         for book in cur_result:
             counter += 1
             temp_arr.append(book)
-            if counter % ITEMS_COUNT == 0:
+            if counter % SEARCH_ITEMS_COUNT == 0:
                 search_result[page_count] = copy.copy(temp_arr)
                 page_count += 1
                 temp_arr = list()
-        if page < 0 or page > page_count:
-            return render_template('main/search.html', search_result=0, date_list=date_list, len=len)
-        if counter % ITEMS_COUNT > 0:
+                
+        if counter % SEARCH_ITEMS_COUNT > 0:
             search_result[page_count] = temp_arr
-        search_result = search_result[page]
-        return render_template('main/search.html', search_result=search_result, date_list=date_list, len=len, page_count=page_count, page=page, range=range)
+        else:
+            page_count -= 1
+        try:
+            search_result = search_result[page]
+        except:
+            return render_template('main/category_page.html', search_result=0, date_list=date_list, len=len)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name, list_id=list_id)
     
-    return render_template('main/search.html', search_result=0, date_list=date_list, len=len)
-
-
-@main.route('/book-page/<name>', methods=['GET', 'POST'])
-def book_page(name):
-    global months_dict
-    book = Book.query.filter_by(name=name).first()
-    if request.method == 'POST' and request.form.get('comment') and current_user.is_authenticated:
-        comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
-        database.session.add(comment)
-        database.session.commit()
-        return redirect(url_for('.book_page', name=book.name, page=-1))
-    
-    page = request.args.get('page', 1, type=int)
-    if page == -1:
-        page = round((book.comments.count() - 1) / 10 + 1, 1)
-    
-    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=10, error_out=False)
-    comments = pagination.items
-    fin_grade = 0
-    grade_count = 0
-    grades = BookGrade.query.filter_by(book=book).all()    
-    for value in grades:
-        fin_grade += value.grade
-        grade_count += 1
-    if grade_count:    
-        fin_grade = round(fin_grade / grade_count, 1)
-    return render_template('main/book_page.html', book=book, str=str, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, grade_count=grade_count, months_dict=months_dict) 
-
-
-@main.route('/<username>/give-grade/<book_id>/<grade>') 
-@login_required
-def give_grade(username, book_id, grade):
-    book = Book.query.filter_by(id=book_id).first()
-    previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
-    if previous_grade:
-        database.session.delete(previous_grade)
-        database.session.commit()
-            
-    grade = BookGrade(grade=grade, user=current_user, book=book)
-    database.session.add(grade)
-    database.session.commit()
-    return redirect(url_for('main.book_page', name=book.name))
-
-
-@main.route('/<username>/delete-comment/<comment_id>')  
-@login_required
-def comment_delete(username, comment_id):
-    comment = Comment.query.filter_by(id=comment_id).first()
-    book = comment.book
-    database.session.delete(comment)
-    database.session.commit()
-    return redirect(url_for('main.book_page', name=book.name, page=request.args.get('page', type=int))) 
+    return render_template('main/category_page.html', search_result=0, date_list=date_list, categories=categories, len=len)

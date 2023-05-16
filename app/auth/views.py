@@ -33,6 +33,8 @@ def register():
     if current_user.is_authenticated:
         User.query.filter_by(id=current_user.id).delete()
         database.session.commit()
+        logout_user()
+        
     form = RegistrationForm()
     if form.validate_on_submit(): 
         user = User(username=form.username.data, email=form.email.data.lower(),
@@ -41,11 +43,12 @@ def register():
         user.check_admin()
         database.session.add(user)
         database.session.commit()
+        login_user(user)
         token = user.generate_confirmation_token()
         send_email(user.email, 'Confirm Your Account',
         'auth/email/confirm', user=user, token=token)
         #письмо с подтверждением было выслано на ваш аккаунт
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('main.index'))
     return render_template('auth/registraton.html', form=form)
 
 

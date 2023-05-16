@@ -1,23 +1,26 @@
 {% macro pagination_widget(pagination, endpoint, fragment, username) %}
 <ul class="pagination__list list-reset">
     <li{% if not pagination.has_prev %} class="pagination__item disabled"{% endif %}>
-        <a href="{% if pagination.has_prev %}{{ url_for(endpoint, page=pagination.prev_num, username=username) }}{{ fragment }}{% else %}#{% endif %}">
+        <a href="{% if pagination.has_prev %}{{ url_for(endpoint, page=pagination.prev_num, username=username) }}{{ fragment }}{% else %}#{% endif %}" id="lists_back">
             &laquo;
         </a>
+        <script>scroll('lists_back')</script>
     </li>
     {% for p in pagination.iter_pages() %}
         {% if p %}
             <li class="pagination__item active">
-                <a href="{{ url_for(endpoint, page=p, username=username) }}{{ fragment }}">{{ p }}</a>
+                <a href="{{ url_for(endpoint, page=p, username=username) }}{{ fragment }}" id="{{ p }}list_pagination">{{ p }}</a>
             </li>
+            <script>scroll({{ p }} + 'list_pagination')</script>
         {% else %}
         <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
         {% endif %}
     {% endfor %}
     <li{% if not pagination.has_next %} class="pagination__item disabled"{% endif %}>
-        <a href="{% if pagination.has_next %}{{ url_for(endpoint, page=pagination.next_num, username=username) }}{{ fragment }}{% else %}#{% endif %}">
+        <a href="{% if pagination.has_next %}{{ url_for(endpoint, page=pagination.next_num, username=username) }}{{ fragment }}{% else %}#{% endif %}" id="lists_up">
             &raquo;
         </a>
+        <script>scroll('lists_up')</script>
     </li>
 </ul>
 {% endmacro %}

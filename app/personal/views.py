@@ -3,7 +3,13 @@ from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, request, make_response
 from .forms import EditProfileForm, AddListForm, AddNewBookForm
 from ..begin_to_app import database
-from app.models import User, Cataloge, Book, Item
+from app.models import User, Cataloge, Book, Item, Role, Category, Comment
+LISTS_COUNT = 2
+
+
+@personal.app_context_processor
+def inject_roles():
+    return dict(Role=Role)
 
 
 @personal.route('/<username>/edit-profile/edit-avatar')
@@ -16,11 +22,13 @@ def avatar(username):
 @personal.route('/<username>')
 @login_required
 def person(username, flag=False):
+    add_book_form = AddNewBookForm()
+    form = AddListForm()
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
-    pagination = user.catalogues.order_by().paginate(page, per_page=2, error_out=False)
+    pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag)
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag, form=form, add_book_form=add_book_form, display="none")
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -40,7 +48,7 @@ def edit(username):
     return render_template('personal/edit_user_page_profile.html', form=form)
 
 
-@personal.route('/<username>/add-list', methods=['GET', 'POST'])
+@personal.route('/<username>/add-list', methods=['POST'])
 @login_required
 def add_list(username):
     form = AddListForm()
@@ -48,23 +56,30 @@ def add_list(username):
         cataloge = Cataloge(name=str(form.list_name.data).strip().lower(), user=current_user._get_current_object())
         database.session.add(cataloge)
         database.session.commit()
-        return redirect(url_for('.person', username=username, page=request.args.get('page')))
-    return render_template('personal/add_list.html', form=form)
-
+        user = User.query.filter_by(username=username).first()
+        user_cataloges = user.cataloges.all()
+        page = int(len(user_cataloges) / LISTS_COUNT)
+        if len(user_cataloges) % LISTS_COUNT > 0:
+            page += 1
+        return redirect(url_for('.person', username=username, page=page))
+    categories = Category.query.all()
+    user = User.query.filter_by(username=username).first()
+    page = request.args.get('page', 1, type=int)
+    pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+    catalogues = pagination.items
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, categories=categories, len=len, form=form, display="block")
+  
 
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
 def add_new_book(username):
+    categories = Category.query.all()
     form = AddNewBookForm()
     if form.validate_on_submit():
-        genre = request.form.getlist('genres')
-        genre_ = ''
-        for value in genre:
-            genre_ += str(value) + ' '
-            
+        category = Category.query.filter_by(name=str(request.form.get('category'))).first()
         book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower(), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
                     description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data, \
-                    genre=genre_, user=current_user._get_current_object())
+                    category=category, user=current_user._get_current_object())
         
         if not book.cover:
             book.default_cover()
@@ -72,14 +87,21 @@ def add_new_book(username):
         database.session.add(book)
         database.session.commit()
         return redirect(url_for('.person', username=username, flag=True))
-    return render_template('personal/add_book.html', form=form)
+    return render_template('personal/add_book.html', form=form, categories=categories, range=range, len=len)
 
 
-@personal.route('/<username>/add-book-in-list/<book_id>', methods=['POST'])
+@personal.route('/<username>/add-book-in-list/<book_id>', methods=['GET', 'POST'])
 @login_required
 def add_book_in_list_tmp(username, book_id):
-    read_state = request.form.get('read_state')
+    list_id = request.args.get('list_id', None, type=int)
+    if request.form:
+        read_state = request.form.get('read_state')
+    else:
+        read_state = "Читаю"
     user = User.query.filter_by(username=username).first()
+    if list_id:
+        return redirect(url_for('.add_book_in_list', username=username, list_id=list_id, book_id=book_id, read_state=read_state))
+    
     catalogues = Cataloge.query.filter_by(user_id=user.id).all()
     return render_template('personal/user_page_add_book.html', username=username, book_id=book_id, catalogues=catalogues, read_state=read_state)
 

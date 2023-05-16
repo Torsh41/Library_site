@@ -6,8 +6,12 @@ from datetime import datetime, timedelta
 from jose import jwt
 
 
+class Role:
+    USER = 0
+    ADMIN = 1
+    
+    
 #отношение один ко многим
-
 class User(UserMixin, database.Model):
     __tablename__ = "users"
     id = database.Column(database.Integer, primary_key=True)
@@ -20,11 +24,11 @@ class User(UserMixin, database.Model):
     about_me = database.Column(database.Text, default=False)
     password_hash = database.Column(database.String(128))
     books = database.relationship('Book', backref='user')
-    grades = database.relationship('BookGrade', backref='user')
-    comments = database.relationship('Comment', backref='user')
-    catalogues = database.relationship('Cataloge', backref='user', lazy='dynamic')#, uselist=False)
+    grades = database.relationship('BookGrade', backref='user', cascade="all, delete, delete-orphan")
+    comments = database.relationship('Comment', backref='user', cascade="all, delete, delete-orphan")
+    cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
-    is_admin = database.Column(database.Boolean, default=False)
+    role = database.Column(database.Boolean, default=False)
     
     def generate_confirmation_token(self): #30 минут время действия токена
         now = datetime.utcnow()
@@ -64,13 +68,25 @@ class User(UserMixin, database.Model):
         return check_password_hash(self.password_hash, password)
     
     def check_admin(self):
-        if current_app.config['MBK_ADMIN'] == self.email:
-            self.is_admin = True
+        try:
+            if self.email in current_app.config['MBK_ADMIN']:
+                self.role = True
+            else:
+                self.role = False
+        except:
+            self.role = False
             
     def default_ava(self):
         with application.open_resource(application.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
             self.avatar = f.read()
-      
+            
+            
+class Category(database.Model):
+    __tablename__ = "categories"    
+    id = database.Column(database.Integer, primary_key=True)
+    name = database.Column(database.String(64), unique=True, index=True)
+    books = database.relationship('Book', backref='category', cascade="all, delete, delete-orphan")
+    
     
 class Book(database.Model):
     __tablename__ = "books"
@@ -83,9 +99,9 @@ class Book(database.Model):
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
-    genre = database.Column(database.Text(), unique=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
-    catalogue_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
+    category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
+    cataloge_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
     grades = database.relationship('BookGrade', backref='book', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
@@ -140,7 +156,6 @@ class SearchResult(database.Model):
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
-    genre = database.Column(database.Text(), unique=False)
     def __init__(self, book):
         self.id = book.id
         self.cover = book.cover
@@ -151,7 +166,6 @@ class SearchResult(database.Model):
         self.description = book.description
         self.release_date = book.release_date
         self.count_of_chapters = book.count_of_chapters
-        self.genre = book.genre
     
         
 @login_manager.user_loader
