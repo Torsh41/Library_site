@@ -1,3 +1,4 @@
+{% import "lists_macro.html" as macros %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,9 +7,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin dashboard</title>
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
+  <script src="{{ url_for('static', filename='js/admin/show_page_elems.js')}}"></script>
+  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script> 
 </head>
 
 <body>
@@ -19,28 +23,13 @@
       </a>
 
       <div class="header__admin admin">
-        <a href="#" class="admin__link">
+        <a href="{{url_for('personal.person', username=current_user.username)}}" class="admin__link">
           <div class="admin__set">
-            <img src="img/default_avatar.jpg" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
+            <img src="{{url_for('personal.avatar', username=current_user.username)}}" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
           </div>
-          Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
+          {{ current_user.username }} личный кабинет<!--Имя админа и ссылка обратно в личный кабинет-->
         </a>
       </div>
-
-      <!-- <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
-
-                {% if (comment.user.username == current_user.username) and current_user.is_authenticated %}
-                  </div>
-                  <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">{{ comment.user.username }}</a>
-                  </div>
-                {% else %}
-                  </div>
-                  <a class="comments__link">{{ comment.user.username }}</a>
-                  </div>
-                {% endif %} -->
-
-
-
     </div>
   </header>
 
@@ -50,7 +39,7 @@
 
         <div class="main__top">
 
-          <h1 class="main__title">Hello, </h1>
+          <h1 class="main__title">Hello, {{ current_user.username }}</h1>
           <!--Hello, имя пользователя!-->
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -62,16 +51,12 @@
         <nav class="nav header__nav">
           <ul class="nav__admin-list list-reset">
             <li class="nav__admin-item">
-              <a href="" class="nav__admin-link">Список пользователей</a>
-
+              <a class="nav__admin-link" onclick="edit_elem_state('users_search')">Список пользователей</a>
             </li>
             <li class="nav__admin-item">
-
               <a href="" class="nav__admin-link">Список категорий книг</a>
-
             </li>
             <li class="nav__admin-item">
-
               <a href="" class="nav__admin-link">Настройки</a>
             </li>
           </ul>
@@ -81,12 +66,11 @@
 
 
     <!--При нажатии на кнопку списка пользователей открывается этот блок-->
-    <section class="users">
+    <section class="users" id="users_search" style="display: {{ users_search_result_disp }}">
       <div class="users__container container">
         <h2 class="users__title">Список пользователей</h2>
 
-        <form class="list__form" action="" method="post">
-
+        <form class="list__form" action="{{url_for('admin.user_search', username=current_user.username)}}" method="post">     
           <label class="list__form-label">
             <svg class="list__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
               xmlns="http://www.w3.org/2000/svg">
@@ -101,37 +85,33 @@
                 </clipPath>
               </defs>
             </svg>
-            <input type="text" name="search_result" class="list__form-input" placeholder="Введите имя пользователя..">
+            <input type="text" name="users_search_result" class="list__form-input" placeholder="Введите имя пользователя.." required>
           </label>
-
-
-          <button class="list__btn-search ">Найти</button>
+          <button class="list__btn-search" id="get_users">Найти</button>
         </form>
+        <script>scroll('get_users')</script>
 
-
+        {% if pagination and len(pagination.items) > 1 %}
         <ul class="users__list list-reset">
+          {% for user in users %}
           <li class="users__item">
-            <a href="#" class="users__link">
+            <span class="users__link">
               <div class="users__set">
-                <img src="img/default_avatar.jpg" alt="" class="users__img"> <!--Фото админа из его личного кабинета-->
+                <img src="{{url_for('personal.avatar', username=user.username)}}" alt="" class="users__img"> <!--Фото админа из его личного кабинета-->
               </div>
-              Элеонора <!--Имя админа и ссылка обратно в личный кабинет-->
-            </a>
-
-            <button class="users__btn">Удалить пользователя</button>
+              {{ user.username }} <!--Имя админа и ссылка обратно в личный кабинет-->
+            </span>
+            <a href="{{url_for('admin.user_delete', username=user.username, user_id=user.id)}}" class="users__btn" id="{{user.id}}del_user">Удалить пользователя</a>
           </li>
-
-          <li class="users__item">
-            <a href="#" class="users__link">
-              <div class="users__set">
-                <img src="img/default_avatar.jpg" alt="" class="users__img"> <!--Фото админа из его личного кабинета-->
-              </div>
-              gggggggggggggggggggggggggggggggggggggg <!--Имя админа и ссылка обратно в личный кабинет-->
-            </a>
-
-            <button class="users__btn">Удалить пользователя</button>
-          </li>
+          <script>scroll({{user.id}} + 'del_user')</script>
+          {% endfor %}
         </ul>
+        <div class="list__pagination pagination">
+          {{ macros.pagination_widget(pagination, 'admin.user_search', fragment='#search_result', username=current_user.username) }}
+        </div>
+        {% elif len %}
+          <h2 class="list__title title">Ничего не найдено</h2>
+        {% endif %}
       </div>
     </section>
 
@@ -204,9 +184,7 @@
           </form>
 
           <ul class="list__books list-reset">
-            <!-- {% for book in search_result %} -->
-
-
+          
             <!--Найденные книги-->
             <a href="" class="list__link">
               <li class="list__book list__add">
@@ -227,14 +205,14 @@
 
             <li class="list__book">
               <div class="list__top">
-                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
-                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt=""> <!--Перекидываем на страницу книги-->
+                <a href="" class="list__book-set">
+                  <img class="list__book-set" src="" alt=""> <!--Перекидываем на страницу книги-->
                 </a>
 
 
                 <div class="list__book-wrap">
-                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
+                  <a href="" class="list__link">Книга: </a>
+                  <a href="#" class="list__link">Автор: </a>
                 </div>
               </div>
 
@@ -248,14 +226,14 @@
 
             <li class="list__book">
               <div class="list__top">
-                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
-                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
+                <a href="" class="list__book-set">
+                  <img class="list__book-set" src="" alt="">
                 </a>
 
 
                 <div class="list__book-wrap">
-                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
+                  <a href="" class="list__link">Книга: </a>
+                  <a href="#" class="list__link">Автор: </a>
                 </div>
               </div>
 
@@ -265,14 +243,8 @@
                 <span class="list__mark">Оценка</span>
               </div>
             </li>
-
-
-            <!-- {% endfor %} -->
           </ul>
         </div>
-        <!-- <div class="list__pagination pagination">
-          {{ macros.pagination_widget(page_count=page_count, range=range) }}
-        </div> -->
       </div>
     </section>
   </main>

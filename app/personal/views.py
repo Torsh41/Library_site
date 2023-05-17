@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, request, make_response
 from .forms import EditProfileForm, AddListForm, AddNewBookForm
 from ..begin_to_app import database
-from app.models import User, Cataloge, Book, Item, Role, Category, Comment
+from app.models import User, Cataloge, Book, Item, Category, Role
 LISTS_COUNT = 2
 
 

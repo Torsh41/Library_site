@@ -107,7 +107,9 @@
             <ul class="nav__sublist list-reset">
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-              <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
+              {% if current_user.role == Role.ADMIN %}
+                <li class="nav__subitem"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li> 
+              {% endif %}
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
             </ul>
           </li>

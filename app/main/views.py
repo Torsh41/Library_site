@@ -68,18 +68,13 @@ def book_page(name):
 @main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
 @login_required
 def edit_comment(username, comment_id, book_name):
-    # user = User.query.filter_by(username=username).first()
-    # book = Book.query.filter_by(name=book_name).first()
     comment = Comment.query.filter_by(id=comment_id).first()
     comment.body = request.form.get('newComment')
-    # comment.book = book
-    # comment.user = user
     database.session.add(comment)
     database.session.commit()
     page = request.args.get('page')
     return redirect(url_for('main.book_page', name=book_name, page=page))
    
-
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 
 @login_required
