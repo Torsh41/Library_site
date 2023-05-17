@@ -226,45 +226,30 @@
             </a>
 
             <li class="list__book">
-              <div class="list__top">
-                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
-                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt=""> <!--Перекидываем на страницу книги-->
-                </a>
+
+              <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
+                <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
+              </a>
 
 
-                <div class="list__book-wrap">
-                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
+              <div class="list__book-wrap">
+
+                <!-- <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id, list_id=list_id)}}" class="list__link">Добавить в список</a> -->
+
+                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
+                <span class="list__link">Автор: {{ book.author }}</span>
+
+                <button class="list__btn">Удалить книгу</button>
+
+                <div class="list__show">
+                  <span class="list__act">Показать оценку</span>
+                  <span class="list__mark">Оценка</span>
                 </div>
-              </div>
-
-
-              <button class="list__btn">Удалить книгу</button>
-              <div class="list__show">
-                <span class="list__act">Показать оценку</span>
-                <span class="list__mark">Оценка</span>
+                
               </div>
             </li>
 
-            <li class="list__book">
-              <div class="list__top">
-                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
-                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
-                </a>
-
-
-                <div class="list__book-wrap">
-                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-                  <a href="#" class="list__link">Автор: {{ book.author }}</a>
-                </div>
-              </div>
-
-              <button class="list__btn">Удалить книгу</button>
-              <div class="list__show">
-                <span class="list__act">Показать оценку</span>
-                <span class="list__mark">Оценка</span>
-              </div>
-            </li>
+            
 
 
             <!-- {% endfor %} -->

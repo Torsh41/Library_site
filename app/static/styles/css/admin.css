@@ -66,6 +66,7 @@
 }
 
 .list__btn {
+  margin-top: 20px;
   margin-bottom: 10px;
 }
 
@@ -125,9 +126,7 @@
 
 .list__show {
   position: relative;
-  margin-bottom: 10px;
   cursor: pointer;
-
 }
 
 .list__mark {

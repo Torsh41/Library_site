@@ -72,15 +72,10 @@
   justify-content: flex-end;
   position: relative;
   width: 322px;
-  height: 322px;
+  height: 400px;
   margin-bottom: 48px;
   background-color: #E9E6C3;
   margin-right: 50px;
-
-  /* background-image: url(../img/book.jpg);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover; */
 }
 
 .list__add {
@@ -257,3 +252,5 @@
 .list__book:nth-child(3n) {
   margin-right: 0;
 }
+
+
