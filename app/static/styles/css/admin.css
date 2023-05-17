@@ -125,15 +125,22 @@
 }
 
 .list__show {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   position: relative;
   cursor: pointer;
 }
 
 .list__mark {
   position: absolute;
-  margin-left: 20px;
+  margin-left: 30px;
   visibility: hidden;
+  font-size: 15px;
+}
 
+.list__act {
+  font-size: 15px;
 }
 
 .list__show:hover .list__act {
