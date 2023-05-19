@@ -158,7 +158,7 @@ def search_by_category(name):
             if not search_result:
                 search_result = 404
                 page_count = None
-            all_search_result = search_result
+        all_search_result = search_result
             
         if search_result != 404:
                 old_books_result = SearchResult.query.all()

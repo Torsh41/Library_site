@@ -10,13 +10,10 @@ function edit_elem_state(id)
     }
 }
 
-function openCategoryForm() 
-{
-  document.getElementById("popupCategoryForm").style.display = "block";
-}
 
-function closeCategoryForm() 
+function form_activate(form_id, title_id, data)
 {
-  document.getElementById("popupCategoryForm").style.display = "none";
+    edit_elem_state(form_id);
+    if (document.getElementById(id).style.display == "block")
+        document.getElementById(title_id).value += ` ${data}`;
 }
-

@@ -332,14 +332,13 @@
                   <!--Тут добавленная фотка пользователем-->
                   {% if (comment.user.username == current_user.username) and current_user.is_authenticated %}
                 </div>
-                <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">{{
-                  comment.user.username }}</a>
+                <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">{{ comment.user.username }}</a>
               </div>
-              {% else %}
+                  {% else %}
             </li>
             <a class="comments__link">{{ comment.user.username }}</a>
           </ul>
-          {% endif %}
+                  {% endif %}
 
           <p class="comments__link">{{ str(comment.timestamp.date().day) + " " +
             months_dict[comment.timestamp.date().month] +

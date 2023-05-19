@@ -4,15 +4,16 @@ from .init import database, login_manager, application
 from flask import current_app, url_for
 from datetime import datetime, timedelta
 from jose import jwt
+from sqlalchemy_serializer import SerializerMixin
 
 
 class Role:
     USER = 0
     ADMIN = 1
     
-    
+
 #отношение один ко многим
-class User(UserMixin, database.Model):
+class User(UserMixin, database.Model, SerializerMixin):
     __tablename__ = "users"
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.String(64), unique=True, index=True)
@@ -81,14 +82,14 @@ class User(UserMixin, database.Model):
             self.avatar = f.read()
             
             
-class Category(database.Model):
+class Category(database.Model, SerializerMixin):
     __tablename__ = "categories"    
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(64), unique=True, index=True)
     books = database.relationship('Book', backref='category', cascade="all, delete, delete-orphan")
     
     
-class Book(database.Model):
+class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary, default=False)
@@ -110,7 +111,7 @@ class Book(database.Model):
             self.cover = f.read()
     
 
-class BookGrade(database.Model):
+class BookGrade(database.Model, SerializerMixin):
     __tablename__ = "grades"
     id = database.Column(database.Integer, primary_key=True)
     grade = database.Column(database.Integer)
@@ -118,7 +119,7 @@ class BookGrade(database.Model):
     book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
 
 
-class Comment(database.Model):
+class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.Text)
@@ -129,7 +130,7 @@ class Comment(database.Model):
 
 
 #lists and items models
-class Cataloge(database.Model):
+class Cataloge(database.Model, SerializerMixin):
     __tablename__ = "catalogues"
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(64), unique=False, index=True)
@@ -137,7 +138,7 @@ class Cataloge(database.Model):
     items = database.relationship('Item', backref='cataloge', cascade="all, delete, delete-orphan")
 
 
-class Item(database.Model):
+class Item(database.Model, SerializerMixin):
     __tablename__ = "items"
     id = database.Column(database.Integer, primary_key=True)
     read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено  
@@ -145,7 +146,7 @@ class Item(database.Model):
     book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
 
 
-class SearchResult(database.Model):
+class SearchResult(database.Model, SerializerMixin):
     __tablename__ = "search_results"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary, default=False)
