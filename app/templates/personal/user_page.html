@@ -144,7 +144,7 @@
       </div>
     </section>
 
-    <div class="background-book_page">
+    <div class="background-book_page" id="user_page_main_container">
       <section id="1" class="profile">
         <div class="profile__container container">
           <div class="profile__image">
@@ -262,14 +262,14 @@
       </section>
       
         <!--место для списков-->
-        {% for cataloge_value in catalogues %}
-        <section class="list">
+        {% for cataloge_value, pagination_for_book_in_list in zip(catalogues, paginations_for_books_in_lists) %}
+        <section class="list" id="{{cataloge_value.id}}cataloge_info">
           <div class="container list__container">
             <div class="list__wrap">
               <h2 class="list__title title">{{ cataloge_value.name }}</h2>
               <!--Название списка, которое ввел пользователь-->
   
-              <ul class="list__books list-reset">
+              <ul class="list__books list-reset" id="{{cataloge_value.id}}books_info_container">
                 <!--Добавление книги в список - перебрасывает в рааздел категорий книг-->
                 <li class="list__book list__add"><a href="{{url_for('main.categories', list_id=cataloge_value.id)}}" class="list__link">
                     <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -287,36 +287,61 @@
                 </li>
   
                 <!--Добавленные книги-->
-                {% for item in cataloge_value.items %}
-                <li class="list__book">
+                {% for item in pagination_for_book_in_list.items %}
+                <li class="list__book" id="{{cataloge_value.id}}book_info">      
                   <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__book-set">
                     <img class="list__book-set" src="{{url_for('main.cover', name=item.book.name)}}" alt="">
                   </a>
                   
-
                   <div class="list__book-wrap">
-                    <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book">Книга: {{ item.book.name
-                    }}</a>
-                  <a href="#" class="list__link">Состояние чтения: {{ item.read_state }}</a>
+                        <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book">Книга: {{ item.book.name
+                        }}</a>
+                      <a href="#" class="list__link">Состояние чтения: {{ item.read_state }}</a>
   
-                  <!--<select class="list__select">
-                  <option value="">Планирую</option>
-                  <option value="">Читаю</option>
-                  <option value="">Заброшено</option>
-                  <option value="">Прочитано</option>
-                </select>-->
-                  <a class="list__book-delete-btn"
-                    href="{{url_for('personal.item_delete', username=current_user.username, item_id=item.id, page=pagination.page)}}">Удалить
-                    книгу из списка</a>
+                      <!--<select class="list__select">
+                      <option value="">Планирую</option>
+                      <option value="">Читаю</option>
+                      <option value="">Заброшено</option>
+                      <option value="">Прочитано</option>
+                      </select>-->
+                      <a class="list__book-delete-btn"
+                        href="{{url_for('personal.item_delete', username=current_user.username, item_id=item.id, page=pagination.page)}}">Удалить
+                        книгу из списка</a>
                   </div>
-                  
                 </li>
                 {% endfor %}
               </ul>
+                {% if pagination_for_book_in_list %}
+                    <div class="list__pagination pagination">
+                      <ul class="pagination__list list-reset" id="{{cataloge_value.id}}books_pagination">
+                        <li{% if not pagination_for_book_in_list.has_prev %} class="pagination__item disabled"{% endif %}>
+                            <a onclick="{% if pagination_for_book_in_list.has_prev %}get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{pagination_for_book_in_list.prev_num}}', '{{cataloge_value.id}}'){% endif %}" id="lists_back">
+                                &laquo;
+                            </a>
+                            <script>scroll('lists_back')</script>
+                        </li>
+                        {% for p in pagination_for_book_in_list.iter_pages() %}
+                            {% if p %}
+                                <li class="pagination__item active">
+                                    <a onclick="get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{p}}', '{{cataloge_value.id}}')">{{ p }}</a>
+                                </li>
+                                <script>scroll({{ p }} + 'list_pagination')</script>
+                            {% else %}
+                            <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li{% if not pagination_for_book_in_list.has_next %} class="pagination__item disabled"{% endif %}>
+                            <a onclick="{% if pagination_for_book_in_list.has_next %}get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{pagination_for_book_in_list.next_num}}', '{{cataloge_value.id}}'){% endif %}" id="lists_up">
+                                &raquo;
+                            </a>
+                            <script>scroll('lists_up')</script>
+                        </li>
+                      </ul>
+                    </div>
+                {% endif %}
   
               {% if pagination %}
-              {% if len(pagination.items) < 2 %} <a class="list__delete-btn"
-                href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page - 1)}}" id="{{cataloge_value.id}}del_list">
+               <a class="list__delete-btn" onclick="del_list('/user/{{current_user.username}}/delete-list/{{cataloge_value.id}}/{{1}}')" id="{{cataloge_value.id}}del_list">
                 <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line y1="0.5" x2="461" y2="0.5" stroke="black" />
                 </svg>
@@ -325,30 +350,41 @@
                   <line y1="0.5" x2="461" y2="0.5" stroke="black" />
                 </svg>
                 </a>
-                {% else %}
-                <a class="list__delete-btn"
-                  href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=pagination.page)}}" id="{{cataloge_value.id}}del_list">Удалить
-                  список</a>
-                {% endif %}
-                {% else %}
-                <a class="list__delete-btn"
-                  href="{{url_for('personal.list_delete', username=current_user.username, list_id=cataloge_value.id, page=1)}}" id="{{cataloge_value.id}}del_list">Удалить
-                  список</a>
-                {% endif %}
+              {% endif %}
                 <script>scroll({{ cataloge_value.id }} + 'del_list')</script>
             </div>
           </div>
         </section>
         {% endfor %}
-        {% if pagination %}
-        <div class="list__pagination pagination">
-          {{ macros.pagination_widget(pagination=pagination, url_path='personal.person', func_name='',
-          username=current_user.username) }}
-        </div>
-        {% endif %}
     </div>
-    
-
+    {% if pagination %}
+      <div class="list__pagination pagination" id="pagination_container">
+        <ul class="pagination__list list-reset" id="pagination">
+          <li{% if not pagination.has_prev %} class="pagination__item disabled"{% endif %}>
+              <a onclick="{% if pagination.has_prev %}get_lists_page('/user/{{current_user.username}}/get_lists_page/{{pagination.prev_num}}'){% endif %}" id="lists_back">
+                  &laquo;
+              </a>
+              <script>scroll('lists_back')</script>
+          </li>
+          {% for p in pagination.iter_pages() %}
+              {% if p %}
+                  <li class="pagination__item active">
+                      <a onclick="get_lists_page('/user/{{current_user.username}}/get_lists_page/{{p}}')">{{ p }}</a>
+                  </li>
+                  <script>scroll({{ p }} + 'list_pagination')</script>
+              {% else %}
+              <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+              {% endif %}
+          {% endfor %}
+          <li{% if not pagination.has_next %} class="pagination__item disabled"{% endif %}>
+              <a onclick="{% if pagination.has_next %}get_lists_page('/user/{{current_user.username}}/get_lists_page/{{pagination.next_num}}'){% endif %}" id="lists_up">
+                  &raquo;
+              </a>
+              <script>scroll('lists_up')</script>
+          </li>
+        </ul>
+      </div>
+    {% endif %}
   </main>
 
   <footer class="footer">
@@ -358,5 +394,4 @@
   </footer>
 
 </body>
-
 </html>

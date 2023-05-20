@@ -1,7 +1,7 @@
-{% macro pagination_widget(pagination, url_path, func_name, username) %}
-<ul class="pagination__list list-reset">
+{% macro pagination_widget(pagination, url_path, func_name, pagination_id='pagination') %}
+<ul class="pagination__list list-reset" id="{{pagination_id}}">
     <li{% if not pagination.has_prev %} class="pagination__item disabled"{% endif %}>
-        <a onclick="{% if pagination.has_prev %}{{func_name}}('{{url_path}}{{pagination.prev_num}}'){% endif %}" id="lists_back">
+        <a onclick="{% if pagination.has_prev %}{{func_name}}('{{url_path}}{{pagination.prev_num}}', {{pagination_id}}){% endif %}" id="lists_back">
             &laquo;
         </a>
         <script>scroll('lists_back')</script>
@@ -9,7 +9,7 @@
     {% for p in pagination.iter_pages() %}
         {% if p %}
             <li class="pagination__item active">
-                <a onclick="{{func_name}}('{{url_path}}{{p}}')">{{ p }}</a>
+                <a onclick="{{func_name}}('{{url_path}}{{p}}', '{{pagination_id}}')">{{ p }}</a>
             </li>
             <script>scroll({{ p }} + 'list_pagination')</script>
         {% else %}
@@ -17,7 +17,7 @@
         {% endif %}
     {% endfor %}
     <li{% if not pagination.has_next %} class="pagination__item disabled"{% endif %}>
-        <a onclick="{% if pagination.has_next %}{{func_name}}('{{url_path}}{{pagination.next_num}}'){% endif %}" id="lists_up">
+        <a onclick="{% if pagination.has_next %}{{func_name}}('{{url_path}}{{pagination.next_num}}', {{pagination_id}}){% endif %}" id="lists_up">
             &raquo;
         </a>
         <script>scroll('lists_up')</script>

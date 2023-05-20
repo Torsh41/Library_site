@@ -31,7 +31,8 @@ def logout():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        User.query.filter_by(id=current_user.id).delete()
+        user = User.query.filter_by(id=current_user.id).first()
+        database.session.delete(user)
         database.session.commit()
         logout_user()
         

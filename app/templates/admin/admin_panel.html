@@ -163,20 +163,20 @@
           {% if len(users) > 0 %}
             <ul class="users__list list-reset" id="users_search_list">
                 {% for user in users %}
-                <li class="users__item">
+                <li class="users__item" id="{{user.id}}user_info">
                   <span class="users__link">
                     <div class="users__set">
                       <img src="{{url_for('personal.avatar', username=user.username)}}" alt="" class="users__img"> <!--Фото админа из его личного кабинета-->
                     </div>
                     {{ user.username }} <!--Имя админа и ссылка обратно в личный кабинет-->
                   </span>
-                  <a href="{{url_for('admin.user_delete', username=user.username, user_id=user.id)}}" class="users__btn" id="{{user.id}}del_user">Удалить пользователя</a>
+                  <a onclick="del_user('/admin/admin_panel/user_delete/{{user.id}}/{{1}}')" class="users__btn" id="{{user.id}}del_user">Удалить пользователя</a>
                 </li>
                 <script>scroll({{user.id}} + 'del_user')</script>
                 {% endfor %}
             </ul>
-            <div class="list__pagination pagination">
-              {{ macros.pagination_widget(pagination=user_pagination, url_path='/admin/get_user_search_page/', func_name='get_user_search_page', username=current_user.username) }}
+            <div class="list__pagination pagination" id="user_pagination_container">
+              {{ macros.pagination_widget(pagination=user_pagination, url_path='/admin/get_user_search_page/', func_name='get_user_search_page', pagination_id='1pagination') }}
             </div>
           {% else %}
             <h2 class="list__title title">Ничего не найдено</h2>
@@ -232,15 +232,14 @@
          
           {% for category in categories %}
             <li class="category__elem" id="{{category.id}}category_info"><a class="category__book-link">{{ category.name }}</a>
-              <a href="{{url_for('admin.category_delete', username=current_user.username, category_id=category.id)}}" class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
+              <a onclick="del_category('/admin/admin_panel/category_delete/{{category.id}}/{{1}}', '2pagination')" class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
             </li>
             <script>scroll({{category.id}} + 'del_category')</script>
           {% endfor %}
-        
         </ul>
         {% if category_pagination %}
-        <div class="list__pagination pagination">
-          {{ macros.pagination_widget(pagination=category_pagination, url_path='/admin/get_category_search_page/', func_name='get_category_page', username=current_user.username) }}
+        <div class="list__pagination pagination" id="category_pagination_container">
+          {{ macros.pagination_widget(pagination=category_pagination, url_path='/admin/get_category_search_page/', func_name='get_category_page', pagination_id='2pagination') }}
         </div>
         {% endif %}
       </div>

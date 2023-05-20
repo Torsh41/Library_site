@@ -59,6 +59,7 @@ def user_search(username):
 
 
 @admin.route('/get_user_search_page/<page>', methods=['GET'])
+@admin_required
 def get_user_search_page(page):
     page = int(page)
     user_pagination = User.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
@@ -67,6 +68,7 @@ def get_user_search_page(page):
     
     
 @admin.route('/get_category_search_page/<page>', methods=['GET'])   
+@admin_required
 def get_category_search_page(page):
     page = int(page)
     category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
@@ -92,22 +94,36 @@ def add_category(username):
     return render_template('admin/admin_panel.html', categories=categories, form=form, category_pagination=category_pagination, displays={"users_search_result_disp":"none", "book_categories_disp":"block", "add_category_disp":"block", "books_in_a_category_disp":"none"})
 
 
-@admin.route('/<username>/admin_panel/user_delete/<user_id>')
+@admin.route('/admin_panel/user_delete/<user_id>/<page>', methods=['GET'])
 @admin_required
-def user_delete(username, user_id):
+def user_delete(user_id, page):
+    page = int(page)
     User.query.filter_by(id=user_id).delete()
     database.session.commit()
-    return redirect(url_for('.user_search', username=username))
+    if users := User.query.all():
+        has_elems = True
+        user_pagination = User.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        pages = user_pagination.pages
+        if not user_pagination.items:
+            page = page - 1
+    else:
+        page = 1; pages = 1; has_elems = False
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
 
 
-@admin.route('/<username>/admin_panel/category_delete/<category_id>')
+@admin.route('/admin_panel/category_delete/<category_id>/<page>', methods=['GET'])
 @admin_required
-def category_delete(username, category_id):
-    category_page = request.args.get('category_page', 1, type=int)
+def category_delete(category_id, page):
+    page = int(page)
     Category.query.filter_by(id=category_id).delete()
     database.session.commit()
-    form = AddCategoryForm()
-    category_pagination = Category.query.paginate(category_page, per_page=RESULT_COUNT, error_out=False)
-    categories = category_pagination.items
-    return render_template('admin/admin_panel.html', categories=categories, form=form, category_pagination=category_pagination, displays={"users_search_result_disp":"none", "book_categories_disp":"block", "add_category_disp":"none", "books_in_a_category_disp":"none"})
+    if categories := Category.query.all():
+        has_elems = True
+        category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        pages = category_pagination.pages
+        if not category_pagination.items:
+            page = page - 1
+    else:
+        page = 1; pages = 1; has_elems = False
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
 

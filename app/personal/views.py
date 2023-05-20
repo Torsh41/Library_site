@@ -1,11 +1,12 @@
 from . import personal
 from flask_login import login_required, current_user
-from flask import render_template, redirect, url_for, request, make_response
+from flask import render_template, redirect, url_for, request, make_response, jsonify
 from .forms import EditProfileForm, AddListForm, AddNewBookForm
 from ..begin_to_app import database
 from app.models import User, Cataloge, Book, Item, Category, Role
+import copy
 LISTS_COUNT = 2
-
+BOOKS_COUNT = 5
 
 @personal.app_context_processor
 def inject_roles():
@@ -28,7 +29,12 @@ def person(username, flag=False):
     page = request.args.get('page', 1, type=int)
     pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, len=len, flag=flag, form=form, add_book_form=add_book_form, display="none")
+    paginations_for_books_in_lists = list(); books_for_lists = list()
+    for cataloge in catalogues:
+        books_pagination = cataloge.items.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+        paginations_for_books_in_lists.append(books_pagination)
+        
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, len=len, flag=flag, form=form, zip=zip, add_book_form=add_book_form, display="none")
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -68,8 +74,34 @@ def add_list(username):
     pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
     return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, categories=categories, len=len, form=form, display="block")
-  
 
+
+@personal.route('/<username>/get_lists_page/<page>', methods=['GET'])
+@login_required
+def get_lists_page(username, page):
+    page = int(page)
+    user = User.query.filter_by(username=username).first()
+    pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+    cataloges = pagination.items
+    cataloges_items = dict()
+    for cataloge in cataloges:
+        items_pagination = cataloge.items.order_by().paginate(1, per_page=BOOKS_COUNT, error_out=False)
+        cataloge_items = [dict(id=item.id, read_state=item.read_state, name=item.book.name, cur_page=1, pages=items_pagination.pages) for item in items_pagination.items]
+        cataloges_items[cataloge.id] = copy.deepcopy(cataloge_items)
+        
+    return jsonify([dict(id=cataloge.id, name=cataloge.name, items=items, username=user.username) for cataloge, items in zip(cataloges, cataloges_items.values())])
+    
+
+@personal.route('/<username>/get_books_page/<cataloge_id>/<page>', methods=['GET'])
+@login_required
+def get_books_page(username, cataloge_id, page):
+    page = int(page)
+    cataloge = Cataloge.query.filter_by(id=cataloge_id).first()
+    items_pagination = cataloge.items.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+    items = items_pagination.items
+    return jsonify([dict(id=item.id, name=item.book.name, read_state=item.read_state) for item in items])
+    
+    
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
 def add_new_book(username):
@@ -129,13 +161,23 @@ def add_book_in_list(username, list_id, book_id, read_state):
     return redirect(url_for('.person', username=username))
 
 
-@personal.route('/<username>/delete-list/<list_id>')
+@personal.route('/<username>/delete-list/<list_id>/<page>')
 @login_required
-def list_delete(username, list_id):
+def list_delete(username, list_id, page):
+    page = int(page)
+    user = User.query.filter_by(username=username).first()
     cataloge = Cataloge.query.filter_by(id=list_id).first()
     database.session.delete(cataloge)
     database.session.commit()
-    return redirect(url_for('personal.person', username=username, page=request.args.get('page', type=int))) 
+    if cataloges := user.cataloges.all():
+        has_elems = True
+        cataloge_pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+        pages = cataloge_pagination.pages
+        if not cataloge_pagination.items:
+            page = page - 1
+    else:
+        page = 1; pages = 1; has_elems = False
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=username))
 
 
 @personal.route('/<username>/delete-item/<item_id>')

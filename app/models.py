@@ -135,7 +135,7 @@ class Cataloge(database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(64), unique=False, index=True)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
-    items = database.relationship('Item', backref='cataloge', cascade="all, delete, delete-orphan")
+    items = database.relationship('Item', backref='cataloge', lazy='dynamic', cascade="all, delete, delete-orphan")
 
 
 class Item(database.Model, SerializerMixin):

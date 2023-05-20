@@ -112,7 +112,12 @@ def categories():
 def search_by_category(name):
     list_id = request.args.get('list_id', None, type=int)
     page_count = 1
-    books = Book.query.filter(Category.name.like("%{}%".format(name))).all()
+    books = Book.query.all()
+    res = list()
+    for book in books:
+        if book.category.name == name:
+            res.append(book)
+    books = res   
     categories = Category.query.all()
     date_list = list()
     if books:
