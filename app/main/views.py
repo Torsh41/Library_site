@@ -116,23 +116,22 @@ def search_by_category(name):
     res = list()
     for book in books:
         if book.category.name == name:
-            res.append(book)
-    books = res   
+            res.append(book)  
     categories = Category.query.all()
     date_list = list()
-    if books:
-        for book in books:
+    if res:
+        for book in res:
             if not book.release_date in date_list:
                 date_list.append(book.release_date)
    
     if request.method == 'POST':
         result = str(request.form.get('search_result')).strip().lower()
         if result == 'все':
-            search_result = books
+            search_result = res
             if not search_result:
                 search_result = 404
         elif result == '*':
-            search_result = Book.query.all()
+            search_result = books
             if not search_result:
                 search_result = 404
         else:

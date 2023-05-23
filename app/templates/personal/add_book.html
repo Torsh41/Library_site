@@ -68,6 +68,7 @@
 
     <section class="form background-book_page">
       <div class="form__container container">
+        {% if len(categories) > 0 %}
         <form class="form__wrap" enctype="multipart/form-data" method="post">
           {{form.hidden_tag()}}
             <span class="form__span">Обложка книги</span>
@@ -196,7 +197,9 @@
           <!--<button class="form__btn btn">Добавить книгу в базу</button>-->
           {{form.submit(class="form__btn btn")}}
         </form>
-
+        {% else %}
+          <span class="form__span">Чтобы добавить книгу нужна хотя бы одна категория, обратитесь к администратору.</span>
+        {% endif %}
         <a class="form__exit-btn" href="{{url_for('personal.person', username=current_user.username)}}">Вернуться в личный кабинет</a>
       </div>
     </section>

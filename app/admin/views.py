@@ -98,7 +98,8 @@ def add_category(username):
 @admin_required
 def user_delete(user_id, page):
     page = int(page)
-    User.query.filter_by(id=user_id).delete()
+    user = User.query.filter_by(id=user_id).first()
+    database.session.delete(user)
     database.session.commit()
     if users := User.query.all():
         has_elems = True
@@ -115,7 +116,8 @@ def user_delete(user_id, page):
 @admin_required
 def category_delete(category_id, page):
     page = int(page)
-    Category.query.filter_by(id=category_id).delete()
+    category = Category.query.filter_by(id=category_id).first()
+    database.session.delete(category)
     database.session.commit()
     if categories := Category.query.all():
         has_elems = True
