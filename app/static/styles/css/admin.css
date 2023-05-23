@@ -66,6 +66,7 @@
 }
 
 .list__btn {
+  margin-top: 20px;
   margin-bottom: 10px;
 }
 
@@ -124,17 +125,22 @@
 }
 
 .list__show {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   position: relative;
-  margin-bottom: 10px;
   cursor: pointer;
-
 }
 
 .list__mark {
   position: absolute;
-  margin-left: 20px;
+  margin-left: 30px;
   visibility: hidden;
+  font-size: 15px;
+}
 
+.list__act {
+  font-size: 15px;
 }
 
 .list__show:hover .list__act {
@@ -164,7 +170,7 @@
   border-radius: 20px;
   background-color: bisque;
   margin-bottom: 40px;
-  margin-right: 80px;
+
 }
 
 .category__container {
@@ -173,8 +179,8 @@
   background-color: white;
 }
 
-.category__elem:nth-child(3n) {
-  margin-right: 0;
+.category__elem:not(:nth-child(3n)) {
+  margin-right: 80px;
 }
 
 .category__btn {

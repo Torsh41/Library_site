@@ -71,16 +71,10 @@
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  width: 322px;
-  height: 322px;
+  width: 222px;
+  height: 300px;
   margin-bottom: 48px;
   background-color: #E9E6C3;
-  margin-right: 50px;
-
-  /* background-image: url(../img/book.jpg);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover; */
 }
 
 .list__add {
@@ -103,12 +97,12 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  width: 322px;
+  width: 222px;
   min-height: 40px;
-  padding: 20px;
+  padding: 10px;
   /* background: rgba(243, 226, 187, 0.8); */
   background-color: #E9E6C3;
-  /*opacity: 0.8;*/
+  opacity: 0.9;
   text-align: center;
 
 }
@@ -254,6 +248,8 @@
 }
 
 
-.list__book:nth-child(3n) {
-  margin-right: 0;
+.list__book:not(:nth-child(4n)) {
+  margin-right: 60px;
 }
+
+
