@@ -161,7 +161,7 @@ def add_book_in_list(username, list_id, book_id, read_state):
     return redirect(url_for('.person', username=username))
 
 
-@personal.route('/<username>/delete-list/<list_id>/<page>')
+@personal.route('/<username>/delete-list/<list_id>/<page>', methods=['GET'])
 @login_required
 def list_delete(username, list_id, page):
     page = int(page)
@@ -180,10 +180,20 @@ def list_delete(username, list_id, page):
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=username))
 
 
-@personal.route('/<username>/delete-item/<item_id>')
+@personal.route('/<username>/delete-item/<cataloge_id>/<item_id>/<page>', methods=['GET'])
 @login_required
-def item_delete(username, item_id):
+def item_delete(username, cataloge_id, item_id, page):
+    page = int(page)
+    cataloge = Cataloge.query.filter_by(id=cataloge_id).first()
     item = Item.query.filter_by(id=item_id).first()
     database.session.delete(item)
     database.session.commit()
-    return redirect(url_for('personal.person', username=username, page=request.args.get('page', type=int))) 
+    if cataloge.items.all(): 
+        has_elems = True
+        items_pagination = cataloge.items.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+        pages = items_pagination.pages
+        if not items_pagination.items:
+            page = page - 1
+    else:
+        page = 1; pages = 1; has_elems = False
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=username))

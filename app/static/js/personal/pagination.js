@@ -46,14 +46,7 @@ function get_lists_page(url_path)
                           }</a>
                         <a href="#" class="list__link">Состояние чтения: ${ item.read_state }</a>
         
-                        <!--<select class="list__select">
-                        <option value="">Планирую</option>
-                        <option value="">Читаю</option>
-                        <option value="">Заброшено</option>
-                        <option value="">Прочитано</option>
-                      </select>-->
-
-                        <a class="list__book-delete-btn" onclick="del_book_from_list('')">Удалить
+                        <a class="list__book-delete-btn" onclick="del_book_from_list('/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}', '${cataloge.id}')">Удалить
                           книгу из списка</a>
                         </div>
                       </li>`;
@@ -201,8 +194,8 @@ function get_books_page(url_path, cataloge_id)
                       <a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
                     <a href="#" class="list__link">Состояние чтения: ${ book.read_state }</a>
 
-                    <a class="list__book-delete-btn" onclick="del_book_from_list('')">Удалить
-                      книгу из списка</a>
+                    <a class="list__book-delete-btn" onclick="del_book_from_list('/user/${cataloge.username}/delete-item/${cataloge_id}/${item.id}/${url[url.length - 1]}', '${cataloge_id}')">Удалить
+                    книгу из списка</a>
                     </div>
                   </li>`;
       });
@@ -214,29 +207,18 @@ function get_books_page(url_path, cataloge_id)
 });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-function del_book_from_list(url_path) 
+function del_book_from_list(url_path, cataloge_id) 
 {
     $.ajax({
       method: 'get',
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        get_lists_page(`/user/${response.username}/get_lists_page/${response.cur_page}`);
+        get_books_page(`/user/${response.username}/get_books_page/${cataloge_id}/${response.cur_page}`, cataloge_id);
         $('ul').filter(function() {
-          return this.id.match('pagination');
+          return this.id.match(cataloge_id + 'books_pagination');
         }).remove();
+
         html = `<ul class="pagination__list list-reset" id="pagination">`;
         if (response.cur_page == 1)
         {
@@ -245,7 +227,7 @@ function del_book_from_list(url_path)
         }
         else
         {
-          html += `<li> <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${response.cur_page - 1}')" id="lists_back">`;
+          html += `<li> <a onclick="get_books_page('/user/${response.username}/get_books_page/${response.cur_page - 1}', '${cataloge_id}')" id="lists_back">`;
         }
         html += `&laquo;</a><script>scroll('lists_back')</script></li>`;
         if (response.has_elems) 
@@ -253,7 +235,7 @@ function del_book_from_list(url_path)
           for (let i = 1; i <= response.pages; i++)
           {
               html += ` <li class="pagination__item active">
-                        <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${i}')">${i}</a>
+                        <a onclick="get_books_page('/user/${response.username}/get_books_page/${i}', '${cataloge_id}')">${i}</a>
                         </li>
                         <script>scroll(${ i } + 'list_pagination')</script>`;
           }
@@ -266,11 +248,11 @@ function del_book_from_list(url_path)
         }
         else
         {
-          html += `<li> <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${response.cur_page + 1}')" id="lists_up">`;
+          html += `<li> <a onclick="get_books_page('/user/${response.username}/get_books_page/${response.cur_page + 1}', '${cataloge_id}')" id="lists_up">`;
         }
         html += `&raquo;</a><script>scroll('lists_up')</script></li></ul>`;
         
-        document.getElementById('pagination_container').innerHTML = html;
+        document.getElementById(cataloge_id + 'books_pagination_container').innerHTML = html;
       },
       error: function(error) {
           console.log(error);

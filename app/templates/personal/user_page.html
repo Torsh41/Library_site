@@ -304,15 +304,13 @@
                       <option value="">Заброшено</option>
                       <option value="">Прочитано</option>
                       </select>-->
-                      <a class="list__book-delete-btn"
-                        href="{{url_for('personal.item_delete', username=current_user.username, item_id=item.id, page=pagination.page)}}">Удалить
-                        книгу из списка</a>
+                      <a class="list__book-delete-btn" onclick="del_book_from_list('/user/{{current_user.username}}/delete-item/{{cataloge_value.id}}/{{item.id}}/{{1}}', '{{cataloge_value.id}}')">Удалить книгу из списка</a>
                   </div>
                 </li>
                 {% endfor %}
               </ul>
                 {% if pagination_for_book_in_list %}
-                    <div class="list__pagination pagination">
+                    <div class="list__pagination pagination" id="{{cataloge_value.id}}books_pagination_container">
                       <ul class="pagination__list list-reset" id="{{cataloge_value.id}}books_pagination">
                         <li{% if not pagination_for_book_in_list.has_prev %} class="pagination__item disabled"{% endif %}>
                             <a onclick="{% if pagination_for_book_in_list.has_prev %}get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{pagination_for_book_in_list.prev_num}}', '{{cataloge_value.id}}'){% endif %}" id="lists_back">
