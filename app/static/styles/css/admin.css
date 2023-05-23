@@ -170,7 +170,7 @@
   border-radius: 20px;
   background-color: bisque;
   margin-bottom: 40px;
-  margin-right: 80px;
+
 }
 
 .category__container {
@@ -179,8 +179,8 @@
   background-color: white;
 }
 
-.category__elem:nth-child(3n) {
-  margin-right: 0;
+.category__elem:not(:nth-child(3n)) {
+  margin-right: 80px;
 }
 
 .category__btn {
