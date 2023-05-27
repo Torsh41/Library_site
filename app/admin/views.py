@@ -78,17 +78,19 @@ def get_category_search_page(page):
     
 @admin.route('/<username>/add-category', methods=['POST'])
 @admin_required
-def add_category(username):
-    category_page = request.args.get('category_page', 1, type=int)
+def add_category(username):  
     form = AddCategoryForm()
     if form.validate_on_submit():
         category = Category(name=str(form.category_name.data).strip().lower())
         database.session.add(category)
         database.session.commit()
-        category_pagination = Category.query.paginate(category_page, per_page=RESULT_COUNT, error_out=False)
-        categories = category_pagination.items
-        return render_template('admin/admin_panel.html', categories=categories, form=form, category_pagination=category_pagination, displays={"users_search_result_disp":"none", "book_categories_disp":"block", "add_category_disp":"none", "books_in_a_category_disp":"none"})
+        categories = Category.query.all()
+        last_page = len(categories) // RESULT_COUNT
+        if len(categories) % RESULT_COUNT > 0:
+            last_page += 1 
+        return redirect(url_for('.admin_panel', username=username, category_page=last_page))#render_template('admin/admin_panel.html', categories=categories, form=form, category_pagination=category_pagination, displays={"users_search_result_disp":"none", "book_categories_disp":"block", "add_category_disp":"none", "books_in_a_category_disp":"none"})
     
+    category_page = request.args.get('category_page', 1, type=int)
     category_pagination = Category.query.paginate(category_page, per_page=RESULT_COUNT, error_out=False)
     categories = category_pagination.items
     return render_template('admin/admin_panel.html', categories=categories, form=form, category_pagination=category_pagination, displays={"users_search_result_disp":"none", "book_categories_disp":"block", "add_category_disp":"block", "books_in_a_category_disp":"none"})

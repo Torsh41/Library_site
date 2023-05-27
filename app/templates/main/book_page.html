@@ -13,9 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
-  <script src="{{ url_for('static', filename='js/main/edit_comment.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main/edit_comment.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -139,7 +140,7 @@
       <div class="main__container container">
 
         <div class="main__top">
-          <h1 class="main__title">{{book.name}}</h1>
+          <h1 class="main__title">{{ book.name }}</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
             <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
@@ -322,79 +323,84 @@
 
 
           <!--Здесь список оставленных комментариев-->
-          <ul class="comments__info list-reset">
-            {% for comment in comments %}
+          <ul class="comments__info list-reset" id="comments_info_container">
+          {% for comment in comments %}
             <!--Элемент - комментарий-->
-            <li class="comments__comment">
+            <li class="comments__comment" id="{{comment.id}}comment_info">
               <div class="comments__top">
                 <div class="comments__image">
                   <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
                   <!--Тут добавленная фотка пользователем-->
-                  {% if (comment.user.username == current_user.username) and current_user.is_authenticated %}
                 </div>
+                {% if (comment.user.username == current_user.username) and current_user.is_authenticated %}
                 <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">{{ comment.user.username }}</a>
+                {% else %}
+                <a class="comments__link">{{ comment.user.username }}</a>
+                {% endif %}
               </div>
-                  {% else %}
+          
+              <p class="comments__link">{{ str(comment.timestamp.date().day) + " " +
+                months_dict[comment.timestamp.date().month] +
+                " " + str(comment.timestamp.date().year) }}</p>
+
+              <p class="comments__text">{{ comment.body }}</p> <!--Тут коммент введенный пользователем-->
+
+              <div class="comments__commands">
+                    {% if comment.user.username == current_user.username %}
+                      <section class="loginPopup" id="{{ comment.id }}" style="display: {{ display }}">
+                        <div class="formPopup">
+                          <h2 class="comments__title title">Редактирование комментария</h2>
+                          <form class="formContainer"
+                            action="{{url_for('main.edit_comment', username=current_user.username, comment_id=comment.id, book_name=book.name, page=pagination.page)}}"
+                            method="post">
+
+                            <label class="comments__label">
+                              <span class="comments__span">Ваш комментарий</span>
+                              <textarea type="text" class="comments__textarea" id="{{ comment.id }}field" rows="5"
+                                name="newComment" placeholder="введите новый комментарий..." required></textarea>
+                            </label>
+
+                            <button class="comments__btn btn" id="{{ comment.id }}edit_comment">Изменить</button>
+                            <button type="button" class="btn cancel" onclick="closeEditCommentForm('{{ comment.id }}')">Отменить</button>
+                          </form>
+                        </div>
+                      </section>
+                      <script>scroll({{ comment.id }} + 'edit_comment')</script>
+
+                      <a onclick="edit('{{ comment.body }}', '{{ comment.id }}')" class="comments__command">Редактировать</a>
+                      <a class="comments__command" onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')" id="{{ comment.id }}del">Удалить</a>
+                      <script>scroll({{ comment.id }} + 'del')</script>
+                    {% endif %}
+              </div>
             </li>
-            <a class="comments__link">{{ comment.user.username }}</a>
-          </ul>
-                  {% endif %}
-
-          <p class="comments__link">{{ str(comment.timestamp.date().day) + " " +
-            months_dict[comment.timestamp.date().month] +
-            " " + str(comment.timestamp.date().year) }}</p>
-
-          <p class="comments__text">{{ comment.body }}</p> <!--Тут коммент введенный пользователем-->
-
-          <div class="comments__commands">
-
-            {% if comment.user.username == current_user.username %}
-            <section class="loginPopup" id="{{ comment.id }}" style="display: {{ display }}">
-              <div class="formPopup">
-                <h2 class="comments__title title">Редактирование комментария</h2>
-                <form class="formContainer"
-                  action="{{url_for('main.edit_comment', username=current_user.username, comment_id=comment.id, book_name=book.name, page=pagination.page)}}"
-                  method="post">
-
-                  <label class="comments__label">
-                    <span class="comments__span">Ваш комментарий</span>
-                    <textarea type="text" class="comments__textarea" id="{{ comment.id }}field" rows="5"
-                      name="newComment" placeholder="введите новый комментарий..." required></textarea>
-                  </label>
-
-                  <button class="comments__btn btn" id="{{ comment.id }}edit_comment">Изменить</button>
-                  <button type="button" class="btn cancel"
-                    onclick="closeEditCommentForm('{{ comment.id }}')">Отменить</button>
-                </form>
-              </div>
-            </section>
-            <script>scroll({{ comment.id }} + 'edit_comment')</script>
-
-            <a class="comments__command" onclick="edit('{{ comment.body }}', '{{ comment.id }}')">Редактировать</a>
-            {% if pagination %}
-            {% if len(pagination.items) < 2 %} <a class="comments__command"
-              href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page - 1)}}"
-              id="{{ comment.id }}del">Удалить</a>
-              {% else %}
-              <a class="comments__command"
-                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=pagination.page)}}"
-                id="{{ comment.id }}del">Удалить</a>
-              {% endif %}
-              {% else %}
-              <a class="comments__command"
-                href="{{url_for('main.comment_delete', username=current_user.username, comment_id=comment.id, page=1)}}"
-                id="{{ comment.id }}del">Удалить</a>
-              {% endif %}
-              <script>scroll({{ comment.id }} + 'del')</script>
-              {% endif %}
-
-          </div>
-          </li>
           {% endfor %}
           </ul>
           {% if pagination %}
-          <div class="list__pagination pagination">
-            {{ macros.pagination_widget(pagination, 'main.book_page', fragment='#comments', book_name=book.name) }}
+          <div class="list__pagination pagination" id="comments_pagination_container">
+            <ul class="pagination__list list-reset" id="comments_pagination">
+              <li class="pagination__item disabled">
+                  <a onclick="{% if pagination.has_prev %}get_comments_page('/get_comments_page/{{book.name}}/{{int(pagination.prev_num)}}'){% endif %}" id="lists_back">
+                      &laquo;
+                  </a>
+                  <script>scroll('lists_back')</script>
+              </li>
+              {% for p in pagination.iter_pages() %}
+                  {% if p %}
+                      <li class="pagination__item active">
+                          <a onclick="get_comments_page('/get_comments_page/{{book.name}}/{{p}}')">{{ p }}</a>
+                      </li>
+                      <script>scroll({{ p }} + 'list_pagination')</script>
+                  {% else %}
+                  <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                  {% endif %}
+              {% endfor %}
+              <li class="pagination__item disabled">
+                  <a onclick="{% if pagination.has_next %}get_comments_page('/get_comments_page/{{book.name}}/{{int(pagination.next_num)}}'){% endif %}" id="lists_up">
+                      &raquo;
+                  </a>
+                  <script>scroll('lists_up')</script>
+              </li>
+            </ul>
           </div>
           {% endif %}
 

@@ -11,6 +11,9 @@
 @import url(_book.css);
 @import url(_comments.css);
 @import url(admin.css);
+@import url(burger.css);
+@import url(key_frames.css);
+@import url(forum.css);
 
 html {
   box-sizing: border-box;
@@ -29,6 +32,9 @@ body {
   line-height: var(--default-lh);
   color: var(--black);
   background-color: #F5F5F5;
+  background-image: url(../img/fon_image-1.jpg);
+  background-repeat: no-repeat;
+  background-position: top center;
 }
 
 img,
@@ -127,17 +133,10 @@ a {
   margin-right: 20px;
 }
 
-.image-1 {
-  /* position: relative; */
-  background-image: url(../img/fon_image-1.jpg);
-  background-repeat: no-repeat;
-  background-position: top center;
 
-}
 
 .style-1 {
   color: #E9E6C3;
-
 }
 
 .background-index {

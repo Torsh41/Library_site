@@ -1,3 +1,4 @@
+{% import "lists_macro.html" as macros %}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -9,6 +10,8 @@
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
+  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script> 
 </head>
 
 <body>
@@ -73,16 +76,18 @@
 
     <section id="1" class="about">
       <div class="about__container container">
-        <ul class="about__cat-list list-reset">
+        <ul class="about__cat-list list-reset" id="categories_block">
           {% for category in categories %}
-            <li class="about__cat-elem"><a href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}" class="about__book-link">{{ category.name }}</a></li>
+            <li class="about__cat-elem" id="{{category.id}}category_info"><a href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}" class="about__book-link">{{ category.name }}</a></li>
           {% endfor %}
         </ul>
+        {% if category_pagination %}
+          <div class="list__pagination pagination" id="user_pagination_container">
+            {{ macros.pagination_widget(pagination=category_pagination, url_path='/get_categories_page/', func_name='get_categories_page') }}
+          </div>
+        {% endif %}
       </div>
     </section>
-
-    
-
   </main>
 
   <footer class="footer">

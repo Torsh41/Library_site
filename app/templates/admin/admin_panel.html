@@ -172,7 +172,6 @@
                   </span>
                   <a onclick="del_user('/admin/admin_panel/user_delete/{{user.id}}/{{1}}')" class="users__btn" id="{{user.id}}del_user">Удалить пользователя</a>
                 </li>
-                <script>scroll({{user.id}} + 'del_user')</script>
                 {% endfor %}
             </ul>
             <div class="list__pagination pagination" id="user_pagination_container">
@@ -192,7 +191,7 @@
         <ul class="category__list list-reset" id="categories_search_list">
           <section class="loginPopup" id="popupCategoryForm" style="display: {{ displays["add_category_disp"] }}">
             <div class="formPopup">
-              <form class="formContainer" action="{{url_for('admin.add_category', username=current_user.username)}}" method="post">
+              <form class="formContainer" action="{{url_for('admin.add_category', username=current_user.username, category_page=category_pagination.page)}}" method="post" id="add_category_form">
                 {{form.hidden_tag()}}
                 <label class="form__label">
                   {% if form.category_name.errors %}
@@ -214,27 +213,26 @@
           </section>
           <script>scroll('add_category')</script>
 
-          <a class="category__book-link" onclick="openCategoryForm()">
-            <li class="category__elem">
-              <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_139_2)">
-                  <rect x="35" width="8" height="78" fill="#D9D9D9" />
-                  <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_139_2">
-                    <rect width="78" height="78" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </li>
-          </a>
-         
+            <a class="category__book-link" onclick="openCategoryForm()">
+              <li class="category__elem">
+                <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_139_2)">
+                    <rect x="35" width="8" height="78" fill="#D9D9D9" />
+                    <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_139_2">
+                      <rect width="78" height="78" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </li>
+            </a>
           {% for category in categories %}
-            <li class="category__elem" id="{{category.id}}category_info"><a class="category__book-link">{{ category.name }}</a>
+            <li class="category__elem" id="{{category.id}}category_info">
+              <a class="category__book-link">{{ category.name }}</a>
               <a onclick="del_category('/admin/admin_panel/category_delete/{{category.id}}/{{1}}', '2pagination')" class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
             </li>
-            <script>scroll({{category.id}} + 'del_category')</script>
           {% endfor %}
         </ul>
         {% if category_pagination %}

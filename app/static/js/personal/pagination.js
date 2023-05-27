@@ -194,7 +194,7 @@ function get_books_page(url_path, cataloge_id)
                       <a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
                     <a href="#" class="list__link">Состояние чтения: ${ book.read_state }</a>
 
-                    <a class="list__book-delete-btn" onclick="del_book_from_list('/user/${cataloge.username}/delete-item/${cataloge_id}/${item.id}/${url[url.length - 1]}', '${cataloge_id}')">Удалить
+                    <a class="list__book-delete-btn" onclick="del_book_from_list('/user/${book.username_of_cur_user}/delete-item/${cataloge_id}/${book.id}/${url[url.length - 1]}', '${cataloge_id}')">Удалить
                     книгу из списка</a>
                     </div>
                   </li>`;

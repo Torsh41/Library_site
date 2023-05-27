@@ -1,14 +1,14 @@
 from . import main
 from app.init import database
-from app.models import BookGrade, Book, Comment, SearchResult, Category, User
-from flask import render_template, request, redirect, url_for, make_response
+from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicMessage
+from flask import render_template, request, redirect, url_for, make_response, jsonify
 from app.main.sort import sorting
 from flask_login import current_user, login_required
 import copy
 
 
 SEARCH_ITEMS_COUNT = 6
-COMMENTS_COUNT = 10
+COMMENTS_COUNT = 8
 months_dict = {
         1:'января',
         2:'февраля',
@@ -62,8 +62,19 @@ def book_page(name):
     if grade_count:    
         fin_grade = round(fin_grade / grade_count, 1)
    
-    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=grade_count, months_dict=months_dict, display="none") 
+    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=grade_count, months_dict=months_dict, int=int, display="none") 
 
+
+@main.route('/get_comments_page/<book_name>/<page>', methods=['GET'])
+def get_comments_page(book_name, page):
+    page = int(page)
+    book = Book.query.filter_by(name=book_name).first()
+    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=COMMENTS_COUNT, error_out=False).items
+    users = list()
+    for comment in comments:
+        users.append(User.query.filter_by(id=comment.user_id).first())
+    return jsonify([dict(id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    
 
 @main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
 @login_required
@@ -91,23 +102,40 @@ def give_grade(username, book_id, grade):
     return redirect(url_for('main.book_page', name=book.name))
 
 
-@main.route('/<username>/delete-comment/<comment_id>')  
+@main.route('/<username>/<book_name>/delete-comment/<comment_id>/<page>', methods=['GET'])  
 @login_required
-def comment_delete(username, comment_id):
+def comment_delete(username, book_name, comment_id, page):
+    page = int(page)
     comment = Comment.query.filter_by(id=comment_id).first()
-    book = comment.book
     database.session.delete(comment)
     database.session.commit()
-    return redirect(url_for('main.book_page', name=book.name, page=request.args.get('page', type=int))) 
-
+    book = Book.query.filter_by(name=book_name).first()
+    if book.comments.all(): 
+        has_elems = True
+        comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=COMMENTS_COUNT, error_out=False)
+        pages = comments_pagination.pages
+        if not comments_pagination.items:
+            page = page - 1
+    else:
+        page = 1; pages = 1; has_elems = False
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=username, book_name=book_name))
+    
 
 @main.route('/categories', methods=['GET'])
 def categories():
     list_id = request.args.get('list_id', None, type=int)
-    categories = Category.query.all()
-    return render_template('main/categories.html', categories=categories, list_id=list_id)
+    category_pagination = Category.query.order_by().paginate(1, per_page=SEARCH_ITEMS_COUNT, error_out=False)
+    categories = category_pagination.items
+    return render_template('main/categories.html', categories=categories, category_pagination=category_pagination, list_id=list_id)
 
 
+@main.route('/get_categories_page/<page>', methods=['GET'])
+def get_categories_page(page):
+    page = int(page)
+    categories = Category.query.order_by().paginate(page, per_page=SEARCH_ITEMS_COUNT, error_out=False).items
+    return jsonify([dict(id=category.id, name=category.name) for category in categories])
+    
+    
 @main.route('/category/<name>/search', methods=['GET', 'POST'])
 def search_by_category(name):
     list_id = request.args.get('list_id', None, type=int)
@@ -136,7 +164,7 @@ def search_by_category(name):
                 search_result = 404
         else:
             release_date = request.form.get('release_date') 
-            if release_date:
+            if release_date != '#':
                 search_result = None
                 search_result_ = Book.query.filter_by(release_date=release_date).all()
                 
@@ -201,7 +229,34 @@ def search_by_category(name):
         try:
             search_result = search_result[page]
         except:
-            return render_template('main/category_page.html', search_result=0, date_list=date_list, len=len)
+            return render_template('main/category_page.html', name=name, search_result=0, date_list=date_list, len=len)
         return render_template('main/category_page.html', search_result=search_result, date_list=date_list, categories=categories, len=len, page_count=page_count, page=page, range=range, name=name, list_id=list_id, all_search_result=cur_result)
     
-    return render_template('main/category_page.html', search_result=0, date_list=date_list, categories=categories, len=len)
+    return render_template('main/category_page.html', name=name, search_result=0, date_list=date_list, categories=categories, len=len)
+
+
+@main.route('/forum')
+def forum():
+    category_page = request.args.get('category_page', 1, type=int)
+    category_pagination = Category.query.order_by().paginate(category_page, per_page=SEARCH_ITEMS_COUNT, error_out=False)
+    categories = category_pagination.items
+    return render_template('main/forum.html', category_pagination=category_pagination, categories=categories, len=len)
+
+
+@main.route('/forum/<topic_name>')
+def topic(topic_name):
+    return render_template('main/forum_discussion.html', topic_name=topic_name)
+
+
+@main.route('/get_categories_page_on_forum/<page>', methods=['GET'])
+def get_categories_page_on_forum(page):
+    page = int(page)
+    categories = Category.query.order_by().paginate(page, per_page=SEARCH_ITEMS_COUNT, error_out=False).items
+    categories_topics = dict()
+    for category in categories:
+        topics_pagination = category.topics.order_by().paginate(1, per_page=SEARCH_ITEMS_COUNT, error_out=False)
+        category_topics = [dict(id=topic.id, body=topic.body, cur_page=1, pages=topics_pagination.pages) for topic in topics_pagination.items]
+        categories_topics[category.id] = copy.deepcopy(category_topics)
+        
+    return jsonify([dict(id=category.id, name=category.name, topics=topics, topics_count=len(topics)) for category, topics in zip(categories, categories_topics.values())])
+   

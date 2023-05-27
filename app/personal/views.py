@@ -23,18 +23,17 @@ def avatar(username):
 @personal.route('/<username>')
 @login_required
 def person(username, flag=False):
-    add_book_form = AddNewBookForm()
     form = AddListForm()
     user = User.query.filter_by(username=username).first()
     page = request.args.get('page', 1, type=int)
     pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    paginations_for_books_in_lists = list(); books_for_lists = list()
+    paginations_for_books_in_lists = list()
     for cataloge in catalogues:
         books_pagination = cataloge.items.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
         paginations_for_books_in_lists.append(books_pagination)
         
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, len=len, flag=flag, form=form, zip=zip, add_book_form=add_book_form, display="none")
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, len=len, flag=flag, form=form, zip=zip, display="none")
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -99,7 +98,7 @@ def get_books_page(username, cataloge_id, page):
     cataloge = Cataloge.query.filter_by(id=cataloge_id).first()
     items_pagination = cataloge.items.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     items = items_pagination.items
-    return jsonify([dict(id=item.id, name=item.book.name, read_state=item.read_state) for item in items])
+    return jsonify([dict(id=item.id, name=item.book.name, read_state=item.read_state, username_of_cur_user=username) for item in items])
     
     
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])

@@ -22,11 +22,12 @@ class User(UserMixin, database.Model, SerializerMixin):
     city = database.Column(database.String(64), default=False)
     gender = database.Column(database.String(4), default=False)
     age = database.Column(database.Integer, default=False)
-    about_me = database.Column(database.Text, default=False)
+    about_me = database.Column(database.Text(), default=False)
     password_hash = database.Column(database.String(128))
     books = database.relationship('Book', backref='user')
     grades = database.relationship('BookGrade', backref='user', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='user', cascade="all, delete, delete-orphan")
+    topics = database.relationship('TopicMessage', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
     role = database.Column(database.Boolean, default=False)
@@ -86,8 +87,26 @@ class Category(database.Model, SerializerMixin):
     __tablename__ = "categories"    
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(64), unique=True, index=True)
-    books = database.relationship('Book', backref='category', cascade="all, delete, delete-orphan")
-    
+    books = database.relationship('Book', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
+    topics = database.relationship('DiscussionTopic', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
+
+
+class DiscussionTopic(database.Model, SerializerMixin):
+    __tablename__ = "topics"
+    id = database.Column(database.Integer, primary_key=True)
+    name = database.Column(database.String(1024), unique=True, index=True)
+    category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
+    messages = database.relationship('TopicMessage', backref='topic', lazy='dynamic', cascade="all, delete, delete-orphan")
+
+
+class TopicMessage(database.Model, SerializerMixin):
+    __tablename__ = "messages"
+    id = database.Column(database.Integer, primary_key=True)
+    body = database.Column(database.String(1024), unique=True, index=True)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
+    user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+    discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
+
     
 class Book(database.Model, SerializerMixin):
     __tablename__ = "books"

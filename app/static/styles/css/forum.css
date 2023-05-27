@@ -1,0 +1,161 @@
+.fraction__topic-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.fraction__topic {
+  position: relative;
+  display: flex;
+  /* flex-direction: column; */
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 200px;
+
+  border-radius: 20px;
+  background-color: bisque;
+  margin-bottom: 40px;
+
+}
+
+.fraction__container {
+  padding: 52px 100px;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.fraction__topic:not(:nth-child(3n)) {
+  margin-right: 80px;
+}
+
+.fraction__title {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.fraction__results {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.main__description {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 21px;
+}
+
+/* Styles for sections - discussion*/
+
+.discussion__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 52px 100px;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.discussion__message {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.discussion__message:not(:last-child) {
+  margin-bottom: 20px;
+}
+
+.message__left {
+  padding: 20px;
+  width: 400px;
+  background-color: antiquewhite;
+}
+
+.message__right {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  background-color: beige;
+}
+
+.message__admin {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  right: 20px;
+  bottom: 20px;
+}
+
+.message__admin-btn {
+  margin-left: 20px;
+}
+
+.message__name,
+.message__link {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+}
+
+.message__text {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.message__set {
+  margin-right: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: #EFF6F2;
+}
+
+.message__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message__name-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.discussion__btn {
+  padding: 20px;
+  width: 700px;
+  background-color: beige;
+}
+
+.button__text {
+  padding: 20px;
+  cursor: pointer;
+  resize: none;
+}
+
+.button__form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.button__write {
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.main__span-forum {
+  margin-top: 30px;
+  font-size: 15px;
+}

@@ -97,11 +97,16 @@ function get_category_page(url_path, pagination_id)
           html = '';
           categories.forEach(category => {
               html += `<li class="category__elem" id="${category.id}category_info">
-                        <a class="category__book-link">${ category.name }</a>
+                        <a class="category__book-link">${category.name}</a>
                         <a onclick="del_category('/admin/admin_panel/category_delete/${category.id}/${url[url.length - 1]}', '${pagination_id}')" class="category__btn" id="${category.id}del_category">Удалить категорию</a>
                       </li>`;
           });
-            document.getElementById("categories_search_list").innerHTML += html;
+          document.getElementById("categories_search_list").innerHTML += html;
+          form = document.getElementById("add_category_form");
+          action = form.getAttribute('action');
+          action = action.split('?');
+          path = action[0] + `?category_page=${url[url.length - 1]}`;
+          form.setAttribute('action', path);
         },
         error: function(error) {
             console.log(error);
@@ -116,7 +121,7 @@ function del_category(url_path, pagination_id)
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        get_category_page(`/admin/get_category_search_page/${response.cur_page}`);
+        get_category_page(`/admin/get_category_search_page/${response.cur_page}`, `${pagination_id}`);
         $('ul').filter(function() {
           return this.id.match(pagination_id);
         }).remove();
@@ -149,7 +154,7 @@ function del_category(url_path, pagination_id)
         }
         else
         {
-          html += `<li> <a onclick="get_category_page('/admin/get_category_search_page/${response.cur_page + 1}', '${pagination_id}')" id="lists_up">`;
+          html += `<li><a onclick="get_category_page('/admin/get_category_search_page/${response.cur_page + 1}', '${pagination_id}')" id="lists_up">`;
         }
         html += `&raquo;</a><script>scroll('lists_up')</script></li></ul>`;
         
