@@ -160,10 +160,7 @@ function get_categories_page_on_forum(url_path)
                 <div class="fraction__container container">
                   <div class="fraction__wrap">
                     <h2 class="fraction__title title">${category.name}</h2> 
-                    <span class="fraction__results"> Всего тем: ${category.topics_count}</span>`;
-                    topics = Array.from(category.topics);
-                    topics.forEach(topic => {
-                        html += `   <div class="fraction__topic-list">
+                    <span class="fraction__results"> Всего тем: ${category.topics_count}</span> 
                         <a href="#" class="fraction__topic-link"> <!--Add the new topic (for users)-->
                           <div class="fraction__topic">
                             <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -178,8 +175,10 @@ function get_categories_page_on_forum(url_path)
                               </defs>
                             </svg>
                           </div>
-                        </a>
-            
+                        </a>`;
+                    topics = Array.from(category.topics);
+                    topics.forEach(topic => {
+                        html += `<div class="fraction__topic-list">
                         <a href="/forum/${topic.name}" class="fraction__topic-link">
                           <div class="fraction__topic">
                             ${topic.name}
@@ -189,7 +188,8 @@ function get_categories_page_on_forum(url_path)
                     });
                 html += `</div></div></section>`;
             });
-            document.getElementById("categories_container").innerHTML = html;
+            section = document.getElementById('first_section');
+            section.insertAdjacentHTML('afterend', html);
         },
         error: function(error) {
             console.log(error);
