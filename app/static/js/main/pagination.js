@@ -153,7 +153,10 @@ function get_categories_page_on_forum(url_path)
             $('section').filter(function() {
                 return this.id.match(/category_info/);
             }).remove();
-            url = url_path.split('/');
+            $('section').filter(function() {
+              return this.id.match("not_found");
+            }).remove();
+            document.getElementById("category_name_id").value = "";
             html = "";
             categories.forEach(category => {
                 html +=  `<section id="${category.id}category_info" class="fraction">

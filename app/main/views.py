@@ -165,29 +165,29 @@ def search_by_category(name):
         else:
             release_date = request.form.get('release_date') 
             if release_date != '#':
-                search_result = None
-                search_result_ = Book.query.filter_by(release_date=release_date).all()
-                
+                search_result = Book.query.filter_by(release_date=release_date).all()
+            
             elif result:
                 search_result = Book.query.filter(Book.name.like("%{}%".format(result))).all()
                 search_result_ = Book.query.filter(Book.author.like("%{}%".format(result))).all()
-                       
+                search_result_for_category = search_result + search_result_
+                res_for_category = list()
+                for item in search_result_for_category:
+                       if item.category.name == name:
+                           res_for_category.append(item)
+                search_result = res_for_category      
             else:
                 search_result = None
-                search_result_ = []
-            
+              
             if search_result:
-                for cur_res in search_result:
-                    search_result_.append(cur_res)
-        
-            search_result_fin = [] 
-            [search_result_fin.append(value) for value in search_result_ if value not in search_result_fin]
-            fin_result = list()
-            for each in search_result_fin:
-                if each:
-                    fin_result.append(each)
-            search_result = fin_result
-            if not search_result:
+                search_result_fin = [] 
+                [search_result_fin.append(value) for value in search_result if value not in search_result_fin]
+                fin_result = list()
+                for each in search_result_fin:
+                    if each:
+                        fin_result.append(each)
+                search_result = fin_result
+            else:
                 search_result = 404
                 page_count = None
         all_search_result = search_result
@@ -259,4 +259,27 @@ def get_categories_page_on_forum(page):
         categories_topics[category.id] = copy.deepcopy(category_topics)
         
     return jsonify([dict(id=category.id, name=category.name, topics=topics, topics_count=len(topics)) for category, topics in zip(categories, categories_topics.values())])
+
+
+@main.route('/search_category_on_forum', methods=['POST'])
+def search_category_on_forum():
+    category_name = str(request.form.get('category_name')).strip().lower()
+    found_category = Category.query.filter(Category.name.like("%{}%".format(category_name))).first()
+    if found_category:
+        page = 1; cur_page_items = list()
+        while True:
+            cur_page_items = Category.query.order_by().paginate(page, per_page=SEARCH_ITEMS_COUNT, error_out=False).items
+            if found_category in cur_page_items:
+                break
+            page += 1
+              
+        categories_topics = dict()
+        for category in cur_page_items:
+            topics_pagination = category.topics.order_by().paginate(1, per_page=SEARCH_ITEMS_COUNT, error_out=False)
+            category_topics = [dict(id=topic.id, body=topic.body, cur_page=1, pages=topics_pagination.pages) for topic in topics_pagination.items]
+            categories_topics[category.id] = copy.deepcopy(category_topics)
+        return jsonify([dict(result=True, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(topics)) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
+    else:
+        return jsonify([dict(result=False)])
+        
    

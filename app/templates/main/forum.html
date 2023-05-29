@@ -12,6 +12,7 @@
   <script defer src="js/burger.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/search_on_forum.js')}}"></script>
 </head>
 
 <body>
@@ -20,11 +21,7 @@
       <a class="header__logo" href="index.html">
         <img class="header__logo-image" src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
       </a>
-
-
-
       <div class="header__admin admin admin__wrap">
-
         <a href="#" class="admin__link ">
           <div class="admin__set">
             <img src="img/default_avatar.jpg" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
@@ -32,8 +29,6 @@
           Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
         </a>
       </div>
-
-
     </div>
   </header>
 
@@ -50,7 +45,7 @@
 
         <div class="main__description">
           <p class="main__bottom-text">Для общения и обсуждения книг и учебы</p>
-          <form class="main__form" action="" method="post">
+          <form class="main__form" action="/search_category_on_forum" method="post">
             <label class="main__form-label">
               <svg class="main__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_6_94)">
@@ -64,17 +59,15 @@
                   </clipPath>
                 </defs>
               </svg>
-
-              <input type="text" class="main__form-input" placeholder="Введите название раздела..">
+              <input id="category_name_id" name="category_name" type="text" class="main__form-input" placeholder="Введите название раздела.." required>
             </label>
-
-            <button class="main__form-btn btn">Найти</button>
+            <button id="found_category" class="main__form-btn btn" onclick="search_category_on_forum()">Найти</button>
           </form>
         </div>
 
       </div>
     </section>
-
+    
 
     <!--Секция для одного раздела (все разделы идут друг за другом)-->
       {% for category in categories %}
@@ -149,5 +142,4 @@
   </footer>
 
 </body>
-
 </html>
