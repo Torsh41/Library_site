@@ -1,9 +1,10 @@
 from . import main
 from app.init import database
-from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicMessage
+from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicMessage, DiscussionTopic
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from app.main.sort import sorting
 from flask_login import current_user, login_required
+from .forms import AddTopicForm
 import copy
 
 
@@ -240,7 +241,7 @@ def forum():
     category_page = request.args.get('category_page', 1, type=int)
     category_pagination = Category.query.order_by().paginate(category_page, per_page=SEARCH_ITEMS_COUNT, error_out=False)
     categories = category_pagination.items
-    return render_template('main/forum.html', category_pagination=category_pagination, categories=categories, len=len)
+    return render_template('main/forum.html', category_pagination=category_pagination, categories=categories, len=len, display="none")
 
 
 @main.route('/forum/<topic_name>')
@@ -255,10 +256,14 @@ def get_categories_page_on_forum(page):
     categories_topics = dict()
     for category in categories:
         topics_pagination = category.topics.order_by().paginate(1, per_page=SEARCH_ITEMS_COUNT, error_out=False)
-        category_topics = [dict(id=topic.id, body=topic.body, cur_page=1, pages=topics_pagination.pages) for topic in topics_pagination.items]
+        category_topics = [dict(id=topic.id, name=topic.name, cur_page=1, pages=topics_pagination.pages) for topic in topics_pagination.items]
         categories_topics[category.id] = copy.deepcopy(category_topics)
         
-    return jsonify([dict(id=category.id, name=category.name, topics=topics, topics_count=len(topics)) for category, topics in zip(categories, categories_topics.values())])
+    if current_user.is_authenticated:
+        username_of_cur_user = current_user.username
+    else:
+        username_of_cur_user = False
+    return jsonify([dict(username_of_cur_user=username_of_cur_user, id=category.id, name=category.name, topics=topics, topics_count=len(topics)) for category, topics in zip(categories, categories_topics.values())])
 
 
 @main.route('/search_category_on_forum', methods=['POST'])
@@ -276,10 +281,43 @@ def search_category_on_forum():
         categories_topics = dict()
         for category in cur_page_items:
             topics_pagination = category.topics.order_by().paginate(1, per_page=SEARCH_ITEMS_COUNT, error_out=False)
-            category_topics = [dict(id=topic.id, body=topic.body, cur_page=1, pages=topics_pagination.pages) for topic in topics_pagination.items]
+            category_topics = [dict(id=topic.id, name=topic.name, cur_page=1, pages=topics_pagination.pages) for topic in topics_pagination.items]
             categories_topics[category.id] = copy.deepcopy(category_topics)
-        return jsonify([dict(result=True, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(topics)) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
+            
+        if current_user.is_authenticated:
+            username_of_cur_user = current_user.username
+        else:
+            username_of_cur_user = False
+        return jsonify([dict(result=True, cur_page=page, username_of_cur_user=username_of_cur_user, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(topics)) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
     else:
         return jsonify([dict(result=False)])
+    
+    
+@main.route('/<username>/<category_name>/add_topic', methods=['POST'])
+@login_required
+def add_topic(username, category_name):
+    page = request.args.get("page", 1, type=int)
+    in_topic_name = str(request.form.get('topic_name')).strip()
+    cur_category = Category.query.filter_by(name=category_name).first()
+    result = True
+    for topic in cur_category.topics.all():
+        if topic.name == in_topic_name:
+            result = False
+            break
+    if result:
+        topic = DiscussionTopic(name=in_topic_name, category=cur_category)
+        database.session.add(topic)
+        database.session.commit()
+        cur_category = Category.query.filter_by(name=category_name).first()
+        topics_for_cur_category = cur_category.topics.all()
+        # if current_user.is_authenticated:
+        #     username_of_cur_user = current_user.username
+        # else:
+        #     username_of_cur_user = False
+        return jsonify([dict(result=result, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category)) for topic in topics_for_cur_category])
+    return jsonify([dict(result=result)])
+   
+  
+        
         
    

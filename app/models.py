@@ -94,7 +94,7 @@ class Category(database.Model, SerializerMixin):
 class DiscussionTopic(database.Model, SerializerMixin):
     __tablename__ = "topics"
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(1024), unique=True, index=True)
+    name = database.Column(database.String(1024), unique=False, index=True)
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
     messages = database.relationship('TopicMessage', backref='topic', lazy='dynamic', cascade="all, delete, delete-orphan")
 
@@ -102,7 +102,7 @@ class DiscussionTopic(database.Model, SerializerMixin):
 class TopicMessage(database.Model, SerializerMixin):
     __tablename__ = "messages"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.String(1024), unique=True, index=True)
+    body = database.Column(database.String(1024), index=True)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
