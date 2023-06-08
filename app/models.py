@@ -18,6 +18,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.String(64), unique=True, index=True)
     username = database.Column(database.String(64), unique=True, index=True)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     avatar = database.Column(database.LargeBinary, default=False)
     city = database.Column(database.String(64), default=False)
     gender = database.Column(database.String(4), default=False)
@@ -27,7 +28,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     books = database.relationship('Book', backref='user')
     grades = database.relationship('BookGrade', backref='user', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='user', cascade="all, delete, delete-orphan")
-    topics = database.relationship('TopicMessage', backref='user', cascade="all, delete, delete-orphan")
+    posts_from_all_topics = database.relationship('TopicPost', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
     role = database.Column(database.Boolean, default=False)
@@ -96,11 +97,11 @@ class DiscussionTopic(database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(1024), unique=False, index=True)
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
-    messages = database.relationship('TopicMessage', backref='topic', lazy='dynamic', cascade="all, delete, delete-orphan")
+    posts = database.relationship('TopicPost', backref='topic', lazy='dynamic', cascade="all, delete, delete-orphan")
 
 
-class TopicMessage(database.Model, SerializerMixin):
-    __tablename__ = "messages"
+class TopicPost(database.Model, SerializerMixin):
+    __tablename__ = "posts"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.String(1024), index=True)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)

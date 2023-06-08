@@ -210,3 +210,88 @@ function get_categories_page_on_forum(url_path)
         }
     });
 }
+
+function get_posts_page(url_path)
+{
+  $.ajax({
+    method: 'get',
+    url: url_path,
+    dataType: 'json',
+    success: function(response) {
+        posts = Array.from(response);
+        $('div').filter(function() {
+            return this.id.match(/discussion_post/);
+        }).remove();
+        html = "";
+        posts.forEach(post => {
+        html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
+                      <div class="message__left">
+                        <div class="message__name">
+                          <a href="#" class="message__link">
+                            <div class="message__set">
+                              <img src="/user/${post.username}/edit-profile/edit-avatar" alt="" class="message__img"> 
+                            </div>
+                            ${post.username}
+                          </a>
+                        </div>
+      
+                        <div class="message__name-info">
+                          <p class="message__info">Данные о пользователе</p>
+                          <span class="message__span">На сайте с ${post.user_day + " " + post.user_month +
+                          " " + post.user_year}</span>
+                        </div>
+                      </div>
+    
+                      <div class="message__right">
+                        <p class="message__text">
+                        ${post.body} <!--Сообщение пользователя-->
+                        </p>`;
+
+                  if (post.username == post.current_username)
+                  {
+                    html += `<div class="message__admin">
+                              <a href="" class="message__admin-btn">Редактировать</a>
+                              <a href="" class="message__admin-btn">Удалить</a>
+                              </div>`;
+                  }
+                 html += `</div></div>`;
+         });
+         div = document.getElementById('disc_posts_container');
+         div.insertAdjacentHTML('afterbegin', html);
+    },
+    error: function(error) {
+        console.log(error);
+    }
+  });
+}
+
+function get_topics_page_on_forum(url_path, category_id)
+{
+  $.ajax({
+    method: 'get',
+    url: url_path,
+    dataType: 'json',
+    success: function(response) {
+      topics = Array.from(response);
+      $('a').filter(function() {
+        return this.id.match(category_id + 'topic_info');
+      }).remove();
+      url = url_path.split('/');
+      html = '';
+      topics.forEach(topic => {
+                    html += ` <a href="/forum/${topic.id}" id="${category_id}topic_info" class="fraction__topic-link">
+                              <div class="fraction__topic">
+                                ${topic.name} 
+                              </div>
+                              </a>`;
+      });
+      div = document.getElementById(category_id + "grid_container");
+      div.insertAdjacentHTML('beforeend', html);
+    },
+    error: function(error) {
+        console.log(error);
+    }
+  });
+}
+
+

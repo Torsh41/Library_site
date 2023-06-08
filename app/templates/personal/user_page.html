@@ -305,27 +305,20 @@
                 {% if pagination_for_book_in_list %}
                     <div class="list__pagination pagination" id="{{cataloge_value.id}}books_pagination_container">
                       <ul class="pagination__list list-reset" id="{{cataloge_value.id}}books_pagination">
-                        <li{% if not pagination_for_book_in_list.has_prev %} class="pagination__item disabled"{% endif %}>
-                            <a onclick="{% if pagination_for_book_in_list.has_prev %}get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{pagination_for_book_in_list.prev_num}}', '{{cataloge_value.id}}'){% endif %}" id="lists_back">
-                                &laquo;
-                            </a>
-                            <script>scroll('lists_back')</script>
+                        <li class="pagination__item disabled">
+                          &bull;
                         </li>
                         {% for p in pagination_for_book_in_list.iter_pages() %}
                             {% if p %}
                                 <li class="pagination__item active">
                                     <a onclick="get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{p}}', '{{cataloge_value.id}}')">{{ p }}</a>
                                 </li>
-                                <script>scroll({{ p }} + 'list_pagination')</script>
                             {% else %}
                             <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
                             {% endif %}
                         {% endfor %}
-                        <li{% if not pagination_for_book_in_list.has_next %} class="pagination__item disabled"{% endif %}>
-                            <a onclick="{% if pagination_for_book_in_list.has_next %}get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{pagination_for_book_in_list.next_num}}', '{{cataloge_value.id}}'){% endif %}" id="lists_up">
-                                &raquo;
-                            </a>
-                            <script>scroll('lists_up')</script>
+                        <li class="pagination__item disabled">
+                          &bull;
                         </li>
                       </ul>
                     </div>
@@ -351,27 +344,20 @@
     {% if pagination %}
       <div class="list__pagination pagination" id="pagination_container">
         <ul class="pagination__list list-reset" id="pagination">
-          <li{% if not pagination.has_prev %} class="pagination__item disabled"{% endif %}>
-              <a onclick="{% if pagination.has_prev %}get_lists_page('/user/{{current_user.username}}/get_lists_page/{{pagination.prev_num}}'){% endif %}" id="lists_back">
-                  &laquo;
-              </a>
-              <script>scroll('lists_back')</script>
+          <li class="pagination__item disabled">
+            &bull;
           </li>
           {% for p in pagination.iter_pages() %}
               {% if p %}
                   <li class="pagination__item active">
                       <a onclick="get_lists_page('/user/{{current_user.username}}/get_lists_page/{{p}}')">{{ p }}</a>
                   </li>
-                  <script>scroll({{ p }} + 'list_pagination')</script>
               {% else %}
               <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
               {% endif %}
           {% endfor %}
-          <li{% if not pagination.has_next %} class="pagination__item disabled"{% endif %}>
-              <a onclick="{% if pagination.has_next %}get_lists_page('/user/{{current_user.username}}/get_lists_page/{{pagination.next_num}}'){% endif %}" id="lists_up">
-                  &raquo;
-              </a>
-              <script>scroll('lists_up')</script>
+          <li class="pagination__item disabled">
+            &bull;  
           </li>
         </ul>
       </div>

@@ -6,9 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin dashboard</title>
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="img/favicon.svg">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
+  <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
+  <!--<link rel="icon" href="img/favicon.svg">-->
+
 </head>
 
 <body>
@@ -48,94 +53,110 @@
 
 
         <div class="main__bottom">
-          <a class="main__bottom-item" href="forum.html">Главная страница форума</a>
+          <a class="main__bottom-item" href="{{url_for('main.forum')}}">Главная страница форума</a>
           <a class="main__bottom-item" href="#1">Написать сообщение</a>
         </div>
 
-        <span class="main__span-forum">Сообщений: </span> <!--Количество сообщений в этой теме-->
+        <span class="main__span-forum">Сообщений: {{posts_count}}</span> <!--Количество сообщений в этой теме-->
 
       </div>
     </section>
-
 
     <section class="discussion">
-      <div class="discussion__container container">
-        <div class="discussion__message message">  <!--Сообщение-->
-          <div class="message__left">
-            <div class="message__name">
-              <a href="#" class="message__link">
-                <div class="message__set">
-                  <img src="img/default_avatar.jpg" alt="" class="message__img"> <!--Фото админа из его личного кабинета-->
-                </div>
-                Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
-              </a>
+      <div class="discussion__container container" id="disc_posts_container">
+        {% for post in posts %}
+          <div class="discussion__message message" id="{{post.id}}discussion_post">  <!--Сообщение-->
+            <div class="message__left">
+              <div class="message__name">
+                <a href="#" class="message__link">
+                  <div class="message__set">
+                    <img src="{{url_for('personal.avatar', username=post["username"])}}" alt="" class="message__img"> <!--Фото админа из его личного кабинета-->
+                  </div>
+                  {{post["username"]}}
+                </a>
+              </div>
+
+              <div class="message__name-info">
+                <p class="message__info">
+                  <span class="message__span">
+                    {{post["age"]}}
+                  </span>
+                  <span class="message__span">
+                    {{post["gender"]}}
+                  </span>
+                  <span class="message__span">
+                    {{post["city"]}}
+                  </span>
+                  <span class="message__span">
+                    {{post["about_me"]}}
+                  </span>
+                </p>
+                <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " +
+                  months_dict[post["user_timestamp"].date().month] +
+                  " " + str(post["user_timestamp"].date().year) }}</span>
+              </div>
             </div>
 
-            <div class="message__name-info">
-              <p class="message__info">Данные о пользователе</p>
-              <span class="message__span">На сайте с "дата"</span>
+            <div class="message__right">
+              <p class="message__text">
+               {{post["body"]}} <!--Сообщение пользователя-->
+              </p>
+
+              <!--This block for admin or moderator-->
+
+              <!-- <div class="message__admin">
+                <a href="" class="message__admin-btn">Cкрыть</a>
+                <a href="" class="message__admin-btn">Удалить</a>
+              </div> -->
+
+              <!--This block for user (only for his messages)-->
+              {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
+              <div class="message__admin">
+                <a href="" class="message__admin-btn">Редактировать</a>
+                <a href="" class="message__admin-btn">Удалить</a>
+              </div>
+              {% endif %}
+
             </div>
           </div>
-
-          <div class="message__right">
-            <p class="message__text">
-              Комментарий <!--Сообщение пользователя-->
-            </p>
-
-            <!--This block for admin or moderator-->
-
-            <!-- <div class="message__admin">
-              <a href="" class="message__admin-btn">Cкрыть</a>
-              <a href="" class="message__admin-btn">Удалить</a>
-            </div> -->
-
-            <!--This block for user (only for his messages)-->
-            <div class="message__admin">
-              <a href="" class="message__admin-btn">Редактировать</a>
-              <a href="" class="message__admin-btn">Удалить</a>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="discussion__message message">  <!--Сообщение-->
-          <div class="message__left">
-            <div class="message__name">
-              <a href="#" class="message__link">
-                <div class="message__set">
-                  <img src="img/default_avatar.jpg" alt="" class="message__img"> <!--Фото админа из его личного кабинета-->
-                </div>
-                Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
-              </a>
-            </div>
-
-            <div class="message__name-info">
-              <p class="message__info">Данные о пользователе</p>
-              <span class="message__span">На сайте с "дата"</span>
-            </div>
-          </div>
-
-          <div class="message__right">
-            <p class="message__text">
-              Комментарий <!--Сообщение пользователя-->
-            </p>
-          </div>
-        </div>
+        {% endfor %}
 
         <!--Этот блок есть всегда (только для авторизированных пользователей)-->
-        <div id="1" class="discussion__btn button">
-          <form action="" class="button__form">
-            <textarea name="" id="" cols="70" rows="5" class="button__text" placeholder="Написать сообщение.."></textarea>
-            <button class="button__write">Отправить</button>
-          </form>
-        </div>
-
+        {% if current_user.is_authenticated %}
+          <div id="1" class="discussion__btn button">
+            <form action="/{{current_user.username}}/{{topic_id}}/add_post" class="button__form" id="add_post_form" method="post">
+              <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text" placeholder="Написать сообщение.." required></textarea>
+              <input id="add_post_button" class="button__write" type="button" value="Отправить" onclick="add_post_on_forum()">
+            </form>
+          </div>
+        {% else %}
+          <div id="1" class="discussion__btn button">
+            Писать посты могут только авторизованные пользователи
+          </div>
+        {% endif %}
       </div>
+      {% if posts_pagination %}
+      <div class="list__pagination pagination" id="posts_pagination_container">
+        <ul class="pagination__list list-reset" id="pagination">
+          <li class="pagination__item disabled">
+            &bull;
+          </li>
+          {% for p in posts_pagination.iter_pages() %}
+              {% if p %}
+                  <li class="pagination__item active">
+                      <a onclick="get_posts_page('/get_posts_page/{{topic_id}}/{{p}}')">{{ p }}</a>
+                  </li>
+              {% else %}
+              <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+              {% endif %}
+          {% endfor %}
+          <li class="pagination__item disabled">
+            &bull;
+          </li>
+        </ul>
+      </div>
+      {% endif %}
     </section>
-
-
-
-
   </main>
   <footer class="footer">
     <div class="footer__container container">

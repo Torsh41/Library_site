@@ -59,11 +59,22 @@ function search_category_on_forum()
                         }
                         topics = Array.from(category.topics);
                         topics.forEach(topic => {
-                            html += `<a href="/forum/${topic.name}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
+                          if (topic.name.slice(-1) == "?")
+                          {
+                            html += `<a href="/forum/${topic.name.slice(0, -1) + "%3F"}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
                                       <div class="fraction__topic">
                                         ${topic.name}
                                       </div>
                                       </a>`;
+                          }
+                          else
+                          {
+                            html += `<a href="/forum/${topic.name}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
+                            <div class="fraction__topic">
+                              ${topic.name}
+                            </div>
+                            </a>`;
+                          }
                         });
                     html += `</div></div></div></section>`;
                 });

@@ -56,48 +56,19 @@ function get_lists_page(url_path)
                 // собираем пагинацию книг каждого списка
                 html += `<div class="list__pagination pagination">
                           <ul class="pagination__list list-reset" id="${cataloge.id}books_pagination">
-                          <li class="pagination__item disabled">
-                              <a onclick="" id="lists_back">
-                                  &laquo;
-                              </a>
-                              <script>scroll('lists_back')</script>
-                          </li>`;
+                          <li class="pagination__item disabled">&bull;</li>`;
                 try
                 {
                   for (let i = 1; i <= items[0].pages; i++)
                   {
-                      html += `<li class="pagination__item active">
-                                <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
-                                </li>
-                                <script>scroll(${ i } + 'list_pagination')</script>`;
+                        html += `<li class="pagination__item active">
+                                  <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
+                                  </li>`;
                   }
-                    
-                  if (items[0].pages > items[0].cur_page)
-                  {
-                    html += `<li>  
-                              <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${items[0].cur_page + 1}', '${cataloge.id}')" id="lists_up">
-                              &raquo;
-                              </a>`;     
-                  }   
-                  else
-                  {
-                    html += `<li class="pagination__item disabled">  
-                              <a onclick="" id="lists_up">
-                              &raquo;
-                              </a>`;    
-                  }
-                }   
-                catch
-                {
-                  html += `<li class="pagination__item disabled">  
-                  <a onclick="" id="lists_up">
-                  &raquo;
-                  </a>`;    
                 }
-                html += `<script>scroll('lists_up')</script>
-                          </li>
-                          </ul>
-                          </div>`;
+                catch
+                {}
+                html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;    
                 // 
 
                 html += `<a class="list__delete-btn" id="${cataloge.id}del_list" onclick="del_list('/user/${cataloge.username}/delete-list/${cataloge.id}/${url[url.length - 1]}')">
@@ -130,39 +101,19 @@ function del_list(url_path)
         $('ul').filter(function() {
           return this.id.match('pagination');
         }).remove();
-        html = `<ul class="pagination__list list-reset" id="pagination">`;
-        if (response.cur_page == 1)
-        {
-          html += `<li class="pagination__item disabled"> 
-          <a onclick="" id="lists_back">`;
-        }
-        else
-        {
-          html += `<li> <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${response.cur_page - 1}')" id="lists_back">`;
-        }
-        html += `&laquo;</a><script>scroll('lists_back')</script></li>`;
+        html = `<ul class="pagination__list list-reset" id="pagination">
+        <li class="pagination__item disabled">&bull;</li>`;
+
         if (response.has_elems) 
         {
           for (let i = 1; i <= response.pages; i++)
           {
               html += `<li class="pagination__item active">
                         <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${i}')">${i}</a>
-                        </li>
-                        <script>scroll(${ i } + 'list_pagination')</script>`;
+                        </li>`;
           }
         }
-
-        if (response.cur_page == response.pages)
-        {
-          html += `<li class="pagination__item disabled">
-          <a onclick="" id="lists_up">`;
-        }
-        else
-        {
-          html += `<li> <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${response.cur_page + 1}')" id="lists_up">`;
-        }
-        html += `&raquo;</a><script>scroll('lists_up')</script></li></ul>`;
-        
+        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         document.getElementById('pagination_container').innerHTML = html;
       },
       error: function(error) {

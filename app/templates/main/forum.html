@@ -149,7 +149,7 @@
     
 
     <!--Секция для одного раздела (все разделы идут друг за другом)-->
-      {% for category in categories %}
+      {% for category, topics_pagination in zip(categories, pagination_for_topics_foreach_category) %}
       <section id="{{category.id}}category_info" class="fraction">
         <div class="fraction__container container">
           <div class="fraction__wrap">
@@ -182,15 +182,34 @@
                 {% endif %}
 
               
-                {% for topic in category.topics.all() %}
-                <a href="{{url_for('main.topic', topic_name=topic.name)}}" id="{{ category.id }}topic_info" class="fraction__topic-link">
-                  <div class="fraction__topic">
-                    {{ topic.name }} <!--The title of the topic and transition to "forum-discussion.html"  -->
-                  </div>
-                </a>
+                {% for topic in topics_pagination.items %}
+                  <a href="{{url_for('main.topic', topic_id=topic.id)}}" id="{{ category.id }}topic_info" class="fraction__topic-link">
+                    <div class="fraction__topic">
+                      {{ topic.name }} 
+                    </div>
+                  </a>
                 {% endfor %}
             </div>
           </div>
+          {% if topics_pagination %}
+          <ul class="pagination__list list-reset" id="{{category.id}}topics_pagi">
+            <li class="pagination__item disabled">
+              &bull;
+            </li>
+            {% for p in topics_pagination.iter_pages() %}
+                {% if p %}
+                    <li class="pagination__item active">
+                        <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/{{category.id}}/{{p}}', '{{category.id}}')">{{ p }}</a>
+                    </li>
+                {% else %}
+                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                {% endif %}
+            {% endfor %}
+            <li class="pagination__item disabled">
+              &bull;
+            </li>
+          </ul>
+        {% endif %}
         </div>
       </section> 
       {% endfor %}
@@ -198,27 +217,20 @@
     {% if category_pagination %}
     <div class="list__pagination pagination" id="pagination_container">
       <ul class="pagination__list list-reset" id="pagination">
-        <li{% if not category_pagination.has_prev %} class="pagination__item disabled"{% endif %}>
-            <a onclick="{% if category_pagination.has_prev %}get_categories_page_on_forum('/get_categories_page_on_forum/{{category_pagination.prev_num}}'){% endif %}" id="lists_back">
-                &laquo;
-            </a>
-            <script>scroll('lists_back')</script>
+        <li class="pagination__item disabled">
+          &bull;
         </li>
         {% for p in category_pagination.iter_pages() %}
             {% if p %}
                 <li class="pagination__item active">
                     <a onclick="get_categories_page_on_forum('/get_categories_page_on_forum/{{p}}')">{{ p }}</a>
                 </li>
-                <script>scroll({{ p }} + 'list_pagination')</script>
             {% else %}
             <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
             {% endif %}
         {% endfor %}
-        <li{% if not category_pagination.has_next %} class="pagination__item disabled"{% endif %}>
-            <a onclick="{% if category_pagination.has_next %}get_categories_page_on_forum('/get_categories_page_on_forum/{{category_pagination.next_num}}'){% endif %}" id="lists_up">
-                &raquo;
-            </a>
-            <script>scroll('lists_up')</script>
+        <li class="pagination__item disabled">
+          &bull;
         </li>
       </ul>
     </div>

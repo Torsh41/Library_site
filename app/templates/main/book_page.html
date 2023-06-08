@@ -379,26 +379,19 @@
           <div class="list__pagination pagination" id="comments_pagination_container">
             <ul class="pagination__list list-reset" id="comments_pagination">
               <li class="pagination__item disabled">
-                  <a onclick="{% if pagination.has_prev %}get_comments_page('/get_comments_page/{{book.name}}/{{int(pagination.prev_num)}}'){% endif %}" id="lists_back">
-                      &laquo;
-                  </a>
-                  <script>scroll('lists_back')</script>
+                &bull;
               </li>
               {% for p in pagination.iter_pages() %}
                   {% if p %}
                       <li class="pagination__item active">
                           <a onclick="get_comments_page('/get_comments_page/{{book.name}}/{{p}}')">{{ p }}</a>
                       </li>
-                      <script>scroll({{ p }} + 'list_pagination')</script>
                   {% else %}
                   <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
                   {% endif %}
               {% endfor %}
               <li class="pagination__item disabled">
-                  <a onclick="{% if pagination.has_next %}get_comments_page('/get_comments_page/{{book.name}}/{{int(pagination.next_num)}}'){% endif %}" id="lists_up">
-                      &raquo;
-                  </a>
-                  <script>scroll('lists_up')</script>
+                &bull;
               </li>
             </ul>
           </div>

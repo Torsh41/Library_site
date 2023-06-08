@@ -72,7 +72,7 @@ def add_list(username):
     page = request.args.get('page', 1, type=int)
     pagination = user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, categories=categories, len=len, form=form, display="block")
+    return render_template('personal/user_page.html', user=user, catalogues=catalogues, pagination=pagination, categories=categories, len=len, form=form, zip=zip, display="block")
 
 
 @personal.route('/<username>/get_lists_page/<page>', methods=['GET'])
@@ -88,7 +88,7 @@ def get_lists_page(username, page):
         cataloge_items = [dict(id=item.id, read_state=item.read_state, name=item.book.name, cur_page=1, pages=items_pagination.pages) for item in items_pagination.items]
         cataloges_items[cataloge.id] = copy.deepcopy(cataloge_items)
         
-    return jsonify([dict(id=cataloge.id, name=cataloge.name, items=items, username=user.username) for cataloge, items in zip(cataloges, cataloges_items.values())])
+    return jsonify([dict(cur_page=pagination.page, pages=pagination.pages, id=cataloge.id, name=cataloge.name, items=items, username=user.username) for cataloge, items in zip(cataloges, cataloges_items.values())])
     
 
 @personal.route('/<username>/get_books_page/<cataloge_id>/<page>', methods=['GET'])
