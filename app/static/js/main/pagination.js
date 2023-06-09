@@ -49,7 +49,7 @@ function get_comments_page(url_path)
                     html += `<a class="comments__link">${comment.username}</a></div>`;
                 }
                 html += `<p class="comments__link">${comment.day + " " + comment.month + " " + comment.year}</p>`;
-                html += `<p class="comments__text">${comment.body}</p>`;
+                html += `<p class="comments__text" id="${comment.id}com_body">${comment.body}</p>`;
                 html += ` <div class="comments__commands">`;
                 if (comment.username == comment.name_of_current_user)
                 {
@@ -72,9 +72,8 @@ function get_comments_page(url_path)
                             </form>
                         </div>
                         </section>
-                        <script>scroll(${comment.id + 'edit_comment'})</script>
-
-                        <a onclick="edit('${comment.body}', '${comment.id}')" class="comments__command">Редактировать</a>
+                    
+                        <a id="${comment.id}edit_com_a" onclick="edit('${comment.body}', '${comment.name_of_current_user}', '${comment.book_name}', '${comment.id}')" class="comments__command">Редактировать</a>
                         <a class="comments__command" onclick="del_comment('/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}')" id="${comment.id}del">Удалить</a>
                         <script>scroll(${comment.id  + 'del'})</script>`;
                 }
@@ -101,38 +100,18 @@ function del_comment(url_path)
             return this.id.match('comments_pagination');
           }).remove();
   
-          html = `<ul class="pagination__list list-reset" id="pagination">`;
-          if (response.cur_page == 1)
-          {
-            html += `<li class="pagination__item disabled"> 
-            <a onclick="" id="lists_back">`;
-          }
-          else
-          {
-            html += `<li> <a onclick="get_comments_page('/get_comments_page/${response.book_name}/${response.cur_page - 1}')" id="lists_back">`;
-          }
-          html += `&laquo;</a><script>scroll('lists_back')</script></li>`;
+          html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;
           if (response.has_elems) 
           {
             for (let i = 1; i <= response.pages; i++)
             {
                 html += ` <li class="pagination__item active">
                           <a onclick="get_comments_page('/get_comments_page/${response.book_name}/${i}')">${i}</a>
-                          </li>
-                          <script>scroll(${i} + 'list_pagination')</script>`;
+                          </li>`;
             }
           }
   
-          if (response.cur_page == response.pages)
-          {
-            html += `<li class="pagination__item disabled">
-            <a onclick="" id="lists_up">`;
-          }
-          else
-          {
-            html += `<li> <a onclick="get_comments_page('/get_comments_page/${response.book_name}/${response.cur_page + 1}')" id="lists_up">`;
-          }
-          html += `&raquo;</a><script>scroll('lists_up')</script></li></ul>`;
+          html += `<li class="pagination__item disabled">&bull;</li></ul>`;
           
           document.getElementById('comments_pagination_container').innerHTML = html;
         },
@@ -194,13 +173,32 @@ function get_categories_page_on_forum(url_path)
                     }
                     topics = Array.from(category.topics);
                     topics.forEach(topic => {
-                        html += `<a href="/forum/${topic.name}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
-                                <div class="fraction__topic">
-                                  ${topic.name}
-                                </div>
+                        html += `<a href="/forum/${topic.id}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
+                                  <div class="fraction__topic">
+                                    ${topic.name}
+                                  </div>
                                 </a>`;
                     });
-                html += `</div></div></div></section>`;
+                html += `</div></div>
+                        <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
+                        <li class="pagination__item disabled">
+                          &bull;
+                        </li>`;
+                try
+                {
+                  for (let i = 1; i <= topics[0].topic_pages; i++)
+                  {
+                      html +=`<li class="pagination__item active">
+                                <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${category.id}/${i}', '${category.id}')">${i}</a>
+                              </li>`;
+                  }
+                }
+                catch
+                {}
+                html += `<li class="pagination__item disabled">
+                            &bull;
+                          </li>
+                          </ul></div></section>`;
             });
             section = document.getElementById('first_section');
             section.insertAdjacentHTML('afterend', html);
@@ -251,13 +249,46 @@ function get_posts_page(url_path)
                   {
                     html += `<div class="message__admin">
                               <a href="" class="message__admin-btn">Редактировать</a>
-                              <a href="" class="message__admin-btn">Удалить</a>
+                              <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
                               </div>`;
                   }
                  html += `</div></div>`;
          });
          div = document.getElementById('disc_posts_container');
          div.insertAdjacentHTML('afterbegin', html);
+    },
+    error: function(error) {
+        console.log(error);
+    }
+  });
+}
+
+function del_post(url_path, topic_id)
+{
+  $.ajax({
+    method: 'get',
+    url: url_path,
+    dataType: 'json',
+    success: function(response) {
+      get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
+      $('ul').filter(function() {
+        return this.id.match('pagination');
+      }).remove();
+
+      html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;                            
+      if (response.has_elems) 
+      {
+        for (let i = 1; i <= response.pages; i++)
+        {
+            html += `<li class="pagination__item active">
+                      <a onclick="get_posts_page('/get_posts_page/${topic_id}/${i}')">${i}</a>
+                      </li>`;
+        }
+      }
+
+      html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+      
+      document.getElementById('posts_pagination_container').innerHTML = html;
     },
     error: function(error) {
         console.log(error);

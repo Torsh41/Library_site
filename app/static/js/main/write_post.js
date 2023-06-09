@@ -1,7 +1,6 @@
 $(document).ready(function () {
     $('#add_post_form').submit(function(event) {
         add_post_on_forum();
-        document.getElementById("post_body_id").setAttribute('required');
         event.preventDefault();
     });
   });
@@ -49,7 +48,7 @@ function add_post_on_forum()
                       {
                         html += `<div class="message__admin">
                                   <a href="" class="message__admin-btn">Редактировать</a>
-                                  <a href="" class="message__admin-btn">Удалить</a>
+                                  <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
                                   </div>`;
                       }
                      html += `</div></div>`;

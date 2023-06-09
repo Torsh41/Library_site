@@ -169,39 +169,19 @@ function del_book_from_list(url_path, cataloge_id)
         $('ul').filter(function() {
           return this.id.match(cataloge_id + 'books_pagination');
         }).remove();
-
-        html = `<ul class="pagination__list list-reset" id="pagination">`;
-        if (response.cur_page == 1)
-        {
-          html += `<li class="pagination__item disabled"> 
-          <a onclick="" id="lists_back">`;
-        }
-        else
-        {
-          html += `<li> <a onclick="get_books_page('/user/${response.username}/get_books_page/${response.cur_page - 1}', '${cataloge_id}')" id="lists_back">`;
-        }
-        html += `&laquo;</a><script>scroll('lists_back')</script></li>`;
+        html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled">&bull;</li>`;
+        
         if (response.has_elems) 
         {
           for (let i = 1; i <= response.pages; i++)
           {
               html += ` <li class="pagination__item active">
                         <a onclick="get_books_page('/user/${response.username}/get_books_page/${i}', '${cataloge_id}')">${i}</a>
-                        </li>
-                        <script>scroll(${ i } + 'list_pagination')</script>`;
+                        </li>`;
           }
         }
 
-        if (response.cur_page == response.pages)
-        {
-          html += `<li class="pagination__item disabled">
-          <a onclick="" id="lists_up">`;
-        }
-        else
-        {
-          html += `<li> <a onclick="get_books_page('/user/${response.username}/get_books_page/${response.cur_page + 1}', '${cataloge_id}')" id="lists_up">`;
-        }
-        html += `&raquo;</a><script>scroll('lists_up')</script></li></ul>`;
+        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         
         document.getElementById(cataloge_id + 'books_pagination_container').innerHTML = html;
       },

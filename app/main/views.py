@@ -8,7 +8,7 @@ from .forms import AddTopicForm
 import copy
 
 
-ELEMS_COUNT = 5
+ELEMS_COUNT = 6
 months_dict = {
         1:'января',
         2:'февраля',
@@ -88,8 +88,7 @@ def edit_comment(username, comment_id, book_name):
     comment.body = request.form.get('newComment')
     database.session.add(comment)
     database.session.commit()
-    page = request.args.get('page')
-    return redirect(url_for('main.book_page', name=book_name, page=page))
+    return jsonify(dict(id=comment_id, body=comment.body, username=username, book_name=book_name))
    
 
 @main.route('/<username>/give-grade/<book_id>/<grade>') 
@@ -242,7 +241,6 @@ def search_by_category(name):
 
 @main.route('/forum')
 def forum():
-    # category_page = request.args.get('category_page', 1, type=int)
     category_pagination = Category.query.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
     categories = category_pagination.items
     pagination_for_topics_foreach_category = list()
@@ -260,8 +258,8 @@ def topic(topic_id):
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
-        posts.append({"body": post.body, "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
-    return render_template('main/forum_discussion.html', topic_id=topic.id, topic_name=topic.name, posts_count=len(posts_pagination.items), posts_pagination=posts_pagination, posts=posts, str=str)
+        posts.append({"id": post.id, "body": post.body, "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
+    return render_template('main/forum_discussion.html', topic_id=topic_id, topic_name=topic.name, posts_count=len(posts_pagination.items), posts_pagination=posts_pagination, posts=posts, str=str)
 
 
 @main.route('/<username>/<discussion_topic_id>/add_post', methods=['POST'])
@@ -280,7 +278,7 @@ def add_post(username, discussion_topic_id):
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
-        posts.append(dict(topic_id=topic.id, pages=posts_pagination.pages, id=post.id, body=post.body, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+        posts.append(dict(topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
     return jsonify(posts)
     
     
@@ -291,7 +289,7 @@ def get_categories_page_on_forum(page):
     categories_topics = dict()
     for category in categories:
         topics_pagination = category.topics.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
-        category_topics = [dict(id=topic.id, name=topic.name, cur_page=1, pages=topics_pagination.pages) for topic in topics_pagination.items]
+        category_topics = [dict(id=topic.id, name=topic.name, cur_page=1, topic_pages=topics_pagination.pages) for topic in topics_pagination.items]
         categories_topics[category.id] = copy.deepcopy(category_topics)
         
     if current_user.is_authenticated:
@@ -313,9 +311,28 @@ def get_posts_page(topic_id, page):
         username = None
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
-        posts.append(dict(pages=posts_pagination.pages, id=post.id, body=post.body, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+        posts.append(dict(cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
     return jsonify(posts)
     
+    
+@main.route('/<username>/del_post/<topic_id>/<post_id>/<page>', methods=['GET'])
+@login_required
+def post_delete(username, topic_id, post_id, page):
+    page = int(page)
+    post = TopicPost.query.filter_by(id=post_id).first()
+    database.session.delete(post)
+    database.session.commit()
+    topic = DiscussionTopic.query.filter_by(id=topic_id).first()
+    if posts := topic.posts.all():
+        has_elems = True
+        posts_pagination = topic.posts.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        pages = posts_pagination.pages
+        if not posts_pagination.items:
+            page = page - 1
+    else:
+        page = 1; pages = 1; has_elems = False
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
+
 
 @main.route('/search_category_on_forum', methods=['POST'])
 def search_category_on_forum():

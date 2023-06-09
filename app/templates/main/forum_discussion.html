@@ -23,17 +23,30 @@
         <img class="header__logo-image" src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
-      <div class="header__admin admin">
-        <a href="#" class="admin__link">
-          <div class="admin__set">
-            <img src="img/default_avatar.jpg" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
-          </div>
-          Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
-        </a>
-      </div>
+      <nav class="nav header__nav">
+        <ul class="nav__list list-reset">
+          <li class="nav__item"><a class="nav__link" href="#">Меню
+              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
+                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
+                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
+              </svg>
 
-
-
+            </a>
+            <ul class="nav__sublist list-reset">
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+              {% if current_user.is_authenticated %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              {% else %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+              {% endif %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
     </div>
   </header>
 
@@ -113,7 +126,7 @@
               {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
               <div class="message__admin">
                 <a href="" class="message__admin-btn">Редактировать</a>
-                <a href="" class="message__admin-btn">Удалить</a>
+                <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}')">Удалить</a>
               </div>
               {% endif %}
 
@@ -147,7 +160,7 @@
                       <a onclick="get_posts_page('/get_posts_page/{{topic_id}}/{{p}}')">{{ p }}</a>
                   </li>
               {% else %}
-              <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                  <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
               {% endif %}
           {% endfor %}
           <li class="pagination__item disabled">

@@ -298,6 +298,22 @@
         {% endif %}
       </form>
 
+      <section class="loginPopup" id="edit_comment_sec" style="display: {{ display }}">
+        <div class="formPopup">
+          <h2 class="comments__title title">Редактирование комментария</h2>
+          <form class="formContainer" action="" id="edit_comment_form" method="post">
+
+            <label class="comments__label">
+              <span class="comments__span">Ваш комментарий</span>
+              <textarea type="text" class="comments__textarea" id="edit_comment_field" rows="5"
+                name="newComment" placeholder="введите новый комментарий..."></textarea>
+            </label>
+
+            <input class="comments__btn btn" id="edit_comment" type="button" value="Изменить" onclick="edit_comment_ajax()">
+            <button type="button" class="btn cancel" onclick="closeEditCommentForm()">Отменить</button>
+          </form>
+        </div>
+      </section>
 
       <!--Блок комментирования книги-->
       <section class="comments">
@@ -339,35 +355,15 @@
                 {% endif %}
               </div>
           
-              <p class="comments__link">{{ str(comment.timestamp.date().day) + " " +
+              <p class="comments__link" id="{{comment.id}}date">{{ str(comment.timestamp.date().day) + " " +
                 months_dict[comment.timestamp.date().month] +
                 " " + str(comment.timestamp.date().year) }}</p>
 
-              <p class="comments__text">{{ comment.body }}</p> <!--Тут коммент введенный пользователем-->
+              <p class="comments__text" id="{{comment.id}}com_body">{{ comment.body }}</p> <!--Тут коммент введенный пользователем-->
 
-              <div class="comments__commands">
+              <div class="comments__commands" id="{{comment.id}}com_commands_cont">
                     {% if comment.user.username == current_user.username %}
-                      <section class="loginPopup" id="{{ comment.id }}" style="display: {{ display }}">
-                        <div class="formPopup">
-                          <h2 class="comments__title title">Редактирование комментария</h2>
-                          <form class="formContainer"
-                            action="{{url_for('main.edit_comment', username=current_user.username, comment_id=comment.id, book_name=book.name, page=pagination.page)}}"
-                            method="post">
-
-                            <label class="comments__label">
-                              <span class="comments__span">Ваш комментарий</span>
-                              <textarea type="text" class="comments__textarea" id="{{ comment.id }}field" rows="5"
-                                name="newComment" placeholder="введите новый комментарий..." required></textarea>
-                            </label>
-
-                            <button class="comments__btn btn" id="{{ comment.id }}edit_comment">Изменить</button>
-                            <button type="button" class="btn cancel" onclick="closeEditCommentForm('{{ comment.id }}')">Отменить</button>
-                          </form>
-                        </div>
-                      </section>
-                      <script>scroll({{ comment.id }} + 'edit_comment')</script>
-
-                      <a onclick="edit('{{ comment.body }}', '{{ comment.id }}')" class="comments__command">Редактировать</a>
+                      <a id="{{comment.id}}edit_com_a" onclick="edit('{{ comment.body }}', '{{current_user.username}}', '{{book.name}}', '{{comment.id}}')" class="comments__command">Редактировать</a>
                       <a class="comments__command" onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')" id="{{ comment.id }}del">Удалить</a>
                       <script>scroll({{ comment.id }} + 'del')</script>
                     {% endif %}

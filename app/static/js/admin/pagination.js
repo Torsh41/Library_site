@@ -41,38 +41,19 @@ function del_user(url_path, pagination_id)
         $('ul').filter(function() {
           return this.id.match(pagination_id);
         }).remove();
-        html = `<ul class="pagination__list list-reset" id="${pagination_id}">`;
-        if (response.cur_page == 1)
-        {
-          html += `<li class="pagination__item disabled"> 
-          <a onclick="" id="lists_back">`;
-        }
-        else
-        {
-          html += `<li> <a onclick="get_user_search_page('/admin/get_user_search_page/${response.cur_page - 1}', '${pagination_id}')" id="lists_back">`;
-        }
-        html += `&laquo;</a><script>scroll('lists_back')</script></li>`;
+        html = `<ul class="pagination__list list-reset" id="${pagination_id}"><li class="pagination__item disabled">&bull;</li>`;
+
         if (response.has_elems) 
         {
           for (let i = 1; i <= response.pages; i++)
           {
               html += ` <li class="pagination__item active">
                         <a onclick="get_user_search_page('/admin/get_user_search_page/${i}', '${pagination_id}')">${i}</a>
-                        </li>
-                        <script>scroll(${ i } + 'list_pagination')</script>`;
+                        </li>`;
           }
         }
 
-        if (response.cur_page == response.pages)
-        {
-          html += `<li class="pagination__item disabled">
-          <a onclick="" id="lists_up">`;
-        }
-        else
-        {
-          html += `<li> <a onclick="get_user_search_page('/admin/get_user_search_page/${response.cur_page + 1}', '${pagination_id}')" id="lists_up">`;
-        }
-        html += `&raquo;</a><script>scroll('lists_up')</script></li></ul>`;
+        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         
         document.getElementById('user_pagination_container').innerHTML = html;
       },
@@ -126,37 +107,19 @@ function del_category(url_path, pagination_id)
           return this.id.match(pagination_id);
         }).remove();
         html = `<ul class="pagination__list list-reset" id="${pagination_id}">`;
-        if (response.cur_page == 1)
-        {
-          html += `<li class="pagination__item disabled"> 
-          <a onclick="" id="lists_back">`;
-        }
-        else
-        {
-          html += `<li> <a onclick="get_category_page('/admin/get_category_search_page/${response.cur_page - 1}', '${pagination_id}')" id="lists_back">`;
-        }
-        html += `&laquo;</a><script>scroll('lists_back')</script></li>`;
+        html += `<li class="pagination__item disabled">&bull;</li>`;
+
         if (response.has_elems) 
         {
           for (let i = 1; i <= response.pages; i++)
           {
               html += ` <li class="pagination__item active">
                         <a onclick="get_category_page('/admin/get_category_search_page/${i}', '${pagination_id}')">${i}</a>
-                        </li>
-                        <script>scroll(${ i } + 'list_pagination')</script>`;
+                        </li>`;
           }
         }
 
-        if (response.cur_page == response.pages)
-        {
-          html += `<li class="pagination__item disabled">
-          <a onclick="" id="lists_up">`;
-        }
-        else
-        {
-          html += `<li><a onclick="get_category_page('/admin/get_category_search_page/${response.cur_page + 1}', '${pagination_id}')" id="lists_up">`;
-        }
-        html += `&raquo;</a><script>scroll('lists_up')</script></li></ul>`;
+        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         
         document.getElementById('category_pagination_container').innerHTML = html;
       },
