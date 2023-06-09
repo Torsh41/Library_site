@@ -289,6 +289,12 @@ function del_post(url_path, topic_id)
       html += `<li class="pagination__item disabled">&bull;</li></ul>`;
       
       document.getElementById('posts_pagination_container').innerHTML = html;
+      $('span').filter(function() {
+        return this.id.match('posts_count');
+      }).remove();
+      html = `<span class="main__span-forum" id="posts_count">Сообщений: ${response.posts_count}</span>`;
+      div = document.getElementById("main_container");
+      div.insertAdjacentHTML("beforeend", html);
     },
     error: function(error) {
         console.log(error);

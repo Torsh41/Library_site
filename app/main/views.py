@@ -259,7 +259,7 @@ def topic(topic_id):
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
         posts.append({"id": post.id, "body": post.body, "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
-    return render_template('main/forum_discussion.html', topic_id=topic_id, topic_name=topic.name, posts_count=len(posts_pagination.items), posts_pagination=posts_pagination, posts=posts, str=str)
+    return render_template('main/forum_discussion.html', topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str)
 
 
 @main.route('/<username>/<discussion_topic_id>/add_post', methods=['POST'])
@@ -278,7 +278,7 @@ def add_post(username, discussion_topic_id):
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
-        posts.append(dict(topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+        posts.append(dict(posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
     return jsonify(posts)
     
     
@@ -331,7 +331,7 @@ def post_delete(username, topic_id, post_id, page):
             page = page - 1
     else:
         page = 1; pages = 1; has_elems = False
-    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, posts_count=len(posts)))
 
 
 @main.route('/search_category_on_forum', methods=['POST'])
