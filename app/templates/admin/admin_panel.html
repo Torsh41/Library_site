@@ -10,9 +10,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
+  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/admin/show_page_elems.js')}}"></script>
   <script src="{{ url_for('static', filename='js/admin/book_search_in_a_category_act.js')}}"></script>
-  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script> 
   <script src="{{ url_for('static', filename='js/admin/pagination.js')}}"></script> 
   <style>
@@ -229,7 +229,7 @@
             </a>
           {% for category in categories %}
             <li class="category__elem" id="{{category.id}}category_info">
-              <a class="category__book-link">{{ category.name }}</a>
+              <a class="category__book-link" onclick="open_book_panel('{{current_user.username}}', '{{category.name}}')">{{ category.name }}</a>
               <a onclick="del_category('/admin/admin_panel/category_delete/{{category.id}}/{{1}}', '2pagination')" class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
             </li>
           {% endfor %}
@@ -245,8 +245,8 @@
 
     <!--При нажатии на кнопку соответствующей категории-->
     <section class="list" id="book_search_in_a_category" style="display: {{ displays["books_in_a_category_disp"] }}">
-      <div class="container list__container">
-        <div class="list__wrap">
+      <div class="container list__container" id="books_keeper_cont">
+        <div class="list__wrap" id="2cont">
           <h2 class="list__title title" id="category_title">Книги в категории</h2> <!--Название категории-->
 
           <form class="list__form" action="" id="category_book_search" method="post">
@@ -264,13 +264,12 @@
                   </clipPath>
                 </defs>
               </svg>
-              <input type="text" name="search_result" class="list__form-input" placeholder="Введите название книги или автора..">
+              <input type="text" id="search_res_id" name="search_result" class="list__form-input" placeholder="Введите название книги или автора..">
             </label>
-            <button class="list__btn-search" onclick="">Найти</button>
+            <input class="list__btn-search" type="button" value="Найти" onclick="search_books_on_category()">
           </form>
 
-          <ul class="list__books list-reset">
-          
+          <ul class="list__books list-reset" id="list_res">
             <!--Найденные книги-->
             <a href="" class="list__link">
               <li class="list__book list__add">
@@ -285,52 +284,11 @@
                     </clipPath>
                   </defs>
                 </svg>
-
               </li>
             </a>
-
-            <li class="list__book">
-              <div class="list__top">
-                <a href="" class="list__book-set">
-                  <img class="list__book-set" src="" alt=""> <!--Перекидываем на страницу книги-->
-                </a>
-
-
-                <div class="list__book-wrap">
-                  <a href="" class="list__link">Книга: </a>
-                  <a href="#" class="list__link">Автор: </a>
-                </div>
-              </div>
-
-
-              <button class="list__btn">Удалить книгу</button>
-              <div class="list__show">
-                <span class="list__act">Показать оценку</span>
-                <span class="list__mark">Оценка</span>
-              </div>
-            </li>
-
-            <li class="list__book">
-              <div class="list__top">
-                <a href="" class="list__book-set">
-                  <img class="list__book-set" src="" alt="">
-                </a>
-
-
-                <div class="list__book-wrap">
-                  <a href="" class="list__link">Книга: </a>
-                  <a href="#" class="list__link">Автор: </a>
-                </div>
-              </div>
-
-              <button class="list__btn">Удалить книгу</button>
-              <div class="list__show">
-                <span class="list__act">Показать оценку</span>
-                <span class="list__mark">Оценка</span>
-              </div>
-            </li>
           </ul>
         </div>
+
       </div>
     </section>
   </main>

@@ -123,7 +123,7 @@ class Book(database.Model, SerializerMixin):
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
     cataloge_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
-    grades = database.relationship('BookGrade', backref='book', cascade="all, delete, delete-orphan")
+    grades = database.relationship('BookGrade', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
     def default_cover(self):
@@ -142,7 +142,7 @@ class BookGrade(database.Model, SerializerMixin):
 class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.Text)
+    body = database.Column(database.Text(512))
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))

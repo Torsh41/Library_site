@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Выш выбор</title>
+  <title>Страница книги</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
@@ -16,6 +16,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/main/edit_comment.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/add_comment.js')}}"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
   <style>
     * {
@@ -320,16 +321,16 @@
         <div class="comments__container container">
           <h2 class="comments__title title">Комментарии</h2>
           {% if current_user.is_authenticated %}
-          <form class="comments__form" action="" method="post">
+            <form class="comments__form" action="" id="add_comment_form" method="post">
 
-            <label class="comments__label">
-              <span class="comments__span">Ваш комментарий</span>
-              <textarea type="text" name="comment" class="comments__textarea" rows="7"
-                placeholder="Введите свой комментарий.."></textarea>
-            </label>
+              <label class="comments__label">
+                <span class="comments__span">Ваш комментарий</span>
+                <textarea type="text" id="comment_body_id" name="comment" class="comments__textarea" rows="7"
+                  placeholder="Введите свой комментарий.."></textarea>
+              </label>
 
-            <button class="comments__btn btn" id="send_comment">Отправить</button>
-          </form>
+              <input class="comments__btn btn" type="button" value="Отправить" id="send_comment" onclick="add_comment_for_book('{{current_user.username}}', '{{book.name}}')">
+            </form>
           <script>scroll('send_comment')</script>
           {% else %}
           <div class="book__footer">

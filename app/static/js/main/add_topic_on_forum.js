@@ -36,9 +36,12 @@ function validate_topic_name()
           $('span').filter(function() {
             return this.id.match(topics_for_cur_category[0].category_id + 'topics_count');
           }).remove();
+          $('ul').filter(function() {
+            return this.id.match(topics_for_cur_category[0].category_id + 'topics_pagi');
+          }).remove();
           html = '';
           topics_for_cur_category.forEach(topic => {
-              html += `<a href="/forum/${topic.name}" class="fraction__topic-link" id="${topic.category_id + 'topic_info'}">
+              html += `<a href="/forum/${topic.topic_id}" class="fraction__topic-link" id="${topic.category_id + 'topic_info'}">
                         <div class="fraction__topic">
                           ${topic.name}
                         </div>
@@ -50,6 +53,21 @@ function validate_topic_name()
           div.insertAdjacentHTML('beforeend', html);
           document.getElementById("topic_name_id_form").value = "";
           document.getElementById("popupForm").style.display = "none";
+
+          // собираем пагинацию
+          html = `<ul class="pagination__list list-reset" id="${topics_for_cur_category[0].category_id}topics_pagi">
+                  <li class="pagination__item disabled">
+                    &bull;
+                  </li>`;
+          for (let i = 1; i <= topics_for_cur_category[0].topic_pages; i++)
+          {
+            html += `<li class="pagination__item active">
+                        <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${i}', '${topics_for_cur_category[0].category_id}')">${i}</a>
+                     </li>`;
+          }
+          html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+          div = document.getElementById(topics_for_cur_category[0].category_id + 'category_main_cont');
+          div.insertAdjacentHTML('beforeend', html);
           alert(`Тема успешно создана`);
         }
         else

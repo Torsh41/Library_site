@@ -166,7 +166,7 @@
     <!--Секция для одного раздела (все разделы идут друг за другом)-->
       {% for category, topics_pagination in zip(categories, pagination_for_topics_foreach_category) %}
       <section id="{{category.id}}category_info" class="fraction">
-        <div class="fraction__container container">
+        <div class="fraction__container container" id="{{category.id}}category_main_cont">
           <div class="fraction__wrap">
             <h2 class="fraction__title title" id="{{ category.id }}category_title">{{ category.name }}</h2> <!--The title of the category/section-->
 

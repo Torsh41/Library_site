@@ -2,9 +2,10 @@ from . import admin
 from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, request, jsonify
 from ..begin_to_app import database
-from app.models import User, Cataloge, Book, Item, Category
+from app.models import User, Cataloge, Book, Item, Category, SearchResult
 from .forms import AddCategoryForm
 from app.decorators import admin_required
+import copy
 
 
 RESULT_COUNT = 5
@@ -130,4 +131,75 @@ def category_delete(category_id, page):
     else:
         page = 1; pages = 1; has_elems = False
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
+
+
+@admin.route('/<username>/search_books_on_admin_panel/<category>', methods=['GET', 'POST'])
+@admin_required
+def search_books_on_admin_panel(username, category):
+    category = Category.query.filter_by(name=category).first()
+    if request.method == "POST":
+        result = str(request.form.get('search_result')).strip().lower()
+        if result == "все":
+            books = category.books.all()
+        else:
+            books = category.books.filter(Book.name.like("%{}%".format(result))).all()
+            books_ = category.books.filter(Book.author.like("%{}%".format(result))).all()
+            books = books + books_
+        search_result_fin = [] 
+        [search_result_fin.append(value) for value in books if value not in search_result_fin]
+        fin_result = list()
+        for each in search_result_fin:
+            if each:
+                fin_result.append(each)
+        books = fin_result
+        if books:
+            pages = len(books) // RESULT_COUNT
+            if len(books) % RESULT_COUNT > 0:
+                pages += 1
+            books_grades = list() 
+            old_books_result = SearchResult.query.all()
+            if old_books_result:
+                for elem in old_books_result:
+                    database.session.delete(elem)
+            for book in books:
+                book_for_cur_result = SearchResult(book)
+                database.session.add(book_for_cur_result)
+                grades = book.grades.all()
+                try:
+                    books_grades.append(round(sum([value.grade for value in grades]) / len(grades), 1))
+                except:
+                    books_grades.append(None)
+            database.session.commit()
+            books = books[:RESULT_COUNT] 
+            return jsonify([dict(has_books=True, pages=pages, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books, books_grades)])
+        else:
+            return jsonify([dict(has_books=False)])
+              
+    elif page := request.args.get('page', None, type=int):
+        cur_result_for_pagi = SearchResult.query.all()
+        page_count = 1; temp_arr = list(); books = dict(); counter = 0
+        for book in cur_result_for_pagi:
+            counter += 1
+            temp_arr.append(book)
+            if counter % RESULT_COUNT == 0:
+                books[page_count] = copy.copy(temp_arr)
+                page_count += 1
+                temp_arr = list()
+                
+        if counter % RESULT_COUNT > 0:
+            books[page_count] = temp_arr
+        books_grades = list()
+        for book in books[page]:
+            grades = book.grades.all()
+            try:
+                books_grades.append(round(sum([value.grade for value in grades]) / len(grades), 1))
+            except:
+                books_grades.append(None)
+        return jsonify([dict(id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books[page], books_grades)])
+    
+    return render_template('500.html')
+            
+        
+    
+    
 

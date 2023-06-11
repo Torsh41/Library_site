@@ -4,7 +4,6 @@ from app.models import BookGrade, Book, Comment, SearchResult, Category, User, T
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from app.main.sort import sorting
 from flask_login import current_user, login_required
-from .forms import AddTopicForm
 import copy
 
 
@@ -42,21 +41,10 @@ def index():
     return render_template('main/index.html')
  
 
-@main.route('/book-page/<name>', methods=['GET', 'POST'])
+@main.route('/book-page/<name>', methods=['GET'])
 def book_page(name):
-    global months_dict
-    book = Book.query.filter_by(name=name).first()
-    if request.method == 'POST' and request.form.get('comment') and current_user.is_authenticated:
-        comment = Comment(body=request.form.get('comment'), book=book, user=current_user._get_current_object())
-        database.session.add(comment)
-        database.session.commit()
-        return redirect(url_for('.book_page', name=book.name, page=-1))
-    
-    page = request.args.get('page', 1, type=int)
-    if page == -1:
-        page = round((book.comments.count() - 1) / ELEMS_COUNT + 1, 1)
-    
-    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    book = Book.query.filter_by(name=name).first() 
+    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(1, per_page=ELEMS_COUNT, error_out=False)
     comments = pagination.items
     fin_grade = 0
     grade_count = 0
@@ -81,6 +69,23 @@ def get_comments_page(book_name, page):
     return jsonify([dict(id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
     
 
+@main.route('/<username>/<book_name>/add_comment', methods=['POST'])
+@login_required
+def add_comment(username, book_name):
+    book = Book.query.filter_by(name=book_name).first()
+    comment = Comment(body=str(request.form.get('comment')).strip(), book=book, user=current_user._get_current_object())
+    database.session.add(comment)
+    database.session.commit()
+    comments = book.comments.all(); last_page = len(comments) // ELEMS_COUNT; id_of_added_comment = comments[-1].id
+    if len(comments) % ELEMS_COUNT > 0:
+        last_page += 1
+    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(last_page, per_page=ELEMS_COUNT, error_out=False).items
+    users = list()
+    for comment in comments:
+        users.append(User.query.filter_by(id=comment.user_id).first())
+    return jsonify([dict(pages=last_page, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    
+    
 @main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
 @login_required
 def edit_comment(username, comment_id, book_name):
@@ -377,12 +382,15 @@ def add_topic(username, category_name):
         database.session.add(topic)
         database.session.commit()
         cur_category = Category.query.filter_by(name=category_name).first()
-        topics_for_cur_category = cur_category.topics.all()
+        topics_for_cur_category = cur_category.topics.all(); last_page = len(topics_for_cur_category) // ELEMS_COUNT
+        if len(topics_for_cur_category) % ELEMS_COUNT > 0:
+            last_page += 1
+        topics_for_cur_category_by_page = cur_category.topics.order_by().paginate(last_page, per_page=ELEMS_COUNT, error_out=False).items
         # if current_user.is_authenticated:
         #     username_of_cur_user = current_user.username
         # else:
         #     username_of_cur_user = False
-        return jsonify([dict(result=result, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category)) for topic in topics_for_cur_category])
+        return jsonify([dict(result=result, topic_pages=last_page, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category_by_page)) for topic in topics_for_cur_category_by_page])
     return jsonify([dict(result=result)])
 
 

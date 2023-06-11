@@ -35,7 +35,7 @@ function get_comments_page(url_path)
             url = url_path.split('/');
             html = "";
             comments.forEach(comment => {
-                html += `<li class="comments__comment">
+                html += `<li class="comments__comment" id="${comment.id}comment_info">
                         <div class="comments__top">
                         <div class="comments__image">
                         <img class="comments__image-set" src="/user/${comment.username}/edit-profile/edit-avatar">
@@ -48,34 +48,14 @@ function get_comments_page(url_path)
                 {
                     html += `<a class="comments__link">${comment.username}</a></div>`;
                 }
-                html += `<p class="comments__link">${comment.day + " " + comment.month + " " + comment.year}</p>`;
+                html += `<p class="comments__link" id="${comment.id}date">${comment.day + " " + comment.month + " " + comment.year}</p>`;
                 html += `<p class="comments__text" id="${comment.id}com_body">${comment.body}</p>`;
-                html += ` <div class="comments__commands">`;
+                html += ` <div class="comments__commands" id="${comment.id}com_commands_cont">`;
                 if (comment.username == comment.name_of_current_user)
                 {
-                    html += `  
-                        <section class="loginPopup" id="${comment.id}" style="display: none">
-                        <div class="formPopup">
-                            <h2 class="comments__title title">Редактирование комментария</h2>
-                            <form class="formContainer"
-                            action="/${comment.name_of_current_user}/${comment.book_name}/edit-comment/${comment.id}?page=${url[url.length - 1]}" method="post">
-
-                            <label class="comments__label">
-                                <span class="comments__span">Ваш комментарий</span>
-                                <textarea type="text" class="comments__textarea" id="${comment.id}field" rows="5"
-                                name="newComment" placeholder="введите новый комментарий..." required></textarea>
-                            </label>
-
-                            <button class="comments__btn btn" id="${comment.id}edit_comment">Изменить</button>
-                            <button type="button" class="btn cancel"
-                                onclick="closeEditCommentForm('${comment.id}')">Отменить</button>
-                            </form>
-                        </div>
-                        </section>
-                    
-                        <a id="${comment.id}edit_com_a" onclick="edit('${comment.body}', '${comment.name_of_current_user}', '${comment.book_name}', '${comment.id}')" class="comments__command">Редактировать</a>
-                        <a class="comments__command" onclick="del_comment('/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}')" id="${comment.id}del">Удалить</a>
-                        <script>scroll(${comment.id  + 'del'})</script>`;
+                  html += `<a id="${comment.id}edit_com_a" onclick="edit('${comment.body}', '${comment.name_of_current_user}', '${comment.book_name}', '${comment.id}')" class="comments__command">Редактировать</a>
+                            <a class="comments__command" onclick="del_comment('/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}')" id="${comment.id}del">Удалить</a>
+                            <script>scroll(${comment.id  + 'del'})</script>`;
                 }
                 html += `</div></li>`;
                 
@@ -105,7 +85,7 @@ function del_comment(url_path)
           {
             for (let i = 1; i <= response.pages; i++)
             {
-                html += ` <li class="pagination__item active">
+                html += `<li class="pagination__item active">
                           <a onclick="get_comments_page('/get_comments_page/${response.book_name}/${i}')">${i}</a>
                           </li>`;
             }
