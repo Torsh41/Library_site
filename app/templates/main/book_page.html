@@ -127,6 +127,7 @@
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               </li>
               <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
             </ul>
@@ -366,7 +367,8 @@
                     {% if comment.user.username == current_user.username %}
                       <a id="{{comment.id}}edit_com_a" onclick="edit('{{ comment.body }}', '{{current_user.username}}', '{{book.name}}', '{{comment.id}}')" class="comments__command">Редактировать</a>
                       <a class="comments__command" onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')" id="{{ comment.id }}del">Удалить</a>
-                      <script>scroll({{ comment.id }} + 'del')</script>
+                    {% elif current_user.role == Role.ADMIN %}
+                      <a class="comments__command" onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')" id="{{ comment.id }}del">Удалить</a>
                     {% endif %}
               </div>
             </li>

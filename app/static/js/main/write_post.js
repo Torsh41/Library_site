@@ -9,11 +9,16 @@ function add_post_on_forum()
 {
     if (document.getElementById('post_body_id').value.trim())
     {
+     
+      form = document.getElementById("add_post_form");
+      var formData = new FormData(form); 
       $.ajax({
           method: 'post',
           url: $("#add_post_form").attr('action'),
           dataType: 'json',
-          data: $('#add_post_form').serialize(),
+          contentType: false,
+			    processData: false,
+          data: formData,
           success: function(response) {
             posts = Array.from(response);
             $('div').filter(function() {
@@ -43,6 +48,10 @@ function add_post_on_forum()
                             <p class="message__text">
                             ${post.body} <!--Сообщение пользователя-->
                             </p>`;
+                            if (post.file)
+                            {
+                              html += `<img style="width: 80px; height: 80px" src="/${post.id}/get-post_screenshot">`;
+                            }
 
                       if (post.username == post.current_username)
                       {
@@ -83,6 +92,7 @@ function add_post_on_forum()
             html = `<span class="main__span-forum" id="posts_count">Сообщений: ${posts[0].posts_count}</span>`;
             div = document.getElementById("main_container");
             div.insertAdjacentHTML("beforeend", html);
+            document.getElementById("file_input_id").value = '';
           },
           error: function(error) {
               console.log(error);

@@ -13,7 +13,18 @@
   <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
   <!--<link rel="icon" href="img/favicon.svg">-->
+  <style>
+    img.zoom {
+    cursor: pointer;
+    max-width: 80px;
+    max-height: 80px;
+    }
 
+    img.zoom:hover {
+    max-width: none;
+    max-height: none;
+    }
+  </style>
 </head>
 
 <body>
@@ -114,7 +125,11 @@
               <p class="message__text">
                {{post["body"]}} <!--Сообщение пользователя-->
               </p>
-
+              {% if post["file"] %}
+                <img style="width: 80px; height: 80px" src="{{url_for('main.post_screenshot', post_id=post["id"])}}"/>
+              {% endif %}
+             
+          
               <!--This block for admin or moderator-->
 
               <!-- <div class="message__admin">
@@ -137,7 +152,8 @@
         <!--Этот блок есть всегда (только для авторизированных пользователей)-->
         {% if current_user.is_authenticated %}
           <div id="1" class="discussion__btn button">
-            <form action="/{{current_user.username}}/{{topic_id}}/add_post" class="button__form" id="add_post_form" method="post">
+            <form action="/{{current_user.username}}/{{topic_id}}/add_post" enctype="multipart/form-data" class="button__form" id="add_post_form" method="post">
+              <input class="profile__foto" type="file" id="file_input_id" name="screenshot" multiple accept="image/*,image/jpeg">
               <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text" placeholder="Написать сообщение.." required></textarea>
               <input id="add_post_button" class="button__write" type="button" value="Отправить" onclick="add_post_on_forum()">
             </form>

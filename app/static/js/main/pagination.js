@@ -224,6 +224,10 @@ function get_posts_page(url_path)
                         <p class="message__text">
                         ${post.body} <!--Сообщение пользователя-->
                         </p>`;
+                        if (post.file)
+                        {
+                          html += `<img style="width: 80px; height: 80px" src="/${post.id}/get-post_screenshot">`;
+                        }
 
                   if (post.username == post.current_username)
                   {

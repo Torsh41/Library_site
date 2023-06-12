@@ -104,6 +104,7 @@ class TopicPost(database.Model, SerializerMixin):
     __tablename__ = "posts"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.String(1024), index=True)
+    file = database.Column(database.LargeBinary, default=False)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
