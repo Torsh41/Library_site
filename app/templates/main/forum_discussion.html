@@ -13,18 +13,6 @@
   <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
   <!--<link rel="icon" href="img/favicon.svg">-->
-  <style>
-    img.zoom {
-    cursor: pointer;
-    max-width: 80px;
-    max-height: 80px;
-    }
-
-    img.zoom:hover {
-    max-width: none;
-    max-height: none;
-    }
-  </style>
 </head>
 
 <body>
@@ -92,11 +80,15 @@
           <div class="discussion__message message" id="{{post.id}}discussion_post">  <!--Сообщение-->
             <div class="message__left">
               <div class="message__name">
-                <a href="#" class="message__link">
+                {% if (post['username'] == current_user.username) and current_user.is_authenticated %}
+                  <a href="{{url_for('personal.person', username=current_user.username)}}" class="message__link">
+                {% else %}
+                  <a class="message__link">
+                {% endif %}
                   <div class="message__set">
                     <img src="{{url_for('personal.avatar', username=post["username"])}}" alt="" class="message__img"> <!--Фото админа из его личного кабинета-->
                   </div>
-                  {{post["username"]}}
+                  {{post['username']}}
                 </a>
               </div>
 
@@ -126,7 +118,8 @@
                {{post["body"]}} <!--Сообщение пользователя-->
               </p>
               {% if post["file"] %}
-                <img style="width: 80px; height: 80px" src="{{url_for('main.post_screenshot', post_id=post["id"])}}"/>
+                <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
+                onmouseout="this.style.width='80px'; this.style.height='80px'" src="{{url_for('main.post_screenshot', post_id=post["id"])}}"/>
               {% endif %}
              
           

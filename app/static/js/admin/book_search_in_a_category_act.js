@@ -10,6 +10,18 @@ function edit_elem_state(id)
     if (document.getElementById(id).style.display == "block")
     {
         document.getElementById(id).style.display = "none";
+        if (id == "book_categories")
+          document.getElementById("book_search_in_a_category").style.display = "none";
+        if (id == "users_search")
+        {
+            $('ul').filter(function() {
+                return this.id.match("users_search_list");
+            }).remove();
+            $('h2').filter(function() {
+                return this.id.match("nothing_found");
+            }).remove();
+            document.getElementById("username_field").value = "";
+        }
     }
     else
     {

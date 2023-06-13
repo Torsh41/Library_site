@@ -54,8 +54,12 @@ function get_comments_page(url_path)
                 if (comment.username == comment.name_of_current_user)
                 {
                   html += `<a id="${comment.id}edit_com_a" onclick="edit('${comment.body}', '${comment.name_of_current_user}', '${comment.book_name}', '${comment.id}')" class="comments__command">Редактировать</a>
-                            <a class="comments__command" onclick="del_comment('/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}')" id="${comment.id}del">Удалить</a>
-                            <script>scroll(${comment.id  + 'del'})</script>`;
+                            <a class="comments__command" onclick="del_comment('/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}')" id="${comment.id}del">Удалить</a>`;
+                }
+                else if (comment.user_is_admin)
+                {
+                  html += `<a class="comments__command">Админ</a>
+                           <a class="comments__command" onclick="del_comment('/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}')" id="${comment.id}del">Удалить</a>`;
                 }
                 html += `</div></li>`;
                 
@@ -204,10 +208,17 @@ function get_posts_page(url_path)
         posts.forEach(post => {
         html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
                       <div class="message__left">
-                        <div class="message__name">
-                          <a href="#" class="message__link">
-                            <div class="message__set">
-                              <img src="/user/${post.username}/edit-profile/edit-avatar" alt="" class="message__img"> 
+                        <div class="message__name">`;
+                        if (post.username == post.current_username) 
+                        {
+                          html += `<a href="/user/${post.current_username}" class="message__link">`;
+                        }
+                        else
+                        {
+                          html += `<a class="message__link">`;
+                        }
+                        html += `<div class="message__set">
+                            <img src="/user/${post.username}/edit-profile/edit-avatar" alt="" class="message__img"> 
                             </div>
                             ${post.username}
                           </a>
@@ -226,7 +237,8 @@ function get_posts_page(url_path)
                         </p>`;
                         if (post.file)
                         {
-                          html += `<img style="width: 80px; height: 80px" src="/${post.id}/get-post_screenshot">`;
+                          html += `<img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
+                          onmouseout="this.style.width='80px'; this.style.height='80px'" src="/${post.id}/get-post_screenshot">`;
                         }
 
                   if (post.username == post.current_username)

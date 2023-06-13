@@ -368,6 +368,7 @@
                       <a id="{{comment.id}}edit_com_a" onclick="edit('{{ comment.body }}', '{{current_user.username}}', '{{book.name}}', '{{comment.id}}')" class="comments__command">Редактировать</a>
                       <a class="comments__command" onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')" id="{{ comment.id }}del">Удалить</a>
                     {% elif current_user.role == Role.ADMIN %}
+                      <a class="comments__command">Админ</a>
                       <a class="comments__command" onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')" id="{{ comment.id }}del">Удалить</a>
                     {% endif %}
               </div>

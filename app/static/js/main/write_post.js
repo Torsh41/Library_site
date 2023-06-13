@@ -28,9 +28,17 @@ function add_post_on_forum()
             posts.forEach(post => {
               html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
                           <div class="message__left">
-                            <div class="message__name">
-                              <a href="#" class="message__link">
-                                <div class="message__set">
+                            <div class="message__name">`;
+                            if (post.username == post.current_username) 
+                            {
+                              html += `<a href="/user/${post.current_username}" class="message__link">`;
+                            }
+                            else
+                            {
+                              html += `<a class="message__link">`;
+                            }
+                
+                            html += `<div class="message__set">
                                   <img src="/user/${post.username}/edit-profile/edit-avatar" alt="" class="message__img"> 
                                 </div>
                                 ${post.username}
@@ -50,7 +58,8 @@ function add_post_on_forum()
                             </p>`;
                             if (post.file)
                             {
-                              html += `<img style="width: 80px; height: 80px" src="/${post.id}/get-post_screenshot">`;
+                              html += `<img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
+                              onmouseout="this.style.width='80px'; this.style.height='80px'" src="/${post.id}/get-post_screenshot">`;
                             }
 
                       if (post.username == post.current_username)

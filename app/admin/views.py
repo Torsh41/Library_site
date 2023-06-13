@@ -44,21 +44,32 @@ def admin_panel(username):
 @admin.route('/<username>/admin_panel/user_search', methods=['POST'])
 @admin_required
 def user_search(username):
-    page = request.args.get('page', 1, type=int)
-    username = str(request.form.get('users_search_result'))
-    if username == 'все':
-        user_pagination = User.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
-        users = result_without_admin(user_pagination.items)
-    else:
-        user_pagination = User.query.filter(User.username.like("%{}%".format(username))).paginate(page, per_page=RESULT_COUNT, error_out=False)
-        users = result_without_admin(user_pagination.items)
+    users = User.query.all()
+    if users:
+        last_page = len(users) // RESULT_COUNT
+        if len(users) % RESULT_COUNT > 0:
+            last_page += 1
     
-    form = AddCategoryForm()
-    category_pagination = Category.query.paginate(1, per_page=RESULT_COUNT, error_out=False)
-    categories = category_pagination.items
-    return render_template('admin/admin_panel.html', categories=categories, category_pagination=category_pagination, users=users, user_pagination=user_pagination, form=form, displays={"users_search_result_disp":"block", "book_categories_disp":"none", "add_category_disp":"none", "books_in_a_category_disp":"none"}, len=len)
-
-
+        username = str(request.form.get('users_search_result'))
+        if username == 'все':
+            user_pagination = User.query.paginate(last_page, per_page=RESULT_COUNT, error_out=False)
+            if user_pagination.items:
+                users = result_without_admin(user_pagination.items)
+                return jsonify([dict(result=True, page=last_page, id=user.id, username=user.username) for user in users])
+            else:
+                return jsonify([dict(result=False)])
+        else:
+            user = User.query.filter(User.username.like("%{}%".format(username))).first()
+            if user:
+                users = result_without_admin([user])
+                last_page = 1
+                return jsonify([dict(result=True, page=last_page, id=user.id, username=user.username)])
+            else:
+                return jsonify([dict(result=False)])
+    else:
+        return jsonify([dict(result=False)])   
+    
+    
 @admin.route('/get_user_search_page/<page>', methods=['GET'])
 @admin_required
 def get_user_search_page(page):

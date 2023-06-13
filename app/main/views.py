@@ -76,9 +76,10 @@ def get_comments_page(book_name, page):
     book = Book.query.filter_by(name=book_name).first()
     comments = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=ELEMS_COUNT, error_out=False).items
     users = list()
+    user_is_admin = (current_user.role == Role.ADMIN)
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
     
 
 @main.route('/<username>/<book_name>/add_comment', methods=['POST'])
@@ -407,10 +408,6 @@ def add_topic(username, category_name):
         if len(topics_for_cur_category) % ELEMS_COUNT > 0:
             last_page += 1
         topics_for_cur_category_by_page = cur_category.topics.order_by().paginate(last_page, per_page=ELEMS_COUNT, error_out=False).items
-        # if current_user.is_authenticated:
-        #     username_of_cur_user = current_user.username
-        # else:
-        #     username_of_cur_user = False
         return jsonify([dict(result=result, topic_pages=last_page, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category_by_page)) for topic in topics_for_cur_category_by_page])
     return jsonify([dict(result=result)])
 
