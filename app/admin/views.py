@@ -1,8 +1,8 @@
 from . import admin
-from flask_login import login_required, current_user
+from flask_login import current_user
 from flask import render_template, redirect, url_for, request, jsonify
 from ..begin_to_app import database
-from app.models import User, Cataloge, Book, Item, Category, SearchResult
+from app.models import User, Book, Category, SearchResult
 from .forms import AddCategoryForm
 from app.decorators import admin_required
 import copy
@@ -100,7 +100,7 @@ def add_category(username):
         last_page = len(categories) // RESULT_COUNT
         if len(categories) % RESULT_COUNT > 0:
             last_page += 1 
-        return redirect(url_for('.admin_panel', username=username, category_page=last_page))#render_template('admin/admin_panel.html', categories=categories, form=form, category_pagination=category_pagination, displays={"users_search_result_disp":"none", "book_categories_disp":"block", "add_category_disp":"none", "books_in_a_category_disp":"none"})
+        return redirect(url_for('.admin_panel', username=username, category_page=last_page))
     
     category_page = request.args.get('category_page', 1, type=int)
     category_pagination = Category.query.paginate(category_page, per_page=RESULT_COUNT, error_out=False)
@@ -144,10 +144,10 @@ def category_delete(category_id, page):
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
 
 
-@admin.route('/<username>/search_books_on_admin_panel/<category>', methods=['GET', 'POST'])
+@admin.route('/<username>/search_books_on_admin_panel/<category_name>', methods=['GET', 'POST'])
 @admin_required
-def search_books_on_admin_panel(username, category):
-    category = Category.query.filter_by(name=category).first()
+def search_books_on_admin_panel(username, category_name):
+    category = Category.query.filter_by(name=category_name).first()
     if request.method == "POST":
         result = str(request.form.get('search_result')).strip().lower()
         if result == "все":
@@ -179,37 +179,51 @@ def search_books_on_admin_panel(username, category):
                 try:
                     books_grades.append(round(sum([value.grade for value in grades]) / len(grades), 1))
                 except:
-                    books_grades.append(None)
+                    books_grades.append(0)
             database.session.commit()
             books = books[:RESULT_COUNT] 
-            return jsonify([dict(has_books=True, pages=pages, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books, books_grades)])
+            return jsonify([dict(has_books=True, pages=pages, username=username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books, books_grades)])
         else:
             return jsonify([dict(has_books=False)])
               
     elif page := request.args.get('page', None, type=int):
         cur_result_for_pagi = SearchResult.query.all()
-        page_count = 1; temp_arr = list(); books = dict(); counter = 0
-        for book in cur_result_for_pagi:
-            counter += 1
-            temp_arr.append(book)
-            if counter % RESULT_COUNT == 0:
-                books[page_count] = copy.copy(temp_arr)
-                page_count += 1
-                temp_arr = list()
-                
-        if counter % RESULT_COUNT > 0:
-            books[page_count] = temp_arr
-        books_grades = list()
-        for book in books[page]:
-            grades = book.grades.all()
-            try:
-                books_grades.append(round(sum([value.grade for value in grades]) / len(grades), 1))
-            except:
-                books_grades.append(None)
-        return jsonify([dict(id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books[page], books_grades)])
-    
+        if cur_result_for_pagi:
+            page_count = 1; temp_arr = list(); books = dict(); counter = 0
+            for book in cur_result_for_pagi:
+                counter += 1
+                temp_arr.append(book)
+                if counter % RESULT_COUNT == 0:
+                    books[page_count] = copy.copy(temp_arr)
+                    page_count += 1
+                    temp_arr = list()
+                    
+            if counter % RESULT_COUNT > 0:
+                books[page_count] = temp_arr
+            return jsonify([dict(has_books=True, cur_page=page, username=username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book.grade) for book in books[page]])
+        else:
+            return jsonify([dict(has_books=False)])
     return render_template('500.html')
-            
+
+
+@admin.route('/<username>/del_book/<category_name>/<book_id>/<page>', methods=['GET']) 
+@admin_required
+def del_book(username, category_name, book_id, page):
+    page = int(page)
+    book = Book.query.filter_by(id=book_id).first()
+    database.session.delete(book)
+    book_for_search_result = SearchResult.query.filter_by(id=book_id).first()
+    database.session.delete(book_for_search_result)
+    database.session.commit()
+    if books := SearchResult.query.all():
+        has_elems = True
+        books_result_pagination = SearchResult.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        pages = books_result_pagination.pages
+        if not books_result_pagination.items:
+            page = page - 1
+    else:
+        page = 1; pages = 1; has_elems = False
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=username, category=category_name))
         
     
     

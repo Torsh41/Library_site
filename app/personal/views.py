@@ -8,6 +8,7 @@ import copy
 LISTS_COUNT = 2
 BOOKS_COUNT = 5
 
+
 @personal.app_context_processor
 def inject_roles():
     return dict(Role=Role)

@@ -178,6 +178,7 @@ class SearchResult(database.Model, SerializerMixin):
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
+    grade = database.Column(database.Integer, unique=False)
     def __init__(self, book):
         self.id = book.id
         self.cover = book.cover
@@ -188,6 +189,10 @@ class SearchResult(database.Model, SerializerMixin):
         self.description = book.description
         self.release_date = book.release_date
         self.count_of_chapters = book.count_of_chapters
+        try:
+            self.grade = round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)
+        except:
+            self.grade = 0
     
         
 @login_manager.user_loader

@@ -87,14 +87,15 @@ function search_books_on_category()
                     html += `<li class="list__book" id="${book.id}book_info">
                                 <div class="list__top">
                                     
-                                    <img class="list__book-set" src="/${book.name}/get-cover" alt=""> 
-                                    
-                                    <div class="list__book-wrap">
-                                        <a href="/book-page/${book.name}" class="list__link">Книга: ${book.name}</a>
-                                        <span class="list__link">Автор: ${book.author}</span>
-                                        <span class="list__link">Оценка: ${book.grade}</span>
-                                        <a class="list__btn">Удалить книгу</a>
-                                    </div>
+                                    <img style="width: 310px; height: 190px" src="/${book.name}/get-cover" alt=""> 
+                              
+                                    <ul class="book__list list-reset">
+                                        <a href="/book-page/${book.name}" class="list__link"><b>Книга:</b> ${book.name}</a>
+                                        <li class="book__list-element"><b>Автор:</b> ${book.author}</li>
+                                        <li class="book__list-element"><b>Оценка:</b> ${book.grade}</li>
+                                        <a class="book__list-element" onclick="del_book_from_site('/admin/${book.username}/del_book/${book.category}/${book.id}/${1}')">Удалить книгу</a>
+                                    </ul>
+                                      
                                 </div>
                                 </li>`;
                 });
@@ -103,13 +104,13 @@ function search_books_on_category()
                 document.getElementById('search_res_id').value = "";
 
                 // собираем пагинацию
-                html = `<ul class="pagination__list list-reset" id="pagination">
+                html = `<ul class="pagination__list list-reset" id="3pagination">
                 <li class="pagination__item disabled">&bull;</li>`;
                 try {
                     for (let i = 1; i <= books[0].pages; i++) {
                         html += `<li class="pagination__item active">
-                            <a onclick="">${i}</a>
-                            </li>`;
+                                    <a onclick="get_books_page_on_admin_panel('/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${i}')">${i}</a>
+                                </li>`;
                     }
                 }
                 catch { }
@@ -128,37 +129,6 @@ function search_books_on_category()
                 ul.insertAdjacentHTML('beforeend', html);  
                 document.getElementById('search_res_id').value = "";
             }
-
-           
-            
-            
-         
-            //   html = `<ul class="pagination__list list-reset" id="pagination">
-            // <li class="pagination__item disabled">&bull;</li>`;
-            //   try {
-            //       for (let i = 1; i <= posts[0].pages; i++) {
-            //           html += `<li class="pagination__item active">
-            //               <a onclick="get_posts_page('/get_posts_page/${posts[0].topic_id}/${i}')">${i}</a>
-            //               </li>`;
-        //           }
-        //       }
-        //       catch { }
-        //       html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-        //       document.getElementById("posts_pagination_container").innerHTML = html;
-        //       document.getElementById("post_body_id").value = "";
-
-        //       $('span').filter(function () {
-        //           return this.id.match('posts_count');
-        //       }).remove();
-        //       html = `<span class="main__span-forum" id="posts_count">Сообщений: ${posts[0].posts_count}</span>`;
-        //       div = document.getElementById("main_container");
-        //       div.insertAdjacentHTML("beforeend", html);
-        //   },
-        //   get success() {
-        //       return this._success;
-        //   },
-        //   set success(value) {
-        //       this._success = value;
           },
           error: function(error) {
               console.log(error);
@@ -175,4 +145,79 @@ function search_books_on_category()
         alert('Слишком длинный ввод');
         document.getElementById('search_res_id').value = "";
     }
+}
+
+function get_books_page_on_admin_panel(url_path)
+{
+    $.ajax({
+        method: 'get',
+        url: url_path,
+        dataType: 'json',
+        success: function(response) {
+          books = Array.from(response);
+          $('li').filter(function() {
+            return this.id.match(/book_info/);
+          }).remove();
+          if (books[0].has_books)
+          {
+            html = '';
+            books.forEach(book => {
+                    html += `<li class="list__book" id="${book.id}book_info">
+                                <div class="list__top">
+                                    
+                                    <img style="width: 310px; height: 190px" src="/${book.name}/get-cover" alt=""> 
+                            
+                                    <ul class="book__list list-reset">
+                                        <a href="/book-page/${book.name}" class="list__link"><b>Книга:</b> ${book.name}</a>
+                                        <li class="book__list-element"><b>Автор:</b> ${book.author}</li>
+                                        <li class="book__list-element"><b>Оценка:</b> ${book.grade}</li>
+                                        <a class="book__list-element" onclick="del_book_from_site('/admin/${book.username}/del_book/${book.category}/${book.id}/${book.cur_page}')">Удалить книгу</a>
+                                    </ul>
+                                    
+                                
+                                </div>
+                            </li>`;
+                });
+                ul = document.getElementById('list_res');
+                ul.insertAdjacentHTML('beforeend', html);
+          }
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+function del_book_from_site(url_path)
+{
+    $.ajax({
+        method: 'get',
+        url: url_path,
+        dataType: 'json',
+        success: function(response) {
+          $('ul').filter(function() {
+                return this.id.match("3pagination");
+            }).remove();
+          get_books_page_on_admin_panel(`/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${response.cur_page}`);
+          html = `<ul class="pagination__list list-reset" id="3pagination">`;
+          html += `<li class="pagination__item disabled">&bull;</li>`;
+  
+          if (response.has_elems) 
+          {
+            for (let i = 1; i <= response.pages; i++)
+            {
+                html += `<li class="pagination__item active">
+                            <a onclick="get_books_page_on_admin_panel('/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${i}')">${i}</a>
+                        </li>`;
+            }
+          }
+  
+          html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+          ul = document.getElementById('list_res');
+          ul.insertAdjacentHTML('afterend', html);  
+        },
+        error: function(error) {
+            console.log(error);
+        }
+      });
 }
