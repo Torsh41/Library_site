@@ -103,7 +103,7 @@ def add_comment(username, book_name):
 @login_required
 def edit_comment(username, comment_id, book_name):
     comment = Comment.query.filter_by(id=comment_id).first()
-    comment.body = request.form.get('newComment')
+    comment.body = str(request.form.get('newComment')).strip()
     database.session.add(comment)
     database.session.commit()
     return jsonify(dict(id=comment_id, body=comment.body, username=username, book_name=book_name))
@@ -276,8 +276,12 @@ def topic(topic_id):
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
-        posts.append({"id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
-    return render_template('main/forum_discussion.html', topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str)
+        if post.answer_to_post:
+            post_from = TopicPost.query.filter_by(id=post.answer_to_post).first()
+            posts.append({"this_is_answer": True, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
+        else:
+             posts.append({"this_is_answer": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
+    return render_template('main/forum_discussion.html', topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str, display="none")
 
 
 @main.route('/<username>/<discussion_topic_id>/add_post', methods=['POST'])
@@ -289,20 +293,36 @@ def add_post(username, discussion_topic_id):
         post = TopicPost(body=str(request.form.get('post_body')).strip(), user=user, topic=topic, file=request.files['screenshot'].read())
     else:
         post = TopicPost(body=str(request.form.get('post_body')).strip(), user=user, topic=topic, file=bytes(False))
+    if post_id_for_answer := request.args.get('post_id_to_answer', None, type=int):
+        post.answer_to_post = post_id_for_answer
+    else:
+        post.answer_to_post = 0
     database.session.add(post)
     database.session.commit()
-    topic = DiscussionTopic.query.filter_by(id=discussion_topic_id).first()
+    # topic = DiscussionTopic.query.filter_by(id=discussion_topic_id).first()
     posts_for_pagi = topic.posts.all(); last_page = len(posts_for_pagi) // ELEMS_COUNT
     if len(posts_for_pagi) % ELEMS_COUNT > 0:
         last_page += 1
     posts_pagination = topic.posts.order_by().paginate(last_page, per_page=ELEMS_COUNT, error_out=False) 
+    if current_user.role == Role.ADMIN:
+        user_is_admin = True
+    else:
+        user_is_admin = False
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
         if post.file:
-            posts.append(dict(posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            if post.answer_to_post:
+                post_from = TopicPost.query.filter_by(id=post.answer_to_post).first()
+                posts.append(dict(this_is_answer=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            else:
+                posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
         else:
-            posts.append(dict(posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            if post.answer_to_post:
+                post_from = TopicPost.query.filter_by(id=post.answer_to_post).first()
+                posts.append(dict(this_is_answer=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            else:
+                posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
     return jsonify(posts)
     
     
@@ -333,12 +353,24 @@ def get_posts_page(topic_id, page):
         username = current_user.username
     else:
         username = None
+    if current_user.role == Role.ADMIN:
+        user_is_admin = True
+    else:
+        user_is_admin = False
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
         if post.file:
-            posts.append(dict(cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            if post.answer_to_post:
+                post_from = TopicPost.query.filter_by(id=post.answer_to_post).first()
+                posts.append(dict(this_is_answer=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            else:
+                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
         else:
-            posts.append(dict(cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            if post.answer_to_post:
+                post_from = TopicPost.query.filter_by(id=post.answer_to_post).first()
+                posts.append(dict(this_is_answer=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+            else:
+                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
     return jsonify(posts)
     
     
@@ -419,7 +451,15 @@ def get_topics_page_on_forum(category_id, page):
     topics = category.topics.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False).items
     return jsonify([dict(id=topic.id, name=topic.name) for topic in topics])
    
-  
+
+@main.route('/<username>/edit_post/<topic_id>/<post_id>', methods=['POST'])
+@login_required
+def edit_post(username, topic_id, post_id):
+    post = TopicPost.query.filter_by(id=post_id).first()
+    post.body = str(request.form.get('newComment')).strip()
+    database.session.add(post)
+    database.session.commit()
+    return jsonify(dict(topic_id=topic_id, post_id=post_id, post_body=post.body, username=username))
         
         
    

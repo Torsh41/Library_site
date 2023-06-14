@@ -46,14 +46,34 @@ function add_post_on_forum()
                             </div>
           
                             <div class="message__name-info">
-                              <p class="message__info">Данные о пользователе</p>
+                              <p class="message__info">
+                                <span class="message__span">
+                                  ${post.age}
+                                </span>
+                                <span class="message__span">
+                                  ${post.gender}
+                                </span>
+                                <span class="message__span">
+                                  ${post.city}
+                                </span>
+                                <span class="message__span">
+                                  ${post.about_me}
+                                </span>
+                              </p>
                               <span class="message__span">На сайте с ${post.user_day + " " + post.user_month +
                               " " + post.user_year}</span>
                             </div>
                           </div>
         
-                          <div class="message__right">
-                            <p class="message__text">
+                          <div class="message__right" id="${post.id}msg_write_id">`;
+                            if (post.this_is_answer)
+                            {
+                              html += `<div class="message__answer" id="${post.id}base_to_answer">
+                                        <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
+                                        <p class="message__text-answer">${post.body_of_post_from}</p>
+                                      </div>`;
+                            }
+                            html += `<p class="message__text" id="${post.id}post_body">
                             ${post.body} <!--Сообщение пользователя-->
                             </p>`;
                             if (post.file)
@@ -64,10 +84,25 @@ function add_post_on_forum()
 
                       if (post.username == post.current_username)
                       {
-                        html += `<div class="message__admin">
-                                  <a href="" class="message__admin-btn">Редактировать</a>
+                        html += `<div class="message__admin" id="${post.id}personal_cont">
+                                  <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
+                                  <a class="message__admin-btn" id="${post.id}edit_post_a" onclick="open_popup_form('/${post.current_username}/edit_post/${post.topic_id}/${post.id}', '${post.body}')">Редактировать</a>
                                   <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
                                   </div>`;
+                      }
+                      else if (post.user_is_admin)
+                      {
+                        html += `<div class="message__admin" id="${post.id}personal_cont">
+                        <a class="comments__command">Админ</a>
+                        <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
+                        <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
+                        </div>`;
+                      }
+                      else
+                      {
+                        html += `<div class="message__admin" id="${post.id}personal_cont">
+                                  <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
+                                </div>`;
                       }
                      html += `</div></div>`;
             });
@@ -102,6 +137,10 @@ function add_post_on_forum()
             div = document.getElementById("main_container");
             div.insertAdjacentHTML("beforeend", html);
             document.getElementById("file_input_id").value = '';
+            write_post_form = document.getElementById('add_post_form');
+            action = write_post_form.getAttribute('action');
+            action = action.split('?')[0];
+            write_post_form.setAttribute('action', action);
           },
           error: function(error) {
               console.log(error);
@@ -113,3 +152,12 @@ function add_post_on_forum()
       alert('Заполните поле');
     }
 }      
+
+function answer_on_post(post_id)
+{
+  write_post_form = document.getElementById('add_post_form');
+  action = write_post_form.getAttribute('action');
+  action = action.split('?')[0] + `?post_id_to_answer=${post_id}`;
+  write_post_form.setAttribute('action', action);
+  write_post_form.scrollIntoView();
+}

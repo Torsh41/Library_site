@@ -153,7 +153,7 @@
                   </clipPath>
                 </defs>
               </svg>
-              <input id="category_name_id" name="category_name" type="text" class="main__form-input" placeholder="Введите название раздела.." required>
+              <input id="category_name_id" name="category_name" type="text" class="main__form-input" placeholder="Введите название раздела..">
             </label>
             <button id="found_category" class="main__form-btn btn" onclick="search_category_on_forum()">Найти</button>
           </form>
@@ -200,7 +200,7 @@
                 {% for topic in topics_pagination.items %}
                   <a href="{{url_for('main.topic', topic_id=topic.id)}}" id="{{ category.id }}topic_info" class="fraction__topic-link">
                     <div class="fraction__topic">
-                      {{ topic.name }} 
+                      {{ topic.name }}
                     </div>
                   </a>
                 {% endfor %}

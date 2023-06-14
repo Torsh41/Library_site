@@ -7,6 +7,8 @@ $(document).ready(function () {
 
 function search_category_on_forum() 
 {
+  if (document.getElementById('category_name_id').value.trim())
+  {
     $.ajax({
         method: 'post',
         url: '/search_category_on_forum',
@@ -98,4 +100,9 @@ function search_category_on_forum()
             console.log(error);
         }
     });
+  }
+  else
+  {
+    alert('Заполните поле');
+  }
 }      

@@ -78,16 +78,16 @@
 }
 
 .message__right {
-  position: relative;
   width: 100%;
   padding: 20px;
   background-color: beige;
+  word-break: break-all;
 }
 
 .message__admin {
-  position: absolute;
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   right: 20px;
   bottom: 20px;
 }
@@ -106,8 +106,14 @@
 }
 
 .message__text {
+  display: inline-block;
   margin-top: 0;
   margin-bottom: 20px;
+}
+
+.message__text-answer {
+  display: inline-block;
+  max-width: 690px;
 }
 
 .message__set {
@@ -158,4 +164,17 @@
 .main__span-forum {
   margin-top: 30px;
   font-size: 15px;
+}
+
+.message__answer {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: white;
+  word-break: break-all;
+}
+
+.message__span-answer {
+  font-weight: 700;
 }

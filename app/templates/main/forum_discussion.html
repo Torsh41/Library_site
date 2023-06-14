@@ -12,7 +12,85 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/edit_post.js')}}"></script>
   <!--<link rel="icon" href="img/favicon.svg">-->
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .openBtn {
+      display: flex;
+      justify-content: left;
+    }
+
+    .openButton {
+      border: none;
+      border-radius: 5px;
+      background-color: #1c87c9;
+      color: white;
+      padding: 14px 20px;
+      cursor: pointer;
+      position: fixed;
+    }
+
+    .loginPopup {
+      position: absolute;
+      text-align: center;
+      width: 100%;
+    }
+
+    .formPopup {
+      position: fixed;
+      left: 45%;
+      top: 5%;
+      transform: translate(-50%, 5%);
+      border: 3px solid #999999;
+      z-index: 9;
+    }
+
+    .formContainer {
+      max-width: 300px;
+      padding: 20px;
+      background-color: #fff;
+    }
+
+    .formContainer input[type=text],
+    .formContainer input[type=password] {
+      width: 100%;
+      padding: 15px;
+      margin: 5px 0 20px 0;
+      border: none;
+      background: #eee;
+    }
+
+    .formContainer input[type=text]:focus,
+    .formContainer input[type=password]:focus {
+      background-color: #ddd;
+      outline: none;
+    }
+
+    .formContainer .btn {
+      padding: 12px 20px;
+      border: none;
+      background-color: #8ebf42;
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+
+    .formContainer .cancel {
+      background-color: #cc0000;
+    }
+
+    .formContainer .btn:hover,
+    .openButton:hover {
+      opacity: 1;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -74,6 +152,23 @@
       </div>
     </section>
 
+    <section class="loginPopup" id="edit_post_sec" style="display: {{ display }}">
+      <div class="formPopup">
+        <h2 class="comments__title title">Редактирование поста</h2>
+        <form class="formContainer" action="" id="edit_post_form" method="post">
+
+          <label class="comments__label">
+            <span class="comments__span">Ваш пост</span>
+            <textarea type="text" class="comments__textarea" id="edit_post_field" rows="5"
+              name="newComment" placeholder="напишите новый пост..."></textarea>
+          </label>
+
+          <input class="comments__btn btn" id="edit_post" type="button" value="Изменить" onclick="edit_post_ajax()">
+          <button type="button" class="btn cancel" onclick="closeEditPostForm()">Отменить</button>
+        </form>
+      </div>
+    </section>
+
     <section class="discussion">
       <div class="discussion__container container" id="disc_posts_container">
         {% for post in posts %}
@@ -113,8 +208,14 @@
               </div>
             </div>
 
-            <div class="message__right">
-              <p class="message__text">
+            <div class="message__right" id="{{post["id"]}}msg_write_id">
+              {% if post["this_is_answer"] %}
+                <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                  <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
+                    <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
+                </div>
+              {% endif %}           
+              <p class="message__text" id="{{post["id"]}}post_body">
                {{post["body"]}} <!--Сообщение пользователя-->
               </p>
               {% if post["file"] %}
@@ -132,9 +233,20 @@
 
               <!--This block for user (only for his messages)-->
               {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
-              <div class="message__admin">
-                <a href="" class="message__admin-btn">Редактировать</a>
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
+                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" onclick="open_popup_form('/{{current_user.username}}/edit_post/{{topic_id}}/{{post["id"]}}', '{{post["body"]}}')">Редактировать</a>
                 <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}')">Удалить</a>
+              </div>
+              {% elif current_user.role == Role.ADMIN %}
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
+                  <a class="comments__command">Админ</a>
+                  <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                  <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}')">Удалить</a>
+              </div>
+              {% else %}
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
+                  <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
               </div>
               {% endif %}
 
@@ -147,7 +259,7 @@
           <div id="1" class="discussion__btn button">
             <form action="/{{current_user.username}}/{{topic_id}}/add_post" enctype="multipart/form-data" class="button__form" id="add_post_form" method="post">
               <input class="profile__foto" type="file" id="file_input_id" name="screenshot" multiple accept="image/*,image/jpeg">
-              <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text" placeholder="Написать сообщение.." required></textarea>
+              <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text" placeholder="Написать сообщение.."></textarea>
               <input id="add_post_button" class="button__write" type="button" value="Отправить" onclick="add_post_on_forum()">
             </form>
           </div>
