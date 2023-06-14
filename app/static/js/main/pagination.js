@@ -287,6 +287,10 @@ function get_posts_page(url_path)
          });
          div = document.getElementById('disc_posts_container');
          div.insertAdjacentHTML('afterbegin', html);
+         write_post_form = document.getElementById('add_post_form');
+         action = write_post_form.getAttribute('action');
+         action = action.split('?')[0];
+         write_post_form.setAttribute('action', action);
     },
     error: function(error) {
         console.log(error);

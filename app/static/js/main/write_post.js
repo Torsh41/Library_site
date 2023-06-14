@@ -128,7 +128,7 @@ function add_post_on_forum()
             {}
             html += `<li class="pagination__item disabled">&bull;</li></ul>`;
             document.getElementById("posts_pagination_container").innerHTML = html;
-            document.getElementById("post_body_id").value = "";
+            document.getElementById("post_body_id").value = '';
 
             $('span').filter(function() {
               return this.id.match('posts_count');
