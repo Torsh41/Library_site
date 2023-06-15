@@ -2,7 +2,7 @@ function add_comment_for_book(username, book_name)
 {
     form = document.getElementById('add_comment_form');
     form.setAttribute("action", `/${username}/${book_name}/add_comment`);
-    if (document.getElementById('comment_body_id').value.trim() && document.getElementById('comment_body_id').value.trim().length <= 512)
+    if (document.getElementById('comment_body_id').value.trim() && document.getElementById('comment_body_id').value.trim().length <= 200)
     {
       $.ajax({
           method: 'post',
@@ -72,14 +72,13 @@ function add_comment_for_book(username, book_name)
           }
       });
     }
-    else if (!document.getElementById('comment_body_id').value.trim())
+    else if (document.getElementById('comment_body_id').value.trim().length > 200)
+    {
+        alert('Слишком длинный комментарий');
+    }
+    else
     {
         alert('Заполните поле');
-        // document.getElementById('search_res_id').value = "";
-    }
-    else if (document.getElementById('comment_body_id').value.trim().length > 512)
-    {
-        alert('Слишком длинный ввод');
-        // document.getElementById('search_res_id').value = "";
+        document.getElementById('comment_body_id').value = '';
     }
 }

@@ -7,7 +7,7 @@ $(document).ready(function () {
 
 function search_users_on_forum()
 {
-    if (document.getElementById('username_field').value.trim())
+    if (document.getElementById('username_field').value.trim() && document.getElementById('username_field').value.trim().length <= 62)
     {
         $.ajax({
             method: 'post',
@@ -70,8 +70,13 @@ function search_users_on_forum()
             }
         });
     }
+    else if (document.getElementById('username_field').value.trim().length > 62)
+    {
+        alert('Слишком длинное имя пользователя');
+    }
     else
     {
         alert('Заполните поле');
+        document.getElementById('username_field').value = '';
     }
 }

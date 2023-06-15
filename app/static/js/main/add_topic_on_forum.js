@@ -19,7 +19,7 @@ function closeForm()
 
 function validate_topic_name()
 {
-  if (document.getElementById('topic_name_id_form').value.trim())
+  if (document.getElementById('topic_name_id_form').value.trim() && document.getElementById('topic_name_id_form').value.trim().length <= 200)
   {
     $.ajax({
       method: 'post',
@@ -81,9 +81,14 @@ function validate_topic_name()
       }
     });
   }
+  else if (document.getElementById('topic_name_id_form').value.trim().length > 200)
+  {
+    alert('Слишком длинное название темы');
+  }
   else
   {
     alert('Заполните поле');
+    document.getElementById('topic_name_id_form').value = '';
   }
 }
     

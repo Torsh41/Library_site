@@ -87,7 +87,7 @@ class User(UserMixin, database.Model, SerializerMixin):
 class Category(database.Model, SerializerMixin):
     __tablename__ = "categories"    
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(64), unique=True, index=True)
+    name = database.Column(database.String(256), unique=True, index=True)
     books = database.relationship('Book', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
     topics = database.relationship('DiscussionTopic', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
 
@@ -116,9 +116,9 @@ class Book(database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary, default=False)
     isbn = database.Column(database.String(64), unique=False)
-    name = database.Column(database.String(64), unique=True, index=True)
-    author = database.Column(database.String(64), unique=False)
-    publishing_house = database.Column(database.String(64), unique=False)
+    name = database.Column(database.String(128), unique=True, index=True)
+    author = database.Column(database.String(128), unique=False)
+    publishing_house = database.Column(database.String(128), unique=False)
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)

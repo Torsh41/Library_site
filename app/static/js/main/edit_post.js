@@ -20,7 +20,7 @@ function closeEditPostForm()
 }
 function edit_post_ajax()
 {
-    if (document.getElementById('edit_post_field').value.trim())
+    if (document.getElementById('edit_post_field').value.trim() && document.getElementById('edit_post_field').value.trim().length <= 200)
     {
       $.ajax({
           method: 'post',
@@ -59,8 +59,13 @@ function edit_post_ajax()
           }
       });
     }
+    else if (document.getElementById('edit_post_field').value.trim().length > 200)
+    {
+      alert('Слишком длинный пост');
+    }
     else
     {
       alert('Заполните поле');
+      document.getElementById('edit_post_field').value = '';
     }
 }

@@ -36,14 +36,12 @@
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               {% if current_user.is_anonymous %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+                <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
               {% endif %}
               {% if current_user.is_authenticated %}
-              <li class="nav__subitem"><a class="nav__link"
-                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+                <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
               {% else %}
-              <li class="nav__subitem"><a class="nav__link"
-                href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+                <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
             </ul>
           </li>

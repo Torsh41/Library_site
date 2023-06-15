@@ -61,7 +61,7 @@ function open_book_panel(username, category)
 
 function search_books_on_category()
 {
-    if (document.getElementById('search_res_id').value.trim() && document.getElementById('search_res_id').value.trim().length <= 64)
+    if (document.getElementById('search_res_id').value.trim() && document.getElementById('search_res_id').value.trim().length <= 200)
     {
       $.ajax({
           method: 'post',
@@ -135,15 +135,14 @@ function search_books_on_category()
         }
       });
     }
-    else if (!document.getElementById('search_res_id').value.trim())
-    {
-        alert('Заполните поле');
-        document.getElementById('search_res_id').value = "";
-    }
-    else if (document.getElementById('search_res_id').value.trim().length > 64)
+    else if (document.getElementById('search_res_id').value.trim().length > 200)
     {
         alert('Слишком длинный ввод');
-        document.getElementById('search_res_id').value = "";
+    }
+    else
+    {
+        alert('Заполните поле');
+        document.getElementById('search_res_id').value = '';
     }
 }
 

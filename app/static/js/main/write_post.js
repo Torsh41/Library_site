@@ -7,7 +7,7 @@ $(document).ready(function () {
   
 function add_post_on_forum() 
 {
-    if (document.getElementById('post_body_id').value.trim())
+    if (document.getElementById('post_body_id').value.trim() && document.getElementById('post_body_id').value.trim().length <= 200)
     {
      
       form = document.getElementById("add_post_form");
@@ -147,9 +147,14 @@ function add_post_on_forum()
           }
       });
     }
+    else if (document.getElementById('post_body_id').value.trim().length > 200)
+    {
+      alert('Слишком длинный пост');
+    }
     else
     {
       alert('Заполните поле');
+      document.getElementById('post_body_id').value = '';
     }
 }      
 

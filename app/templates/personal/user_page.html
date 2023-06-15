@@ -16,7 +16,7 @@
   <link charset="utf-8" rel="stylesheet" href="{{url_for('static', filename='styles/css/smoke-pure.css')}}" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/personal/add_book_js.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/personal/add_book_list_js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/personal/add_list_on_user_page.js')}}"></script>
   <script src="{{ url_for('static', filename='js/personal/pagination.js')}}"></script> 
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script> 
   <style>
@@ -197,22 +197,14 @@
       {% if pagination %}
       <section class="loginPopup" id="popupForm" style="display: {{ display }}">
         <div class="formPopup">
-          <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=pagination.page)}}" method="post">
-            {{form.hidden_tag()}}
-            <label class="form__label">
-              {% if form.list_name.errors %}
-              <!--<input type="text" name="list_name" class="form__input" placeholder="Введите название списка..">-->
-              {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
-              <span>
-                {% for msg in form.list_name.errors %}
-                {{ msg }}
-                {% endfor %}
-              </span>
-              {% else %}
-              {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
-              {% endif %}
+          <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=pagination.page)}}" id="add_list_form" method="post">
+            <label class="comments__label">
+              <span class="comments__span">Ваш список</span>
+              <textarea type="text" class="comments__textarea" id="add_list_field" rows="5"
+                name="newList" placeholder="введите название списка..."></textarea>
             </label>
-            <button class="comments__btn btn" id="add_list">Добавить</button>
+  
+            <input class="comments__btn btn" id="add_list" type="button" value="Добавить" onclick="add_list_ajax()">
             <button type="button" class="btn cancel" onclick="closeForm()">Отменить</button>
           </form>
         </div>
@@ -220,28 +212,19 @@
       {% else %}
       <section class="loginPopup" id="popupForm" style="display: {{ display }}">
         <div class="formPopup">
-          <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=1)}}" method="post">
-            {{form.hidden_tag()}}
-            <label class="form__label">
-              {% if form.list_name.errors %}
-            
-              {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
-              <span>
-                {% for msg in form.list_name.errors %}
-                {{ msg }}
-                {% endfor %}
-              </span>
-              {% else %}
-              {{form.list_name(class="form__input", placeholder="Введите название списка..")}}
-              {% endif %}
+          <form class="formContainer" action="{{url_for('personal.add_list', username=current_user.username, page=1)}}" id="add_list_form" method="post">
+            <label class="comments__label">
+              <span class="comments__span">Ваш список</span>
+              <textarea type="text" class="comments__textarea" id="add_list_field" rows="5"
+                name="newList" placeholder="введите название списка..."></textarea>
             </label>
-            <button class="comments__btn btn" id="add_list">Добавить</button>
+  
+            <input class="comments__btn btn" id="add_list" type="button" value="Добавить" onclick="add_list_ajax()">
             <button type="button" class="btn cancel" onclick="closeForm()">Отменить</button>
           </form>
         </div>
       </section>
       {% endif %}
-      <script>scroll('add_list')</script>
 
       <!--Кнопка все время присутствует на странице пользователя-->
       <section class="list">
@@ -326,7 +309,7 @@
                 {% endif %}
   
               {% if pagination %}
-               <a class="list__delete-btn" onclick="del_list('/user/{{current_user.username}}/delete-list/{{cataloge_value.id}}/{{1}}')" id="{{cataloge_value.id}}del_list">
+               <a class="list__delete-btn" onclick="del_list('/user/{{current_user.username}}/delete-list/{{cataloge_value.id}}/{{cataloges_page}}')" id="{{cataloge_value.id}}del_list">
                 <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line y1="0.5" x2="461" y2="0.5" stroke="black" />
                 </svg>
@@ -336,7 +319,6 @@
                 </svg>
                 </a>
               {% endif %}
-                <script>scroll({{ cataloge_value.id }} + 'del_list')</script>
             </div>
           </div>
         </section>

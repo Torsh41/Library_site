@@ -54,17 +54,17 @@ function get_lists_page(url_path)
                 html += `</ul>`;
 
                 // собираем пагинацию книг каждого списка
-                html += `<div class="list__pagination pagination">
+                html += `<div class="list__pagination pagination" id="${cataloge.id}books_pagination_container">
                           <ul class="pagination__list list-reset" id="${cataloge.id}books_pagination">
                           <li class="pagination__item disabled">&bull;</li>`;
                 try
                 {
-                  for (let i = 1; i <= items[0].pages; i++)
-                  {
-                        html += `<li class="pagination__item active">
-                                  <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
-                                  </li>`;
-                  }
+                    for (let i = 1; i <= items[0].pages; i++)
+                    {
+                          html += `<li class="pagination__item active">
+                                    <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
+                                   </li>`;
+                    }
                 }
                 catch
                 {}
@@ -79,7 +79,7 @@ function get_lists_page(url_path)
                           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <line y1="0.5" x2="461" y2="0.5" stroke="black" />
                           </svg>
-                          </a><script>scroll(${cataloge.id} + 'del_list')</script></div></div></section>`;
+                          </a></div></div></section>`;
         });
           
         document.getElementById("user_page_main_container").innerHTML += html;

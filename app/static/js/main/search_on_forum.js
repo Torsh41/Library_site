@@ -7,7 +7,7 @@ $(document).ready(function () {
 
 function search_category_on_forum() 
 {
-  if (document.getElementById('category_name_id').value.trim())
+  if (document.getElementById('category_name_id').value.trim() && document.getElementById('category_name_id').value.trim().length <= 200)
   {
     $.ajax({
         method: 'post',
@@ -101,8 +101,13 @@ function search_category_on_forum()
         }
     });
   }
+  else if (document.getElementById('category_name_id').value.trim().length > 200)
+  {
+    alert('Слишком длинное название категории');
+  }
   else
   {
     alert('Заполните поле');
+    document.getElementById('category_name_id').value = '';
   }
 }      
