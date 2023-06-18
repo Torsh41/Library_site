@@ -63,18 +63,60 @@ function search_category_on_forum()
                         topics.forEach(topic => {
           
                           html += `<a href="/forum/${topic.id}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
-                            <div class="fraction__topic">
-                              ${topic.name}
-                            </div>
-                            </a>`;
-                      
+                                    <div class="fraction__topic">
+                                      ${topic.name}
+                                    </div>
+                                    </a>`;                    
                         });
-                    html += `</div></div></div></section>`;
+
+                    html += `</div></div>`;
+                    // собираем пагинацию для топиков каждой категории
+                    html += `<ul class="pagination__list list-reset" id="${category.id}topics_pagi">
+                                  <li class="pagination__item disabled">
+                                    &bull;
+                                  </li>`;
+                    try
+                    {
+                      for (let i = 1; i <= topics[0].pages; i++)
+                      {
+                        if (topics[0].pages > 1 && i == topics[0].cur_page)
+                        {
+                          html += `<li class="pagination__item_cur_page">
+                                      <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${category.id}/${i}', '${category.id}')">${i}</a>
+                                    </li>`;
+                        }
+                        else
+                        {
+                          html += `<li class="pagination__item active">
+                                      <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${category.id}/${i}', '${category.id}')">${i}</a>
+                                    </li>`;
+                        }
+                      }
+                    }
+                    catch {}
+                    html += `<li class="pagination__item disabled">
+                                    &bull;
+                                  </li>
+                              </ul>`;
+                    html += `</div></section>`;
                 });
                 section = document.getElementById('first_section');
                 section.insertAdjacentHTML('afterend', html);
                 section = document.getElementById(categories[0].id_of_found_elem + 'category_info');
                 section.scrollIntoView(); // Прокрутка до верхней границы
+                pagi = document.getElementById('pagination');
+                pagi_li = pagi.querySelector('.pagination__item_cur_page');
+                if (pagi_li)
+                {
+                  pagi_li.className = 'pagination__item active';
+                }
+                for (const child of pagi.children)
+                {
+                  if (categories[0].cur_page == child.textContent)
+                  {
+                    child.className = 'pagination__item_cur_page';
+                  }
+                }
           }
           else
           {

@@ -272,18 +272,18 @@
   
                 <!--Добавленные книги-->
                 {% for item in pagination_for_book_in_list.items %}
-                <li class="list__book" id="{{cataloge_value.id}}book_info">      
-                  <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__book-set">
-                    <img class="list__book-set" src="{{url_for('main.cover', name=item.book.name)}}" alt="">
-                  </a>
-                  
-                  <div class="list__book-wrap">
-                        <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book">Книга: {{ item.book.name
-                        }}</a>
-                      <a href="#" class="list__link">Состояние чтения: {{ item.read_state }}</a>
-                      <a class="list__book-delete-btn" onclick="del_book_from_list('/user/{{current_user.username}}/delete-item/{{cataloge_value.id}}/{{item.id}}/{{1}}', '{{cataloge_value.id}}')">Удалить книгу из списка</a>
-                  </div>
-                </li>
+                  <li class="list__book" id="{{cataloge_value.id}}book_info">      
+                    <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__book-set">
+                      <img class="list__book-set" src="{{url_for('main.cover', name=item.book.name)}}" alt="">
+                    </a>
+                    
+                    <div class="list__book-wrap">
+                          <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book">Книга: {{ item.book.name
+                          }}</a>
+                        <a href="#" class="list__link">Состояние чтения: {{ item.read_state }}</a>
+                        <a class="list__book-delete-btn" onclick="del_book_from_list('/user/{{current_user.username}}/delete-item/{{cataloge_value.id}}/{{item.id}}/{{1}}', '{{cataloge_value.id}}')">Удалить книгу из списка</a>
+                    </div>
+                  </li>
                 {% endfor %}
               </ul>
                 {% if pagination_for_book_in_list %}

@@ -30,7 +30,7 @@ function add_list_ajax()
             html += `<section class="list" id="${cataloge.id}cataloge_info">
                 <div class="container list__container">
                     <div class="list__wrap">
-                    <h2 class="list__title title">${ cataloge.name }</h2>
+                    <h2 class="list__title title">${cataloge.name}</h2>
                     <!--Название списка, которое ввел пользователь-->
         
                     <ul class="list__books list-reset" id="${cataloge.id}books_info_container">
@@ -77,9 +77,18 @@ function add_list_ajax()
                            
                                 for (let i = 1; i <= items[0].items_pages; i++)
                                 {
+                                    if (items[0].items_pages > 1 && i == 1)
+                                    {
+                                        html += `<li class="pagination__item_cur_page">
+                                                    <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
+                                                </li>`;
+                                    }
+                                    else
+                                    {
                                         html += `<li class="pagination__item active">
                                                     <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
                                                 </li>`;
+                                    }
                                 }
                          
                             html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;    
@@ -106,9 +115,18 @@ function add_list_ajax()
             {
                 for (let i = 1; i <= cataloges[0].pages; i++)
                 {
-                    html += `<li class="pagination__item active">
+                    if (cataloges[0].pages > 1 && i == cataloges[0].pages)
+                    {
+                        html += `<li class="pagination__item_cur_page">
+                                    <a onclick="get_lists_page('/user/${cataloges[0].username}/get_lists_page/${i}')">${i}</a>
+                                </li>`;
+                    }
+                    else
+                    {
+                        html += `<li class="pagination__item active">
                                 <a onclick="get_lists_page('/user/${cataloges[0].username}/get_lists_page/${i}')">${i}</a>
                             </li>`;
+                    }
                 }
             }
             catch {}

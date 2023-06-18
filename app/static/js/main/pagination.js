@@ -14,6 +14,19 @@ function get_categories_page(url_path)
                 html += `<li class="about__cat-elem" id="${category.id}category_info"><a href="/category/${category.name}/search" class="about__book-link">${category.name}</a></li>`;
             });
             document.getElementById("categories_block").innerHTML = html;
+            pagi = document.getElementById('pagination');
+            pagi_li = pagi.querySelector('.pagination__item_cur_page');
+            if (pagi_li)
+            {
+              pagi_li.className = 'pagination__item active';
+            }
+            for (const child of pagi.children)
+            {
+              if (categories[0].cur_page == child.textContent)
+              {
+                child.className = 'pagination__item_cur_page';
+              }
+            }
         },
         error: function(error) {
             console.log(error);
@@ -65,6 +78,19 @@ function get_comments_page(url_path)
                 
             });
             document.getElementById("comments_info_container").innerHTML = html;
+            pagi = document.getElementById('comments_pagination');
+            pagi_li = pagi.querySelector('.pagination__item_cur_page');
+            if (pagi_li)
+            {
+              pagi_li.className = 'pagination__item active';
+            }
+            for (const child of pagi.children)
+            {
+              if (comments[0].cur_page == child.textContent)
+              {
+                child.className = 'pagination__item_cur_page';
+              }
+            }
         },
         error: function(error) {
             console.log(error);
@@ -74,6 +100,8 @@ function get_comments_page(url_path)
 
 function del_comment(url_path) 
 {
+  if (confirm('Подтвердите действие'))
+  {
     $.ajax({
         method: 'get',
         url: url_path,
@@ -84,14 +112,23 @@ function del_comment(url_path)
             return this.id.match('comments_pagination');
           }).remove();
   
-          html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;
+          html = `<ul class="pagination__list list-reset" id="comments_pagination"><li class="pagination__item disabled"> &bull;</li>`;
           if (response.has_elems) 
           {
             for (let i = 1; i <= response.pages; i++)
             {
+              if (response.pages > 1 && i == response.cur_page)
+              {
+                html += `<li class="pagination__item_cur_page">
+                          <a onclick="get_comments_page('/get_comments_page/${response.book_name}/${i}')">${i}</a>
+                        </li>`;
+              }
+              else
+              {
                 html += `<li class="pagination__item active">
                           <a onclick="get_comments_page('/get_comments_page/${response.book_name}/${i}')">${i}</a>
                           </li>`;
+              }
             }
           }
   
@@ -103,6 +140,7 @@ function del_comment(url_path)
             console.log(error);
         }
       });
+  }
 }
 
 function get_categories_page_on_forum(url_path)
@@ -186,6 +224,19 @@ function get_categories_page_on_forum(url_path)
             });
             section = document.getElementById('first_section');
             section.insertAdjacentHTML('afterend', html);
+            pagi = document.getElementById('pagination');
+            pagi_li = pagi.querySelector('.pagination__item_cur_page');
+            if (pagi_li)
+            {
+              pagi_li.className = 'pagination__item active';
+            }
+            for (const child of pagi.children)
+            {
+              if (categories[0].cur_page == child.textContent)
+              {
+                child.className = 'pagination__item_cur_page';
+              }
+            }
         },
         error: function(error) {
             console.log(error);
@@ -291,6 +342,19 @@ function get_posts_page(url_path)
          action = write_post_form.getAttribute('action');
          action = action.split('?')[0];
          write_post_form.setAttribute('action', action);
+         pagi = document.getElementById('pagination');
+         pagi_li = pagi.querySelector('.pagination__item_cur_page');
+         if (pagi_li)
+         {
+           pagi_li.className = 'pagination__item active';
+         }
+         for (const child of pagi.children)
+         {
+           if (posts[0].cur_page == child.textContent)
+           {
+             child.className = 'pagination__item_cur_page';
+           }
+         }
     },
     error: function(error) {
         console.log(error);
@@ -300,41 +364,53 @@ function get_posts_page(url_path)
 
 function del_post(url_path, topic_id)
 {
-  $.ajax({
-    method: 'get',
-    url: url_path,
-    dataType: 'json',
-    success: function(response) {
-      get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
-      $('ul').filter(function() {
-        return this.id.match('pagination');
-      }).remove();
+  if (confirm('Подтвердите действие'))
+  {
+    $.ajax({
+      method: 'get',
+      url: url_path,
+      dataType: 'json',
+      success: function(response) {
+        get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
+        $('ul').filter(function() {
+          return this.id.match('pagination');
+        }).remove();
 
-      html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;                            
-      if (response.has_elems) 
-      {
-        for (let i = 1; i <= response.pages; i++)
+        html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;                            
+        if (response.has_elems) 
         {
-            html += `<li class="pagination__item active">
-                      <a onclick="get_posts_page('/get_posts_page/${topic_id}/${i}')">${i}</a>
+          for (let i = 1; i <= response.pages; i++)
+          {
+            if (response.pages > 1 && i == response.cur_page)
+            {
+              html += `<li class="pagination__item_cur_page">
+                        <a onclick="get_posts_page('/get_posts_page/${topic_id}/${i}')">${i}</a>
                       </li>`;
+            }
+            else
+            {
+              html += `<li class="pagination__item active">
+                        <a onclick="get_posts_page('/get_posts_page/${topic_id}/${i}')">${i}</a>
+                        </li>`;
+            }
+          }
         }
-      }
 
-      html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-      
-      document.getElementById('posts_pagination_container').innerHTML = html;
-      $('span').filter(function() {
-        return this.id.match('posts_count');
-      }).remove();
-      html = `<span class="main__span-forum" id="posts_count">Сообщений: ${response.posts_count}</span>`;
-      div = document.getElementById("main_container");
-      div.insertAdjacentHTML("beforeend", html);
-    },
-    error: function(error) {
-        console.log(error);
-    }
-  });
+        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+        
+        document.getElementById('posts_pagination_container').innerHTML = html;
+        $('span').filter(function() {
+          return this.id.match('posts_count');
+        }).remove();
+        html = `<span class="main__span-forum" id="posts_count">Сообщений: ${response.posts_count}</span>`;
+        div = document.getElementById("main_container");
+        div.insertAdjacentHTML("beforeend", html);
+      },
+      error: function(error) {
+          console.log(error);
+      }
+    });
+  }
 }
 
 function get_topics_page_on_forum(url_path, category_id)
@@ -359,6 +435,19 @@ function get_topics_page_on_forum(url_path, category_id)
       });
       div = document.getElementById(category_id + "grid_container");
       div.insertAdjacentHTML('beforeend', html);
+      pagi = document.getElementById(category_id + 'topics_pagi');
+      pagi_li = pagi.querySelector('.pagination__item_cur_page');
+      if (pagi_li)
+      {
+        pagi_li.className = 'pagination__item active';
+      }
+      for (const child of pagi.children)
+      {
+        if (topics[0].cur_page == child.textContent)
+        {
+          child.className = 'pagination__item_cur_page';
+        }
+      }
     },
     error: function(error) {
         console.log(error);
@@ -366,4 +455,45 @@ function get_topics_page_on_forum(url_path, category_id)
   });
 }
 
-
+function get_lists_page_to_add_book(url_path, read_state, book_id)
+{
+  $.ajax({
+    method: 'get',
+    url: url_path,
+    dataType: 'json',
+    success: function(response) {
+      cataloges = Array.from(response);
+      $('section').filter(function() {
+            return this.id.match(/cataloge_info/);
+      }).remove();
+      html = "";
+      cataloges.forEach(cataloge => {
+      html += ` <section class="list__list" id="${cataloge.id}cataloge_info">
+                    <div class="container lists__catalog">
+                      <div class="list__wrap ">
+                        <a class="title list__name" href="/user/${cataloge.username}/add-book-in-list/${cataloge.id}/${book_id}/${read_state}">${cataloge.name}</a>
+                      </div>
+                    </div>
+                  </section>`;
+      });
+      div = document.getElementById('cataloges_container');
+      div.insertAdjacentHTML('afterbegin', html);
+      pagi = document.getElementById('pagination');
+      pagi_li = pagi.querySelector('.pagination__item_cur_page');
+      if (pagi_li)
+      {
+        pagi_li.className = 'pagination__item active';
+      }
+      for (const child of pagi.children)
+      {
+        if (cataloges[0].cur_page == child.textContent)
+        {
+          child.className = 'pagination__item_cur_page';
+        }
+      }
+    },
+    error: function(error) {
+        console.log(error);
+    }
+  });
+}

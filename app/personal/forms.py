@@ -2,8 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaField, DateField
 from wtforms.validators import DataRequired, Length, Regexp, NumberRange
 from wtforms import ValidationError
-from ..models import Book, Cataloge
-from flask_login import current_user
+from ..models import Book
 
 
 class EditProfileForm(FlaskForm):
@@ -14,24 +13,7 @@ class EditProfileForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired('Поля не должны быть пустыми.')])
     submit = SubmitField('Сохранить')
     
-    
-def validate_list_name(form, field): 
-    catalogues = Cataloge.query.filter_by(name=str(field.data).strip().lower()).all()
-    for value in catalogues:
-        if value.user == current_user:
-            raise ValidationError('У вас уже есть список с таким названием.')
-        
-
-def  validate_lists_count(form, field):
-    if len(current_user.cataloges.all()) > 5:
-        raise ValidationError('Различных списков может быть не больше 6.')
-    
-         
-class AddListForm(FlaskForm):
-    list_name = StringField('ListName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Название списка должно содержать только буквы и пробелы.'), validate_list_name, validate_lists_count])
-   
-                  
+              
 def validate_bookname(form, field):
     if Book.query.filter_by(name=str(field.data).strip().lower()).first():
         raise ValidationError('Данное название книги уже находится в общей базе.')

@@ -5,7 +5,7 @@
     </li>
     {% for p in pagination.iter_pages() %}
         {% if p %}
-            <li class="pagination__item active">
+            <li class="pagination__item active" id="{{p}}list_pagi">
                 <a onclick="{{func_name}}('{{url_path}}{{p}}', '{{pagination_id}}')">{{ p }}</a>
             </li>
         {% else %}

@@ -6,15 +6,7 @@ from app.models import User, Book, Category, SearchResult
 from .forms import AddCategoryForm
 from app.decorators import admin_required
 import copy
-
-
-RESULT_COUNT = 5
-def result_without_admin(items):
-    without_admin = list()
-    for user in items:
-        if user.username != current_user.username:
-            without_admin.append(user)
-    return without_admin
+RESULT_COUNT = 6
 
 
 @admin.route('/<username>/admin_panel', methods=['GET', 'POST'])
@@ -22,48 +14,37 @@ def result_without_admin(items):
 def admin_panel(username):
     form = AddCategoryForm()
     category_page = request.args.get('category_page', None, type=int)
-    page = request.args.get('page', None, type=int)
-    if not category_page and not page:
+    if not category_page:
         category_pagination = Category.query.paginate(1, per_page=RESULT_COUNT, error_out=False)
         categories = category_pagination.items
-       
-    elif category_page:
+        return render_template('admin/admin_panel.html', categories=categories, category_pagination=category_pagination, form=form, displays={"users_search_result_disp":"none", "book_categories_disp":"none", "add_category_disp":"none", "books_in_a_category_disp":"none"})
+    else:
         category_pagination = Category.query.paginate(category_page, per_page=RESULT_COUNT, error_out=False)
         categories = category_pagination.items
         return render_template('admin/admin_panel.html', categories=categories, category_pagination=category_pagination, form=form, displays={"users_search_result_disp":"none", "book_categories_disp":"block", "add_category_disp":"none", "books_in_a_category_disp":"none"})
     
-    elif page:
-        category_pagination = Category.query.paginate(1, per_page=RESULT_COUNT, error_out=False)
-        categories = category_pagination.items
-        user_pagination = User.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
-        users = result_without_admin(user_pagination.items)
-        return render_template('admin/admin_panel.html', categories=categories, category_pagination=category_pagination, users=users, user_pagination=user_pagination, form=form, displays={"users_search_result_disp":"block", "book_categories_disp":"none", "add_category_disp":"none", "books_in_a_category_disp":"none"})
-    return render_template('admin/admin_panel.html', categories=categories, category_pagination=category_pagination, form=form, displays={"users_search_result_disp":"none", "book_categories_disp":"none", "add_category_disp":"none", "books_in_a_category_disp":"none"})
-
-
+  
 @admin.route('/<username>/admin_panel/user_search', methods=['POST'])
 @admin_required
 def user_search(username):
     users = User.query.all()
     if users:
-        last_page = len(users) // RESULT_COUNT
-        if len(users) % RESULT_COUNT > 0:
-            last_page += 1
-    
-        username = str(request.form.get('users_search_result'))
-        if username == 'все':
-            user_pagination = User.query.paginate(last_page, per_page=RESULT_COUNT, error_out=False)
+        search_username = str(request.form.get('users_search_result'))
+        if search_username == 'все':
+            last_page = (len(users) - 1) // RESULT_COUNT
+            if len(users) % RESULT_COUNT > 0:
+                last_page += 1
+            user_pagination = User.query.filter(User.username!=current_user.username).paginate(1, per_page=RESULT_COUNT, error_out=False)
             if user_pagination.items:
-                users = result_without_admin(user_pagination.items)
-                return jsonify([dict(result=True, page=last_page, id=user.id, username=user.username) for user in users])
+                users = user_pagination.items
+                return jsonify([dict(result=True, cur_page=1, page=last_page, id=user.id, username=user.username) for user in users])
             else:
                 return jsonify([dict(result=False)])
         else:
-            user = User.query.filter(User.username.like("%{}%".format(username))).first()
+            user = User.query.filter((User.username!=current_user.username) & (User.username.like("%{}%".format(search_username)))).first()
             if user:
-                users = result_without_admin([user])
                 last_page = 1
-                return jsonify([dict(result=True, page=last_page, id=user.id, username=user.username)])
+                return jsonify([dict(result=True, cur_page=1, page=last_page, id=user.id, username=user.username)])
             else:
                 return jsonify([dict(result=False)])
     else:
@@ -74,9 +55,9 @@ def user_search(username):
 @admin_required
 def get_user_search_page(page):
     page = int(page)
-    user_pagination = User.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
-    users = result_without_admin(user_pagination.items)
-    return jsonify([dict(id=user.id, email=user.email, username=user.username, city=user.city, gender=user.gender, age=user.age, about_me=user.about_me) for user in users])
+    user_pagination = User.query.filter(User.username!=current_user.username).paginate(page, per_page=RESULT_COUNT, error_out=False)
+    users = user_pagination.items
+    return jsonify([dict(cur_page=page, id=user.id, email=user.email, username=user.username, city=user.city, gender=user.gender, age=user.age, about_me=user.about_me) for user in users])
     
     
 @admin.route('/get_category_search_page/<page>', methods=['GET'])   
@@ -85,7 +66,7 @@ def get_category_search_page(page):
     page = int(page)
     category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
     categories = category_pagination.items
-    return jsonify([dict(id=category.id, name=category.name) for category in categories])
+    return jsonify([dict(cur_page=page, id=category.id, name=category.name) for category in categories])
     
     
 @admin.route('/<username>/add-category', methods=['POST'])
@@ -153,16 +134,10 @@ def search_books_on_admin_panel(username, category_name):
         if result == "все":
             books = category.books.all()
         else:
-            books = category.books.filter(Book.name.like("%{}%".format(result))).all()
-            books_ = category.books.filter(Book.author.like("%{}%".format(result))).all()
-            books = books + books_
+            books = category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
         search_result_fin = [] 
-        [search_result_fin.append(value) for value in books if value not in search_result_fin]
-        fin_result = list()
-        for each in search_result_fin:
-            if each:
-                fin_result.append(each)
-        books = fin_result
+        [search_result_fin.append(value) for value in books if value and value not in search_result_fin]
+        books = search_result_fin
         if books:
             pages = len(books) // RESULT_COUNT
             if len(books) % RESULT_COUNT > 0:
@@ -181,8 +156,9 @@ def search_books_on_admin_panel(username, category_name):
                 except:
                     books_grades.append(0)
             database.session.commit()
-            books = books[:RESULT_COUNT] 
-            return jsonify([dict(has_books=True, pages=pages, username=username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books, books_grades)])
+            if len(books) > RESULT_COUNT:
+                books = books[:RESULT_COUNT] 
+            return jsonify([dict(has_books=True, pages=pages, cur_page=1, username=current_user.username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books, books_grades)])
         else:
             return jsonify([dict(has_books=False)])
               
@@ -200,7 +176,7 @@ def search_books_on_admin_panel(username, category_name):
                     
             if counter % RESULT_COUNT > 0:
                 books[page_count] = temp_arr
-            return jsonify([dict(has_books=True, cur_page=page, username=username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book.grade) for book in books[page]])
+            return jsonify([dict(has_books=True, cur_page=page, username=current_user.username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book.grade) for book in books[page]])
         else:
             return jsonify([dict(has_books=False)])
     return render_template('500.html')
@@ -223,7 +199,7 @@ def del_book(username, category_name, book_id, page):
             page = page - 1
     else:
         page = 1; pages = 1; has_elems = False
-    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=username, category=category_name))
+    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=current_user.username, category=category_name))
         
     
     

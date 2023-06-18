@@ -61,9 +61,18 @@ function validate_topic_name()
                   </li>`;
           for (let i = 1; i <= topics_for_cur_category[0].topic_pages; i++)
           {
-            html += `<li class="pagination__item active">
+            if (topics_for_cur_category[0].pages > 1 && i == topics_for_cur_category[0].pages)
+            {
+              html += `<li class="pagination__item_cur_page">
+                        <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${i}', '${topics_for_cur_category[0].category_id}')">${i}</a>
+                      </li>`;
+            }
+            else
+            {
+              html += `<li class="pagination__item active">
                         <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${i}', '${topics_for_cur_category[0].category_id}')">${i}</a>
                      </li>`;
+            }
           }
           html += `<li class="pagination__item disabled">&bull;</li></ul>`;
           div = document.getElementById(topics_for_cur_category[0].category_id + 'category_main_cont');

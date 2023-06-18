@@ -119,9 +119,18 @@ function add_post_on_forum()
             {
               for (let i = 1; i <= posts[0].pages; i++)
               {
-                html += `<li class="pagination__item active">
+                if (posts[0].pages > 1 && i == posts[0].pages)
+                {
+                  html += `<li class="pagination__item_cur_page">
+                            <a onclick="get_posts_page('/get_posts_page/${posts[0].topic_id}/${i}')">${i}</a>
+                          </li>`;
+                }
+                else
+                {
+                  html += `<li class="pagination__item active">
                           <a onclick="get_posts_page('/get_posts_page/${posts[0].topic_id}/${i}')">${i}</a>
                           </li>`;
+                }
               }
             }
             catch

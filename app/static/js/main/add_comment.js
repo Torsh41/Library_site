@@ -56,9 +56,18 @@ function add_comment_for_book(username, book_name)
             {
               for (let i = 1; i <= comments[0].pages; i++)
               {
-                html += `<li class="pagination__item active">
+                if (comments[0].pages > 1 && i == comments[0].pages)
+                {
+                  html += `<li class="pagination__item_cur_page">
+                              <a onclick="get_comments_page('/get_comments_page/${comments[0].book_name}/${i}')">${i}</a>
+                            </li>`;
+                }
+                else
+                {
+                  html += `<li class="pagination__item active">
                             <a onclick="get_comments_page('/get_comments_page/${comments[0].book_name}/${i}')">${i}</a>
                         </li>`;
+                }
               }
             }
             catch {}

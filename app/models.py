@@ -136,7 +136,7 @@ class Book(database.Model, SerializerMixin):
 class BookGrade(database.Model, SerializerMixin):
     __tablename__ = "grades"
     id = database.Column(database.Integer, primary_key=True)
-    grade = database.Column(database.Integer)
+    grade = database.Column(database.Integer, default=0)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
 
@@ -180,7 +180,7 @@ class SearchResult(database.Model, SerializerMixin):
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
     grade = database.Column(database.Integer, unique=False)
-    def __init__(self, book):
+    def __init__(self, book: Book):
         self.id = book.id
         self.cover = book.cover
         self.isbn = book.isbn

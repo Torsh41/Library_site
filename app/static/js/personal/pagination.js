@@ -15,7 +15,7 @@ function get_lists_page(url_path)
           html += `<section class="list" id="${cataloge.id}cataloge_info">
           <div class="container list__container">
             <div class="list__wrap">
-              <h2 class="list__title title">${ cataloge.name }</h2>
+              <h2 class="list__title title">${cataloge.name}</h2>
               <!--Название списка, которое ввел пользователь-->
   
               <ul class="list__books list-reset" id="${cataloge.id}books_info_container">
@@ -61,9 +61,18 @@ function get_lists_page(url_path)
                 {
                     for (let i = 1; i <= items[0].pages; i++)
                     {
-                          html += `<li class="pagination__item active">
+                      if (items[0].pages > 1 && i == 1)
+                      {
+                          html += `<li class="pagination__item_cur_page">
                                     <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
                                    </li>`;
+                      }
+                      else
+                      {
+                        html += `<li class="pagination__item active">
+                                  <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
+                                </li>`;
+                      }
                     }
                 }
                 catch
@@ -80,9 +89,21 @@ function get_lists_page(url_path)
                             <line y1="0.5" x2="461" y2="0.5" stroke="black" />
                           </svg>
                           </a></div></div></section>`;
-        });
-          
+        }); 
         document.getElementById("user_page_main_container").innerHTML += html;
+        pagi = document.getElementById('pagination');
+        pagi_li = pagi.querySelector('.pagination__item_cur_page');
+        if (pagi_li)
+        {
+          pagi_li.className = 'pagination__item active';
+        }
+        for (const child of pagi.children)
+        {
+          if (cataloges[0].cur_page == child.textContent)
+          {
+            child.className = 'pagination__item_cur_page';
+          }
+        }
       },
       error: function(error) {
           console.log(error);
@@ -92,6 +113,8 @@ function get_lists_page(url_path)
 
 function del_list(url_path) 
 {
+  if (confirm('Подтвердите действие'))
+  {
     $.ajax({
       method: 'get',
       url: url_path,
@@ -108,9 +131,18 @@ function del_list(url_path)
         {
           for (let i = 1; i <= response.pages; i++)
           {
+            if (response.pages > 1 && i == response.cur_page)
+            {
+              html += `<li class="pagination__item_cur_page">
+                        <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${i}')">${i}</a>
+                      </li>`;
+            }
+            else
+            {
               html += `<li class="pagination__item active">
                         <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${i}')">${i}</a>
                         </li>`;
+            }
           }
         }
         html += `<li class="pagination__item disabled">&bull;</li></ul>`;
@@ -120,6 +152,7 @@ function del_list(url_path)
           console.log(error);
       }
     });
+  }
 }
 
 function get_books_page(url_path, cataloge_id)
@@ -136,7 +169,7 @@ function get_books_page(url_path, cataloge_id)
       url = url_path.split('/');
       html = '';
       books.forEach(book => {
-                    html += `<li class="list__book" id="${cataloge_id}book_info">
+        html += `<li class="list__book" id="${cataloge_id}book_info">
                     <a href="/book-page/${book.name}" class="list__book-set">
                       <img class="list__book-set" src="/${book.name}/get-cover" alt="">
                     </a>
@@ -151,6 +184,19 @@ function get_books_page(url_path, cataloge_id)
                   </li>`;
       });
       document.getElementById(cataloge_id + 'books_info_container').innerHTML += html;
+      pagi = document.getElementById(cataloge_id + 'books_pagination');
+      pagi_li = pagi.querySelector('.pagination__item_cur_page');
+      if (pagi_li)
+      {
+        pagi_li.className = 'pagination__item active';
+      }
+      for (const child of pagi.children)
+      {
+        if (books[0].cur_page == child.textContent)
+        {
+            child.className = 'pagination__item_cur_page';
+        }
+      }
     },
     error: function(error) {
         console.log(error);
@@ -160,6 +206,8 @@ function get_books_page(url_path, cataloge_id)
 
 function del_book_from_list(url_path, cataloge_id) 
 {
+  if (confirm('Подтвердите действие'))
+  {
     $.ajax({
       method: 'get',
       url: url_path,
@@ -175,9 +223,18 @@ function del_book_from_list(url_path, cataloge_id)
         {
           for (let i = 1; i <= response.pages; i++)
           {
-              html += ` <li class="pagination__item active">
-                        <a onclick="get_books_page('/user/${response.username}/get_books_page/${i}', '${cataloge_id}')">${i}</a>
+            if (response.pages > 1 && i == response.cur_page)
+            {
+              html += `<li class="pagination__item_cur_page">
+                          <a onclick="get_books_page('/user/${response.username}/get_books_page/${i}', '${cataloge_id}')">${i}</a>
                         </li>`;
+            }
+            else
+            {
+              html += `<li class="pagination__item active">
+                          <a onclick="get_books_page('/user/${response.username}/get_books_page/${i}', '${cataloge_id}')">${i}</a>
+                        </li>`;
+            }
           }
         }
 
@@ -189,4 +246,50 @@ function del_book_from_list(url_path, cataloge_id)
           console.log(error);
       }
     });
+  }
+}
+
+function get_categories_page_for_book_adding(url_path)
+{
+  $.ajax({
+    method: 'get',
+    url: url_path,
+    dataType: 'json',
+    success: function(response) {
+      categories = Array.from(response);
+      $('a').filter(function() {
+        return this.id.match(/categories/);
+      }).remove();
+      html = '';
+      for (let i = 0; i < categories.length; i++)
+      {
+        if (i == 0)
+        {
+          html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox" value="${categories[i].name}" checked>${categories[i].name}</a>`;
+        }
+        else
+        {
+          html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox" value="${categories[i].name}">${categories[i].name}</a>`;
+        }
+      }
+      div = document.getElementById('cat_container');
+      div.insertAdjacentHTML('afterbegin', html);
+      pagi = document.getElementById('pagination');
+      pagi_li = pagi.querySelector('.pagination__item_cur_page');
+      if (pagi_li)
+      {
+        pagi_li.className = 'pagination__item active';
+      }
+      for (const child of pagi.children)
+      {
+        if (categories[0].cur_page == child.textContent)
+        {
+            child.className = 'pagination__item_cur_page';
+        }
+      }
+    },
+    error: function(error) {
+        console.log(error);
+    }
+  });
 }

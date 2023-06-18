@@ -128,6 +128,14 @@ a {
   font-weight: 600;
 }
 
+.pagination__item_cur_page {
+  margin-right: 20px;
+  font-size: 20px;
+  transition: font-weight .5s linear;
+  font-weight: 600;
+  color: red;
+}
+
 
 .pagination__item:not(:last-child) {
   margin-right: 20px;

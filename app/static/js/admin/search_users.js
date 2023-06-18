@@ -17,7 +17,7 @@ function search_users_on_forum()
             success: function(response) {
             users = Array.from(response);
             div = document.getElementById("main_users_container");
-            if (users[0].result)
+            if (users.length && users[0].result)
             {
                 $('ul').filter(function() {
                     return this.id.match("users_search_list");
@@ -49,12 +49,22 @@ function search_users_on_forum()
         
                 for (let i = 1; i <= users[0].page; i++)
                 {
-                    html += `<li class="pagination__item active">
+                    if (users[0].page > 1 && i == users[0].cur_page)
+                    {
+                        html += `<li class="pagination__item_cur_page">
                                 <a onclick="get_user_search_page('/admin/get_user_search_page/${i}', '1pagination')">${i}</a>
-                            </li>`;
+                                </li>`;
+                    }
+                    else
+                    {
+                        html += `<li class="pagination__item active">
+                                <a onclick="get_user_search_page('/admin/get_user_search_page/${i}', '1pagination')">${i}</a>
+                                </li>`;
+                    }
                 }
                 html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                 div.insertAdjacentHTML("beforeend", html);
+                document.getElementById('username_field').value = '';
             }
             else
             {
@@ -63,6 +73,7 @@ function search_users_on_forum()
                 }).remove();
                 html = `<h2 class="list__title title" id="nothing_found">Ничего не найдено</h2>`;
                 div.insertAdjacentHTML("beforeend", html);
+                document.getElementById('username_field').value = '';
             }
             },
             error: function(error) {

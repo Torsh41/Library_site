@@ -23,6 +23,19 @@ function get_user_search_page(url_path, pagination_id)
               </li>`;
             });
             document.getElementById("users_search_list").innerHTML = html;
+            pagi = document.getElementById('1pagination');
+            pagi_li = pagi.querySelector('.pagination__item_cur_page');
+            if (pagi_li)
+            {
+              pagi_li.className = 'pagination__item active';
+            }
+            for (const child of pagi.children)
+            {
+              if (users[0].cur_page == child.textContent)
+              {
+                child.className = 'pagination__item_cur_page';
+              }
+            }
         },
         error: function(error) {
             console.log(error);
@@ -32,6 +45,8 @@ function get_user_search_page(url_path, pagination_id)
 
 function del_user(url_path, pagination_id) 
 {
+  if (confirm('Подтвердите действие'))
+  {
     $.ajax({
       method: 'get',
       url: url_path,
@@ -47,9 +62,18 @@ function del_user(url_path, pagination_id)
         {
           for (let i = 1; i <= response.pages; i++)
           {
+            if (response.pages > 1 && i == response.cur_page)
+            {
+              html += ` <li class="pagination__item_cur_page">
+                          <a onclick="get_user_search_page('/admin/get_user_search_page/${i}', '${pagination_id}')">${i}</a>
+                        </li>`;
+            }
+            else
+            {
               html += ` <li class="pagination__item active">
                         <a onclick="get_user_search_page('/admin/get_user_search_page/${i}', '${pagination_id}')">${i}</a>
                         </li>`;
+            }
           }
         }
 
@@ -61,6 +85,7 @@ function del_user(url_path, pagination_id)
           console.log(error);
       }
     });
+  }
 }
 
 function get_category_page(url_path, pagination_id)
@@ -88,6 +113,19 @@ function get_category_page(url_path, pagination_id)
           action = action.split('?');
           path = action[0] + `?category_page=${url[url.length - 1]}`;
           form.setAttribute('action', path);
+          pagi = document.getElementById('2pagination');
+          pagi_li = pagi.querySelector('.pagination__item_cur_page');
+          if (pagi_li)
+          {
+            pagi_li.className = 'pagination__item active';
+          }
+          for (const child of pagi.children)
+          {
+            if (categories[0].cur_page == child.textContent)
+            {
+              child.className = 'pagination__item_cur_page';
+            }
+          }
         },
         error: function(error) {
             console.log(error);
@@ -97,6 +135,8 @@ function get_category_page(url_path, pagination_id)
 
 function del_category(url_path, pagination_id) 
 {
+  if (confirm('Подтвердите действие'))
+  {
     $.ajax({
       method: 'get',
       url: url_path,
@@ -113,9 +153,18 @@ function del_category(url_path, pagination_id)
         {
           for (let i = 1; i <= response.pages; i++)
           {
+            if (response.pages > 1 && i == response.cur_page)
+            {
+              html += ` <li class="pagination__item_cur_page">
+                          <a onclick="get_category_page('/admin/get_category_search_page/${i}', '${pagination_id}')">${i}</a>
+                        </li>`;
+            }
+            else
+            {
               html += ` <li class="pagination__item active">
                         <a onclick="get_category_page('/admin/get_category_search_page/${i}', '${pagination_id}')">${i}</a>
                         </li>`;
+            }
           }
         }
 
@@ -127,4 +176,5 @@ function del_category(url_path, pagination_id)
           console.log(error);
       }
     });
+  }
 }
