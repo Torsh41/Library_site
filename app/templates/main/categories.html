@@ -1,3 +1,4 @@
+{% import "lists_macro.html" as macros %}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -9,6 +10,8 @@
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
+  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script> 
 </head>
 
 <body>
@@ -31,15 +34,14 @@
             </a>
             <ul class="nav__sublist list-reset">
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               {% if current_user.is_anonymous %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+                <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
               {% endif %}
               {% if current_user.is_authenticated %}
-              <li class="nav__subitem"><a class="nav__link"
-                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+                <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
               {% else %}
-              <li class="nav__subitem"><a class="nav__link"
-                href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+                <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
               {% endif %}
             </ul>
           </li>
@@ -73,12 +75,18 @@
 
     <!-- <section id="1" class="about">
       <div class="about__container container">
-        <ul class="about__cat-list list-reset">
+        <ul class="about__cat-list list-reset" id="categories_block">
           {% for category in categories %}
-            <li class="about__cat-elem"><a href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}" class="about__book-link">{{ category.name }}</a></li>
+            <li class="about__cat-elem" id="{{category.id}}category_info"><a href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}" class="about__book-link">{{ category.name }}</a></li>
           {% endfor %}
         </ul>
+        {% if category_pagination %}
+          <div class="list__pagination pagination" id="user_pagination_container">
+            {{ macros.pagination_widget(pagination=category_pagination, url_path='/get_categories_page/', func_name='get_categories_page') }}
+          </div>
+        {% endif %}
       </div>
+<<<<<<< HEAD
     </section> -->
 
     <!--Проверь как работает эта секция-->
@@ -108,6 +116,9 @@
       </div>
     </section>
 
+=======
+    </section>
+>>>>>>> 930bf1ecf5b9a23c6edc87bed13b98b3fb1c428a
   </main>
 
   <footer class="footer">

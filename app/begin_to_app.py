@@ -2,6 +2,7 @@ from app.init import *
 from config import config
 from .auth import auth as auth_blueprint
 from .main import main as main_blueprint
+from .admin import admin as admin_blueprint
 from .personal import personal as personal_blueprint
 
 
@@ -14,6 +15,7 @@ def create_app(config_name):
   application.register_blueprint(auth_blueprint, url_prefix='/auth')
   application.register_blueprint(main_blueprint)
   application.register_blueprint(personal_blueprint, url_prefix='/user')
+  application.register_blueprint(admin_blueprint, url_prefix='/admin')
   database.init_app(application)
   with application.app_context():
     database.create_all()

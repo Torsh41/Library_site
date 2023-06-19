@@ -194,3 +194,12 @@
 .admin__back {
   margin-right: 40px;
 }
+
+.list__mark-star {
+  display: flex;
+  flex-direction: row;
+}
+
+.list__star {
+  margin-left: 5px;
+}

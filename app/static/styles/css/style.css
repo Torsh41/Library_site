@@ -11,6 +11,9 @@
 @import url(_book.css);
 @import url(_comments.css);
 @import url(admin.css);
+@import url(burger.css);
+@import url(key_frames.css);
+@import url(forum.css);
 
 html {
   box-sizing: border-box;
@@ -123,6 +126,14 @@ a {
 
 .pagination__item:active {
   font-weight: 600;
+}
+
+.pagination__item_cur_page {
+  margin-right: 20px;
+  font-size: 20px;
+  transition: font-weight .5s linear;
+  font-weight: 600;
+  color: red;
 }
 
 

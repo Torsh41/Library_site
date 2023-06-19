@@ -1,26 +1,19 @@
 {% macro pagination_widget(pagination, endpoint, fragment, book_name) %}
 <ul class="pagination__list list-reset">
-    <li{% if not pagination.has_prev %} class="pagination__item disabled"{% endif %}>
-        <a href="{% if pagination.has_prev %}{{ url_for(endpoint, page=pagination.prev_num, name=book_name) }}{{ fragment }}{% else %}#{% endif %}" id="comments_back">
-            &laquo;
-        </a>
-        <script>scroll('comments_back')</script>
+    <li class="pagination__item disabled">
+        &bull;
     </li>
     {% for p in pagination.iter_pages() %}
         {% if p %}
             <li class="pagination__item active">
                 <a href="{{ url_for(endpoint, page=p, name=book_name) }}{{ fragment }}" id="comments_pagination">{{ p }}</a>
             </li>
-            <script>scroll({{ p }}  + 'comments_pagination')</script>
         {% else %}
         <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
         {% endif %}
     {% endfor %}
-    <li{% if not pagination.has_next %} class="pagination__item disabled"{% endif %}>
-        <a href="{% if pagination.has_next %}{{ url_for(endpoint, page=pagination.next_num, name=book_name) }}{{ fragment }}{% else %}#{% endif %}" id="comments_up">
-            &raquo;
-        </a>
-        <script>scroll('comments_up')</script>
+    <li class="pagination__item disabled">
+        &bull;
     </li>
 </ul>
 {% endmacro %}

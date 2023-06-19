@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
+  <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/edit_post.js')}}"></script>
+  <!--<link rel="icon" href="img/favicon.svg">-->
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .openBtn {
+      display: flex;
+      justify-content: left;
+    }
+
+    .openButton {
+      border: none;
+      border-radius: 5px;
+      background-color: #1c87c9;
+      color: white;
+      padding: 14px 20px;
+      cursor: pointer;
+      position: fixed;
+    }
+
+    .loginPopup {
+      position: absolute;
+      text-align: center;
+      width: 100%;
+    }
+
+    .formPopup {
+      position: fixed;
+      left: 45%;
+      top: 5%;
+      transform: translate(-50%, 5%);
+      border: 3px solid #999999;
+      z-index: 9;
+    }
+
+    .formContainer {
+      max-width: 300px;
+      padding: 20px;
+      background-color: #fff;
+    }
+
+    .formContainer input[type=text],
+    .formContainer input[type=password] {
+      width: 100%;
+      padding: 15px;
+      margin: 5px 0 20px 0;
+      border: none;
+      background: #eee;
+    }
+
+    .formContainer input[type=text]:focus,
+    .formContainer input[type=password]:focus {
+      background-color: #ddd;
+      outline: none;
+    }
+
+    .formContainer .btn {
+      padding: 12px 20px;
+      border: none;
+      background-color: #8ebf42;
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+
+    .formContainer .cancel {
+      background-color: #cc0000;
+    }
+
+    .formContainer .btn:hover,
+    .openButton:hover {
+      opacity: 1;
+    }
+
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="header__container container">
+      <a class="header__logo" href="index.html">
+        <img class="header__logo-image" src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+      </a>
+
+      <nav class="nav header__nav">
+        <ul class="nav__list list-reset">
+          <li class="nav__item"><a class="nav__link" href="#">Меню
+              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
+                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
+                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
+              </svg>
+
+            </a>
+            <ul class="nav__sublist list-reset">
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+              {% if current_user.is_authenticated %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              {% else %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+              {% endif %}
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="main">
+      <div class="main__container container" id="main_container">
+
+        <div class="main__top">
+          <h1 class="main__title">{{ topic_name }}</h1>
+          <!--title of the topic-->
+
+          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+          </svg>
+
+        </div>
+
+
+        <div class="main__bottom">
+          <a class="main__bottom-item" href="{{url_for('main.forum')}}">Главная страница форума</a>
+          <a class="main__bottom-item" href="#1">Написать сообщение</a>
+        </div>
+
+        <span class="main__span-forum" id="posts_count">Сообщений: {{posts_count}}</span> <!--Количество сообщений в этой теме-->
+
+      </div>
+    </section>
+
+    <section class="loginPopup" id="edit_post_sec" style="display: {{ display }}">
+      <div class="formPopup">
+        <h2 class="comments__title title">Редактирование поста</h2>
+        <form class="formContainer" action="" id="edit_post_form" method="post">
+
+          <label class="comments__label">
+            <span class="comments__span">Ваш пост</span>
+            <textarea type="text" class="comments__textarea" id="edit_post_field" rows="5"
+              name="newComment" placeholder="напишите новый пост..."></textarea>
+          </label>
+
+          <input class="comments__btn btn" id="edit_post" type="button" value="Изменить" onclick="edit_post_ajax()">
+          <button type="button" class="btn cancel" onclick="closeEditPostForm()">Отменить</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="discussion">
+      <div class="discussion__container container" id="disc_posts_container">
+        {% for post in posts %}
+          <div class="discussion__message message" id="{{post.id}}discussion_post">  <!--Сообщение-->
+            <div class="message__left">
+              <div class="message__name">
+                {% if (post['username'] == current_user.username) and current_user.is_authenticated %}
+                  <a href="{{url_for('personal.person', username=current_user.username)}}" class="message__link">
+                {% else %}
+                  <a class="message__link">
+                {% endif %}
+                  <div class="message__set">
+                    <img src="{{url_for('personal.avatar', username=post["username"])}}" alt="" class="message__img"> <!--Фото админа из его личного кабинета-->
+                  </div>
+                  {{post['username']}}
+                </a>
+              </div>
+
+              <div class="message__name-info">
+                <p class="message__info">
+                  <span class="message__span">
+                    {{post["age"]}}
+                  </span>
+                  <span class="message__span">
+                    {{post["gender"]}}
+                  </span>
+                  <span class="message__span">
+                    {{post["city"]}}
+                  </span>
+                  <span class="message__span">
+                    {{post["about_me"]}}
+                  </span>
+                </p>
+                <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " +
+                  months_dict[post["user_timestamp"].date().month] +
+                  " " + str(post["user_timestamp"].date().year) }}</span>
+              </div>
+            </div>
+
+            <div class="message__right" id="{{post["id"]}}msg_write_id">
+              {% if post["this_is_answer"] %}
+                <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                  <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
+                    <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
+                </div>
+              {% endif %}           
+              <p class="message__text" id="{{post["id"]}}post_body">
+               {{post["body"]}} <!--Сообщение пользователя-->
+              </p>
+              {% if post["file"] %}
+                <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
+                onmouseout="this.style.width='80px'; this.style.height='80px'" src="{{url_for('main.post_screenshot', post_id=post["id"])}}"/>
+              {% endif %}
+             
+          
+              <!--This block for admin or moderator-->
+
+              <!-- <div class="message__admin">
+                <a href="" class="message__admin-btn">Cкрыть</a>
+                <a href="" class="message__admin-btn">Удалить</a>
+              </div> -->
+
+              <!--This block for user (only for his messages)-->
+              {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
+                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" onclick="open_popup_form('/{{current_user.username}}/edit_post/{{topic_id}}/{{post["id"]}}', '{{post["body"]}}')">Редактировать</a>
+                <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}')">Удалить</a>
+              </div>
+              {% elif current_user.role == Role.ADMIN %}
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
+                  <a class="comments__command">Админ</a>
+                  <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                  <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}')">Удалить</a>
+              </div>
+              {% else %}
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
+                  <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+        {% endfor %}
+
+        <!--Этот блок есть всегда (только для авторизированных пользователей)-->
+        {% if current_user.is_authenticated %}
+          <div id="1" class="discussion__btn button">
+            <form action="/{{current_user.username}}/{{topic_id}}/add_post" enctype="multipart/form-data" class="button__form" id="add_post_form" method="post">
+              <input class="profile__foto" type="file" id="file_input_id" name="screenshot" multiple accept="image/*,image/jpeg">
+              <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text" placeholder="Написать сообщение.."></textarea>
+              <input id="add_post_button" class="button__write" type="button" value="Отправить" onclick="add_post_on_forum()">
+            </form>
+          </div>
+        {% else %}
+          <div id="1" class="discussion__btn button">
+            Писать посты могут только авторизованные пользователи
+          </div>
+        {% endif %}
+      </div>
+      {% if posts_pagination %}
+      <div class="list__pagination pagination" id="posts_pagination_container">
+        <ul class="pagination__list list-reset" id="pagination">
+          <li class="pagination__item disabled">
+            &bull;
+          </li>
+          {% for p in posts_pagination.iter_pages() %}
+              {% if p %}
+                  <li class="pagination__item active">
+                      <a onclick="get_posts_page('/get_posts_page/{{topic_id}}/{{p}}')">{{ p }}</a>
+                  </li>
+              {% else %}
+                  <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+              {% endif %}
+          {% endfor %}
+          <li class="pagination__item disabled">
+            &bull;
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+    </div>
+  </footer>
+
+</body>
+
+</html>

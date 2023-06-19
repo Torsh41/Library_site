@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="img/favicon.svg">
-  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script> 
   <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script> 
 </head>
 
 <body>
@@ -34,6 +34,7 @@
             </a>
             <ul class="nav__sublist list-reset">
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               {% if current_user.is_anonymous %}
               <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
               {% endif %}
@@ -58,6 +59,44 @@
 
         <div class="main__top">
           <span class="main__span">{{ name }}</span>
+              <section class="list">
+                <div class="container list__container">
+                  <div class="list__wrap">
+                    <h2 class="list__title title">Лучшее за последнее время</h2>
+          
+                    <ul class="list__books list-reset">
+          
+                      <!--Подборка лучших книг-->
+                      {% for book in top_books %}
+                        <li class="list__book">
+            
+                          <a href="" class="list__book-set">
+                            <img class="list__book-set" src="{{url_for('main.cover', name=book[0].name)}}" alt="">
+                          </a>
+            
+            
+                          <div class="list__book-wrap">
+            
+                          
+                            {% if current_user.is_authenticated %}
+                              <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}" class="list__link">Добавить в список</a>
+                            {% endif %}
+                            <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__link">Книга: {{book[0].name}}</a>
+                            <span class="list__link">Автор: {{book[0].author}}</span>
+                            <div class="list__mark-star">
+                              <span class="list__mark-visible">Оценка {{book[1]}}</span>
+                              <img src="{{url_for('static', filename='styles/img/star1.svg')}}" alt="" class="list__star">
+                            </div>
+                          </div>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+          
+                  <!--pagination - по 4 элемента только на одном слайдере -->
+                </div>
+              </section>
+        
           <h1 class="main__title">Поиск книги</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,7 +122,7 @@
                 </defs>
               </svg>
 
-              <input type="text" class="main__form-input" name="search_result" placeholder="Введите название книги или автора..">
+              <input type="text" class="main__form-input" name="search_result" placeholder="Введите название книги или автора.." required>
             </label>
             <div>
               <span class="form__help">Для просмотра всех книг из данной категории введите слово все</span>
@@ -96,7 +135,7 @@
             <div class="main__form-wrap">
              
               <select name="release_date" id="" class="main__form-select">
-                <option>Дата издания</option>
+                <option value="#">Дата издания</option>
                 {% for date in date_list %}
                   <option value="{{ date }}">{{ date }}</option>
                 {% endfor %}
@@ -104,7 +143,7 @@
 
             </div>
 
-            <button class="main__form-btn btn">Найти</button>
+            <button class="main__form-btn btn" id="find_books_button">Найти</button>
 
           </form>
         </div>
@@ -118,35 +157,33 @@
       <div class="container list__container">
         <div class="list__wrap">
           <h2 class="list__title title">Вот, что есть в данной категории</h2>
-          <span class="list__results"> Всего результатов: {{ len(search_result) }} </span>
-          <ul class="list__books list-reset">
+          <span class="list__results"> Всего результатов: {{ len(all_search_result) }} </span>
+            <ul class="list__books list-reset" id="book_search_res_ul">
 
-            {% for book in search_result %}
+              {% for book in search_result %}
+                <!--Найденные книги-->
 
+                <li class="list__book" id="{{book.id}}search_books_info">
+                  
+                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
+                    <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
+                  </a>
+                  
 
-              <!--Найденные книги-->
-
-              <li class="list__book">
-                
-                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
-                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
-                </a>
-                
-
-                <div class="list__book-wrap">
-                  {% if current_user.is_authenticated %}
-                    <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id, list_id=list_id)}}" class="list__link">Добавить в список</a>
-                  {% endif %}
-                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-                  <span class="list__link">Автор: {{ book.author }}</span>
-                </div>
-              </li>
-
+                  <div class="list__book-wrap">
+                    {% if current_user.is_authenticated %}
+                      <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id, list_id=list_id)}}" class="list__link">Добавить в список</a>
+                    {% endif %}
+                    <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
+                    <span class="list__link">Автор: {{ book.author }}</span>
+                  </div>
+                </li>
               {% endfor %}
-          </ul>
+            </ul>
           </div>
           <div class="list__pagination pagination">
-              {{ macros.pagination_widget(page_count=page_count, range=range, name=name, list_id=list_id) }}
+            {{macros.pagination_widget(page_count=page_count, range=range, name=name, list_id=list_id)}}
+            <script>scroll('find_books_button')</script>
           </div>
         </div>
       </section>

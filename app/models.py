@@ -4,28 +4,31 @@ from .init import database, login_manager, application
 from flask import current_app, url_for
 from datetime import datetime, timedelta
 from jose import jwt
+from sqlalchemy_serializer import SerializerMixin
 
 
 class Role:
     USER = 0
     ADMIN = 1
     
-    
+
 #отношение один ко многим
-class User(UserMixin, database.Model):
+class User(UserMixin, database.Model, SerializerMixin):
     __tablename__ = "users"
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.String(64), unique=True, index=True)
     username = database.Column(database.String(64), unique=True, index=True)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     avatar = database.Column(database.LargeBinary, default=False)
     city = database.Column(database.String(64), default=False)
     gender = database.Column(database.String(4), default=False)
     age = database.Column(database.Integer, default=False)
-    about_me = database.Column(database.Text, default=False)
+    about_me = database.Column(database.Text(), default=False)
     password_hash = database.Column(database.String(128))
     books = database.relationship('Book', backref='user')
     grades = database.relationship('BookGrade', backref='user', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='user', cascade="all, delete, delete-orphan")
+    posts_from_all_topics = database.relationship('TopicPost', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
     role = database.Column(database.Boolean, default=False)
@@ -81,28 +84,48 @@ class User(UserMixin, database.Model):
             self.avatar = f.read()
             
             
-class Category(database.Model):
+class Category(database.Model, SerializerMixin):
     __tablename__ = "categories"    
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(64), unique=True, index=True)
-    books = database.relationship('Book', backref='category', cascade="all, delete, delete-orphan")
+    name = database.Column(database.String(256), unique=True, index=True)
+    books = database.relationship('Book', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
+    topics = database.relationship('DiscussionTopic', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
+
+
+class DiscussionTopic(database.Model, SerializerMixin):
+    __tablename__ = "topics"
+    id = database.Column(database.Integer, primary_key=True)
+    name = database.Column(database.String(1024), unique=False, index=True)
+    category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
+    posts = database.relationship('TopicPost', backref='topic', lazy='dynamic', cascade="all, delete, delete-orphan")
+
+
+class TopicPost(database.Model, SerializerMixin):
+    __tablename__ = "posts"
+    id = database.Column(database.Integer, primary_key=True)
+    body = database.Column(database.String(1024), index=True)
+    file = database.Column(database.LargeBinary, default=False)
+    answer_to_post = database.Column(database.Integer, default=False)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
+    user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+    discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
+
     
-    
-class Book(database.Model):
+class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary, default=False)
     isbn = database.Column(database.String(64), unique=False)
-    name = database.Column(database.String(64), unique=True, index=True)
-    author = database.Column(database.String(64), unique=False)
-    publishing_house = database.Column(database.String(64), unique=False)
+    name = database.Column(database.String(128), unique=True, index=True)
+    author = database.Column(database.String(128), unique=False)
+    publishing_house = database.Column(database.String(128), unique=False)
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
     cataloge_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
-    grades = database.relationship('BookGrade', backref='book', cascade="all, delete, delete-orphan")
+    grades = database.relationship('BookGrade', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
     def default_cover(self):
@@ -110,18 +133,18 @@ class Book(database.Model):
             self.cover = f.read()
     
 
-class BookGrade(database.Model):
+class BookGrade(database.Model, SerializerMixin):
     __tablename__ = "grades"
     id = database.Column(database.Integer, primary_key=True)
-    grade = database.Column(database.Integer)
+    grade = database.Column(database.Integer, default=0)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
 
 
-class Comment(database.Model):
+class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.Text)
+    body = database.Column(database.Text(512))
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -129,15 +152,15 @@ class Comment(database.Model):
 
 
 #lists and items models
-class Cataloge(database.Model):
+class Cataloge(database.Model, SerializerMixin):
     __tablename__ = "catalogues"
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(64), unique=False, index=True)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
-    items = database.relationship('Item', backref='cataloge', cascade="all, delete, delete-orphan")
+    items = database.relationship('Item', backref='cataloge', lazy='dynamic', cascade="all, delete, delete-orphan")
 
 
-class Item(database.Model):
+class Item(database.Model, SerializerMixin):
     __tablename__ = "items"
     id = database.Column(database.Integer, primary_key=True)
     read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено  
@@ -145,7 +168,7 @@ class Item(database.Model):
     book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
 
 
-class SearchResult(database.Model):
+class SearchResult(database.Model, SerializerMixin):
     __tablename__ = "search_results"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary, default=False)
@@ -156,7 +179,8 @@ class SearchResult(database.Model):
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
-    def __init__(self, book):
+    grade = database.Column(database.Integer, unique=False)
+    def __init__(self, book: Book):
         self.id = book.id
         self.cover = book.cover
         self.isbn = book.isbn
@@ -166,6 +190,10 @@ class SearchResult(database.Model):
         self.description = book.description
         self.release_date = book.release_date
         self.count_of_chapters = book.count_of_chapters
+        try:
+            self.grade = round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)
+        except:
+            self.grade = 0
     
         
 @login_manager.user_loader

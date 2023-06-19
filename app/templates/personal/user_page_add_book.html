@@ -12,6 +12,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
 </head>
 
 <body class="image-2">
@@ -65,7 +67,7 @@
       </div>
     </section>
 
-    <div class="background-book_page">
+    <div class="background-book_page" id="cataloges_container">
       <!--место для списков-->
       {% if not catalogues %}
       <section class="list__list">
@@ -77,16 +79,31 @@
       </section>
       {% else %}
       {% for cataloge_value in catalogues %}
-      <section class="list__list">
-        <div class="container lists__catalog">
-          <div class="list__wrap ">
-            <a class="title list__name"
-              href="{{url_for('personal.add_book_in_list', username=current_user.username, list_id=cataloge_value.id, book_id=book_id, read_state=read_state)}}">{{
-              cataloge_value.name }}</a>
+        <section class="list__list" id="{{cataloge_value.id}}cataloge_info">
+          <div class="container lists__catalog">
+            <div class="list__wrap ">
+              <a class="title list__name"
+                href="{{url_for('personal.add_book_in_list', username=current_user.username, list_id=cataloge_value.id, book_id=book_id, read_state=read_state)}}">{{
+                cataloge_value.name }}</a>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       {% endfor %}
+        <div class="list__pagination pagination" id="comments_pagination_container">
+              <ul class="pagination__list list-reset" id="pagination">
+                <li class="pagination__item disabled">
+                  &bull;
+                </li>
+                {% for p in catalogues_pagination.iter_pages() %}
+                  <li class="pagination__item active">
+                     <a onclick="get_lists_page_to_add_book('/user/{{current_user.username}}/get_lists_page_to_add_book/{{p}}', '{{read_state}}', '{{book_id}}')">{{ p }}</a>
+                  </li>
+                {% endfor %}
+                <li class="pagination__item disabled">
+                  &bull;
+                </li>
+              </ul>
+        </div>
       {% endif %}
     </div>
 

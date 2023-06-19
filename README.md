@@ -10,3 +10,5 @@ venv/Scripts/activate (его активация)
 pip install -r requirements.txt (установка всех необходимых пакетов)
 
 python manage.py runserver (запуск сервера и всего приложения)
+
+Поддерживается версия python 3.11.4

@@ -12,6 +12,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/personal/pagination.js')}}"></script>
 </head>
 
 <body class="image-2">
@@ -68,135 +70,145 @@
 
     <section class="form background-book_page">
       <div class="form__container container">
-        <form class="form__wrap" enctype="multipart/form-data" method="post">
-          {{form.hidden_tag()}}
-            <span class="form__span">Обложка книги</span>
-            <div class="profile__image profile__image-edit">
-              <!--Тут получаем обложку для книги-->
-              <input class="profile__foto" type="file" name="cover" multiple accept="image/*,image/jpeg">
-            </div>
-          <label class="form__label">
-            <span class="form__span">ISBN</span>
-            {% if form.isbn.errors %}
-            <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
-            {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
-            <span> 
-              {% for msg in form.isbn.errors %}
-              {{ msg }}
-              {% endfor %}
-            </span>
-            {% else %}
-            {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
-            {% endif %}
-          </label>
+        {% if len(categories) > 0 %}
+          <form class="form__wrap" enctype="multipart/form-data" method="post">
+            {{form.hidden_tag()}}
+              <span class="form__span">Обложка книги</span>
+              <div class="profile__image profile__image-edit">
+                <!--Тут получаем обложку для книги-->
+                <input class="profile__foto" type="file" name="cover" multiple accept="image/*,image/jpeg">
+              </div>
+            <label class="form__label">
+              <span class="form__span">ISBN</span>
+              {% if form.isbn.errors %}
+              <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
+              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
+              <span> 
+                {% for msg in form.isbn.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
+              {% endif %}
+            </label>
 
-          <label class="form__label">
-            <span class="form__span">Название</span>
-            {% if form.name.errors %}
-            <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
-            {{form.name(class="form__input", placeholder="Введите название книги")}}
-            <span> 
-              {% for msg in form.name.errors %}
-              {{ msg }}
-              {% endfor %}
-            </span>
-            {% else %}
-            {{form.name(class="form__input", placeholder="Введите название книги")}}
-            {% endif %}
-          </label>
+            <label class="form__label">
+              <span class="form__span">Название</span>
+              {% if form.name.errors %}
+              <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
+              {{form.name(class="form__input", placeholder="Введите название книги")}}
+              <span> 
+                {% for msg in form.name.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.name(class="form__input", placeholder="Введите название книги")}}
+              {% endif %}
+            </label>
 
-          <label class="form__label">
-            <span class="form__span">Автор</span>
-            {% if form.author.errors %}
-            <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
-            {{form.author(class="form__input", placeholder="Иванов Иван Иванович")}}
-            <span> 
-              {% for msg in form.author.errors %}
-              {{ msg }}
-              {% endfor %}
-            </span>
-            {% else %}
-            {{form.author(class="form__input", placeholder="Иванов Иван Иванович")}}
-            {% endif %}
-          </label>
+            <label class="form__label">
+              <span class="form__span">Автор</span>
+              {% if form.author.errors %}
+              <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
+              {{form.author(class="form__input", placeholder="Иванов Иван Иванович")}}
+              <span> 
+                {% for msg in form.author.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.author(class="form__input", placeholder="Иванов Иван Иванович")}}
+              {% endif %}
+            </label>
 
-          <label class="form__label">
-            <span class="form__span">Издательство</span>
-            {% if form.publishing_house.errors %}
-            <!--<input type="text" class="form__input" placeholder="Введите издательство" required>-->
-            {{form.publishing_house(class="form__input", placeholder="Введите издательство")}}
-            <span> 
-              {% for msg in form.publishing_house.errors %}
-              {{ msg }}
-              {% endfor %}
-            </span>
-            {% else %}
-            {{form.publishing_house(class="form__input", placeholder="Введите издательство")}}
-            {% endif %}
-          </label>
+            <label class="form__label">
+              <span class="form__span">Издательство</span>
+              {% if form.publishing_house.errors %}
+              <!--<input type="text" class="form__input" placeholder="Введите издательство" required>-->
+              {{form.publishing_house(class="form__input", placeholder="Введите издательство")}}
+              <span> 
+                {% for msg in form.publishing_house.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.publishing_house(class="form__input", placeholder="Введите издательство")}}
+              {% endif %}
+            </label>
 
-          <label class="form__label">
-            <span class="form__span">Описание</span>
-            {% if form.description.errors %}
-            {{form.description(class="form__input", placeholder="Описание книги..")}}
-            <span> 
-              {% for msg in form.description.errors %}
-              {{ msg }}
-              {% endfor %}
-            </span>
-            {% else %}
-            {{form.description(class="form__input", placeholder="Описание книги..")}}
-            {% endif %}
-            <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
-          </label>
+            <label class="form__label">
+              <span class="form__span">Описание</span>
+              {% if form.description.errors %}
+              {{form.description(class="form__input", placeholder="Описание книги..")}}
+              <span> 
+                {% for msg in form.description.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.description(class="form__input", placeholder="Описание книги..")}}
+              {% endif %}
+              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
+            </label>
 
-          <label class="form__label">
-            <span class="form__span">Дата выхода</span>
-            {% if form.release_date.errors %}
-            {{form.release_date(class="form__input")}}
-            <span> 
-              {% for msg in form.release_date.errors %}
-              {{ msg }}
-              {% endfor %}
-            </span>
-            {% else %}
-            {{form.release_date(class="form__input")}}
-            {% endif %}
-            <!--<input type="date" class="form__input" required>-->
-          </label>
+            <label class="form__label">
+              <span class="form__span">Дата выхода</span>
+              {% if form.release_date.errors %}
+              {{form.release_date(class="form__input")}}
+              <span> 
+                {% for msg in form.release_date.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.release_date(class="form__input")}}
+              {% endif %}
+              <!--<input type="date" class="form__input" required>-->
+            </label>
 
-          <label class="form__label">
-            <span class="form__span">Количество глав</span>
-            {% if form.chapters_count.errors %}
-            {{form.chapters_count(class="form__input", placeholder="Введите количество глав")}}
-            <span> 
-              {% for msg in form.chapters_count.errors %}
-              {{ msg }}
-              {% endfor %}
-            </span>
-            {% else %}
-            {{form.chapters_count(class="form__input", placeholder="Введите количество глав")}}
-            {% endif %}
-            <!--<input type="number" class="form__input" min="2" placeholder="Введите количество глав" required>-->
-          </label>
+            <label class="form__label">
+              <span class="form__span">Количество глав</span>
+              {% if form.chapters_count.errors %}
+              {{form.chapters_count(class="form__input", placeholder="Введите количество глав")}}
+              <span> 
+                {% for msg in form.chapters_count.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.chapters_count(class="form__input", placeholder="Введите количество глав")}}
+              {% endif %}
+              <!--<input type="number" class="form__input" min="2" placeholder="Введите количество глав" required>-->
+            </label>
 
-          <label class="form__label">
-            <span class="form__span">Категории</span>
-            <div class="form__genre-wrap">
-              {% for index in range(len(categories)) %}
-                {% if index == 0 %}
-                  <a class="form__genre"><input type="radio" name="category" class="form__checkbox" value="{{ categories[index].name }}" checked>{{ categories[index].name }}</a>
-                {% else %}
-                  <a class="form__genre"><input type="radio" name="category" class="form__checkbox" value="{{ categories[index].name }}">{{ categories[index].name }}</a>
-                {% endif %}
-              {% endfor %}
-            </div> 
-          </label>
+            <label class="form__label">
+              <span class="form__span">Категории</span>
+              <div class="form__genre-wrap" id="cat_container">
+                {% for index in range(len(categories)) %}
+                  {% if index == 0 %}
+                    <a class="form__genre" id="{{categories[index].id}}categories"><input type="radio" name="category" class="form__checkbox" value="{{ categories[index].name }}" checked>{{ categories[index].name }}</a>
+                  {% else %}
+                    <a class="form__genre" id="{{categories[index].id}}categories"><input type="radio" name="category" class="form__checkbox" value="{{ categories[index].name }}">{{ categories[index].name }}</a>
+                  {% endif %}
+                {% endfor %}
+                <ul class="pagination__list list-reset" id="pagination">
+                  {% for p in pagination.iter_pages() %}
+                    <li class="pagination__item active">
+                      <a onclick="get_categories_page_for_book_adding('/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}')">{{ p }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div> 
+            </label>
 
-          <!--<button class="form__btn btn">Добавить книгу в базу</button>-->
-          {{form.submit(class="form__btn btn")}}
-        </form>
-
+            <!--<button class="form__btn btn">Добавить книгу в базу</button>-->
+            {{form.submit(class="form__btn btn")}}
+          </form>
+        {% else %}
+          <span class="form__span">Чтобы добавить книгу нужна хотя бы одна категория, обратитесь к администратору.</span>
+        {% endif %}
         <a class="form__exit-btn" href="{{url_for('personal.person', username=current_user.username)}}">Вернуться в личный кабинет</a>
       </div>
     </section>

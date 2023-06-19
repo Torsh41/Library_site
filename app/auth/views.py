@@ -31,13 +31,14 @@ def logout():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        User.query.filter_by(id=current_user.id).delete()
+        user = User.query.filter_by(id=current_user.id).first()
+        database.session.delete(user)
         database.session.commit()
         logout_user()
         
     form = RegistrationForm()
     if form.validate_on_submit(): 
-        user = User(username=form.username.data, email=form.email.data.lower(),
+        user = User(username=form.username.data.strip(), email=form.email.data.strip().lower(),
         password=form.password.data)
         user.default_ava()
         user.check_admin()
