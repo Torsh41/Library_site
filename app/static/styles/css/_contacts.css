@@ -4,9 +4,7 @@
 }
 
 .contacts__container {
-  padding: 52px 100px;
-  border-radius: 15px;
-  background-color: #E9E6C3;
+
 }
 
 .contacts__wrap {
@@ -14,5 +12,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 52px 100px;
+  border-radius: 15px;
+  background-color: #cec8bd;
+}
 
+.about__icon-link {
+  cursor: pointer;
+  outline: none;
 }

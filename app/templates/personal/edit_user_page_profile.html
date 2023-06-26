@@ -6,19 +6,21 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Личный кабинет</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}"/>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+
 </head>
 
-<body class="image-3">
+<body>
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
-        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
+        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+          alt="Логотип MAGIC BOOK KEEPER">
       </a>
     </div>
   </header>
@@ -38,19 +40,15 @@
 
         </div>
 
-        <!--<div class="main__bottom">
-          <a class="main__bottom-item" href="#">Мой профиль</a>
-          <a class="main__bottom-item" href="#">Моя статистика</a>
-          <a class="main__bottom-item" href="#">Мои списки книг</a>
-        </div>-->
-
       </div>
     </section>
 
-    <div class="background-book_page">
-      <section class="profile">
-        <div class="profile__container container">
-          <form class="profile__form" enctype="multipart/form-data" method="post"> <!--Вопрос по поводу enctype(action?)-->
+
+    <section class="profile">
+      <div class="profile__container container">
+        <div class="profile__wrap">
+          <form class="profile__form" enctype="multipart/form-data" method="post">
+            <!--Вопрос по поводу enctype(action?)-->
             {{form.hidden_tag()}}
             <span class="profile__span">Фото профиля</span>
             <div class="profile__image profile__image-edit">
@@ -58,7 +56,7 @@
               <input class="profile__foto" type="file" name="avatar" multiple accept="image/*,image/jpeg">
             </div>
             {{form.city(class="profile__input", placeholder="Введите город..")}}
-            
+  
             <label class="profile__info">
               <span class="profile__span">Пол:</span>
               <select name="gender" id="" class="profile__select">
@@ -71,18 +69,17 @@
             {{form.description(class="profile__text", rows="5", placeholder="Расскажите о себе..")}}
             {{form.submit(class="profile__edit-btn")}}
           </form>
-         
-          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
-          </svg>
-        
-          <a class="profile__exit" href="{{url_for('personal.person', username=current_user.username)}}">Отмена</a>
-         
-        </div>
   
-      </section>
-    </div>
-    
+  
+          <a class="profile__exit" href="{{url_for('personal.person', username=current_user.username)}}">Отмена</a>
+        </div>
+        
+
+      </div>
+
+    </section>
+
+
 
 
   </main>

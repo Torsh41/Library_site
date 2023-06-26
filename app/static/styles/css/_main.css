@@ -3,7 +3,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 540px;
+  padding-top: 180px;
+  padding-bottom: 180px;
+  /* min-height: 540px; */
 }
 
 .main__container {
@@ -11,6 +13,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: #cec8bd;
+  /* color: #F5F5DC; */
 }
 
 .main__top {
@@ -31,7 +35,12 @@
 
 .main__bottom-item {
   display: inline-block;
-  font-size: 18px;
+  padding: 3px 6px;
+  font-size: 20px;
+  line-height: 23px;
+  background-color: transparent;
+  outline: none;
+  transition: color .3s linear, background-color .3s linear;
 }
 
 .main__bottom-item:not(:last-child) {
@@ -39,21 +48,21 @@
 }
 
 .main__bottom-item:hover {
-  font-weight: 600;
-
+  color: #2E3033;
+  background-color: #fdfde9;
 }
 
 .main__bottom-item:focus {
-  text-decoration-line: underline;
-  text-decoration-color : #E5C085;
-  color: #E5C085;
+  color: #2E3033;
+  background-color: #cec8bd;
 }
 
 .main__bottom-item:active {
-  text-decoration-line: underline;
   color: #F5F5DC;
-  text-decoration-color : #F5F5DC;
+  background-color: #2E3033;
 }
+
+
 
 .main__title {
   margin-top: 0;
@@ -68,15 +77,12 @@
 }
 
 .main__span {
-  margin-bottom: 30px;
-  font-size: 36px;
-  font-family: 'Montaga';
+  margin-bottom: 5px;
+  font-size: 17px;
+  opacity: 0.5;
 }
 
-.main__bottom-item {
-  font-size: 20px;
-  line-height: 23px;
-}
+
 
 /* Стилизация страницы поиска книг */
 
@@ -98,22 +104,12 @@
   width: 500px;
   border: none;
   background-color: transparent;
+  outline: none;
   cursor: pointer;
   transition: background-color 0.2s linear;
 }
 
-.main__form-label:hover {
-  background-color: #E9E6C3;
-}
 
-.main__form-input:focus {
-  border: none;
-  outline: none;
-}
-
-.main__form-label:active {
-  background-color: #E9E6C3;
-}
 
 .main__form-label {
   display: flex;
@@ -123,7 +119,26 @@
   border-radius: 20px;
   background-color: var(--white);
   cursor: pointer;
-  background-color: #F5F5DC;
+  background-color: #cec8bd;
+  transition: background-color 0.3s linear;
+}
+
+.main__form-label:hover {
+  background-color: #fdfde9;
+}
+
+.main__form-input:focus {
+  border: none;
+  outline: none;
+}
+
+.main__form-label:focus {
+  background-color: #989185;
+  color: #fdfde9;
+}
+
+.main__form-label:active {
+  background-color: #fdfde9;
 }
 
 .main__form-icon {
@@ -134,8 +149,9 @@
   padding: 13px;
   border: none;
   border-radius: 20px;
+  outline: none;
   cursor: pointer;
-  background-color: #F5F5DC;
+  background-color: #cec8bd;
 }
 
 .main__form-select:not(:last-child) {
@@ -143,7 +159,7 @@
 }
 
 .main__form-select:hover {
-  background-color: #E9E6C3;
+  background-color: #fdfde9;
 }
 
 .main__form-select:focus {
@@ -151,34 +167,48 @@
 }
 
 .main__form-select:active {
-  background-color: #E9E6C3;
+  background-color: #fdfde9;
 }
 
-.main__form-btn {
-  width: 210px;
-  margin-top: 30px;
-  background-color: #FCDCA9;
-  border: 2px solid #2E3033;
+.main__help,
+.main__help-end {
+  font-size: 17px;
+  line-height: 20px;
+  opacity: 0.5;
   text-align: center;
 }
 
+.main__help-end {
+  margin-bottom: 20px;
+}
+
+.main__form-btn {
+  padding: 12px 38px;
+  margin-top: 30px;
+  background-color: #989185;
+  color: #fdfde9;
+  text-align: center;
+  border: none;
+  outline: none;
+  transition: color .3s linear, background-color .3s linear;
+}
+
 .main__form-btn:hover {
-  background-color: #FFC464;
-  text-decoration-line: underline;
-  text-decoration-color: #2E3033;
+  color: #2E3033;
+  background-color: #fdfde9;
 }
 
 .main__form-btn:focus {
-  background-color: #FFC464;
-  border: 2px solid #B98E4B;
-  outline: none;
+  background-color: #ffffff;
+  color: #332f2e;
 }
 
 .main__form-btn:active {
-  background-color: #E5C085;
-  border: 2px solid #2E3033;
-  text-decoration-line: none;
+  background-color: #332f2e;
+  color: #fdfde9;
+
 }
+
 
 /*Unconfrimed.html*/
 
@@ -188,6 +218,8 @@
 }
 
 .main__link-confirm {
+  outline: none;
+  cursor: pointer;
   font-weight: 600;
   color: brown;
 }
@@ -199,6 +231,8 @@
   background-color: #FCDCA9;
   border: 2px solid #2E3033;
   text-align: center;
+  outline: none;
+  cursor: pointer;
 }
 
 

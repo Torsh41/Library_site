@@ -1,12 +1,11 @@
 .about {
   padding-top: 0;
   padding-bottom: 25px;
+
 }
 
 .about__container {
-  padding: 52px 100px;
-  border-radius: 15px;
-  background-color: #E9E6C3;
+
 }
 
 .about__wrap {
@@ -14,6 +13,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 52px 100px;
+  border-radius: 15px;
+  background-color: #cec8bd;
 
 }
 
@@ -41,7 +43,7 @@
 
 /* Категории */
 
-.about__cat-list {
+/* .about__cat-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -55,6 +57,6 @@
   width: 300px;
   height: 200px;
   border-radius: 20px;
-  background-color: bisque;
+  background-color: #F5F5DC;
   margin-bottom: 40px;
-}
+} */

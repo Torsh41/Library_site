@@ -1,7 +1,10 @@
 .footer {
+  /* position: absolute;
+  bottom: 0;
+  width: 100%; */
   padding-top: 50px;
   padding-bottom: 25px;
-  background-color: #E9E6C3;
+  background-color: #cec8bd;
 }
 
 /* .footer__container {
@@ -17,6 +20,7 @@
   align-items: center;
   justify-content: center;
   color: #2E3033;
+  text-align: center;
 
 }
 
