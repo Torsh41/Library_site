@@ -1,5 +1,6 @@
 @import url('_fonts.css');
 @import url('_variables.css');
+@import url(popup.css);
 @import url(_header.css);
 @import url(_main.css);
 @import url(_about.css);
@@ -14,6 +15,7 @@
 @import url(burger.css);
 @import url(key_frames.css);
 @import url(forum.css);
+@import url(media.css);
 
 html {
   box-sizing: border-box;
@@ -26,14 +28,14 @@ html {
 }
 
 body {
-  font-family: "Montserrat", sans-serif;
 
+  font-family: "Montserrat", sans-serif;
   font-size: var(--default-fs);
   line-height: var(--default-lh);
   color: var(--black);
   background-color: #F5F5F5;
-  background-image: url(../img/fon_image-1.jpg);
-  background-repeat: no-repeat;
+  background-image: url(../img/back19201.jpg);
+  background-repeat: repeat;
   background-position: top center;
 }
 
@@ -62,8 +64,8 @@ a {
 .container {
   margin-left: auto;
   margin-right: auto;
-  /* padding-left: var(--container-padding);
-  padding-right: var(--container-padding); */
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
   max-width: var(--container-max-width);
 }
 
@@ -147,13 +149,7 @@ a {
   color: #E9E6C3;
 }
 
-.background-index {
-  background-image: url(../img/image_index.jpg);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
 
-}
 
 .background-search {
   background-image: url(../img/image_search.jpg);
@@ -162,25 +158,17 @@ a {
   background-size: cover;
 }
 
-.image-2 {
-  background-image: url(../img/fon_image-1.jpg);
-  background-repeat: no-repeat;
-  background-position: top;
-}
 
-.image-3 {
-  background-image: url(../img/fon_image-3.jpg);
-  background-repeat: no-repeat;
-  background-position: top;
-
-
-}
 
 .title {
   font-weight: 400;
 }
 
-.background-book_page {
-  background-color: #171D1D;
+.content {
+  min-height: calc(100vh - 127px);
+}
+
+.footer {
+  height: 107px;
 }
 

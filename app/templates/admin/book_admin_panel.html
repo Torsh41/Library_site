@@ -14,8 +14,8 @@
 <body>
   <header class="header">
     <div class="header__container container">
-      <a class="header__logo" href="index.html">
-        <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+      <a class="header__logo" href="{{url_for('main.index')}}">
+        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
       <div class="header__admin admin">

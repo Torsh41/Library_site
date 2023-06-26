@@ -14,34 +14,34 @@
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/personal/pagination.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
-<body class="image-2">
+<body>
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
         <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
-      <nav class="nav header__nav">
-        <ul class="nav__list list-reset">
-          <li class="nav__item"><a class="nav__link" href="#">Меню
-              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
-              </svg>
+      <div class="header__right">
+        <span class="header__menu">Меню</span>
+        <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+          <span class="hamburger__box">
+            <span class="hamburger__inner"></span>
+          </span>
+        </button>
+      </div>
 
-            </a>
-            <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
-            </ul>
-          </li>
-        </ul>
+      <nav class="nav header__nav">
+        <div class="nav__menu js-menu-wrap">
+          <ul class="nav__list list-reset">
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+          </ul>
+        </div>
       </nav>
+
     </div>
   </header>
 
@@ -68,7 +68,7 @@
       </div>
     </section>
 
-    <section class="form background-book_page">
+    <section class="form ">
       <div class="form__container container">
         {% if len(categories) > 0 %}
           <form class="form__wrap" enctype="multipart/form-data" method="post">
@@ -184,7 +184,7 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Категории</span>
+              <span class="form__span-genre">Категории</span>
               <div class="form__genre-wrap" id="cat_container">
                 {% for index in range(len(categories)) %}
                   {% if index == 0 %}
@@ -193,23 +193,28 @@
                     <a class="form__genre" id="{{categories[index].id}}categories"><input type="radio" name="category" class="form__checkbox" value="{{ categories[index].name }}">{{ categories[index].name }}</a>
                   {% endif %}
                 {% endfor %}
-                <ul class="pagination__list list-reset" id="pagination">
-                  {% for p in pagination.iter_pages() %}
-                    <li class="pagination__item active">
-                      <a onclick="get_categories_page_for_book_adding('/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}')">{{ p }}</a>
-                    </li>
-                  {% endfor %}
-                </ul>
+
+              
               </div> 
+              
+              <ul class="pagination__list list-reset" id="pagination">
+                {% for p in pagination.iter_pages() %}
+                  <li class="pagination__item active">
+                    <a onclick="get_categories_page_for_book_adding('/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}')">{{ p }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
             </label>
 
             <!--<button class="form__btn btn">Добавить книгу в базу</button>-->
             {{form.submit(class="form__btn btn")}}
+
+            <a class="form__exit-btn" href="{{url_for('personal.person', username=current_user.username)}}">Вернуться в личный кабинет</a>
           </form>
         {% else %}
           <span class="form__span">Чтобы добавить книгу нужна хотя бы одна категория, обратитесь к администратору.</span>
         {% endif %}
-        <a class="form__exit-btn" href="{{url_for('personal.person', username=current_user.username)}}">Вернуться в личный кабинет</a>
+        
       </div>
     </section>
 
