@@ -6,6 +6,7 @@ from flask_login import current_user, login_required
 import copy
 from operator import itemgetter
 ELEMS_COUNT = 10
+TOP_BOOKS_COUNT = 3 
 months_dict = {
         1:'января',
         2:'февраля',
@@ -166,8 +167,8 @@ def search_by_category(name):
                 top_books.append([book, 0])
             if not book.release_date in date_list:
                 date_list.append(book.release_date)
-        if len(top_books) > 3:
-            top_books = sorted(top_books, key=itemgetter(1))[-3:]    
+        if len(top_books) > TOP_BOOKS_COUNT:
+            top_books = sorted(top_books, key=itemgetter(1))[-TOP_BOOKS_COUNT:]    
         else:
             top_books = sorted(top_books, key=itemgetter(1))
     else:
