@@ -79,7 +79,7 @@ def get_comments_page(book_name, page):
 @login_required
 def add_comment(username, book_name):
     book = Book.query.filter_by(name=book_name).first()
-    comment = Comment(body=str(request.form.get('comment')).strip(), book=book, user=current_user._get_current_object())
+    comment = Comment(body=str(request.form.get('comment')).strip().replace("'", ""), book=book, user=current_user._get_current_object())
     database.session.add(comment)
     database.session.commit()
     comments = book.comments.all(); last_page = len(comments) // ELEMS_COUNT; id_of_added_comment = comments[-1].id
@@ -96,7 +96,7 @@ def add_comment(username, book_name):
 @login_required
 def edit_comment(username, comment_id, book_name):
     comment = Comment.query.filter_by(id=comment_id).first()
-    comment.body = str(request.form.get('newComment')).strip()
+    comment.body = str(request.form.get('newComment')).strip().replace("'", "")
     database.session.add(comment)
     database.session.commit()
     return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_name=book_name))
@@ -277,9 +277,9 @@ def topic(topic_id):
 def add_post(username, discussion_topic_id):
     topic = DiscussionTopic.query.filter_by(id=discussion_topic_id).first()
     if request.files['screenshot'].filename != '':
-        post = TopicPost(body=str(request.form.get('post_body')).strip(), user=current_user, topic=topic, file=request.files['screenshot'].read())
+        post = TopicPost(body=str(request.form.get('post_body')).strip().replace("'", ""), user=current_user, topic=topic, file=request.files['screenshot'].read())
     else:
-        post = TopicPost(body=str(request.form.get('post_body')).strip(), user=current_user, topic=topic, file=bytes(False))
+        post = TopicPost(body=str(request.form.get('post_body')).strip().replace("'", ""), user=current_user, topic=topic, file=bytes(False))
     if post_id_for_answer := request.args.get('post_id_to_answer', None, type=int):
         post.answer_to_post = post_id_for_answer
     else:
@@ -453,7 +453,7 @@ def get_topics_page_on_forum(category_id, page):
 @login_required
 def edit_post(username, topic_id, post_id):
     post = TopicPost.query.filter_by(id=post_id).first()
-    post.body = str(request.form.get('newComment')).strip()
+    post.body = str(request.form.get('newComment')).strip().replace("'", "")
     database.session.add(post)
     database.session.commit()
     return jsonify(dict(topic_id=topic_id, post_id=post_id, post_body=post.body, username=current_user.username))
