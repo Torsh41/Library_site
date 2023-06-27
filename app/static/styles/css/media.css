@@ -1,3 +1,16 @@
+@media (max-width: 1920px) {
+  .nav__menu {
+    width: 600px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .nav__menu {
+    width: 400px;
+  }
+}
+
+
 @media (max-width: 1300px) {
 
   .category__wrap {

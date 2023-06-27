@@ -14,7 +14,6 @@
   <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/edit_post.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
-
 </head>
 
 <body>
@@ -95,8 +94,8 @@
     </section>
 
     <section class="discussion">
-      <div class="discussion__container container" id="disc_posts_container">
-        <div class="discussion__wrap">
+      <div class="discussion__container container">
+        <div class="discussion__wrap" id="disc_posts_container">
           {% for post in posts %}
           <div class="discussion__message message" id="{{post.id}}discussion_post"> <!--Сообщение-->
             <div class="message__left">
@@ -107,7 +106,7 @@
                   <a class="message__link">
                     {% endif %}
                     <div class="message__set">
-                      <img src="{{url_for('personal.avatar', username=post[" username"])}}" alt="" class="message__img">
+                      <img src="{{url_for('personal.avatar', username=post["username"])}}" alt="" class="message__img">
                       <!--Фото админа из его личного кабинета-->
                     </div>
                     {{post['username']}}
@@ -135,50 +134,36 @@
               </div>
             </div>
 
-            <div class="message__right" id="{{post[" id"]}}msg_write_id">
+            <div class="message__right" id="{{post["id"]}}msg_write_id">
               {% if post["this_is_answer"] %}
-              <div class="message__answer" id="{{post[" id"]}}base_to_answer">
+              <div class="message__answer" id="{{post["id"]}}base_to_answer">
                 <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
                 <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
               </div>
               {% endif %}
-              <p class="message__text" id="{{post[" id"]}}post_body">
+              <p class="message__text" id="{{post["id"]}}post_body">
                 {{post["body"]}} <!--Сообщение пользователя-->
               </p>
               {% if post["file"] %}
               <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
                 onmouseout="this.style.width='80px'; this.style.height='80px'"
-                src="{{url_for('main.post_screenshot', post_id=post[" id"])}}" />
+                src="{{url_for('main.post_screenshot', post_id=post["id"])}}" />
               {% endif %}
 
               <!--This block for user (only for his messages)-->
               {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
-              <div class="message__admin" id="{{post[" id"]}}personal_cont">
-                <a class="message__admin-btn" id="{{post[" id"]}}answer_on" onclick="answer_on_post('{{post["
-                  id"]}}')">Ответить</a>
-                <a class="message__admin-btn" id="{{post[" id"]}}edit_post_a"
-                  onclick="open_popup_form('/{{current_user.username}}/edit_post/{{topic_id}}/{{post["
-                  id"]}}', '{{post["body"]}}' )">Редактировать</a>
-                <a class="message__admin-btn"
-                  onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["
-                  id"]}}/{{1}}', '{{topic_id}}' )">Удалить</a>
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
+                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" onclick="open_popup_form('/{{current_user.username}}/edit_post/{{topic_id}}/{{post["id"]}}', '{{post["body"]}}')">Редактировать</a>
+                <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}')">Удалить</a>
               </div>
               {% elif current_user.role == Role.ADMIN %}
-              <div class="message__admin" id="{{post[" id"]}}personal_cont">
+              <div class="message__admin" id="{{post["id"]}}personal_cont">
                 <a class="comments__command">Админ</a>
-                <a class="message__admin-btn" id="{{post[" id"]}}answer_on" onclick="answer_on_post('{{post["
-                  id"]}}')">Ответить</a>
-                <a class="message__admin-btn"
-                  onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["
-                  id"]}}/{{1}}', '{{topic_id}}' )">Удалить</a>
-              </div>
-              {% else %}
-              <div class="message__admin" id="{{post[" id"]}}personal_cont">
-                <a class="message__admin-btn" id="{{post[" id"]}}answer_on" onclick="answer_on_post('{{post["
-                  id"]}}')">Ответить</a>
+                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}' )">Удалить</a>
               </div>
               {% endif %}
-
             </div>
           </div>
           {% endfor %}

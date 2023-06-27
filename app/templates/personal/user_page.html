@@ -171,7 +171,7 @@
     {% endif %}
 
     <!--Кнопка все время присутствует на странице пользователя-->
-    <section class="list">
+    <section class="list" id="add_list_button">
       <div id="3" class="container lists__create">
         <button class="lists__btn" onclick="openForm()">Создать список
           <svg class="list__svg" width="78" height="78" viewBox="0 0 78 78" fill="none"
@@ -191,7 +191,7 @@
     </section>
 
     <!--место для списков-->
-    {% for cataloge_value, pagination_for_book_in_list in zip(catalogues, paginations_for_books_in_lists) %}
+    {% for cataloge_value, pagination_for_book_in_list, cur_books_page_for_cataloge in zip(catalogues, paginations_for_books_in_lists, cur_books_page_for_cataloges) %}
     <section class="list" id="{{cataloge_value.id}}cataloge_info">
       <div class="container list__container">
         <div class="list__wrap">
@@ -227,12 +227,11 @@
               </a>
 
               <div class="list__book-wrap">
-                <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book"> <u>Книга:</u> {{
+                <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book"><u>Книга:</u> {{
                   item.book.name }}</a>
-                <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-plan"> <u>Состояние
-                    чтения:</u> <i>{{item.read_state }}</i></a>
+                <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-plan"><u>Состояние чтения:</u> {{item.read_state }}</a>
                 <a class="list__book-delete-btn"
-                  onclick="del_book_from_list('/user/{{current_user.username}}/delete-item/{{cataloge_value.id}}/{{item.id}}/{{1}}', '{{cataloge_value.id}}')">Удалить
+                  onclick="del_book_from_list('/user/{{current_user.username}}/delete-item/{{cataloge_value.id}}/{{item.id}}/{{cur_books_page_for_cataloge}}', '{{cataloge_value.id}}')">Удалить
                   книгу из списка</a>
               </div>
             </li>
@@ -242,21 +241,19 @@
           <div class="list__pagination pagination" id="{{cataloge_value.id}}books_pagination_container">
             <ul class="pagination__list list-reset" id="{{cataloge_value.id}}books_pagination">
               <li class="pagination__item disabled">
-                &#8249;
+                &bull;
               </li>
               {% for p in pagination_for_book_in_list.iter_pages() %}
               {% if p %}
               <li class="pagination__item active">
-                <a
-                  onclick="get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{p}}', '{{cataloge_value.id}}')">{{
-                  p }}</a>
+                <a onclick="get_books_page('/user/{{current_user.username}}/get_books_page/{{cataloge_value.id}}/{{p}}', '{{cataloge_value.id}}')">{{p}}</a>
               </li>
               {% else %}
               <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
               {% endif %}
               {% endfor %}
               <li class="pagination__item disabled">
-                &#8250;
+                &bull;
               </li>
             </ul>
           </div>

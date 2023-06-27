@@ -363,3 +363,31 @@
   width: 8px;
   cursor: pointer;
 }
+
+.list__wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pagination__list {
+  width: 200px;
+  border-radius: 10px;
+  background-color: #fdfde9;
+}
+
+.list__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  outline: none;
+  cursor: pointer;
+}
+  
+.list__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

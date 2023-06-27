@@ -31,7 +31,7 @@ function get_user_search_page(url_path, pagination_id)
             }
             for (const child of pagi.children)
             {
-              if (users[0].cur_page == child.textContent)
+              if (users.length && users[0].cur_page == child.textContent)
               {
                 child.className = 'pagination__item_cur_page';
               }
@@ -103,8 +103,8 @@ function get_category_page(url_path, pagination_id)
           html = '';
           categories.forEach(category => {
               html += `<li class="category__elem" id="${category.id}category_info">
-                        <a class="category__book-link">${category.name}</a>
-                        <a onclick="del_category('/admin/admin_panel/category_delete/${category.id}/${url[url.length - 1]}', '${pagination_id}')" class="category__btn" id="${category.id}del_category">Удалить категорию</a>
+                        <a onclick="open_book_panel('${category.username}', '${category.name}')" class="category__book-link">${category.name}</a>
+                        <a onclick="del_category('/admin/${category.username}/category_delete/${category.id}/${url[url.length - 1]}', '${pagination_id}')" class="category__btn" id="${category.id}del_category">Удалить категорию</a>
                       </li>`;
           });
           document.getElementById("categories_search_list").innerHTML += html;
@@ -121,7 +121,7 @@ function get_category_page(url_path, pagination_id)
           }
           for (const child of pagi.children)
           {
-            if (categories[0].cur_page == child.textContent)
+            if (categories.length && categories[0].cur_page == child.textContent)
             {
               child.className = 'pagination__item_cur_page';
             }
@@ -142,7 +142,7 @@ function del_category(url_path, pagination_id)
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        get_category_page(`/admin/get_category_search_page/${response.cur_page}`, `${pagination_id}`);
+        get_category_page(`/admin/${response.username}/get_category_search_page/${response.cur_page}`, `${pagination_id}`);
         $('ul').filter(function() {
           return this.id.match(pagination_id);
         }).remove();
@@ -156,13 +156,13 @@ function del_category(url_path, pagination_id)
             if (response.pages > 1 && i == response.cur_page)
             {
               html += ` <li class="pagination__item_cur_page">
-                          <a onclick="get_category_page('/admin/get_category_search_page/${i}', '${pagination_id}')">${i}</a>
+                          <a onclick="get_category_page('/admin/${response.username}/get_category_search_page/${i}', '${pagination_id}')">${i}</a>
                         </li>`;
             }
             else
             {
               html += ` <li class="pagination__item active">
-                        <a onclick="get_category_page('/admin/get_category_search_page/${i}', '${pagination_id}')">${i}</a>
+                          <a onclick="get_category_page('/admin/${response.username}/get_category_search_page/${i}', '${pagination_id}')">${i}</a>
                         </li>`;
             }
           }

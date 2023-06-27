@@ -32,44 +32,52 @@ function search_category_on_forum()
                       <div class="fraction__wrap">
                         <h2 class="fraction__title title" id="${category.id + 'category_title'}">${category.name}</h2> 
                         <span class="fraction__results" id="${category.id + 'topics_count'}"> Всего тем: ${category.topics_count}</span>`;
-                        html += `<div class="fraction__topic-list" id="${category.id + 'grid_container'}">`;
+                        html += `<ul class="fraction__topic-list list-reset" id="${category.id + 'grid_container'}">`;
                         if (category.username_of_cur_user)
                         {
-                            html += `<a class="fraction__topic-link" onclick="openForm('${category.username_of_cur_user}', '${category.name}', '${category.cur_page}')"> <!--Add the new topic (for users)-->
-                                      <div class="fraction__topic">
-                                        <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                          <g clip-path="url(#clip0_139_2)">
-                                            <rect x="35" width="8" height="78" fill="#D9D9D9" />
-                                            <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
-                                          </g>
-                                          <defs>
-                                            <clipPath id="clip0_139_2">
-                                              <rect width="78" height="78" fill="white" />
-                                            </clipPath>
-                                          </defs>
-                                        </svg>
-                                      </div>
-                                      </a>`;
+                            html += `<li class="fraction__list-item">
+                                        <a class="fraction__topic-link" onclick="openForm('${category.username_of_cur_user}', '${category.name}', '${category.cur_page}')"> <!--Add the new topic (for users)-->
+                                          <div class="fraction__topic">
+                                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                              <g clip-path="url(#clip0_139_2)">
+                                                <rect x="35" width="8" height="78" fill="#F5F5DC" />
+                                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC"/>
+                                              </g>
+                                              <defs>
+                                                <clipPath id="clip0_139_2">
+                                                  <rect width="78" height="78" fill="white" />
+                                                </clipPath>
+                                              </defs>
+                                            </svg>
+                                          </div>
+                                        </a>
+                                      </li>`;
                         }
                         else
                         {
-                            html += ` <a class="fraction__topic-link"> 
-                                      <div class="fraction__topic">
-                                        Создавать темы могут только авторизованные пользователи.
-                                      </div>
-                                      </a>`;
+                            html += `<li class="fraction__list-item">
+                                        <a class="fraction__topic-link"> 
+                                        <div class="fraction__topic">
+                                          <p class="fraction__text-error">
+                                            Создавать темы могут только авторизованные пользователи.
+                                          </p>
+                                        </div>
+                                        </a>
+                                      </li>`;
                         }
                         topics = Array.from(category.topics);
                         topics.forEach(topic => {
           
-                          html += `<a href="/forum/${topic.id}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
-                                    <div class="fraction__topic">
-                                      ${topic.name}
-                                    </div>
-                                    </a>`;                    
+                          html += `<li class="fraction__list-item">
+                                    <a href="/forum/${topic.id}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
+                                      <div class="fraction__topic">
+                                        <p class="fraction__text-error"> ${topic.name}</p>
+                                      </div>
+                                    </a>
+                                  </li>`;                    
                         });
 
-                    html += `</div></div>`;
+                    html += `</ul>`;
                     // собираем пагинацию для топиков каждой категории
                     html += `<ul class="pagination__list list-reset" id="${category.id}topics_pagi">
                                   <li class="pagination__item disabled">
@@ -98,7 +106,7 @@ function search_category_on_forum()
                                     &bull;
                                   </li>
                               </ul>`;
-                    html += `</div></section>`;
+                    html += `</div></div></section>`;
                 });
                 section = document.getElementById('first_section');
                 section.insertAdjacentHTML('afterend', html);
@@ -112,7 +120,7 @@ function search_category_on_forum()
                 }
                 for (const child of pagi.children)
                 {
-                  if (categories[0].cur_page == child.textContent)
+                  if (categories.length && categories[0].cur_page == child.textContent)
                   {
                     child.className = 'pagination__item_cur_page';
                   }
@@ -128,11 +136,11 @@ function search_category_on_forum()
             }).remove();
             document.getElementById("category_name_id").value = "";
             html = `<section class="list" id="not_found">
-                    <div class="container list__container">
-                      <div class="list__wrap">
-                        <h2 class="list__title title">Ничего не найдено</h2>
+                      <div class="container list__container">
+                        <div class="list__wrap">
+                          <h2 class="list__title title">Ничего не найдено</h2>
+                        </div>
                       </div>
-                    </div>
                     </section>`;
             section = document.getElementById('first_section');
             section.insertAdjacentHTML('afterend', html);

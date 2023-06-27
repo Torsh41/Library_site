@@ -8,8 +8,7 @@
   <title>Обсуждение тем</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
-  <link rel="icon" href="img/favicon.svg">
-  <script defer src="js/burger.js"></script>
+  <link rel="icon" href="{{ url_for('static', filename='styles/img/favicon.svg')}}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/search_on_forum.js')}}"></script>
@@ -176,8 +175,7 @@
           <h2 class="fraction__title title" id="{{ category.id }}category_title">{{ category.name }}</h2>
           <!--The title of the category/section-->
 
-          <span class="fraction__results" id="{{category.id}}topics_count"> Всего тем: {{ len(category.topics.all())
-            }}</span>
+          <span class="fraction__results" id="{{category.id}}topics_count"> Всего тем: {{ len(category.topics.all()) }}</span>
           <ul class="fraction__topic-list list-reset" id="{{ category.id }}grid_container">
             {% if current_user.is_authenticated %}
             <li class="fraction__list-item">
@@ -208,43 +206,45 @@
                 </div>
               </a>
             </li>
-
             {% endif %}
 
 
             {% for topic in topics_pagination.items %}
-            <li class="fraction__list-item">
-              <a href="{{url_for('main.topic', topic_id=topic.id)}}" id="{{ category.id }}topic_info"
-                class="fraction__topic-link">
+            <li class="fraction__list-item" id="{{ category.id }}topic_info">
+              <a href="{{url_for('main.topic', topic_id=topic.id)}}" class="fraction__topic-link">
                 <div class="fraction__topic">
                   <p class="fraction__text-error"> {{ topic.name }}</p>
                 </div>
               </a>
+              {% if current_user.role == Role.ADMIN %}
+                <a class="comments__command">Админ</a>
+                <a class="comments__command" onclick="del_topic('/delete-topic/{{category.id}}/{{topic.id}}/{{1}}', '{{category.id}}')">Удалить</a>
+              {% endif %}
             </li>
-
             {% endfor %}
           </ul>
 
           {% if topics_pagination %}
-        <ul class="pagination__list list-reset" id="{{category.id}}topics_pagi">
-          <li class="pagination__item disabled">
-            &bull;
-          </li>
-          {% for p in topics_pagination.iter_pages() %}
-          {% if p %}
-          <li class="pagination__item active">
-            <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/{{category.id}}/{{p}}', '{{category.id}}')">{{
-              p }}</a>
-          </li>
-          {% else %}
-          <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+          <div class="list__pagination pagination">
+            <ul class="pagination__list list-reset" id="{{category.id}}topics_pagi">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>
+              {% for p in topics_pagination.iter_pages() %}
+              {% if p %}
+              <li class="pagination__item active">
+                <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/{{category.id}}/{{p}}', '{{category.id}}')">{{p}}</a>
+              </li>
+              {% else %}
+              <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+              {% endif %}
+              {% endfor %}
+              <li class="pagination__item disabled">
+                &bull;
+              </li>
+            </ul>
+          </div>
           {% endif %}
-          {% endfor %}
-          <li class="pagination__item disabled">
-            &bull;
-          </li>
-        </ul>
-        {% endif %}
         </div>
         
       </div>

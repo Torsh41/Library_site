@@ -60,13 +60,13 @@ def get_user_search_page(page):
     return jsonify([dict(cur_page=page, id=user.id, email=user.email, username=user.username, city=user.city, gender=user.gender, age=user.age, about_me=user.about_me) for user in users])
     
     
-@admin.route('/get_category_search_page/<page>', methods=['GET'])   
+@admin.route('/<username>/get_category_search_page/<page>', methods=['GET'])   
 @admin_required
-def get_category_search_page(page):
+def get_category_search_page(username, page):
     page = int(page)
     category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
     categories = category_pagination.items
-    return jsonify([dict(cur_page=page, id=category.id, name=category.name) for category in categories])
+    return jsonify([dict(username=current_user.username, cur_page=page, id=category.id, name=category.name) for category in categories])
     
     
 @admin.route('/<username>/add-category', methods=['POST'])
@@ -93,23 +93,23 @@ def add_category(username):
 @admin_required
 def user_delete(user_id, page):
     page = int(page)
-    user = User.query.filter_by(id=user_id).first()
+    user = User.query.filter((User.id!=current_user.id) & (User.id==user_id)).first()
     database.session.delete(user)
     database.session.commit()
-    if users := User.query.all():
+    if users := User.query.filter(User.id!=current_user.id).all():
         has_elems = True
-        user_pagination = User.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        user_pagination = User.query.filter(User.id!=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages = user_pagination.pages
         if not user_pagination.items:
-            page = page - 1
+            page -= 1
     else:
         page = 1; pages = 1; has_elems = False
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
 
 
-@admin.route('/admin_panel/category_delete/<category_id>/<page>', methods=['GET'])
+@admin.route('/<username>/category_delete/<category_id>/<page>', methods=['GET'])
 @admin_required
-def category_delete(category_id, page):
+def category_delete(username, category_id, page):
     page = int(page)
     category = Category.query.filter_by(id=category_id).first()
     database.session.delete(category)
@@ -122,7 +122,7 @@ def category_delete(category_id, page):
             page = page - 1
     else:
         page = 1; pages = 1; has_elems = False
-    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems))
+    return jsonify(dict(username=current_user.username, cur_page=page, pages=pages, has_elems=has_elems))
 
 
 @admin.route('/<username>/search_books_on_admin_panel/<category_name>', methods=['GET', 'POST'])

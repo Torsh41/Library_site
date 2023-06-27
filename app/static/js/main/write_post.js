@@ -93,18 +93,12 @@ function add_post_on_forum()
                       else if (post.user_is_admin)
                       {
                         html += `<div class="message__admin" id="${post.id}personal_cont">
-                        <a class="comments__command">Админ</a>
-                        <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
-                        <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
-                        </div>`;
+                                    <a class="comments__command">Админ</a>
+                                    <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
+                                    <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
+                                  </div>`;
                       }
-                      else
-                      {
-                        html += `<div class="message__admin" id="${post.id}personal_cont">
-                                  <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
-                                </div>`;
-                      }
-                     html += `</div></div>`;
+                      html += `</div></div>`;
             });
             div = document.getElementById('disc_posts_container');
             div.insertAdjacentHTML('afterbegin', html);
@@ -147,9 +141,12 @@ function add_post_on_forum()
             div.insertAdjacentHTML("beforeend", html);
             document.getElementById("file_input_id").value = '';
             write_post_form = document.getElementById('add_post_form');
-            action = write_post_form.getAttribute('action');
-            action = action.split('?')[0];
-            write_post_form.setAttribute('action', action);
+            if (write_post_form)
+            {
+              action = write_post_form.getAttribute('action');
+              action = action.split('?')[0];
+              write_post_form.setAttribute('action', action);
+            }
           },
           error: function(error) {
               console.log(error);

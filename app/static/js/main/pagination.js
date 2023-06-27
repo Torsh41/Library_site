@@ -11,7 +11,7 @@ function get_categories_page(url_path)
             }).remove();
             html = "";
             categories.forEach(category => {
-                html += `<li class="about__cat-elem" id="${category.id}category_info"><a href="/category/${category.name}/search" class="about__book-link">${category.name}</a></li>`;
+                html += `<li class="category__elem" id="${category.id}category_info"><a href="/category/${category.name}/search" class="about__book-link"><div class="category__block">${category.name}</div></a></li>`;
             });
             document.getElementById("categories_block").innerHTML = html;
             pagi = document.getElementById('pagination');
@@ -22,7 +22,7 @@ function get_categories_page(url_path)
             }
             for (const child of pagi.children)
             {
-              if (categories[0].cur_page == child.textContent)
+              if (categories.length && categories[0].cur_page == child.textContent)
               {
                 child.className = 'pagination__item_cur_page';
               }
@@ -86,7 +86,7 @@ function get_comments_page(url_path)
             }
             for (const child of pagi.children)
             {
-              if (comments[0].cur_page == child.textContent)
+              if (comments.length && comments[0].cur_page == child.textContent)
               {
                 child.className = 'pagination__item_cur_page';
               }
@@ -166,46 +166,62 @@ function get_categories_page_on_forum(url_path)
                   <div class="fraction__wrap">
                     <h2 class="fraction__title title" id="${category.id + 'category_title'}">${category.name}</h2> 
                     <span class="fraction__results" id="${category.id + 'topics_count'}"> Всего тем: ${category.topics_count}</span>`;
-                    html += `<div class="fraction__topic-list" id="${category.id + 'grid_container'}">`;
+                    html += `<ul class="fraction__topic-list list-reset" id="${category.id + 'grid_container'}">`;
                     if (category.username_of_cur_user)
                     {
-                        html += `<a class="fraction__topic-link" onclick="openForm('${category.username_of_cur_user}', '${category.name}', '${url[url.length - 1]}')"> <!--Add the new topic (for users)-->
-                                  <div class="fraction__topic">
-                                    <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <g clip-path="url(#clip0_139_2)">
-                                        <rect x="35" width="8" height="78" fill="#D9D9D9" />
-                                        <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
-                                      </g>
-                                      <defs>
-                                        <clipPath id="clip0_139_2">
-                                          <rect width="78" height="78" fill="white" />
-                                        </clipPath>
-                                      </defs>
-                                    </svg>
-                                  </div>
-                                </a>`;
+                        html += `<li class="fraction__list-item">
+                                    <a class="fraction__topic-link" onclick="openForm('${category.username_of_cur_user}', '${category.name}', '${url[url.length - 1]}')"> <!--Add the new topic (for users)-->
+                                      <div class="fraction__topic">
+                                        <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <g clip-path="url(#clip0_139_2)">
+                                            <rect x="35" width="8" height="78" fill="#F5F5DC" />
+                                            <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" />
+                                          </g>
+                                          <defs>
+                                            <clipPath id="clip0_139_2">
+                                              <rect width="78" height="78" fill="white" />
+                                            </clipPath>
+                                          </defs>
+                                        </svg>
+                                      </div>
+                                    </a>
+                                  </li>`;
                     }
                     else
                     {
-                        html += ` <a class="fraction__topic-link"> 
-                                  <div class="fraction__topic">
-                                    Создавать темы могут только авторизованные пользователи.
-                                  </div>
-                                  </a>`;
+                        html += `<li class="fraction__list-item">
+                                    <a class="fraction__topic-link"> 
+                                    <div class="fraction__topic">
+                                      <p class="fraction__text-error">
+                                        Создавать темы могут только авторизованные пользователи.
+                                      </p>
+                                    </div>
+                                    </a>
+                                  </li>`;
                     }
                     topics = Array.from(category.topics);
                     topics.forEach(topic => {
-                        html += `<a href="/forum/${topic.id}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
-                                  <div class="fraction__topic">
-                                    ${topic.name}
-                                  </div>
-                                </a>`;
+                        html += `<li class="fraction__list-item" id="${category.id + 'topic_info'}">
+                                    <a href="/forum/${topic.id}" class="fraction__topic-link">
+                                      <div class="fraction__topic">
+                                        <p class="fraction__text-error">
+                                          ${topic.name}
+                                        </p>
+                                      </div>
+                                    </a>`;
+                        if (category.cur_user_is_admin)
+                        {
+                          html += `<a class="comments__command">Админ</a>
+                                  <a class="comments__command" onclick="del_topic('/delete-topic/${category.id}/${topic.id}/${1}', '${category.id}')">Удалить</a>`;      
+                        }
+                        html += `</li>`;
                     });
-                html += `</div></div>
-                        <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
-                        <li class="pagination__item disabled">
-                          &bull;
-                        </li>`;
+                html += `</ul>
+                        <div class="list__pagination pagination">
+                          <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
+                          <li class="pagination__item disabled">
+                            &bull;
+                          </li>`;
                 try
                 {
                   for (let i = 1; i <= topics[0].topic_pages; i++)
@@ -220,7 +236,7 @@ function get_categories_page_on_forum(url_path)
                 html += `<li class="pagination__item disabled">
                             &bull;
                           </li>
-                          </ul></div></section>`;
+                          </ul></div></div></section>`;
             });
             section = document.getElementById('first_section');
             section.insertAdjacentHTML('afterend', html);
@@ -232,7 +248,7 @@ function get_categories_page_on_forum(url_path)
             }
             for (const child of pagi.children)
             {
-              if (categories[0].cur_page == child.textContent)
+              if (categories.length && categories[0].cur_page == child.textContent)
               {
                 child.className = 'pagination__item_cur_page';
               }
@@ -328,20 +344,17 @@ function get_posts_page(url_path)
                     <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
                     </div>`;
                   }
-                  else
-                  {
-                    html += `<div class="message__admin" id="${post.id}personal_cont">
-                              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
-                            </div>`;
-                  }
                  html += `</div></div>`;
          });
          div = document.getElementById('disc_posts_container');
          div.insertAdjacentHTML('afterbegin', html);
          write_post_form = document.getElementById('add_post_form');
-         action = write_post_form.getAttribute('action');
-         action = action.split('?')[0];
-         write_post_form.setAttribute('action', action);
+         if (write_post_form)
+         {
+          action = write_post_form.getAttribute('action');
+          action = action.split('?')[0];
+          write_post_form.setAttribute('action', action);
+         }
          pagi = document.getElementById('pagination');
          pagi_li = pagi.querySelector('.pagination__item_cur_page');
          if (pagi_li)
@@ -350,7 +363,7 @@ function get_posts_page(url_path)
          }
          for (const child of pagi.children)
          {
-           if (posts[0].cur_page == child.textContent)
+           if (posts.length && posts[0].cur_page == child.textContent)
            {
              child.className = 'pagination__item_cur_page';
            }
@@ -421,17 +434,27 @@ function get_topics_page_on_forum(url_path, category_id)
     dataType: 'json',
     success: function(response) {
       topics = Array.from(response);
-      $('a').filter(function() {
+      $('li').filter(function() {
         return this.id.match(category_id + 'topic_info');
       }).remove();
       url = url_path.split('/');
       html = '';
       topics.forEach(topic => {
-                    html += ` <a href="/forum/${topic.id}" id="${category_id}topic_info" class="fraction__topic-link">
-                              <div class="fraction__topic">
-                                ${topic.name} 
-                              </div>
-                              </a>`;
+          html += `<li class="fraction__list-item" id="${category_id}topic_info">
+                      <a href="/forum/${topic.id}" class="fraction__topic-link">
+                        <div class="fraction__topic">
+                          <p class="fraction__text-error">
+                            ${topic.name}
+                          </p> 
+                        </div>
+                      </a>`;
+                    if (topic.cur_user_is_admin)
+                    {
+                      html += `<a class="comments__command">Админ</a>
+                                <a class="comments__command" onclick="del_topic('/delete-topic/${category_id}/${topic.id}/${topic.cur_page}', '${category_id}')">Удалить</a>`;
+                           
+                    }
+        html += `</li>`;
       });
       div = document.getElementById(category_id + "grid_container");
       div.insertAdjacentHTML('beforeend', html);
@@ -443,7 +466,7 @@ function get_topics_page_on_forum(url_path, category_id)
       }
       for (const child of pagi.children)
       {
-        if (topics[0].cur_page == child.textContent)
+        if (topics.length && topics[0].cur_page == child.textContent)
         {
           child.className = 'pagination__item_cur_page';
         }
@@ -453,6 +476,52 @@ function get_topics_page_on_forum(url_path, category_id)
         console.log(error);
     }
   });
+}
+
+function del_topic(url_path, category_id)
+{
+  if (confirm('Подтвердите действие'))
+  {
+    $.ajax({
+      method: 'get',
+      url: url_path,
+      dataType: 'json',
+      success: function(response) {
+        get_topics_page_on_forum(`/get_topics_page_on_forum/${category_id}/${response.cur_page}`, `${category_id}`);
+        $('ul').filter(function() {
+          return this.id.match(category_id + 'topics_pagi');
+        }).remove();
+
+        html = `<div class="list__pagination pagination">
+                  <ul class="pagination__list list-reset" id="${category_id}topics_pagi"><li class="pagination__item disabled"> &bull;</li>`;                            
+        if (response.has_elems) 
+        {
+          for (let i = 1; i <= response.pages; i++)
+          {
+            if (response.pages > 1 && i == response.cur_page)
+            {
+              html += `<li class="pagination__item_cur_page">
+                        <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${category_id}/${i}', '${category_id}')">${i}</a>
+                      </li>`;
+            }
+            else
+            {
+              html += `<li class="pagination__item active">
+                        <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${category_id}/${i}', '${category_id}')">${i}</a>
+                        </li>`;
+            }
+          }
+        }
+        html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
+        div = document.getElementById(category_id + 'grid_container');
+        div.insertAdjacentHTML('afterend', html);
+        document.getElementById(category_id + 'topics_count').textContent = `Всего тем: ${response.topics_count}`;
+      },
+      error: function(error) {
+          console.log(error);
+      }
+    });
+  }
 }
 
 function get_lists_page_to_add_book(url_path, read_state, book_id)
@@ -468,16 +537,14 @@ function get_lists_page_to_add_book(url_path, read_state, book_id)
       }).remove();
       html = "";
       cataloges.forEach(cataloge => {
-      html += ` <section class="list__list" id="${cataloge.id}cataloge_info">
+      html += `<section class="list__list" id="${cataloge.id}cataloge_info">
                     <div class="container lists__catalog">
-                      <div class="list__wrap ">
-                        <a class="title list__name" href="/user/${cataloge.username}/add-book-in-list/${cataloge.id}/${book_id}/${read_state}">${cataloge.name}</a>
-                      </div>
+                      <a class="title list__name" href="/user/${cataloge.username}/add-book-in-list/${cataloge.id}/${book_id}/${read_state}">${cataloge.name}</a>
                     </div>
-                  </section>`;
+                </section>`;
       });
-      div = document.getElementById('cataloges_container');
-      div.insertAdjacentHTML('afterbegin', html);
+      div = document.getElementById('cataloges_hat');
+      div.insertAdjacentHTML('afterend', html);
       pagi = document.getElementById('pagination');
       pagi_li = pagi.querySelector('.pagination__item_cur_page');
       if (pagi_li)
@@ -486,7 +553,7 @@ function get_lists_page_to_add_book(url_path, read_state, book_id)
       }
       for (const child of pagi.children)
       {
-        if (cataloges[0].cur_page == child.textContent)
+        if (cataloges.length && cataloges[0].cur_page == child.textContent)
         {
           child.className = 'pagination__item_cur_page';
         }

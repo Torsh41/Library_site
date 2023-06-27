@@ -38,10 +38,9 @@
         <div class="nav__menu js-menu-wrap">
           <ul class="nav__list list-reset">
             <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-            <li class="nav__item"><a class="nav__link"
-                href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a>
-            </li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
           </ul>
         </div>
 
@@ -51,7 +50,7 @@
   </header>
 
   <main>
-    <section class="main style-1">
+    <section class="main style-1" id="cataloges_hat">
       <div class="main__container container">
 
         <div class="main__top">
@@ -75,7 +74,7 @@
 
     <!--место для списков-->
     {% if not catalogues %}
-    <section class="list__list" id="cataloges_container">
+    <section class="list__list">
       <div class="container lists__catalog">
         <div class="list__wrap">
           <a class="title list__name" href="{{url_for('personal.person', username=current_user.username)}}">У вас пока

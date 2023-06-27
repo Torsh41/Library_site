@@ -35,19 +35,22 @@ function add_list_ajax()
         
                     <ul class="list__books list-reset" id="${cataloge.id}books_info_container">
                         <!--Добавление книги в список - перебрасывает в рааздел категорий книг-->
-                        <li class="list__book list__add"><a href="/categories?list_id=${cataloge.id}" class="list__link">
-                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_139_2)">
-                                <rect x="35" width="8" height="78" fill="#D9D9D9" />
-                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_139_2">
-                                <rect width="78" height="78" fill="white" />
-                                </clipPath>
-                            </defs>
-                            </svg>
-                        </a>
+                        <li class="list__book list__add">
+                            <a href="/categories?list_id=${cataloge.id}" class="list__link">
+                                <div class="list__block-add">
+                                    <svg class="list__svg2" width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <g clip-path="url(#clip0_139_2)">
+                                            <rect x="35" width="8" height="78" fill="#cec8bd" />
+                                            <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#cec8bd" />
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_139_2">
+                                            <rect width="78" height="78" fill="white" />
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                </div>
+                            </a>
                         </li>`;
                         items = Array.from(cataloge.items);
                         if (items.length != 0)
@@ -55,12 +58,12 @@ function add_list_ajax()
                             items.forEach(item => {
                             html += `<li class="list__book" id="${cataloge.id}book_info">
                                         <a href="/book-page/${item.name}" class="list__book-set">
-                                        <img class="list__book-set" src="/${item.name}/get-cover" alt="">
+                                            <img class="list__book-set" src="/${item.name}/get-cover" alt="">
                                         </a>
                                         
                                         <div class="list__book-wrap">
-                                            <a href="/book-page/${item.name}" class="list__link-book">Книга: ${item.name}</a>
-                                            <a href="#" class="list__link">Состояние чтения: ${item.read_state}</a>
+                                            <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
+                                            <a href="/book-page/${item.name}" class="list__link-plan"><u>Состояние чтения:</u> ${item.read_state}</a>
                                             <a class="list__book-delete-btn" onclick="del_book_from_list('/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}', '${cataloge.id}')">Удалить
                                             книгу из списка</a>
                                         </div>
@@ -94,17 +97,13 @@ function add_list_ajax()
                             html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;    
                         }    // 
 
-                        html += `<a class="list__delete-btn" id="${cataloge.id}del_list" onclick="del_list('/user/${cataloge.username}/delete-list/${cataloge.id}/${cataloge.pages}')">
-                                <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <line y1="0.5" x2="461" y2="0.5" stroke="black" />
-                                </svg>
-                                Удалить список
-                                <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <line y1="0.5" x2="461" y2="0.5" stroke="black" />
-                                </svg>
-                                </a></div></div></section>`;
+                        html += ` <div class="list__end">
+                                    <a class="list__delete-btn" id="${cataloge.id}del_list" onclick="del_list('/user/${cataloge.username}/delete-list/${cataloge.id}/${cataloge.pages}')">
+                                        Удалить список
+                                    </a></div></div></div></section>`;
                 });
-            document.getElementById("user_page_main_container").innerHTML += html;
+            section = document.getElementById('add_list_button');
+            section.insertAdjacentHTML('afterend', html);
             // собираем пагинацию для списков
             $('ul').filter(function() {
             return this.id.match('pagination');
@@ -124,8 +123,8 @@ function add_list_ajax()
                     else
                     {
                         html += `<li class="pagination__item active">
-                                <a onclick="get_lists_page('/user/${cataloges[0].username}/get_lists_page/${i}')">${i}</a>
-                            </li>`;
+                                    <a onclick="get_lists_page('/user/${cataloges[0].username}/get_lists_page/${i}')">${i}</a>
+                                </li>`;
                     }
                 }
             }

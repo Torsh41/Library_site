@@ -38,7 +38,8 @@ function form_activate(form_id, title_id, data)
 
 function open_book_panel(username, category)
 {
-    document.getElementById("book_search_in_a_category").style.display = "block";
+    section = document.getElementById("book_search_in_a_category");
+    section.style.display = "block";
     document.getElementById('search_res_id').value = "";
     $('li').filter(function () {
         return this.id.match(/book_info/);
@@ -57,6 +58,7 @@ function open_book_panel(username, category)
     div.insertAdjacentHTML("afterbegin", html);
     form = document.getElementById("category_book_search");
     form.setAttribute("action", `/admin/${username}/search_books_on_admin_panel/${category}`);
+    section.scrollIntoView(); // Прокрутка до верхней границы
 }
 
 function search_books_on_category()
@@ -85,18 +87,19 @@ function search_books_on_category()
               {
                 books.forEach(book => {
                     html += `<li class="list__book" id="${book.id}book_info">
-                                <div class="list__top">
+                                
+                                <a href="/book-page/${book.name}" class="list__book-set">
+                                   <img class="list__book-set" src="/${book.name}/get-cover" alt=""> 
+                                </a>
                                     
-                                    <img style="width: 310px; height: 190px" src="/${book.name}/get-cover" alt=""> 
-                              
-                                    <ul class="book__list list-reset">
-                                        <a href="/book-page/${book.name}" class="list__link"><b>Книга:</b> ${book.name}</a>
-                                        <li class="book__list-element"><b>Автор:</b> ${book.author}</li>
-                                        <li class="book__list-element"><b>Оценка:</b> ${book.grade}</li>
-                                        <a class="book__list-element" onclick="del_book_from_site('/admin/${book.username}/del_book/${book.category}/${book.id}/${1}')">Удалить книгу</a>
-                                    </ul>
-                                      
+                                
+                                <div class="list__book-wrap">
+                                        <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                                        <span class="list__link"><b>Автор:</b> ${book.author}</span>
+                                        <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
+                                        <a class="list__book-delete-btn" onclick="del_book_from_site('/admin/${book.username}/del_book/${book.category}/${book.id}/${1}')">Удалить книгу</a>
                                 </div>
+                                      
                             </li>`;
                 });
                 ul = document.getElementById('list_res');
@@ -124,7 +127,7 @@ function search_books_on_category()
                 }
                 catch {}
                 html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-                div = document.getElementById('books_keeper_cont');
+                div = document.getElementById('2cont');
                 div.insertAdjacentHTML('beforeend', html);
             }
             else
@@ -171,17 +174,16 @@ function get_books_page_on_admin_panel(url_path)
                 html = '';
                 books.forEach(book => {
                         html += `<li class="list__book" id="${book.id}book_info">
-                                    <div class="list__top">
-                                        
-                                        <img style="width: 310px; height: 190px" src="/${book.name}/get-cover" alt=""> 
-                                
-                                        <ul class="book__list list-reset">
-                                            <a href="/book-page/${book.name}" class="list__link"><b>Книга:</b> ${book.name}</a>
-                                            <li class="book__list-element"><b>Автор:</b> ${book.author}</li>
-                                            <li class="book__list-element"><b>Оценка:</b> ${book.grade}</li>
-                                            <a class="book__list-element" onclick="del_book_from_site('/admin/${book.username}/del_book/${book.category}/${book.id}/${book.cur_page}')">Удалить книгу</a>
-                                        </ul>
-                                        
+                                     <a href="/book-page/${book.name}" class="list__book-set">
+                                        <img class="list__book-set" src="/${book.name}/get-cover" alt=""> 
+                                    </a>
+                         
+                     
+                                    <div class="list__book-wrap">
+                                            <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                                            <span class="list__link"><b>Автор:</b> ${book.author}</span>
+                                            <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
+                                            <a class="list__book-delete-btn" onclick="del_book_from_site('/admin/${book.username}/del_book/${book.category}/${book.id}/${book.cur_page}')">Удалить книгу</a>
                                     </div>
                                 </li>`;
                     });
@@ -195,7 +197,7 @@ function get_books_page_on_admin_panel(url_path)
                     }
                     for (const child of pagi.children)
                     {
-                        if (books[0].cur_page == child.textContent)
+                        if (books.length && books[0].cur_page == child.textContent)
                         {
                             child.className = 'pagination__item_cur_page';
                         }

@@ -10,13 +10,6 @@ function closeForm()
   document.getElementById("popupForm").style.display = "none";
 }
 
-// $(document).ready(function () {
-//   $('#add_topic_form').submit(function(event) {
-//     validate_topic_name();
-//     event.preventDefault();
-//   });
-// });
-
 function validate_topic_name()
 {
   if (document.getElementById('topic_name_id_form').value.trim() && document.getElementById('topic_name_id_form').value.trim().length <= 200)
@@ -30,7 +23,7 @@ function validate_topic_name()
         topics_for_cur_category = Array.from(response)
         if (topics_for_cur_category[0].result)
         {
-          $('a').filter(function() {
+          $('li').filter(function() {
             return this.id.match(topics_for_cur_category[0].category_id + 'topic_info');
           }).remove();
           $('span').filter(function() {
@@ -41,11 +34,20 @@ function validate_topic_name()
           }).remove();
           html = '';
           topics_for_cur_category.forEach(topic => {
-              html += `<a href="/forum/${topic.topic_id}" class="fraction__topic-link" id="${topic.category_id + 'topic_info'}">
-                        <div class="fraction__topic">
-                          ${topic.name}
-                        </div>
-                        </a>`;
+              html += `<li class="fraction__list-item" id="${topic.category_id + 'topic_info'}">
+                          <a href="/forum/${topic.topic_id}" class="fraction__topic-link">
+                            <div class="fraction__topic">
+                              <p class="fraction__text-error">
+                                ${topic.name}
+                              </p>
+                            </div>
+                          </a>`;
+              if (topic.cur_user_is_admin)
+              {
+                html += `<a class="comments__command">Админ</a>
+                        <a class="comments__command" onclick="del_topic('/delete-topic/${topic.category_id}/${topic.topic_id}/${topic.topic_pages}', '${topic.category_id}')">Удалить</a>`;      
+              }
+              html += `</li>`;
           });
           div_outer = document.getElementById(topics_for_cur_category[0].category_id + 'category_title');
           div_outer.insertAdjacentHTML('afterend', `<span class="fraction__results" id="${topics_for_cur_category[0].category_id + 'topics_count'}">Всего тем: ${topics_for_cur_category[0].topics_count}</span>`);
@@ -55,13 +57,14 @@ function validate_topic_name()
           document.getElementById("popupForm").style.display = "none";
 
           // собираем пагинацию
-          html = `<ul class="pagination__list list-reset" id="${topics_for_cur_category[0].category_id}topics_pagi">
-                  <li class="pagination__item disabled">
-                    &bull;
-                  </li>`;
+          html = `<div class="list__pagination pagination">
+                  <ul class="pagination__list list-reset" id="${topics_for_cur_category[0].category_id}topics_pagi">
+                    <li class="pagination__item disabled">
+                      &bull;
+                    </li>`;
           for (let i = 1; i <= topics_for_cur_category[0].topic_pages; i++)
           {
-            if (topics_for_cur_category[0].pages > 1 && i == topics_for_cur_category[0].pages)
+            if (topics_for_cur_category[0].topic_pages > 1 && i == topics_for_cur_category[0].topic_pages)
             {
               html += `<li class="pagination__item_cur_page">
                         <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${i}', '${topics_for_cur_category[0].category_id}')">${i}</a>
@@ -74,9 +77,8 @@ function validate_topic_name()
                      </li>`;
             }
           }
-          html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-          div = document.getElementById(topics_for_cur_category[0].category_id + 'category_main_cont');
-          div.insertAdjacentHTML('beforeend', html);
+          html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
+          div.insertAdjacentHTML('afterend', html);
           alert(`Тема успешно создана`);
         }
         else

@@ -38,7 +38,7 @@ def register():
         
     form = RegistrationForm()
     if form.validate_on_submit(): 
-        user = User(username=form.username.data.strip(), email=form.email.data.strip().lower(),
+        user = User(username=form.username.data.strip().replace("'", ""), email=form.email.data.strip().lower(),
         password=form.password.data)
         user.default_ava()
         user.check_admin()

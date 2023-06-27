@@ -50,7 +50,7 @@ function add_comment_for_book(username, book_name)
             $('ul').filter(function() {
                     return this.id.match('comments_pagination');
             }).remove();
-            html = `<ul class="pagination__list list-reset" id="pagination">
+            html = `<ul class="pagination__list list-reset" id="comments_pagination">
             <li class="pagination__item disabled">&bull;</li>`;
             try
             {
