@@ -183,3 +183,14 @@
   align-items: center;
   justify-content: center;
 }
+
+.profile__wrapper {
+  display: flex;
+  flex-direction: column;
+}
+  
+.profile__text-about {
+  font-size: 16px;
+  line-height: 20px;
+  word-break: break-all;
+}

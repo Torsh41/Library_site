@@ -77,6 +77,7 @@
         <div class="main__bottom">
           <a class="main__bottom-item" href="#1">Мой профиль</a>
           <a class="main__bottom-item" href="#3">Мои списки книг</a>
+          <a class="main__bottom-item" href="{{url_for('auth.change_password_try')}}">Сменить пароль</a>
         </div>
         <a class="main__form-btn btn"
           href="{{url_for('personal.add_new_book', username=current_user.username)}}">Добавить
@@ -111,11 +112,13 @@
             <!--Тут информация введенная пользователем в редактировании профиля-->
             {% if user.age %}{{ user.age }}{% endif %}
           </div>
-
+        
           <div class="profile__info textarea">
-            <span class="profile__span">О себе: </span>
-            <!--Тут информация введенная пользователем в редактировании профиля-->
-            {% if user.about_me %}{{ user.about_me }}{% endif %}
+            <div class="profile__wrapper">
+              <span class="profile__span">О себе: </span>
+              <!--Тут информация введенная пользователем в редактировании профиля-->
+              <p class="profile__text-about">{% if user.about_me %}{{ user.about_me }}{% endif %}</p>
+            </div>
           </div>
 
           <!--<button class="profile__edit-btn" formaction="{{url_for('personal.edit', username=current_user.username)}}">Редактировать профиль</button>-->

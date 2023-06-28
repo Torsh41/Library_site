@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
 from ..begin_to_app import database
 from ..models import User
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm
+from .forms import LoginForm, RegistrationForm, ChangePasswordForm, ConfirmEmailToChangePasswordForm
 from app.email import send_email
 
 
@@ -16,7 +16,7 @@ def login():
             login_user(user)  # , form.remember_me.data)
             return redirect(url_for('personal.person', username=current_user.username))
 
-        # не правильное имя пользователя или пароль
+        # неправильная почта или пароль
     return render_template('auth/authorization.html', form=form)
 
 
@@ -93,14 +93,26 @@ def resend_confirmation():
 
 
 @auth.route('/password-change', methods=['GET', 'POST'])
-def change_password():
-    form = ChangePasswordForm()
+def change_password_try():
+    form = ConfirmEmailToChangePasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user:
-            user.password = form.password.data
-            database.session.add(user)
-            database.session.commit()
-            # ваш пароль обновлен
+            token = user.generate_change_token()
+            send_email(user.email, 'Change Your Password',
+                       'auth/email/change_password',
+                       user=user, token=token)
             return redirect(url_for('auth.login'))
+    return render_template('auth/change_password_try.html', form=form)
+
+
+@auth.route('/password-change/<token>', methods=['GET', 'POST'])
+def change_password(token):
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if User.change_password(token, form.password.data):
+            database.session.commit()
+            return redirect(url_for('auth.login'))
+        else:
+            return redirect(url_for('main.index'))
     return render_template('auth/change_password.html', form=form)

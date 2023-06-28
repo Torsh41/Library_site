@@ -194,16 +194,16 @@
                   {% endif %}
                 {% endfor %}
 
-              
               </div> 
-              
-              <ul class="pagination__list list-reset" id="pagination">
-                {% for p in pagination.iter_pages() %}
-                  <li class="pagination__item active">
-                    <a onclick="get_categories_page_for_book_adding('/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}')">{{ p }}</a>
-                  </li>
-                {% endfor %}
-              </ul>
+              <div class="list__pagination pagination">
+                <ul class="pagination__list list-reset" id="pagination">
+                  {% for p in pagination.iter_pages() %}
+                    <li class="pagination__item active">
+                      <a onclick="get_categories_page_for_book_adding('/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}')">{{ p }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
             </label>
 
             <!--<button class="form__btn btn">Добавить книгу в базу</button>-->

@@ -391,3 +391,18 @@
   justify-content: center;
   align-items: center;
 }
+
+.list__link-plan {
+  margin-top: 10px;
+  font-size: 16px;
+  line-height: 18px;
+  
+  
+}
+  
+.list__link {
+  margin-top: 5px;
+  font-size: 16px;
+  line-height: 18px;
+  text-align: center;
+}

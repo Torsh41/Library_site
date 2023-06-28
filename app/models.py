@@ -45,6 +45,31 @@ class User(UserMixin, database.Model, SerializerMixin):
         access_token = jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm=current_app.config['JWT_ALGORITHM'])
         return access_token
     
+    def generate_change_token(self): #30 минут время действия токена
+        now = datetime.utcnow()
+        payload = {
+            'iat': 0,
+            'ref': 0,
+            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'scope': 'access_token',
+            'user': self.id,
+        }
+        change_token = jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm=current_app.config['JWT_ALGORITHM'])
+        return change_token
+    
+    @staticmethod
+    def change_password(token, new_password):
+        try:
+            payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=current_app.config['JWT_ALGORITHM'])
+        except:
+            return False
+        user = User.query.filter_by(id=payload.get('user')).first()
+        if user is None:
+            return False
+        user.password = new_password
+        database.session.add(user)
+        return True
+    
     def confirm(self, token):
         try:
             payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=current_app.config['JWT_ALGORITHM'])
@@ -119,7 +144,7 @@ class Book(database.Model, SerializerMixin):
     name = database.Column(database.String(128), unique=True, index=True)
     author = database.Column(database.String(128), unique=False)
     publishing_house = database.Column(database.String(128), unique=False)
-    description = database.Column(database.Text(128), unique=False)
+    description = database.Column(database.Text(512), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))

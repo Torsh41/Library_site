@@ -116,6 +116,12 @@ function add_post_on_forum() {
                                     <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
                                   </div>`;
           }
+          else if (post.current_username)
+          {
+            html += `<div class="message__admin" id="${post.id}personal_cont">
+            <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
+            </div>`;
+          }
           html += `</div></div>`;
         });
         div = document.getElementById("disc_posts_container");
