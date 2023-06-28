@@ -75,10 +75,11 @@ def get_comments_page(book_name, page):
     comments = book.comments.order_by(Comment.timestamp.asc()).paginate(
         page, per_page=ELEMS_COUNT, error_out=False).items
     users = list()
-    user_is_admin = (current_user.role == Role.ADMIN)
+    user_is_admin = True if (current_user.is_authenticated and current_user.role == Role.ADMIN) else False
+    name_of_current_user = current_user.username if (current_user.is_authenticated) else None
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(cur_page=page, user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(cur_page=page, user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=name_of_current_user, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
 
 
 @main.route('/<username>/<book_name>/add_comment', methods=['POST'])
