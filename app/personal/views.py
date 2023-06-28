@@ -20,28 +20,36 @@ def avatar(username):
     user = User.query.filter_by(username=username).first()
     avatar = make_response(user.avatar)
     return avatar
-    
-    
+
+
 @personal.route('/<username>')
 @login_required
 def person(username, flag=False):
-    page = request.args.get('page', 1, type=int); items_page = request.args.get('items_page', 1, type=int); cataloge_id = request.args.get('cataloge_id', None, type=int)
+    page = request.args.get('page', 1, type=int)
+    items_page = request.args.get('items_page', 1, type=int)
+    cataloge_id = request.args.get('cataloge_id', None, type=int)
     cataloge_for_adding = None
     if cataloge_id:
-        cataloge_for_adding = current_user.cataloges.filter_by(id=cataloge_id).first()
-    
-    pagination = current_user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+        cataloge_for_adding = current_user.cataloges.filter_by(
+            id=cataloge_id).first()
+
+    pagination = current_user.cataloges.order_by().paginate(
+        page, per_page=LISTS_COUNT, error_out=False)
     catalogues = pagination.items
-    paginations_for_books_in_lists = list(); cur_books_page_for_cataloges = list()
+    paginations_for_books_in_lists = list()
+    cur_books_page_for_cataloges = list()
     for cataloge in catalogues:
         if cataloge == cataloge_for_adding:
-            books_pagination = cataloge.items.order_by().paginate(items_page, per_page=BOOKS_COUNT, error_out=False)
+            books_pagination = cataloge.items.order_by().paginate(
+                items_page, per_page=BOOKS_COUNT, error_out=False)
             p = items_page
             if not books_pagination.items:
-                books_pagination = cataloge.items.order_by().paginate(1, per_page=BOOKS_COUNT, error_out=False)
+                books_pagination = cataloge.items.order_by().paginate(
+                    1, per_page=BOOKS_COUNT, error_out=False)
                 p = 1
         else:
-            books_pagination = cataloge.items.order_by().paginate(1, per_page=BOOKS_COUNT, error_out=False)
+            books_pagination = cataloge.items.order_by().paginate(
+                1, per_page=BOOKS_COUNT, error_out=False)
             p = 1
         cur_books_page_for_cataloges.append(p)
         paginations_for_books_in_lists.append(books_pagination)
@@ -52,7 +60,7 @@ def person(username, flag=False):
 @login_required
 def edit(username):
     form = EditProfileForm()
-    if form.validate_on_submit():  
+    if form.validate_on_submit():
         if request.files['avatar']:
             current_user.avatar = bytes(request.files['avatar'].read())
         current_user.city = form.city.data
@@ -77,40 +85,47 @@ def add_list(username):
             break
     if len(current_user.cataloges.all()) > 5:
         result = 0
-        
+
     if result == 2:
-        cataloge = Cataloge(name=new_cataloge_name, user=current_user._get_current_object())
+        cataloge = Cataloge(name=new_cataloge_name,
+                            user=current_user._get_current_object())
         database.session.add(cataloge)
         database.session.commit()
         user_cataloges = current_user.cataloges.all()
         last_page = len(user_cataloges) // LISTS_COUNT
         if len(user_cataloges) % LISTS_COUNT > 0:
             last_page += 1
-       
-        cataloges = current_user.cataloges.order_by().paginate(last_page, per_page=LISTS_COUNT, error_out=False).items
+
+        cataloges = current_user.cataloges.order_by().paginate(
+            last_page, per_page=LISTS_COUNT, error_out=False).items
         cataloges_items = dict()
         for cataloge in cataloges:
-            items_pagination = cataloge.items.order_by().paginate(1, per_page=BOOKS_COUNT, error_out=False)
-            cataloge_items = [dict(id=item.id, name=item.book.name, read_state=item.read_state, items_pages=items_pagination.pages) for item in items_pagination.items]
+            items_pagination = cataloge.items.order_by().paginate(
+                1, per_page=BOOKS_COUNT, error_out=False)
+            cataloge_items = [dict(id=item.id, name=item.book.name, read_state=item.read_state,
+                                   items_pages=items_pagination.pages) for item in items_pagination.items]
             cataloges_items[cataloge.id] = copy.deepcopy(cataloge_items)
-        return jsonify([dict(result=result, pages=last_page, id=cataloge.id, name=cataloge.name, items=items, username=username) for cataloge, items in zip(cataloges, cataloges_items.values())]) 
+        return jsonify([dict(result=result, pages=last_page, id=cataloge.id, name=cataloge.name, items=items, username=username) for cataloge, items in zip(cataloges, cataloges_items.values())])
     else:
         return jsonify([dict(result=result)])
-        
-        
+
+
 @personal.route('/<username>/get_lists_page/<page>', methods=['GET'])
 @login_required
 def get_lists_page(username, page):
     page = int(page)
-    pagination = current_user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+    pagination = current_user.cataloges.order_by().paginate(
+        page, per_page=LISTS_COUNT, error_out=False)
     cataloges = pagination.items
     cataloges_items = dict()
     for cataloge in cataloges:
-        items_pagination = cataloge.items.order_by().paginate(1, per_page=BOOKS_COUNT, error_out=False)
-        cataloge_items = [dict(id=item.id, read_state=item.read_state, name=item.book.name, cur_page=1, pages=items_pagination.pages) for item in items_pagination.items]
+        items_pagination = cataloge.items.order_by().paginate(
+            1, per_page=BOOKS_COUNT, error_out=False)
+        cataloge_items = [dict(id=item.id, read_state=item.read_state, name=item.book.name,
+                               cur_page=1, pages=items_pagination.pages) for item in items_pagination.items]
         cataloges_items[cataloge.id] = copy.deepcopy(cataloge_items)
     return jsonify([dict(cur_page=pagination.page, pages=pagination.pages, id=cataloge.id, name=cataloge.name, items=items, username=current_user.username) for cataloge, items in zip(cataloges, cataloges_items.values())])
-    
+
 
 @personal.route('/<username>/get_books_page/<cataloge_id>/<page>', methods=['GET'])
 @login_required
@@ -118,26 +133,30 @@ def get_books_page(username, cataloge_id, page):
     page = int(page)
     cataloge = Cataloge.query.filter_by(id=cataloge_id).first()
     if cataloge:
-        items_pagination = cataloge.items.order_by().paginate(page, per_page=BOOKS_COUNT, error_out=False)
+        items_pagination = cataloge.items.order_by().paginate(
+            page, per_page=BOOKS_COUNT, error_out=False)
         items = items_pagination.items
         return jsonify([dict(cur_page=page, id=item.id, name=item.book.name, read_state=item.read_state, username_of_cur_user=current_user.username) for item in items])
     return render_template("500.html")
-    
-    
+
+
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
 def add_new_book(username):
-    pagination = Category.query.paginate(1, per_page=CATEGORIES_COUNT, error_out=False); categories = pagination.items
+    pagination = Category.query.paginate(
+        1, per_page=CATEGORIES_COUNT, error_out=False)
+    categories = pagination.items
     form = AddNewBookForm()
     if form.validate_on_submit():
-        category = Category.query.filter_by(name=str(request.form.get('category'))).first()
-        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower().replace("'", ""), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(), \
-                    description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data, \
+        category = Category.query.filter_by(
+            name=str(request.form.get('category'))).first()
+        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower().replace("'", ""), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(),
+                    description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data,
                     category=category, user=current_user._get_current_object())
-        
+
         if not book.cover:
             book.default_cover()
-            
+
         database.session.add(book)
         database.session.commit()
         return redirect(url_for('.person', username=current_user.username, flag=True))
@@ -154,8 +173,9 @@ def add_book_in_list_tmp(username, book_id):
         read_state = "Читаю"
     if list_id:
         return redirect(url_for('.add_book_in_list', username=current_user.username, list_id=list_id, book_id=book_id, read_state=read_state))
-    
-    catalogues_pagination = current_user.cataloges.paginate(1, per_page=LISTS_COUNT, error_out=False)
+
+    catalogues_pagination = current_user.cataloges.paginate(
+        1, per_page=LISTS_COUNT, error_out=False)
     return render_template('personal/user_page_add_book.html', username=username, book_id=book_id, catalogues=catalogues_pagination.items, catalogues_pagination=catalogues_pagination, read_state=read_state)
 
 
@@ -163,7 +183,8 @@ def add_book_in_list_tmp(username, book_id):
 @login_required
 def get_lists_page_to_add_book(username, page):
     page = int(page)
-    cataloges_pagination = current_user.cataloges.paginate(page, per_page=LISTS_COUNT, error_out=False)
+    cataloges_pagination = current_user.cataloges.paginate(
+        page, per_page=LISTS_COUNT, error_out=False)
     return jsonify([dict(cur_page=page, id=cataloge.id, name=cataloge.name, username=current_user.username) for cataloge in cataloges_pagination.items])
 
 
@@ -172,34 +193,39 @@ def get_lists_page_to_add_book(username, page):
 def add_book_in_list(username, list_id, book_id, read_state):
     cataloge_for_adding = current_user.cataloges.filter_by(id=list_id).first()
     book = Book.query.filter_by(id=book_id).first()
-    flag = False; page = 1
+    flag = False
+    page = 1
     if cataloge_for_adding and book:
-        all_pages = current_user.cataloges.order_by().paginate(1, per_page=LISTS_COUNT, error_out=False).pages
+        all_pages = current_user.cataloges.order_by().paginate(
+            1, per_page=LISTS_COUNT, error_out=False).pages
         while page <= all_pages:
-            pagination = current_user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+            pagination = current_user.cataloges.order_by().paginate(
+                page, per_page=LISTS_COUNT, error_out=False)
             cur_user_cataloges = pagination.items
             if cataloge_for_adding in cur_user_cataloges:
                 break
             page += 1
-            
+
         for item_ in cataloge_for_adding.items:
             if book.name == item_.book.name:
                 item_for_replace = item_
                 flag = True
                 break
-        if flag: 
+        if flag:
             database.session.delete(item_for_replace)
-        item = Item(read_state=str(read_state), book=book, cataloge=cataloge_for_adding)    
+        item = Item(read_state=str(read_state), book=book,
+                    cataloge=cataloge_for_adding)
         database.session.add(item)
         database.session.commit()
-        all_cataloge_items = cataloge_for_adding.items.all(); items_page = len(all_cataloge_items) // BOOKS_COUNT
+        all_cataloge_items = cataloge_for_adding.items.all()
+        items_page = len(all_cataloge_items) // BOOKS_COUNT
         if len(all_cataloge_items) % BOOKS_COUNT > 0:
             items_page += 1
-        
-        return redirect(url_for('.person', username=current_user.username, page=page, items_page=items_page, cataloge_id=cataloge_for_adding.id))#render_template('personal/user_page.html', user=current_user, catalogues=cur_user_cataloges, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, cataloges_page=page, len=len, flag=flag, zip=zip, display="none")
+
+        return redirect(url_for('.person', username=current_user.username, page=page, items_page=items_page, cataloge_id=cataloge_for_adding.id))
     else:
-        return render_template("500.html") 
-   
+        return render_template("500.html")
+
 
 @personal.route('/<username>/delete-list/<list_id>/<page>', methods=['GET'])
 @login_required
@@ -210,12 +236,15 @@ def list_delete(username, list_id, page):
     database.session.commit()
     if cataloges := current_user.cataloges.all():
         has_elems = True
-        cataloge_pagination = current_user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
+        cataloge_pagination = current_user.cataloges.order_by().paginate(
+            page, per_page=LISTS_COUNT, error_out=False)
         pages = cataloge_pagination.pages
         if not cataloge_pagination.items:
             page = page - 1
     else:
-        page = 1; pages = 1; has_elems = False
+        page = 1
+        pages = 1
+        has_elems = False
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=current_user.username))
 
 
@@ -227,14 +256,17 @@ def item_delete(username, cataloge_id, item_id, page):
     item = cataloge.items.filter_by(id=item_id).first()
     database.session.delete(item)
     database.session.commit()
-    if cataloge.items.all(): 
+    if cataloge.items.all():
         has_elems = True
-        items_pagination = cataloge.items.order_by().paginate(page, per_page=BOOKS_COUNT, error_out=False)
+        items_pagination = cataloge.items.order_by().paginate(
+            page, per_page=BOOKS_COUNT, error_out=False)
         pages = items_pagination.pages
         if not items_pagination.items:
             page = page - 1
     else:
-        page = 1; pages = 1; has_elems = False
+        page = 1
+        pages = 1
+        has_elems = False
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=current_user.username))
 
 
@@ -242,5 +274,6 @@ def item_delete(username, cataloge_id, item_id, page):
 @login_required
 def get_categories_page_for_book_adding(username, page):
     page = int(page)
-    categories = Category.query.paginate(page, per_page=CATEGORIES_COUNT, error_out=False).items
+    categories = Category.query.paginate(
+        page, per_page=CATEGORIES_COUNT, error_out=False).items
     return jsonify([dict(cur_page=page, id=category.id, name=category.name) for category in categories])
