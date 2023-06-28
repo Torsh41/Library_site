@@ -107,7 +107,8 @@ function search_books_on_category()
                 document.getElementById('search_res_id').value = "";
 
                 // собираем пагинацию
-                html = `<ul class="pagination__list list-reset" id="3pagination">
+                html = `<div class="list__pagination pagination">
+                            <ul class="pagination__list list-reset" id="3pagination">
                 <li class="pagination__item disabled">&bull;</li>`;
                 try {
                     for (let i = 1; i <= books[0].pages; i++) {
@@ -126,7 +127,7 @@ function search_books_on_category()
                     }
                 }
                 catch {}
-                html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+                html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                 div = document.getElementById('2cont');
                 div.insertAdjacentHTML('beforeend', html);
             }
@@ -223,7 +224,8 @@ function del_book_from_site(url_path)
                     return this.id.match("3pagination");
                 }).remove();
             get_books_page_on_admin_panel(`/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${response.cur_page}`);
-            html = `<ul class="pagination__list list-reset" id="3pagination">`;
+            html = `<div class="list__pagination pagination">
+                        <ul class="pagination__list list-reset" id="3pagination">`;
             html += `<li class="pagination__item disabled">&bull;</li>`;
     
             if (response.has_elems) 
@@ -246,7 +248,7 @@ function del_book_from_site(url_path)
                 }
             }
     
-            html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+            html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
             ul = document.getElementById('list_res');
             ul.insertAdjacentHTML('afterend', html);  
             },
