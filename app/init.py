@@ -4,9 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask import Flask
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
 
 
 application = Flask(__name__, template_folder='templates')
+socketio = SocketIO()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'

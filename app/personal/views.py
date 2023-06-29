@@ -4,6 +4,7 @@ from flask import render_template, redirect, url_for, request, make_response, js
 from .forms import EditProfileForm, AddNewBookForm
 from ..begin_to_app import database
 from app.models import User, Cataloge, Book, Item, Category, Role
+from app.decorators import check_actual_password
 import copy
 LISTS_COUNT = 2
 BOOKS_COUNT = 5
@@ -24,6 +25,7 @@ def avatar(username):
 
 @personal.route('/<username>')
 @login_required
+@check_actual_password
 def person(username, flag=False):
     page = request.args.get('page', 1, type=int)
     items_page = request.args.get('items_page', 1, type=int)
@@ -58,6 +60,7 @@ def person(username, flag=False):
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
 @login_required
+@check_actual_password
 def edit(username):
     form = EditProfileForm()
     if form.validate_on_submit():
@@ -75,6 +78,7 @@ def edit(username):
 
 @personal.route('/<username>/add-list', methods=['POST'])
 @login_required
+@check_actual_password
 def add_list(username):
     new_cataloge_name = str(request.form.get('newList')).strip().lower()
     user_cataloges = current_user.cataloges.all()
@@ -112,6 +116,7 @@ def add_list(username):
 
 @personal.route('/<username>/get_lists_page/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def get_lists_page(username, page):
     page = int(page)
     pagination = current_user.cataloges.order_by().paginate(
@@ -129,6 +134,7 @@ def get_lists_page(username, page):
 
 @personal.route('/<username>/get_books_page/<cataloge_id>/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def get_books_page(username, cataloge_id, page):
     page = int(page)
     cataloge = Cataloge.query.filter_by(id=cataloge_id).first()
@@ -142,6 +148,7 @@ def get_books_page(username, cataloge_id, page):
 
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
+@check_actual_password
 def add_new_book(username):
     pagination = Category.query.paginate(
         1, per_page=CATEGORIES_COUNT, error_out=False)
@@ -165,6 +172,7 @@ def add_new_book(username):
 
 @personal.route('/<username>/add-book-in-list-tmp/<book_id>', methods=['GET', 'POST'])
 @login_required
+@check_actual_password
 def add_book_in_list_tmp(username, book_id):
     list_id = request.args.get('list_id', None, type=int)
     if request.form:
@@ -181,6 +189,7 @@ def add_book_in_list_tmp(username, book_id):
 
 @personal.route('/<username>/get_lists_page_to_add_book/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def get_lists_page_to_add_book(username, page):
     page = int(page)
     cataloges_pagination = current_user.cataloges.paginate(
@@ -190,6 +199,7 @@ def get_lists_page_to_add_book(username, page):
 
 @personal.route('/<username>/add-book-in-list/<list_id>/<book_id>/<read_state>', methods=['GET', 'POST'])
 @login_required
+@check_actual_password
 def add_book_in_list(username, list_id, book_id, read_state):
     cataloge_for_adding = current_user.cataloges.filter_by(id=list_id).first()
     book = Book.query.filter_by(id=book_id).first()
@@ -229,6 +239,7 @@ def add_book_in_list(username, list_id, book_id, read_state):
 
 @personal.route('/<username>/delete-list/<list_id>/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def list_delete(username, list_id, page):
     page = int(page)
     cataloge = Cataloge.query.filter_by(id=list_id).first()
@@ -250,6 +261,7 @@ def list_delete(username, list_id, page):
 
 @personal.route('/<username>/delete-item/<cataloge_id>/<item_id>/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def item_delete(username, cataloge_id, item_id, page):
     page = int(page)
     cataloge = current_user.cataloges.filter_by(id=cataloge_id).first()
@@ -272,6 +284,7 @@ def item_delete(username, cataloge_id, item_id, page):
 
 @personal.route('/<username>/get_categories_page_for_book_adding/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def get_categories_page_for_book_adding(username, page):
     page = int(page)
     categories = Category.query.paginate(

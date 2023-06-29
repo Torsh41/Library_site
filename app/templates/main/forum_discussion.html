@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/edit_post.js')}}"></script>
@@ -178,12 +179,12 @@
           {% if current_user.is_authenticated %}
           <div id="1" class="discussion__btn button">
             <form action="/{{current_user.username}}/{{topic_id}}/add_post" enctype="multipart/form-data"
-              class="button__form" id="add_post_form" method="post">
+              class="button__form" id="add_post_form" method="POST">
               <input class="profile__foto" type="file" id="file_input_id" name="screenshot" multiple
                 accept="image/*,image/jpeg">
               <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text"
                 placeholder="Написать сообщение.."></textarea>
-              <input id="add_post_button" class="button__write btn" type="button" value="Отправить"
+                <input id="add_post_button" class="button__write btn" type="button" value="Отправить"
                 onclick="add_post_on_forum()">
             </form>
           </div>

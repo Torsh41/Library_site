@@ -14,13 +14,15 @@ window.onload = function () {
 };
 
 $(document).ready(function () {
-  $("#add_post_form").submit(function (event) {
+$("#add_post_form").submit(function (event) {
     add_post_on_forum();
     event.preventDefault();
   });
 });
 
-function add_post_on_forum() {
+  
+function add_post_on_forum() 
+{
   if (
     document.getElementById("post_body_id").value.trim() &&
     document.getElementById("post_body_id").value.trim().length <= 200
@@ -182,7 +184,8 @@ function add_post_on_forum() {
   }
 }
 
-function answer_on_post(post_id) {
+function answer_on_post(post_id) 
+{
   write_post_form = document.getElementById("add_post_form");
   action = write_post_form.getAttribute("action");
   action = action.split("?")[0] + `?post_id_to_answer=${post_id}`;

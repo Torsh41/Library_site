@@ -3,7 +3,7 @@ from app.init import database
 from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicPost, DiscussionTopic, Role
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from flask_login import current_user, login_required
-from app.decorators import admin_required
+from app.decorators import admin_required, check_actual_password
 import copy
 from operator import itemgetter
 ELEMS_COUNT = 10
@@ -84,6 +84,7 @@ def get_comments_page(book_name, page):
 
 @main.route('/<username>/<book_name>/add_comment', methods=['POST'])
 @login_required
+@check_actual_password
 def add_comment(username, book_name):
     book = Book.query.filter_by(name=book_name).first()
     comment = Comment(body=str(request.form.get('comment')).strip().replace(
@@ -105,6 +106,7 @@ def add_comment(username, book_name):
 
 @main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
 @login_required
+@check_actual_password
 def edit_comment(username, comment_id, book_name):
     comment = Comment.query.filter_by(id=comment_id).first()
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
@@ -115,6 +117,7 @@ def edit_comment(username, comment_id, book_name):
 
 @main.route('/<username>/give-grade/<book_id>/<grade>')
 @login_required
+@check_actual_password
 def give_grade(username, book_id, grade):
     book = Book.query.filter_by(id=book_id).first()
     previous_grade = BookGrade.query.filter_by(
@@ -130,6 +133,7 @@ def give_grade(username, book_id, grade):
 
 @main.route('/<username>/<book_name>/delete-comment/<comment_id>/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def comment_delete(username, book_name, comment_id, page):
     page = int(page)
     book = Book.query.filter_by(name=book_name).first()
@@ -305,6 +309,7 @@ def topic(topic_id):
 
 @main.route('/<username>/<discussion_topic_id>/add_post', methods=['POST'])
 @login_required
+@check_actual_password
 def add_post(username, discussion_topic_id):
     topic = DiscussionTopic.query.filter_by(id=discussion_topic_id).first()
     if request.files['screenshot'].filename != '':
@@ -437,6 +442,7 @@ def get_posts_page(topic_id, page):
 
 @main.route('/<username>/del_post/<topic_id>/<post_id>/<page>', methods=['GET'])
 @login_required
+@check_actual_password
 def post_delete(username, topic_id, post_id, page):
     page = int(page)
     post = TopicPost.query.filter_by(id=post_id).first()
@@ -491,6 +497,7 @@ def search_category_on_forum():
 
 @main.route('/<username>/<category_name>/add_topic', methods=['POST'])
 @login_required
+@check_actual_password
 def add_topic(username, category_name):
     page = request.args.get('page', 1, type=int)
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
@@ -533,6 +540,7 @@ def get_topics_page_on_forum(category_id, page):
 
 @main.route('/<username>/edit_post/<topic_id>/<post_id>', methods=['POST'])
 @login_required
+@check_actual_password
 def edit_post(username, topic_id, post_id):
     post = TopicPost.query.filter_by(id=post_id).first()
     post.body = str(request.form.get('newComment')).strip().replace("'", "")
@@ -543,6 +551,7 @@ def edit_post(username, topic_id, post_id):
 
 @main.route('/delete-topic/<category_id>/<topic_id>/<page>', methods=['GET'])
 @admin_required
+@check_actual_password
 def topic_delete(category_id, topic_id, page):
     page = int(page)
     category = Category.query.filter_by(id=category_id).first()

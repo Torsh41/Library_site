@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for
+from flask import render_template, redirect, request, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
 from ..begin_to_app import database
@@ -14,6 +14,8 @@ def login():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user)  # , form.remember_me.data)
+            session['username'] = user.username
+            session['password_hash'] = user.password_hash
             return redirect(url_for('personal.person', username=current_user.username))
 
         # неправильная почта или пароль
@@ -24,6 +26,8 @@ def login():
 @login_required
 def logout():
     logout_user()
+    session.pop('username', None)
+    session.pop('password_hash', None)
     # выход был осуществлен
     return redirect(url_for('main.index'))
 

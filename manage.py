@@ -1,5 +1,5 @@
 import os
-from app.begin_to_app import create_app
+from app.begin_to_app import create_app, socketio
 
 
 application = create_app(os.getenv('FLASK_CONFIG') or 'default')

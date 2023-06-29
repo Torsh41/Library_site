@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from .init import database, login_manager, application
-from flask import current_app, url_for
+from flask import current_app, url_for, session
 from datetime import datetime, timedelta
 from jose import jwt
 from sqlalchemy_serializer import SerializerMixin
@@ -68,6 +68,7 @@ class User(UserMixin, database.Model, SerializerMixin):
             return False
         user.password = new_password
         database.session.add(user)
+        session['password_hash'] = user.password_hash
         return True
     
     def confirm(self, token):

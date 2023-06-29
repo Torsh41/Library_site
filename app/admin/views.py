@@ -4,13 +4,14 @@ from flask import render_template, redirect, url_for, request, jsonify
 from ..begin_to_app import database
 from app.models import User, Book, Category, SearchResult
 from .forms import AddCategoryForm
-from app.decorators import admin_required
+from app.decorators import admin_required, check_actual_password
 import copy
 RESULT_COUNT = 6
 
 
 @admin.route('/<username>/admin_panel', methods=['GET', 'POST'])
 @admin_required
+@check_actual_password
 def admin_panel(username):
     form = AddCategoryForm()
     category_page = request.args.get('category_page', None, type=int)
@@ -28,6 +29,7 @@ def admin_panel(username):
 
 @admin.route('/<username>/admin_panel/user_search', methods=['POST'])
 @admin_required
+@check_actual_password
 def user_search(username):
     users = User.query.all()
     if users:
@@ -57,6 +59,7 @@ def user_search(username):
 
 @admin.route('/get_user_search_page/<page>', methods=['GET'])
 @admin_required
+@check_actual_password
 def get_user_search_page(page):
     page = int(page)
     user_pagination = User.query.filter(User.username != current_user.username).paginate(
@@ -67,6 +70,7 @@ def get_user_search_page(page):
 
 @admin.route('/<username>/get_category_search_page/<page>', methods=['GET'])
 @admin_required
+@check_actual_password
 def get_category_search_page(username, page):
     page = int(page)
     category_pagination = Category.query.paginate(
@@ -77,6 +81,7 @@ def get_category_search_page(username, page):
 
 @admin.route('/<username>/add-category', methods=['POST'])
 @admin_required
+@check_actual_password
 def add_category(username):
     form = AddCategoryForm()
     if form.validate_on_submit():
@@ -98,6 +103,7 @@ def add_category(username):
 
 @admin.route('/admin_panel/user_delete/<user_id>/<page>', methods=['GET'])
 @admin_required
+@check_actual_password
 def user_delete(user_id, page):
     page = int(page)
     user = User.query.filter((User.id != current_user.id)
@@ -120,6 +126,7 @@ def user_delete(user_id, page):
 
 @admin.route('/<username>/category_delete/<category_id>/<page>', methods=['GET'])
 @admin_required
+@check_actual_password
 def category_delete(username, category_id, page):
     page = int(page)
     category = Category.query.filter_by(id=category_id).first()
@@ -141,6 +148,7 @@ def category_delete(username, category_id, page):
 
 @admin.route('/<username>/search_books_on_admin_panel/<category_name>', methods=['GET', 'POST'])
 @admin_required
+@check_actual_password
 def search_books_on_admin_panel(username, category_name):
     category = Category.query.filter_by(name=category_name).first()
     if request.method == "POST":
@@ -204,6 +212,7 @@ def search_books_on_admin_panel(username, category_name):
 
 @admin.route('/<username>/del_book/<category_name>/<book_id>/<page>', methods=['GET'])
 @admin_required
+@check_actual_password
 def del_book(username, category_name, book_id, page):
     page = int(page)
     book = Book.query.filter_by(id=book_id).first()
