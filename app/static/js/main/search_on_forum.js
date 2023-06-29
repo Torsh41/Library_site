@@ -79,7 +79,8 @@ function search_category_on_forum()
 
                     html += `</ul>`;
                     // собираем пагинацию для топиков каждой категории
-                    html += `<ul class="pagination__list list-reset" id="${category.id}topics_pagi">
+                    html += `<div class="list__pagination pagination">
+                                <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
                                   <li class="pagination__item disabled">
                                     &bull;
                                   </li>`;
@@ -105,7 +106,7 @@ function search_category_on_forum()
                     html += `<li class="pagination__item disabled">
                                     &bull;
                                   </li>
-                              </ul>`;
+                              </ul></div>`;
                     html += `</div></div></section>`;
                 });
                 section = document.getElementById('first_section');
