@@ -140,7 +140,7 @@
 
               <div class="list__book-wrap">
                 {% if current_user.is_authenticated %}
-                <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
+                <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id, list_id=list_id)}}"
                   class="list__book-delete-btn">Добавить в список</a>
                 {% endif %}
                 <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link-book">Книга: {{book.name}}</a>
