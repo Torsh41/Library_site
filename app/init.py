@@ -8,7 +8,7 @@ from flask_socketio import SocketIO
 
 
 application = Flask(__name__, template_folder='templates')
-socketio = SocketIO()
+socketio = SocketIO(async_mode='eventlet')
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'

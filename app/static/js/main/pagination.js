@@ -331,23 +331,23 @@ function get_posts_page(url_path)
                   if (post.username == post.current_username)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
-                              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
+                              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
                               <a class="message__admin-btn" id="${post.id}edit_post_a" onclick="open_popup_form('/${post.current_username}/edit_post/${post.topic_id}/${post.id}', '${post.body}')">Редактировать</a>
-                              <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
+                              <a class="message__admin-btn" onclick="del_post_socket('${post.topic_id}', '${post.id}', '${post.cur_page}')">Удалить</a>
                               </div>`;
                   }
                   else if (post.user_is_admin)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
                     <a class="comments__command">Админ</a>
-                    <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
-                    <a class="message__admin-btn" onclick="del_post('/${post.current_username}/del_post/${post.topic_id}/${post.id}/${post.cur_page}', '${post.topic_id}')">Удалить</a>
+                    <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
+                    <a class="message__admin-btn" onclick="del_post_socket('${post.topic_id}', '${post.id}', '${post.cur_page}')">Удалить</a>
                     </div>`;
                   }
                   else if (post.current_username)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
-                    <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.id}')">Ответить</a>
+                    <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
                     </div>`;
                   }
                  html += `</div></div>`;
@@ -379,57 +379,6 @@ function get_posts_page(url_path)
         console.log(error);
     }
   });
-}
-
-function del_post(url_path, topic_id)
-{
-  if (confirm('Подтвердите действие'))
-  {
-    $.ajax({
-      method: 'get',
-      url: url_path,
-      dataType: 'json',
-      success: function(response) {
-        get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
-        $('ul').filter(function() {
-          return this.id.match('pagination');
-        }).remove();
-
-        html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;                            
-        if (response.has_elems) 
-        {
-          for (let i = 1; i <= response.pages; i++)
-          {
-            if (response.pages > 1 && i == response.cur_page)
-            {
-              html += `<li class="pagination__item_cur_page">
-                        <a onclick="get_posts_page('/get_posts_page/${topic_id}/${i}')">${i}</a>
-                      </li>`;
-            }
-            else
-            {
-              html += `<li class="pagination__item active">
-                        <a onclick="get_posts_page('/get_posts_page/${topic_id}/${i}')">${i}</a>
-                        </li>`;
-            }
-          }
-        }
-
-        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-        
-        document.getElementById('posts_pagination_container').innerHTML = html;
-        $('span').filter(function() {
-          return this.id.match('posts_count');
-        }).remove();
-        html = `<span class="main__span-forum" id="posts_count">Сообщений: ${response.posts_count}</span>`;
-        div = document.getElementById("main_container");
-        div.insertAdjacentHTML("beforeend", html);
-      },
-      error: function(error) {
-          console.log(error);
-      }
-    });
-  }
 }
 
 function get_topics_page_on_forum(url_path, category_id)

@@ -70,32 +70,33 @@ function add_list_ajax()
                                     </li>`;
                             });
                         }
-                            html += `</ul>`;
+                        html += `</ul>`;
+                        
+                        // собираем пагинацию книг каждого списка
+                        html += `<div class="list__pagination pagination" id="${cataloge.id}books_pagination_container">
+                                    <ul class="pagination__list list-reset" id="${cataloge.id}books_pagination">
+                                        <li class="pagination__item disabled">&bull;</li>`;
                         if (items.length != 0)
                         {
-                            // собираем пагинацию книг каждого списка
-                            html += `<div class="list__pagination pagination" id="${cataloge.id}books_pagination_container">
-                                        <ul class="pagination__list list-reset" id="${cataloge.id}books_pagination">
-                                            <li class="pagination__item disabled">&bull;</li>`;
-                           
-                                for (let i = 1; i <= items[0].items_pages; i++)
+                            for (let i = 1; i <= items[0].items_pages; i++)
+                            {
+                                if (items[0].items_pages > 1 && i == 1)
                                 {
-                                    if (items[0].items_pages > 1 && i == 1)
-                                    {
-                                        html += `<li class="pagination__item_cur_page">
-                                                    <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
-                                                </li>`;
-                                    }
-                                    else
-                                    {
-                                        html += `<li class="pagination__item active">
-                                                    <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
-                                                </li>`;
-                                    }
+                                    html += `<li class="pagination__item_cur_page">
+                                                <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
+                                            </li>`;
                                 }
-                         
-                            html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;    
-                        }    // 
+                                else
+                                {
+                                    html += `<li class="pagination__item active">
+                                                <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
+                                            </li>`;
+                                }
+                            }
+                        }
+                        
+                        html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;    
+                        // 
 
                         html += ` <div class="list__end">
                                     <a class="list__delete-btn" id="${cataloge.id}del_list" onclick="del_list('/user/${cataloge.username}/delete-list/${cataloge.id}/${cataloge.pages}')">

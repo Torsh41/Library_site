@@ -71,7 +71,7 @@
         <div class="main__bottom forum-main-bottom">
           <a class="main__bottom-item" href="{{url_for('main.forum')}}">Главная страница форума</a>
           {% if current_user.is_authenticated %}
-            <a id="write_msg" class="main__bottom-item" href="#1">Написать сообщение</a>
+            <a id="write_msg" data-username="{{current_user.username}};{{user_is_admin}};{{topic_id}}" class="main__bottom-item" href="#1">Написать сообщение</a>
           {% endif %}
         </div>
 
@@ -156,19 +156,19 @@
               <!--This block for user (only for his messages)-->
               {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
               <div class="message__admin" id="{{post["id"]}}personal_cont">
-                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{topic_id}}', '{{post["id"]}}')">Ответить</a>
                 <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" onclick="open_popup_form('/{{current_user.username}}/edit_post/{{topic_id}}/{{post["id"]}}', '{{post["body"]}}')">Редактировать</a>
-                <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}')">Удалить</a>
+                <a class="message__admin-btn" onclick="del_post_socket('{{topic_id}}', '{{post["id"]}}', '{{1}}')">Удалить</a>
               </div>
               {% elif current_user.role == Role.ADMIN %}
               <div class="message__admin" id="{{post["id"]}}personal_cont">
                 <a class="comments__command">Админ</a>
-                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
-                <a class="message__admin-btn" onclick="del_post('/{{current_user.username}}/del_post/{{topic_id}}/{{post["id"]}}/{{1}}', '{{topic_id}}' )">Удалить</a>
+                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{topic_id}}', '{{post["id"]}}')">Ответить</a>
+                <a class="message__admin-btn" onclick="del_post_socket('{{topic_id}}', '{{post["id"]}}', '{{1}}')">Удалить</a>
               </div>
               {% elif current_user.is_authenticated %}
               <div class="message__admin" id="{{post["id"]}}personal_cont">
-                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{post["id"]}}')">Ответить</a>
+                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{topic_id}}', '{{post["id"]}}')">Ответить</a>
               </div>
               {% endif %}
             </div>
@@ -178,14 +178,13 @@
           <!--Этот блок есть всегда (только для авторизированных пользователей)-->
           {% if current_user.is_authenticated %}
           <div id="1" class="discussion__btn button">
-            <form action="/{{current_user.username}}/{{topic_id}}/add_post" enctype="multipart/form-data"
+            <form action="#" enctype="multipart/form-data"
               class="button__form" id="add_post_form" method="POST">
               <input class="profile__foto" type="file" id="file_input_id" name="screenshot" multiple
                 accept="image/*,image/jpeg">
               <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text"
                 placeholder="Написать сообщение.."></textarea>
-                <input id="add_post_button" class="button__write btn" type="button" value="Отправить"
-                onclick="add_post_on_forum()">
+                <input id="add_post_button" class="button__write btn" type="button" value="Отправить">
             </form>
           </div>
           {% else %}
@@ -201,13 +200,13 @@
                 &bull;
               </li>
               {% for p in posts_pagination.iter_pages() %}
-              {% if p %}
-              <li class="pagination__item active">
-                <a onclick="get_posts_page('/get_posts_page/{{topic_id}}/{{p}}')">{{ p }}</a>
-              </li>
-              {% else %}
-              <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-              {% endif %}
+                {% if p %}
+                <li class="pagination__item active">
+                  <a onclick="get_posts_page('/get_posts_page/{{topic_id}}/{{p}}')">{{ p }}</a>
+                </li>
+                {% else %}
+                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                {% endif %}
               {% endfor %}
               <li class="pagination__item disabled">
                 &bull;
