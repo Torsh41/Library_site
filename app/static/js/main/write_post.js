@@ -3,7 +3,7 @@ let cur_username = '';
 let cur_user_is_admin;
 $(document).ready(function () {
   a = $("#write_msg");
-  if (a) 
+  if (a.length > 0) 
   {
     topic_id = a.data('username').split(';')[2];
     write_post_form = document.getElementById("add_post_form");
@@ -17,7 +17,7 @@ $(document).ready(function () {
       });
     }
     username = a.data('username').split(';')[0];
-    cur_user_is_admin = new Number(a.data('username').split(';')[1]);
+    cur_user_is_admin = Number(a.data('username').split(';')[1]);
     if (username.length > 0)
     {
       cur_username = username;
@@ -85,9 +85,12 @@ function add_post_on_forum(posts) {
     html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
                           <div class="message__left">
                             <div class="message__name">`;
-    if (post.username == post.current_username) {
-      html += `<a href="/user/${post.current_username}" class="message__link">`;
-    } else {
+    if (post.username == cur_username) 
+    {
+      html += `<a href="/user/${cur_username}" class="message__link">`;
+    } 
+    else 
+    {
       html += `<a class="message__link">`;
     }
 
@@ -123,9 +126,7 @@ function add_post_on_forum(posts) {
                             </div>
                           </div>
         
-                          <div class="message__right" id="${
-                            post.id
-                          }msg_write_id">`;
+                          <div class="message__right" id="${post.id}msg_write_id">`;
     if (post.this_is_answer) {
       html += `<div class="message__answer" id="${post.id}base_to_answer">
                                         <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
@@ -143,7 +144,7 @@ function add_post_on_forum(posts) {
     if (post.username == cur_username) {
       html += `<div class="message__admin" id="${post.id}personal_cont">
                                   <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
-                                  <a class="message__admin-btn" id="${post.id}edit_post_a" onclick="open_popup_form('/${post.current_username}/edit_post/${post.topic_id}/${post.id}', '${post.body}')">Редактировать</a>
+                                  <a class="message__admin-btn" id="${post.id}edit_post_a" onclick="open_popup_form('/${cur_username}/edit_post/${post.topic_id}/${post.id}', '${post.body}')">Редактировать</a>
                                   <a class="message__admin-btn" onclick="del_post_socket('${post.topic_id}', '${post.id}', '${post.cur_page}')">Удалить</a>
                                   </div>`;
     } else if (cur_user_is_admin) {
@@ -211,15 +212,16 @@ function del_post(posts, response, topic_id) {
     html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
                 <div class="message__left">
                   <div class="message__name">`;
-    if (post.username == post.current_username) {
-      html += `<a href="/user/${post.current_username}" class="message__link">`;
-    } else {
+    if (post.username == cur_username) 
+    {
+      html += `<a href="/user/${cur_username}" class="message__link">`;
+    } 
+    else 
+    {
       html += `<a class="message__link">`;
     }
     html += `<div class="message__set">
-                      <img src="/user/${
-                        post.username
-                      }/edit-profile/edit-avatar" alt="" class="message__img"> 
+                      <img src="/user/${post.username}/edit-profile/edit-avatar" alt="" class="message__img"> 
                       </div>
                       ${post.username}
                     </a>
@@ -267,19 +269,19 @@ function del_post(posts, response, topic_id) {
 
     if (post.username == cur_username) {
       html += `<div class="message__admin" id="${post.id}personal_cont">
-                        <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.current_username}', '${post.topic_id}', '${post.id}')">Ответить</a>
-                        <a class="message__admin-btn" id="${post.id}edit_post_a" onclick="open_popup_form('/${post.current_username}/edit_post/${post.topic_id}/${post.id}', '${post.body}')">Редактировать</a>
+                        <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
+                        <a class="message__admin-btn" id="${post.id}edit_post_a" onclick="open_popup_form('/${cur_username}/edit_post/${post.topic_id}/${post.id}', '${post.body}')">Редактировать</a>
                         <a class="message__admin-btn" onclick="del_post_socket('${post.topic_id}', '${post.id}', '${post.cur_page}')">Удалить</a>
                         </div>`;
     } else if (cur_user_is_admin) {
       html += `<div class="message__admin" id="${post.id}personal_cont">
               <a class="comments__command">Админ</a>
-              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.current_username}', '${post.topic_id}', '${post.id}')">Ответить</a>
+              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
               <a class="message__admin-btn" onclick="del_post_socket('${post.topic_id}', '${post.id}', '${post.cur_page}')">Удалить</a>
               </div>`;
     } else if (cur_username) {
       html += `<div class="message__admin" id="${post.id}personal_cont">
-              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.current_username}', '${post.topic_id}', '${post.id}')">Ответить</a>
+              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
               </div>`;
     }
     html += `</div></div>`;

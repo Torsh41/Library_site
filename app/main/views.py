@@ -291,7 +291,7 @@ def topic(topic_id):
     if current_user.is_authenticated and current_user.role == Role.ADMIN:
         user_is_admin = 1
     else:
-       user_is_admin = 0
+        user_is_admin = 0
     posts_pagination = topic.posts.order_by().paginate(
         posts_page, per_page=ELEMS_COUNT, error_out=False)
     posts = list()
