@@ -5,6 +5,7 @@ $(document).ready(function () {
     });
   });
 
+
 function edit_elem_state(id)
 {
     if (document.getElementById(id).style.display == "block")
@@ -26,8 +27,10 @@ function edit_elem_state(id)
     else
     {
         document.getElementById(id).style.display = "block";
+        document.getElementById(id).scrollIntoView();
     }
 }
+
 
 function form_activate(form_id, title_id, data)
 {
@@ -35,6 +38,7 @@ function form_activate(form_id, title_id, data)
     if (document.getElementById(id).style.display == "block")
         document.getElementById(title_id).value += ` ${data}`;
 }
+
 
 function open_book_panel(username, category)
 {
@@ -60,6 +64,7 @@ function open_book_panel(username, category)
     form.setAttribute("action", `/admin/${username}/search_books_on_admin_panel/${category}`);
     section.scrollIntoView(); // Прокрутка до верхней границы
 }
+
 
 function search_books_on_category()
 {
@@ -159,6 +164,7 @@ function search_books_on_category()
     }
 }
 
+
 function get_books_page_on_admin_panel(url_path)
 {
     $.ajax({
@@ -210,6 +216,7 @@ function get_books_page_on_admin_panel(url_path)
         }
     });
 }
+
 
 function del_book_from_site(url_path)
 {
