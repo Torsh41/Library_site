@@ -1,6 +1,6 @@
 function get_lists_page(url_path)
 {
-  $.ajax({
+    $.ajax({
       method: 'get',
       url: url_path,
       dataType: 'json',
@@ -9,15 +9,15 @@ function get_lists_page(url_path)
         $('section').filter(function() {
           return this.id.match(/cataloge_info/);
         }).remove();
-        url = url_path.split('/');
-        html = '';
+        let url = url_path.split('/');
+        let html = '';
         cataloges.forEach(cataloge => {
           html += `<section class="list" id="${cataloge.id}cataloge_info">
           <div class="container list__container">
             <div class="list__wrap">
               <h2 class="list__title title">${cataloge.name}</h2>
               <!--Название списка, которое ввел пользователь-->
-  
+
               <ul class="list__books list-reset" id="${cataloge.id}books_info_container">
                 <!--Добавление книги в список - перебрасывает в рааздел категорий книг-->
                 <li class="list__book list__add">
@@ -44,13 +44,12 @@ function get_lists_page(url_path)
                             <img class="list__book-set" src="/${item.name}/get-cover" alt="">
                           </a>
                         
-                        <div class="list__book-wrap">
-                          <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
-                          <a href="/book-page/${item.name}" class="list__link-plan"><u>Состояние чтения:</u> ${ item.read_state }</a>
-                          <a class="list__book-delete-btn" onclick="del_book_from_list('/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}', '${cataloge.id}')">Удалить
-                          книгу из списка</a>
-                        </div>
-                      </li>`;
+                          <div class="list__book-wrap">
+                            <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
+                            <a href="/book-page/${item.name}" class="list__link-plan"><u>Состояние чтения:</u> ${ item.read_state }</a>
+                            <a class="list__book-delete-btn" data-url='/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}' id='${cataloge.id}del_book'>Удалить книгу из списка</a>
+                          </div>
+                        </li>`;
                 });
                 html += `</ul>`;
 
@@ -65,13 +64,13 @@ function get_lists_page(url_path)
                       if (items[0].pages > 1 && i == 1)
                       {
                           html += `<li class="pagination__item_cur_page">
-                                    <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
-                                   </li>`;
+                                    <a data-url='/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}' id='${cataloge.id}books_page'>${i}</a>
+                                  </li>`;
                       }
                       else
                       {
                         html += `<li class="pagination__item active">
-                                  <a onclick="get_books_page('/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}', '${cataloge.id}')">${i}</a>
+                                  <a data-url='/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}' id='${cataloge.id}books_page'>${i}</a>
                                 </li>`;
                       }
                     }
@@ -82,12 +81,10 @@ function get_lists_page(url_path)
                 // 
 
                 html += `<div class="list__end">
-                          <a class="list__delete-btn" id="${cataloge.id}del_list" onclick="del_list('/user/${cataloge.username}/delete-list/${cataloge.id}/${url[url.length - 1]}')">
-                            Удалить список
+                          <a class="list__delete-btn" id="${cataloge.id}del_list" data-url="/user/${cataloge.username}/delete-list/${cataloge.id}/${url[url.length - 1]}">Удалить список
                           </a></div></div></div></section>`;
         }); 
-        section = document.getElementById('add_list_button');
-        section.insertAdjacentHTML('afterend', html);
+        document.getElementById('lists_container').innerHTML = html;
         pagi = document.getElementById('pagination');
         pagi_li = pagi.querySelector('.pagination__item_cur_page');
         if (pagi_li)
@@ -106,50 +103,6 @@ function get_lists_page(url_path)
           console.log(error);
       }
   });
-}
-
-function del_list(url_path) 
-{
-  if (confirm('Подтвердите действие'))
-  {
-    $.ajax({
-      method: 'get',
-      url: url_path,
-      dataType: 'json',
-      success: function(response) {
-        get_lists_page(`/user/${response.username}/get_lists_page/${response.cur_page}`);
-        $('ul').filter(function() {
-          return this.id.match('pagination');
-        }).remove();
-        html = `<ul class="pagination__list list-reset" id="pagination">
-        <li class="pagination__item disabled">&bull;</li>`;
-
-        if (response.has_elems) 
-        {
-          for (let i = 1; i <= response.pages; i++)
-          {
-            if (response.pages > 1 && i == response.cur_page)
-            {
-              html += `<li class="pagination__item_cur_page">
-                        <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${i}')">${i}</a>
-                      </li>`;
-            }
-            else
-            {
-              html += `<li class="pagination__item active">
-                        <a onclick="get_lists_page('/user/${response.username}/get_lists_page/${i}')">${i}</a>
-                        </li>`;
-            }
-          }
-        }
-        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-        document.getElementById('pagination_container').innerHTML = html;
-      },
-      error: function(error) {
-          console.log(error);
-      }
-    });
-  }
 }
 
 function get_books_page(url_path, cataloge_id)
@@ -174,8 +127,7 @@ function get_books_page(url_path, cataloge_id)
                     <div class="list__book-wrap">
                       <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
                       <a href="/book-page/${book.name}" class="list__link-plan"><u>Состояние чтения:</u> ${book.read_state}</a>
-                      <a class="list__book-delete-btn" onclick="del_book_from_list('/user/${book.username_of_cur_user}/delete-item/${cataloge_id}/${book.id}/${url[url.length - 1]}', '${cataloge_id}')">Удалить
-                    книгу из списка</a>
+                      <a class="list__book-delete-btn" data-url='/user/${book.username_of_cur_user}/delete-item/${cataloge_id}/${book.id}/${url[url.length - 1]}' id='${cataloge_id}del_book'>Удалить книгу из списка</a>
                     </div>
                   </li>`;
       });
@@ -197,95 +149,127 @@ function get_books_page(url_path, cataloge_id)
     error: function(error) {
         console.log(error);
     }
-});
-}
-
-function del_book_from_list(url_path, cataloge_id) 
-{
-  if (confirm('Подтвердите действие'))
-  {
-    $.ajax({
-      method: 'get',
-      url: url_path,
-      dataType: 'json',
-      success: function(response) {
-        get_books_page(`/user/${response.username}/get_books_page/${cataloge_id}/${response.cur_page}`, cataloge_id);
-        $('ul').filter(function() {
-          return this.id.match(cataloge_id + 'books_pagination');
-        }).remove();
-        html = `<ul class="pagination__list list-reset" id="${cataloge_id}books_pagination"><li class="pagination__item disabled">&bull;</li>`;
-        
-        if (response.has_elems) 
-        {
-          for (let i = 1; i <= response.pages; i++)
-          {
-            if (response.pages > 1 && i == response.cur_page)
-            {
-              html += `<li class="pagination__item_cur_page">
-                          <a onclick="get_books_page('/user/${response.username}/get_books_page/${cataloge_id}/${i}', '${cataloge_id}')">${i}</a>
-                        </li>`;
-            }
-            else
-            {
-              html += `<li class="pagination__item active">
-                          <a onclick="get_books_page('/user/${response.username}/get_books_page/${cataloge_id}/${i}', '${cataloge_id}')">${i}</a>
-                        </li>`;
-            }
-          }
-        }
-
-        html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-        
-        document.getElementById(cataloge_id + 'books_pagination_container').innerHTML = html;
-      },
-      error: function(error) {
-          console.log(error);
-      }
-    });
-  }
-}
-
-function get_categories_page_for_book_adding(url_path)
-{
-  $.ajax({
-    method: 'get',
-    url: url_path,
-    dataType: 'json',
-    success: function(response) {
-      categories = Array.from(response);
-      $('a').filter(function() {
-        return this.id.match(/categories/);
-      }).remove();
-      html = '';
-      for (let i = 0; i < categories.length; i++)
-      {
-        if (i == 0)
-        {
-          html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox" value="${categories[i].name}" checked>${categories[i].name}</a>`;
-        }
-        else
-        {
-          html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox" value="${categories[i].name}">${categories[i].name}</a>`;
-        }
-      }
-      div = document.getElementById('cat_container');
-      div.insertAdjacentHTML('afterbegin', html);
-      pagi = document.getElementById('pagination');
-      pagi_li = pagi.querySelector('.pagination__item_cur_page');
-      if (pagi_li)
-      {
-        pagi_li.className = 'pagination__item active';
-      }
-      for (const child of pagi.children)
-      {
-        if (categories.length && categories[0].cur_page == child.textContent)
-        {
-            child.className = 'pagination__item_cur_page';
-        }
-      }
-    },
-    error: function(error) {
-        console.log(error);
-    }
   });
 }
+
+$(function() {
+  $('#pagination_container').on('click', function(event){
+    let target = event.target;
+    if (target.tagName === 'A') 
+    {
+      let url_path = target.dataset?.url;
+      get_lists_page(url_path);
+    }
+  });
+
+  $('#lists_container').on('click', function(event){
+    let target = event.target;
+    if (target.tagName === 'A' && target.id.includes('del_list')) 
+    {
+      let url_path = target.dataset?.url;
+      if (confirm('Подтвердите действие'))
+      {
+        $.ajax({
+          method: 'get',
+          url: url_path,
+          dataType: 'json',
+          success: function(response) {
+            get_lists_page(`/user/${response.username}/get_lists_page/${response.cur_page}`);
+            $('ul').filter(function() {
+              return this.id.match('pagination');
+            }).remove();
+            html = `<ul class="pagination__list list-reset" id="pagination">
+            <li class="pagination__item disabled">&bull;</li>`;
+
+            if (response.has_elems) 
+            {
+              for (let i = 1; i <= response.pages; i++)
+              {
+                if (response.pages > 1 && i == response.cur_page)
+                {
+                  html += `<li class="pagination__item_cur_page">
+                            <a data-url="/user/${response.username}/get_lists_page/${i}">${i}</a>
+                          </li>`;
+                }
+                else
+                {
+                  html += `<li class="pagination__item active">
+                            <a data-url="/user/${response.username}/get_lists_page/${i}">${i}</a>
+                           </li>`;
+                }
+              }
+            }
+            html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+            document.getElementById('pagination_container').innerHTML = html;
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+      }
+    }
+    else if (target.tagName === 'A' && target.id.includes('books_page'))
+    {
+      let url_path = target.dataset?.url;
+      let cataloge_id = url_path.split('/')[4];
+      get_books_page(url_path, cataloge_id);
+      
+    }
+    else if (target.tagName === 'A' && target.id.includes('del_book'))
+    {
+      let url_path = target.dataset?.url;
+      let cataloge_id = url_path.split('/')[4];
+      if (confirm('Подтвердите действие'))
+      {
+        $.ajax({
+          method: 'get',
+          url: url_path,
+          dataType: 'json',
+          success: function(response) {
+            get_books_page(`/user/${response.username}/get_books_page/${cataloge_id}/${response.cur_page}`, cataloge_id);
+            $('ul').filter(function() {
+              return this.id.match(cataloge_id + 'books_pagination');
+            }).remove();
+            html = `<ul class="pagination__list list-reset" id="${cataloge_id}books_pagination"><li class="pagination__item disabled">&bull;</li>`;
+            
+            if (response.has_elems) 
+            {
+              for (let i = 1; i <= response.pages; i++)
+              {
+                if (response.pages > 1 && i == response.cur_page)
+                {
+                  html += `<li class="pagination__item_cur_page">
+                              <a data-url='/user/${response.username}/get_books_page/${cataloge_id}/${i}' id='${cataloge_id}books_page'>${i}</a>
+                            </li>`;
+                }
+                else
+                {
+                  html += `<li class="pagination__item active">
+                              <a data-url='/user/${response.username}/get_books_page/${cataloge_id}/${i}' id='${cataloge_id}books_page'>${i}</a>
+                            </li>`;
+                }
+              }
+            }
+
+            html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+            
+            document.getElementById(cataloge_id + 'books_pagination_container').innerHTML = html;
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+      }
+    }
+  });
+});
+
+// let observer = new MutationObserver(callback);
+
+// // наблюдать за всем, кроме атрибутов
+// observer.observe(document, {
+//   childList: true, // наблюдать за непосредственными детьми
+//   subtree: true, // и более глубокими потомками
+//   attributes: true,
+//   characterData: true
+// });

@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/personal/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/personal/book_adding_pagination.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
@@ -199,7 +199,7 @@
                 <ul class="pagination__list list-reset" id="pagination">
                   {% for p in pagination.iter_pages() %}
                     <li class="pagination__item active">
-                      <a onclick="get_categories_page_for_book_adding('/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}')">{{ p }}</a>
+                      <a data-url="/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}">{{ p }}</a>
                     </li>
                   {% endfor %}
                 </ul>

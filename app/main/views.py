@@ -86,6 +86,8 @@ def get_comments_page(book_name, page):
 @login_required
 @check_actual_password
 def add_comment(username, book_name):
+    if current_user.username != username:
+        return render_template('403.html')
     book = Book.query.filter_by(name=book_name).first()
     comment = Comment(body=str(request.form.get('comment')).strip().replace(
         "'", ""), book=book, user=current_user._get_current_object())
@@ -108,6 +110,8 @@ def add_comment(username, book_name):
 @login_required
 @check_actual_password
 def edit_comment(username, comment_id, book_name):
+    if current_user.username != username:
+        return render_template('403.html')
     comment = Comment.query.filter_by(id=comment_id).first()
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
     database.session.add(comment)
@@ -119,6 +123,8 @@ def edit_comment(username, comment_id, book_name):
 @login_required
 @check_actual_password
 def give_grade(username, book_id, grade):
+    if current_user.username != username:
+        return render_template('403.html')
     book = Book.query.filter_by(id=book_id).first()
     previous_grade = BookGrade.query.filter_by(
         user=current_user, book=book).first()
@@ -135,6 +141,8 @@ def give_grade(username, book_id, grade):
 @login_required
 @check_actual_password
 def comment_delete(username, book_name, comment_id, page):
+    if current_user.username != username:
+        return render_template('403.html')
     page = int(page)
     book = Book.query.filter_by(name=book_name).first()
     comment = book.comments.filter_by(id=comment_id).first()
@@ -421,6 +429,8 @@ def search_category_on_forum():
 @login_required
 @check_actual_password
 def add_topic(username, category_name):
+    if current_user.username != username:
+        return render_template('403.html')
     page = request.args.get('page', 1, type=int)
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
     cur_category = Category.query.filter_by(name=category_name).first()
@@ -464,6 +474,8 @@ def get_topics_page_on_forum(category_id, page):
 @login_required
 @check_actual_password
 def edit_post(username, topic_id, post_id):
+    if current_user.username != username:
+        return render_template('403.html')
     post = TopicPost.query.filter_by(id=post_id).first()
     post.body = str(request.form.get('newComment')).strip().replace("'", "")
     database.session.add(post)
