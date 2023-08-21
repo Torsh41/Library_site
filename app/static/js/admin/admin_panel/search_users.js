@@ -1,10 +1,3 @@
-$(document).ready(function () {
-    $('#search_users_form').submit(function(event) {
-        search_users_on_forum();
-        event.preventDefault();
-    });
-  });
-
 function search_users_on_forum()
 {
     if (document.getElementById('username_field').value.trim() && document.getElementById('username_field').value.trim().length <= 62)
@@ -34,7 +27,7 @@ function search_users_on_forum()
                     </div>
                     ${user.username} 
                     </span>
-                    <a class="users__btn" id="${user.id}del_user" onclick="del_user('/admin/admin_panel/user_delete/${user.id}/${user.page}', '1pagination')">Удалить пользователя</a>
+                    <a class="users__btn" id="${user.id}del_user" data-url='/admin/admin_panel/user_delete/${user.id}/${user.page}' data-pagid='1pagination'>Удалить пользователя</a>
                 </li>`;
                 });
                 html += `</ul>`;
@@ -52,13 +45,13 @@ function search_users_on_forum()
                     if (users[0].page > 1 && i == users[0].cur_page)
                     {
                         html += `<li class="pagination__item_cur_page">
-                                <a onclick="get_user_search_page('/admin/get_user_search_page/${i}', '1pagination')">${i}</a>
+                                    <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
                                 </li>`;
                     }
                     else
                     {
                         html += `<li class="pagination__item active">
-                                <a onclick="get_user_search_page('/admin/get_user_search_page/${i}', '1pagination')">${i}</a>
+                                    <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
                                 </li>`;
                     }
                 }
@@ -91,3 +84,15 @@ function search_users_on_forum()
         document.getElementById('username_field').value = '';
     }
 }
+
+$(function() {
+    $('#search_users_form').submit(function(event) {
+        search_users_on_forum();
+        event.preventDefault();
+    });
+
+    $('#get_users').click(function(event) {
+        search_users_on_forum();
+    });
+});
+

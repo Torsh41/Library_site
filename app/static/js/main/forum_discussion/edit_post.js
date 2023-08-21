@@ -1,23 +1,3 @@
-$(document).ready(function () {
-    $('#edit_post_form').submit(function(event) {
-        edit_post_ajax();
-        event.preventDefault();
-    });
-  });
-
-function open_popup_form(url_path, post_body)
-{
-    document.getElementById("edit_post_sec").style.display = "block";
-    document.getElementById("edit_post_field").value = post_body;
-    form = document.getElementById("edit_post_form");
-    form.setAttribute("action", url_path);
-}
-
-function closeEditPostForm()
-{
-    document.getElementById("edit_post_field").value = "";
-    document.getElementById("edit_post_sec").style.display = "none";
-}
 function edit_post_ajax()
 {
     if (document.getElementById('edit_post_field').value.trim() && document.getElementById('edit_post_field').value.trim().length <= 200)
@@ -50,9 +30,10 @@ function edit_post_ajax()
               div.insertAdjacentHTML('afterbegin', html);
             }
             div_ = document.getElementById(response.post_id + 'personal_cont');
-            html = `<a class="message__admin-btn" id="${response.post_id}edit_post_a" onclick="open_popup_form('/${response.username}/edit_post/${response.topic_id}/${response.post_id}', '${response.post_body}')">Редактировать</a>`;
+            html = `<a class="message__admin-btn" id="${response.post_id}edit_post_a" data-url="/${response.username}/edit_post/${response.topic_id}/${response.post_id}" data-body="${response.post_body}">Редактировать</a>`;
             div_.insertAdjacentHTML('afterbegin', html)
-            closeEditPostForm();
+            document.getElementById("edit_post_field").value = "";
+            document.getElementById("edit_post_sec").style.display = "none";
           },
           error: function(error) {
               console.log(error);
@@ -69,3 +50,31 @@ function edit_post_ajax()
       document.getElementById('edit_post_field').value = '';
     }
 }
+
+$(function() {
+  $('#edit_post_form').submit(function(event) {
+      edit_post_ajax();
+      event.preventDefault();
+  });
+
+  $('#disc_posts_container').on('click', function(event) {
+    let target = event.target;
+    if (target.tagName === 'A' && target.id.includes('edit_post_a'))
+    {
+      let url_path = target.dataset?.url;
+      let post_body = target.dataset?.body;
+      document.getElementById("edit_post_sec").style.display = "block";
+      document.getElementById("edit_post_field").value = post_body;
+      form = document.getElementById("edit_post_form");
+      form.setAttribute("action", url_path);
+    }
+  });
+
+  $('#close_edit_post_form').click(function(event) {
+    document.getElementById("edit_post_field").value = "";
+    document.getElementById("edit_post_sec").style.display = "none";
+  });
+});
+
+
+

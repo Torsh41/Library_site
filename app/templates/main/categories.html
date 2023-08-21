@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/categories/pagination.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
@@ -92,12 +92,26 @@
           </ul>
           {% if category_pagination %}
           <div class="list__pagination pagination" id="user_pagination_container">
-            {{ macros.pagination_widget(pagination=category_pagination, url_path='/get_categories_page/',
-            func_name='get_categories_page') }}
+            <ul class="pagination__list list-reset" id="pagination">
+              <li class="pagination__item disabled">
+                  &bull;
+              </li>
+              {% for p in category_pagination.iter_pages() %}
+                  {% if p %}
+                    <li class="pagination__item active">
+                        <a id="{{p}}list_pagi" data-url="/get_categories_page/{{p}}">{{ p }}</a>
+                    </li>
+                  {% else %}
+                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                  {% endif %}
+              {% endfor %}
+              <li class="pagination__item disabled">
+                  &bull; 
+              </li>
+            </ul>
           </div>
           {% endif %}
         </div>
-        
       </div>
     </section>
   </main>
@@ -108,5 +122,4 @@
     </div>
   </footer>
 </body>
-
 </html>

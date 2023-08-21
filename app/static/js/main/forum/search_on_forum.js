@@ -1,10 +1,3 @@
-$(document).ready(function () {
-  $('#search_form').submit(function(event) {
-    search_category_on_forum();
-    event.preventDefault();
-  });
-});
-
 function search_category_on_forum() 
 {
   if (document.getElementById('category_name_id').value.trim() && document.getElementById('category_name_id').value.trim().length <= 200)
@@ -36,21 +29,14 @@ function search_category_on_forum()
                         if (category.username_of_cur_user)
                         {
                             html += `<li class="fraction__list-item">
-                                        <a class="fraction__topic-link" onclick="openForm('${category.username_of_cur_user}', '${category.name}', '${category.cur_page}')"> <!--Add the new topic (for users)-->
-                                          <div class="fraction__topic">
-                                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                              <g clip-path="url(#clip0_139_2)">
-                                                <rect x="35" width="8" height="78" fill="#F5F5DC" />
-                                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC"/>
+                                          <div class="fraction__topic" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}">
+                                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}">
+                                              <g clip-path="url(#clip0_139_2)" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}">
+                                                <rect x="35" width="8" height="78" fill="#F5F5DC" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}" />
+                                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}" />
                                               </g>
-                                              <defs>
-                                                <clipPath id="clip0_139_2">
-                                                  <rect width="78" height="78" fill="white" />
-                                                </clipPath>
-                                              </defs>
                                             </svg>
                                           </div>
-                                        </a>
                                       </li>`;
                         }
                         else
@@ -91,13 +77,13 @@ function search_category_on_forum()
                         if (topics[0].pages > 1 && i == topics[0].cur_page)
                         {
                           html += `<li class="pagination__item_cur_page">
-                                      <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${category.id}/${i}', '${category.id}')">${i}</a>
+                                      <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${i}' data-catid='${category.id}'>${i}</a>
                                     </li>`;
                         }
                         else
                         {
                           html += `<li class="pagination__item active">
-                                      <a onclick="get_topics_page_on_forum('/get_topics_page_on_forum/${category.id}/${i}', '${category.id}')">${i}</a>
+                                      <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${i}' data-catid='${category.id}'>${i}</a>
                                     </li>`;
                         }
                       }
@@ -162,3 +148,15 @@ function search_category_on_forum()
     document.getElementById('category_name_id').value = '';
   }
 }      
+
+$(function() {
+  $('#search_form').submit(function(event) {
+    search_category_on_forum();
+    event.preventDefault();
+  });
+
+  $('#found_category').click(function(event) {
+    search_category_on_forum();
+  });
+});
+

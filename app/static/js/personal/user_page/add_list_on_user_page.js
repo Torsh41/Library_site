@@ -1,14 +1,14 @@
 $(function() {
-    $('#open_popup_form').on('click', function() {
+    $('#open_popup_form').on('click', function(event) {
         document.getElementById("popupForm").style.display = "block";
     });
 
-    $('#close_popup_form').on('click', function()
+    $('#close_popup_form').on('click', function(event)
     {
         document.getElementById("popupForm").style.display = "none";
     });
 
-    $('#add_list').on('click', function() {
+    $('#add_list').on('click', function(event) {
         
         if (document.getElementById('add_list_field').value.trim() && document.getElementById('add_list_field').value.trim().length <= 200)
         {

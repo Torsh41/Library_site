@@ -5,15 +5,15 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin dashboard</title>
+  <title>Обсуждение темы</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/write_post.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/edit_post.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/forum_discussion/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/forum_discussion/write_post.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/forum_discussion/edit_post.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
@@ -89,7 +89,7 @@
 
           <div class="popup__btns">
             <input class="popup__btn" id="edit_post" type="button" value="Изменить" onclick="edit_post_ajax()">
-            <button type="button" class="popup__btn-end" onclick="closeEditPostForm()">Отменить</button>
+            <button id="close_edit_post_form" type="button" class="popup__btn-end">Отменить</button>
           </div>
         </form>
       </div>
@@ -99,79 +99,79 @@
       <div class="discussion__container container">
         <div class="discussion__wrap" id="disc_posts_container">
           {% for post in posts %}
-          <div class="discussion__message message" id="{{post.id}}discussion_post"> <!--Сообщение-->
-            <div class="message__left">
-              <div class="message__name">
-                {% if (post['username'] == current_user.username) and current_user.is_authenticated %}
-                <a href="{{url_for('personal.person', username=current_user.username)}}" class="message__link">
-                  {% else %}
-                  <a class="message__link">
-                    {% endif %}
-                    <div class="message__set">
-                      <img src="{{url_for('personal.avatar', username=post["username"])}}" alt="" class="message__img">
-                      <!--Фото админа из его личного кабинета-->
-                    </div>
-                    {{post['username']}}
-                  </a>
+            <div class="discussion__message message" id="{{post.id}}discussion_post"> <!--Сообщение-->
+              <div class="message__left">
+                <div class="message__name">
+                  {% if (post['username'] == current_user.username) and current_user.is_authenticated %}
+                  <a href="{{url_for('personal.person', username=current_user.username)}}" class="message__link">
+                    {% else %}
+                    <a class="message__link">
+                      {% endif %}
+                      <div class="message__set">
+                        <img src="{{url_for('personal.avatar', username=post["username"])}}" alt="" class="message__img">
+                        <!--Фото админа из его личного кабинета-->
+                      </div>
+                      {{post['username']}}
+                    </a>
+                </div>
+
+                <div class="message__name-info">
+                  <p class="message__info">
+                    <span class="message__span">
+                      {{post["age"]}}
+                    </span>
+                    <span class="message__span">
+                      {{post["gender"]}}
+                    </span>
+                    <span class="message__span">
+                      {{post["city"]}}
+                    </span>
+                    <span class="message__span">
+                      {{post["about_me"]}}
+                    </span>
+                  </p>
+                  <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " +
+                    months_dict[post["user_timestamp"].date().month] +
+                    " " + str(post["user_timestamp"].date().year) }}</span>
+                </div>
               </div>
 
-              <div class="message__name-info">
-                <p class="message__info">
-                  <span class="message__span">
-                    {{post["age"]}}
-                  </span>
-                  <span class="message__span">
-                    {{post["gender"]}}
-                  </span>
-                  <span class="message__span">
-                    {{post["city"]}}
-                  </span>
-                  <span class="message__span">
-                    {{post["about_me"]}}
-                  </span>
+              <div class="message__right" id="{{post["id"]}}msg_write_id">
+                {% if post["this_is_answer"] %}
+                <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                  <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
+                  <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
+                </div>
+                {% endif %}
+                <p class="message__text" id="{{post["id"]}}post_body">
+                  {{post["body"]}} <!--Сообщение пользователя-->
                 </p>
-                <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " +
-                  months_dict[post["user_timestamp"].date().month] +
-                  " " + str(post["user_timestamp"].date().year) }}</span>
+                {% if post["file"] %}
+                <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
+                  onmouseout="this.style.width='80px'; this.style.height='80px'"
+                  src="{{url_for('main.post_screenshot', post_id=post["id"])}}" />
+                {% endif %}
+
+                <!--This block for user (only for his messages)-->
+                {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
+                <div class="message__admin" id="{{post["id"]}}personal_cont">
+                  <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                  <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" data-url="/{{current_user.username}}/edit_post/{{topic_id}}/{{post["id"]}}" data-body="{{post["body"]}}">Редактировать</a>
+                  <a id="{{post.id}}post_d" class="message__admin-btn" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
+                </div>
+                {% elif current_user.role == Role.ADMIN %}
+                <div class="message__admin" id="{{post["id"]}}personal_cont">
+                  <a class="comments__command">Админ</a>
+                  <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                  <a id="{{post.id}}post_d" class="message__admin-btn" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
+                </div>
+                {% elif current_user.is_authenticated %}
+                <div class="message__admin" id="{{post["id"]}}personal_cont">
+                  <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                </div>
+                {% endif %}
               </div>
             </div>
-
-            <div class="message__right" id="{{post["id"]}}msg_write_id">
-              {% if post["this_is_answer"] %}
-              <div class="message__answer" id="{{post["id"]}}base_to_answer">
-                <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
-                <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
-              </div>
-              {% endif %}
-              <p class="message__text" id="{{post["id"]}}post_body">
-                {{post["body"]}} <!--Сообщение пользователя-->
-              </p>
-              {% if post["file"] %}
-              <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
-                onmouseout="this.style.width='80px'; this.style.height='80px'"
-                src="{{url_for('main.post_screenshot', post_id=post["id"])}}" />
-              {% endif %}
-
-              <!--This block for user (only for his messages)-->
-              {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
-              <div class="message__admin" id="{{post["id"]}}personal_cont">
-                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{topic_id}}', '{{post["id"]}}')">Ответить</a>
-                <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" onclick="open_popup_form('/{{current_user.username}}/edit_post/{{topic_id}}/{{post["id"]}}', '{{post["body"]}}')">Редактировать</a>
-                <a class="message__admin-btn" onclick="del_post_socket('{{topic_id}}', '{{post["id"]}}', '{{1}}')">Удалить</a>
-              </div>
-              {% elif current_user.role == Role.ADMIN %}
-              <div class="message__admin" id="{{post["id"]}}personal_cont">
-                <a class="comments__command">Админ</a>
-                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{topic_id}}', '{{post["id"]}}')">Ответить</a>
-                <a class="message__admin-btn" onclick="del_post_socket('{{topic_id}}', '{{post["id"]}}', '{{1}}')">Удалить</a>
-              </div>
-              {% elif current_user.is_authenticated %}
-              <div class="message__admin" id="{{post["id"]}}personal_cont">
-                <a class="message__admin-btn" id="{{post["id"]}}answer_on" onclick="answer_on_post('{{topic_id}}', '{{post["id"]}}')">Ответить</a>
-              </div>
-              {% endif %}
-            </div>
-          </div>
           {% endfor %}
 
           <!--Этот блок есть всегда (только для авторизированных пользователей)-->
@@ -201,7 +201,7 @@
               {% for p in posts_pagination.iter_pages() %}
                 {% if p %}
                 <li class="pagination__item active">
-                  <a onclick="get_posts_page('/get_posts_page/{{topic_id}}/{{p}}')">{{ p }}</a>
+                  <a id="{{p}}posts_p" data-url="/get_posts_page/{{topic_id}}/{{p}}">{{ p }}</a>
                 </li>
                 {% else %}
                 <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
@@ -214,10 +214,7 @@
           </div>
           {% endif %}
         </div>
-
-
       </div>
-
     </section>
   </main>
   <footer class="footer">
@@ -225,7 +222,5 @@
       <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
     </div>
   </footer>
-
 </body>
-
 </html>

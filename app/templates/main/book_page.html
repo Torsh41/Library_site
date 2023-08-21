@@ -14,9 +14,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/edit_comment.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/add_comment.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/book_page/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/book_page/add_comment.js')}}"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
   <style>
@@ -314,9 +313,8 @@
           </label>
 
           <div class="popup__btns">
-            <input class="popup__btn" id="edit_comment" type="button" value="Изменить" onclick="edit_comment_ajax()">
-            <button type="button" class="popup__btn-end" onclick="closeEditCommentForm()">Отменить</button>
-
+            <input class="popup__btn" id="edit_comment" type="button" value="Изменить">
+            <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
           </div>
         </form>
       </div>
@@ -336,8 +334,7 @@
                 placeholder="Введите свой комментарий.."></textarea>
             </label>
   
-            <input class="comments__btn btn" type="button" value="Отправить" id="send_comment"
-              onclick="add_comment_for_book('{{current_user.username}}', '{{book.name}}')">
+            <input class="comments__btn btn" type="button" value="Отправить" id="send_comment" data-user="{{current_user.username}}" data-book="{{book.name}}">
           </form>
           {% else %}
           <div class="book__footer">
@@ -373,46 +370,38 @@
   
               <div class="comments__commands" id="{{comment.id}}com_commands_cont">
                 {% if comment.user.username == current_user.username %}
-                <a id="{{comment.id}}edit_com_a"
-                  onclick="edit('{{ comment.body }}', '{{current_user.username}}', '{{book.name}}', '{{comment.id}}')"
-                  class="comments__command">Редактировать</a>
-                <a class="comments__command"
-                  onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')"
-                  id="{{ comment.id }}del">Удалить</a>
+                  <a id="{{comment.id}}edit_com_a" data-combody="{{ comment.body }}" data-username="{{current_user.username}}" data-bookname="{{book.name}}" data-comid="{{comment.id}}" class="comments__command">Редактировать</a>
+                  <a class="comments__command" data-url="/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
                 {% elif current_user.role == Role.ADMIN %}
-                <a class="comments__command">Админ</a>
-                <a class="comments__command"
-                  onclick="del_comment('/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}')"
-                  id="{{ comment.id }}del">Удалить</a>
+                  <a class="comments__command">Админ</a>
+                  <a class="comments__command" data-url="/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
                 {% endif %}
               </div>
             </li>
             {% endfor %}
           </ul>
           {% if pagination %}
-          <div class="list__pagination pagination" id="comments_pagination_container">
-            <ul class="pagination__list list-reset" id="comments_pagination">
-              <li class="pagination__item disabled">
-                &bull;
-              </li>
-              {% for p in pagination.iter_pages() %}
-              {% if p %}
-              <li class="pagination__item active">
-                <a onclick="get_comments_page('/get_comments_page/{{book.name}}/{{p}}')">{{ p }}</a>
-              </li>
-              {% else %}
-              <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-              {% endif %}
-              {% endfor %}
-              <li class="pagination__item disabled">
-                &bull;
-              </li>
-            </ul>
-          </div>
+            <div class="list__pagination pagination" id="comments_pagination_container">
+              <ul class="pagination__list list-reset" id="comments_pagination">
+                <li class="pagination__item disabled">
+                  &bull;
+                </li>
+                {% for p in pagination.iter_pages() %}
+                {% if p %}
+                <li class="pagination__item active">
+                  <a id="{{p}}comments_p" data-url="/get_comments_page/{{book.name}}/{{p}}">{{ p }}</a>
+                </li>
+                {% else %}
+                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                {% endif %}
+                {% endfor %}
+                <li class="pagination__item disabled">
+                  &bull;
+                </li>
+              </ul>
+            </div>
           {% endif %}
         </div>
-        
-
       </div>
     </section>
 
@@ -425,5 +414,4 @@
     </div>
   </footer>
 </body>
-
 </html>

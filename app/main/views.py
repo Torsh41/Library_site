@@ -98,12 +98,12 @@ def add_comment(username, book_name):
     id_of_added_comment = comments[-1].id
     if len(comments) % ELEMS_COUNT > 0:
         last_page += 1
-    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(
-        last_page, per_page=ELEMS_COUNT, error_out=False).items
+    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(last_page, per_page=ELEMS_COUNT, error_out=False).items
+    user_is_admin = True if current_user.role == Role.ADMIN else False
     users = list()
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(pages=last_page, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(pages=last_page, user_is_admin=user_is_admin, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
 
 
 @main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])

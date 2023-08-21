@@ -1,5 +1,8 @@
-function add_comment_for_book(username, book_name)
-{
+$(function() {
+  $('#send_comment').on('click', function(event) {
+    let target = event.target;
+    let username = target.dataset?.user;
+    let book_name = target.dataset?.book;
     form = document.getElementById('add_comment_form');
     form.setAttribute("action", `/${username}/${book_name}/add_comment`);
     if (document.getElementById('comment_body_id').value.trim() && document.getElementById('comment_body_id').value.trim().length <= 200)
@@ -37,9 +40,13 @@ function add_comment_for_book(username, book_name)
                             html += ` <div class="comments__commands" id="${comment.id}com_commands_cont">`;
                             if (comment.username == comment.name_of_current_user)
                             {
-                              html += `<a id="${comment.id}edit_com_a" onclick="edit('${comment.body}', '${comment.name_of_current_user}', '${comment.book_name}', '${comment.id}')" class="comments__command">Редактировать</a>
-                                        <a class="comments__command" onclick="del_comment('/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${comment.pages}')" id="${comment.id}del">Удалить</a>
-                                        <script>scroll(${comment.id  + 'del'})</script>`;
+                              html += `<a id="${comment.id}edit_com_a" data-combody='${comment.body}' data-username='${comment.name_of_current_user}' data-bookname='${comment.book_name}' data-comid='${comment.id}' class="comments__command">Редактировать</a>
+                                        <a class="comments__command" data-url='/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${comment.pages}' id="${comment.id}del">Удалить</a>`;
+                            }
+                            else if (comment.user_is_admin)
+                            {
+                              html += `<a class="comments__command">Админ</a>
+                                        <a class="comments__command" data-url='/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${comment.pages}' id="${comment.id}del">Удалить</a>`;
                             }
                             html += `</div></li>`;
             });
@@ -59,14 +66,14 @@ function add_comment_for_book(username, book_name)
                 if (comments[0].pages > 1 && i == comments[0].pages)
                 {
                   html += `<li class="pagination__item_cur_page">
-                              <a onclick="get_comments_page('/get_comments_page/${comments[0].book_name}/${i}')">${i}</a>
+                              <a id='${i}comments_p' data-url='/get_comments_page/${comments[0].book_name}/${i}'>${i}</a>
                             </li>`;
                 }
                 else
                 {
                   html += `<li class="pagination__item active">
-                            <a onclick="get_comments_page('/get_comments_page/${comments[0].book_name}/${i}')">${i}</a>
-                        </li>`;
+                            <a id='${i}comments_p' data-url='/get_comments_page/${comments[0].book_name}/${i}'>${i}</a>
+                          </li>`;
                 }
               }
             }
@@ -90,4 +97,5 @@ function add_comment_for_book(username, book_name)
         alert('Заполните поле');
         document.getElementById('comment_body_id').value = '';
     }
-}
+  });
+});
