@@ -1,3 +1,6 @@
+# import mimetypes
+# mimetypes.add_type('text/javascript', '.js', True)
+# mimetypes.add_type('text/css', '.css')
 import os
 from app.begin_to_app import create_app, socketio
 

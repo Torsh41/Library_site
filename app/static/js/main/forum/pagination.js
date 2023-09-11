@@ -121,7 +121,7 @@ $(function() {
                             html += `</li>`;
                         });
                     html += `</ul>
-                            <div class="list__pagination pagination" id="topics_pagi_container">
+                            <div class="list__pagination pagination" id="${category.id}topics_pagi_container">
                               <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
                               <li class="pagination__item disabled">
                                 &bull;
@@ -142,8 +142,8 @@ $(function() {
                               </li>
                               </ul></div></div></section>`;
                 });
-                section = document.getElementById('first_section');
-                section.insertAdjacentHTML('afterend', html);
+                section = document.getElementById('categories_container');
+                section.insertAdjacentHTML('afterbegin', html);
                 pagi = document.getElementById('pagination');
                 pagi_li = pagi.querySelector('.pagination__item_cur_page');
                 if (pagi_li)

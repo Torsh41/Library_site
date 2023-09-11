@@ -52,11 +52,11 @@ function del_user(url_path, pagination_id)
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        url = url_path.split('/'); user_id_for_del = url[url.length - 2];
-        // get_user_search_page(`/admin/get_user_search_page/${response.cur_page}`);
-        $('li').filter(function() {
-          return this.id.match(user_id_for_del + "user_info");
-        }).remove();
+        url = url_path.split('/'); //user_id_for_del = url[url.length - 2];
+        get_user_search_page(`/admin/get_user_search_page/${response.cur_page}`);
+        // $('li').filter(function() {
+        //   return this.id.match(user_id_for_del + "user_info");
+        // }).remove();
 
         $('ul').filter(function() {
           return this.id.match(pagination_id);
@@ -147,11 +147,11 @@ function del_category(url_path, pagination_id)
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        // get_category_page(`/admin/${response.username}/get_category_search_page/${response.cur_page}`, `${pagination_id}`);
-        url = url_path.split('/'); category_id_for_del = url[url.length - 2];
-        $('li').filter(function() {
-          return this.id.match(category_id_for_del + "category_info");
-        }).remove();
+        get_category_page(`/admin/${response.username}/get_category_search_page/${response.cur_page}`, `${pagination_id}`);
+        url = url_path.split('/'); //category_id_for_del = url[url.length - 2];
+        // $('li').filter(function() {
+        //   return this.id.match(category_id_for_del + "category_info");
+        // }).remove();
 
         $('ul').filter(function() {
           return this.id.match(pagination_id);

@@ -74,7 +74,7 @@ $(function() {
                           {
                             html += `<div class="message__admin" id="${post.id}personal_cont">
                                       <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                                      <a class="message__admin-btn" id="${post.id}edit_post_a" data-url='/${post.current_username}/edit_post/${post.topic_id}/${post.id}' data-body='${post.body}'>Редактировать</a>
+                                      <a class="message__admin-btn" id="${post.id}edit_post_a" data-url='/${cur_username}/edit_post/${post.topic_id}/${post.id}' data-body='${post.body}'>Редактировать</a>
                                       <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                                       </div>`;
                           }
@@ -83,7 +83,7 @@ $(function() {
                             html += `<div class="message__admin" id="${post.id}personal_cont">
                             <a class="comments__command">Админ</a>
                             <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                            <a class="message__admin-btn" id="${post.id}post_d" data-topicid'=${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
+                            <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                             </div>`;
                           }
                           else if (post.current_username)

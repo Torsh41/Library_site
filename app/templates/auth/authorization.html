@@ -91,6 +91,11 @@
            {% endif %}
           </label>
 
+          <label  class="form__label">
+            <span class="form__span">Запомнить меня</span>
+            {{form.remember_me(class="form__input")}}
+          </label>
+
           <button class="btn form__btn ">Войти</button>
         </form>
         <p>Забыли пароль? <a class="form__forget" href="{{url_for('auth.change_password_try')}}">Нажмите здесь, чтобы заменить его</a>.</p>

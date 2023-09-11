@@ -1,60 +1,3 @@
-let socket = io(); 
-let cur_username = '';
-let cur_user_is_admin;
-$(function() {
-  a = $("#write_msg");
-  if (a.length > 0) 
-  {
-    topic_id = a.data('username').split(';')[2];
-    write_post_form = document.getElementById("add_post_form");
-    if (write_post_form)
-    {
-      // $('#add_post_button').on('click', function(event) {
-      //   write_post_socket(topic_id);
-      // });
-      document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
-      a.on('click', function () {
-        document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
-        // $('#add_post_button').on('click', function(event) {
-        //   write_post_socket(topic_id);
-        // });
-        write_post_form.scrollIntoView();
-        $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
-      });
-    }
-    username = a.data('username').split(';')[0];
-    cur_user_is_admin = Number(a.data('username').split(';')[1]);
-    if (username.length > 0)
-    {
-      cur_username = username;
-    }
-  }
-  socket.on("add post", function (posts) {
-    add_post_on_forum(posts.data);
-  });
-  socket.on("del post response", function (response) {
-    del_post(response.response, response.topic_id, response.post_id);
-  });
-
-  $('#disc_posts_container').on('click', function(event) {
-      let target = event.target;
-      if (target.tagName === 'A' && target.id.includes('post_d'))
-      {
-        let topic_id = target.dataset?.topicid;
-        let post_id = target.dataset?.postid;
-        let page = target.dataset?.page;
-        del_post_socket(topic_id, post_id, page);
-      }
-      else if (target.tagName === 'A' && target.id.includes('answer_on'))
-      {
-        let topic_id = target.dataset?.topicid;
-        let post_id = target.dataset?.postid;
-        answer_on_post(topic_id, post_id);
-      }
-  });
-});
-
-
 function write_post_socket(topic_id, post_id_to_answer = false) 
 {
   if (document.getElementById("post_body_id").value.trim() && document.getElementById("post_body_id").value.trim().length <= 200) 
@@ -230,6 +173,50 @@ function add_post_on_forum(posts) {
   document.getElementById("file_input_id").value = "";
 }
 
+function del_post(response, topic_id, post_id) 
+{
+  get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
+  
+  $("ul").filter(function () {
+      return this.id.match("pagination");
+    }).remove();
+
+  html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;
+  if (response.has_elems) {
+    for (let i = 1; i <= response.pages; i++) {
+      if (response.pages > 1 && i == response.cur_page) {
+        html += `<li class="pagination__item_cur_page">
+                        <a id='${i}posts_p' data-url='/get_posts_page/${topic_id}/${i}'>${i}</a>
+                      </li>`;
+      } else {
+        html += `<li class="pagination__item active">
+                        <a id='${i}posts_p' data-url='/get_posts_page/${topic_id}/${i}'>${i}</a>
+                        </li>`;
+      }
+    }
+  }
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  document.getElementById("posts_pagination_container").innerHTML = html;
+  $("span")
+    .filter(function () {
+      return this.id.match("posts_count");
+    })
+    .remove();
+  html = `<span class="main__span-forum" id="posts_count">Сообщений: ${response.posts_count}</span>`;
+  div = document.getElementById("main_container");
+  div.insertAdjacentHTML("beforeend", html);
+}
+
+function answer_on_post(topic_id, post_id) 
+{
+  document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}', '${post_id}')`);
+  // $('#add_post_button').on('click', function(event) {
+  //   write_post_socket(topic_id, post_id);
+  // });
+  document.getElementById("add_post_form").scrollIntoView();
+  $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
+}
+
 function get_posts_page(url_path)
 {
   $.ajax({
@@ -301,23 +288,23 @@ function get_posts_page(url_path)
                   if (post.username == post.current_username)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
-                              <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
-                              <a class="message__admin-btn" id="${post.id}edit_post_a" onclick="open_popup_form('/${post.current_username}/edit_post/${post.topic_id}/${post.id}', '${post.body}')">Редактировать</a>
-                              <a class="message__admin-btn" onclick="del_post_socket('${post.topic_id}', '${post.id}', '${post.cur_page}')">Удалить</a>
+                              <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
+                              <a class="message__admin-btn" id="${post.id}edit_post_a" data-url='/${cur_username}/edit_post/${post.topic_id}/${post.id}' data-body='${post.body}'>Редактировать</a>
+                              <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                               </div>`;
                   }
                   else if (post.user_is_admin)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
                     <a class="comments__command">Админ</a>
-                    <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
-                    <a class="message__admin-btn" onclick="del_post_socket('${post.topic_id}', '${post.id}', '${post.cur_page}')">Удалить</a>
+                    <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
+                    <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                     </div>`;
                   }
                   else if (post.current_username)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
-                    <a class="message__admin-btn" id="${post.id}answer_on" onclick="answer_on_post('${post.topic_id}', '${post.id}')">Ответить</a>
+                    <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
                     </div>`;
                   }
                  html += `</div></div>`;
@@ -351,49 +338,64 @@ function get_posts_page(url_path)
   });
 }
 
-function del_post(response, topic_id, post_id) 
-{
-  get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
-  
-  $("ul").filter(function () {
-      return this.id.match("pagination");
-    }).remove();
-
-  html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;
-  if (response.has_elems) {
-    for (let i = 1; i <= response.pages; i++) {
-      if (response.pages > 1 && i == response.cur_page) {
-        html += `<li class="pagination__item_cur_page">
-                        <a id='${i}posts_p' data-url='/get_posts_page/${topic_id}/${i}'>${i}</a>
-                      </li>`;
-      } else {
-        html += `<li class="pagination__item active">
-                        <a id='${i}posts_p' data-url='/get_posts_page/${topic_id}/${i}'>${i}</a>
-                        </li>`;
-      }
+let socket = io(); 
+let cur_username = '';
+let cur_user_is_admin;
+$(function() {
+  let a = $("#write_msg");
+  if (a && a.length > 0) 
+  {
+    let topic_id = a.data('username').split(';')[2];
+    let write_post_form = document.getElementById("add_post_form");
+    if (write_post_form)
+    {
+      // $('#add_post_button').on('click', function(event) {
+      //   write_post_socket(topic_id);
+      // });
+      document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
+      a.on('click', function () {
+        document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
+        // $('#add_post_button').on('click', function(event) {
+        //   write_post_socket(topic_id);
+        // });
+        write_post_form.scrollIntoView();
+        $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
+      });
+    }
+    let username = a.data('username').split(';')[0];
+    cur_user_is_admin = Number(a.data('username').split(';')[1]);
+    if (username.length > 0)
+    {
+      cur_username = username;
     }
   }
-  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-  document.getElementById("posts_pagination_container").innerHTML = html;
-  $("span")
-    .filter(function () {
-      return this.id.match("posts_count");
-    })
-    .remove();
-  html = `<span class="main__span-forum" id="posts_count">Сообщений: ${response.posts_count}</span>`;
-  div = document.getElementById("main_container");
-  div.insertAdjacentHTML("beforeend", html);
-}
+  socket.on("add post", function (posts) {
+    add_post_on_forum(posts.data);
+  });
+  socket.on("del post response", function (response) {
+    del_post(response.response, response.topic_id, response.post_id);
+  });
 
-function answer_on_post(topic_id, post_id) 
-{
-  document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}', '${post_id}')`);
-  // $('#add_post_button').on('click', function(event) {
-  //   write_post_socket(topic_id, post_id);
-  // });
-  document.getElementById("add_post_form").scrollIntoView();
-  $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
-}
+  $('#disc_posts_container').on('click', function(event) {
+      let target = event.target;
+      if (target.tagName === 'A' && target.id.includes('post_d'))
+      {
+        let topic_id = target.dataset?.topicid;
+        let post_id = target.dataset?.postid;
+        let page = target.dataset?.page;
+        del_post_socket(topic_id, post_id, page);
+      }
+      else if (target.tagName === 'A' && target.id.includes('answer_on'))
+      {
+        let topic_id = target.dataset?.topicid;
+        let post_id = target.dataset?.postid;
+        answer_on_post(topic_id, post_id);
+      }
+  });
+});
+
+
+
 
 
 

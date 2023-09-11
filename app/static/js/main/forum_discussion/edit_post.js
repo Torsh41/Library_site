@@ -29,9 +29,9 @@ function edit_post_ajax()
               div = document.getElementById(response.post_id + 'msg_write_id');
               div.insertAdjacentHTML('afterbegin', html);
             }
-            div_ = document.getElementById(response.post_id + 'personal_cont');
+            div_ = document.getElementById(response.post_id + 'answer_on');
             html = `<a class="message__admin-btn" id="${response.post_id}edit_post_a" data-url="/${response.username}/edit_post/${response.topic_id}/${response.post_id}" data-body="${response.post_body}">Редактировать</a>`;
-            div_.insertAdjacentHTML('afterbegin', html)
+            div_.insertAdjacentHTML('afterend', html)
             document.getElementById("edit_post_field").value = "";
             document.getElementById("edit_post_sec").style.display = "none";
           },

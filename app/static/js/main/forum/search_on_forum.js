@@ -18,9 +18,9 @@ function search_category_on_forum()
                   return this.id.match("not_found");
                 }).remove();
                 document.getElementById("category_name_id").value = "";
-                html = "";
+                html = '';
                 categories.forEach(category => {
-                    html +=  `<section id="${category.id}category_info" class="fraction">
+                    html += `<section id="${category.id}category_info" class="fraction">
                     <div class="fraction__container container">
                       <div class="fraction__wrap">
                         <h2 class="fraction__title title" id="${category.id + 'category_title'}">${category.name}</h2> 
@@ -54,7 +54,7 @@ function search_category_on_forum()
                         topics = Array.from(category.topics);
                         topics.forEach(topic => {
           
-                          html += `<li class="fraction__list-item">
+                          html += `<li class="fraction__list-item" id="${category.id}topic_info">
                                     <a href="/forum/${topic.id}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
                                       <div class="fraction__topic">
                                         <p class="fraction__text-error"> ${topic.name}</p>
@@ -65,7 +65,7 @@ function search_category_on_forum()
 
                     html += `</ul>`;
                     // собираем пагинацию для топиков каждой категории
-                    html += `<div class="list__pagination pagination">
+                    html += `<div class="list__pagination pagination" id="${category.id}topics_pagi_container">
                                 <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
                                   <li class="pagination__item disabled">
                                     &bull;
@@ -95,8 +95,8 @@ function search_category_on_forum()
                               </ul></div>`;
                     html += `</div></div></section>`;
                 });
-                section = document.getElementById('first_section');
-                section.insertAdjacentHTML('afterend', html);
+                section = document.getElementById('categories_container');
+                section.insertAdjacentHTML('afterbegin', html);
                 section = document.getElementById(categories[0].id_of_found_elem + 'category_info');
                 section.scrollIntoView(); // Прокрутка до верхней границы
                 pagi = document.getElementById('pagination');

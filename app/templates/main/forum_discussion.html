@@ -12,7 +12,7 @@
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/pagination.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/forum_discussion/write_post.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/forum_discussion/posts_manipulations.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/edit_post.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
@@ -183,7 +183,7 @@
                 accept="image/*,image/jpeg">
               <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text"
                 placeholder="Написать сообщение.."></textarea>
-                <input id="add_post_button" class="button__write btn" type="button" value="Отправить">
+                <input id="add_post_button" class="button__write btn" data-topicid="{{topic_id}}" type="button" value="Отправить">
             </form>
           </div>
           {% else %}
