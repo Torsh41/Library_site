@@ -221,7 +221,24 @@ class SearchResult(database.Model, SerializerMixin):
         except:
             self.grade = 0
     
-        
+
+class BooksMaintaining(database.Model, SerializerMixin):
+    __tablename__ = "books_maintaining"     
+    id = database.Column(database.Integer, primary_key=True)  
+    name = database.Column(database.String(128), unique=False, index=True)
+    authors = database.Column(database.String(128), unique=False, default=None)
+    series = database.Column(database.String(128), unique=False, default=None)
+    categories = database.Column(database.String(128), unique=False, default=False)
+    publishing_date = database.Column(database.Integer, unique=False, default=False)
+    publishing_house = database.Column(database.String(128), unique=False, default=False)
+    pages_count = database.Column(database.Integer, unique=False, default=False)
+    isbn = database.Column(database.String(64), unique=False, default=False)
+    comments = database.Column(database.String(64), unique=False, default=False)
+    summary = database.Column(database.Text(), unique=False, default=False)
+    link = database.Column(database.String(256), unique=False, default=False)
+    count = database.Column(database.Integer, unique=False, default=False)
+    
+    
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)

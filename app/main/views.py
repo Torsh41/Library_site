@@ -1,13 +1,15 @@
 from . import main
 from app.init import database
-from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicPost, DiscussionTopic, Role
+from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicPost, DiscussionTopic, Role, BooksMaintaining
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from flask_login import current_user, login_required
 from app.decorators import admin_required, check_actual_password
+from app.parse_excel import *
 import copy
 from operator import itemgetter
 ELEMS_COUNT = 10
 TOP_BOOKS_COUNT = 3
+BOOKS_MAINTAINING_PER_PAGE = 70
 months_dict = {
     1: 'января',
     2: 'февраля',
@@ -506,3 +508,98 @@ def topic_delete(category_id, topic_id, page):
         pages = 1
         has_elems = False
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, topics_count=len(topics)))
+
+
+@main.route('/books-maintaining', methods=['GET'])
+@admin_required
+@check_actual_password
+def books_relevance():
+    pagination = BooksMaintaining.query.order_by().paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    return render_template('main/books_maintaining.html', info=pagination.items, pagination=pagination)
+
+
+@main.route('/books-maintaining/add-file', methods=['POST'])
+@admin_required
+@check_actual_password
+def add_new_books_info():
+    file = request.files['data_file']
+    # file.save(application.root_path + '\\static\\excel\\' + file.filename)
+    # with application.open_resource(application.root_path + url_for('static', filename='excel/'), 'w') as f:
+    #         self.avatar = f.read()
+    data = parse_excel(file)
+    for book_info in data:
+        book_obj = BooksMaintaining(name=book_info[0], authors=book_info[1], series=book_info[2], 
+                        categories=book_info[3], publishing_date=book_info[4], publishing_house=book_info[5],
+                        pages_count=book_info[6], isbn=book_info[7], comments=book_info[8], summary=book_info[9], 
+                        link=book_info[10], count=book_info[11])
+        database.session.add(book_obj)
+    database.session.commit()
+    data = BooksMaintaining.query.all(); data_len = len(data); data = data[data_len - BOOKS_MAINTAINING_PER_PAGE:]
+    
+    # найдем количество страниц
+    pages = data_len // BOOKS_MAINTAINING_PER_PAGE
+    if data_len % BOOKS_MAINTAINING_PER_PAGE > 0:
+        pages += 1
+    
+    return jsonify([dict(pages=pages, cur_page=pages, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                        categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                        pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                        link=book_info.link, count=book_info.count) for book_info in data])
+    # Название - 0
+    # Авторы - 1
+    # серия - 2
+    # категории - 3
+    # дата публикации - 4
+    # Издательство - 5
+    # Количество страниц - 6
+    # ISBN - 7
+    # Комментарии - 8
+    # Описание - 9
+    # Ссылка - 10
+    
+
+@main.route('/books-maintaining/search', methods=['POST'])
+@admin_required
+@check_actual_password
+def search_book():
+    book_name = str(request.form.get('search_result')).strip().lower()
+    book = BooksMaintaining.query.filter(BooksMaintaining.name.like("%{}%".format(book_name))).first()
+    if not book:
+        return jsonify([dict(result=False)])
+    
+    pagination = BooksMaintaining.query.paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    if book in pagination.items:
+        return jsonify([dict(result=True, cur_page=1, pages=pagination.pages, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                            categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                            pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                            link=book_info.link, count=book_info.count) for book_info in pagination.items])
+    for page in range(2, pagination.pages + 1):  
+        items = BooksMaintaining.query.paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False).items
+        if book in items:
+            return jsonify([dict(result=True, cur_page=page, pages=pagination.pages, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                                categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                                pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                                link=book_info.link, count=book_info.count) for book_info in items])
+            
+
+@main.route('/books-maintaining/get-page/<page>', methods=['GET'])
+@admin_required
+@check_actual_password
+def get_books_info_page(page):
+    page = int(page)
+    data = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False).items
+    return jsonify([dict(cur_page=page, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                        categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                        pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                        link=book_info.link, count=book_info.count) for book_info in data])
+    
+
+@main.route('/books-maintaining/change-count', methods=['POST'])
+@admin_required
+@check_actual_password
+def change_books_count():
+    book = BooksMaintaining.query.filter_by(id=int(request.form.get('id'))).first()
+    book.count = int(request.form.get('new_count'))
+    database.session.add(book)
+    database.session.commit()
+    return jsonify(dict(count=book.count))

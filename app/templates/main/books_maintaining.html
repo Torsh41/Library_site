@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ведение книг</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
+    <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+    <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+    <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+    <script defer src="{{ url_for('static', filename='js/main/books_maintaining/add_new_books_info.js')}}"></script>
+        <style>
+            * {
+            box-sizing: border-box;
+            }
+        
+            .openBtn {
+            display: flex;
+            justify-content: left;
+            }
+        
+            .openButton {
+            border: none;
+            border-radius: 5px;
+            background-color: #1c87c9;
+            color: white;
+            padding: 14px 20px;
+            cursor: pointer;
+            position: fixed;
+            }
+        
+            .loginPopup {
+            position: absolute;
+            text-align: center;
+            width: 100%;
+            }
+        
+            .formPopup {
+            position: fixed;
+            left: 45%;
+            top: 5%;
+            transform: translate(-50%, 5%);
+            border: 6px solid #fdfde9;
+            z-index: 9;
+            background-color: #a59494;
+            }
+        
+            .formContainer-comments {
+            width: 600px;
+            padding: 20px;
+            background-color: #a59494;
+            }
+        
+            .formContainer input[type=text],
+            .formContainer input[type=password] {
+            width: 100%;
+            padding: 15px;
+            margin: 5px 0 20px 0;
+            border: none;
+            background: #eee;
+            }
+        
+            .formContainer input[type=text]:focus,
+            .formContainer input[type=password]:focus {
+            background-color: #ddd;
+            outline: none;
+            }
+        
+            .formContainer .btn {
+            padding: 12px 20px;
+            border: none;
+            background-color: #8ebf42;
+            color: #fff;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            }
+        
+            .formContainer .cancel {
+            background-color: #cc0000;
+            }
+        
+            .formContainer .btn:hover,
+            .openButton:hover {
+            opacity: 1;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__container container">
+            <a class="header__logo" href="{{url_for('main.index')}}">
+                <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
+            </a>
+
+            <div class="header__right">
+                <span class="header__menu">Меню</span>
+                <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+                <span class="hamburger__box">
+                    <span class="hamburger__inner"></span>
+                </span>
+                </button>
+            </div>
+
+            <nav class="nav header__nav">
+                <div class="nav__menu js-menu-wrap">
+                    <ul class="nav__list list-reset">
+                        <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+                        <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+                        <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+                        <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+                    </ul>
+                </div>
+            </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="loginPopup" id="add_info_sec" style="display: none;">
+                <div class="formPopup">
+                  <h2 class="comments__title title">Добавление информации о книгах</h2>
+                    <form id="new_info_form" class="formContainer-comments" enctype="multipart/form-data" method="post">
+                        <div class="profile__image profile__image-edit">
+                            <input id="sel_file" class="profile__foto" type="file" name="data_file" multiple accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
+                        </div>
+                        <input id="new_books_info" class="popup__btn" type="button" value="Добавить информацию о книгах">
+                        <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="main">
+                <div class="main__container container">
+                    <div class="main__top">
+                        <h1 class="main__title">Поиск</h1>
+                        <svg class="main__svg" width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
+                        </svg>
+                    </div>
+            
+                    <div class="main__bottom">
+                        <form id="search_form" class="main__form" method="post">
+                            <label class="main__form-label">
+                                <svg class="main__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_6_94)">
+                                    <path d="M25.5 24.5556L18.1443 17.4723M18.1443 17.4723C19.9088 15.7732 21 13.426 21 10.8333C21 5.64801 16.6349 1.44446 11.25 1.44446C5.86523 1.44446 1.5 5.64801 1.5 10.8333C1.5 16.0188 5.86523 20.2222 11.25 20.2222C13.9424 20.2222 16.3798 19.1714 18.1443 17.4723Z"
+                                    stroke="#332f2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_6_94">
+                                        <rect width="27" height="26" fill="white" />
+                                    </clipPath>
+                                </defs>
+                                </svg>
+                                <input id="name_field" type="text" class="main__form-input" name="search_result" placeholder="Введите название книги или часть названия">
+                            </label>
+                            <button id="find_books_button" class="main__form-btn btn">Найти</button>
+                        </form>
+                    </div>
+
+                    <div id="add_info">
+                        <a id="add_info" class="main__form-btn btn">Добавить информацию</a>
+                    </div>
+
+                    
+                    <table id="main_table" class="table table-sm table-striped table-bordered" width="100%">
+                        <thead id="table_head">
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Авторы</th>
+                                <th>Серия</th>
+                                <th>Категории</th>
+                                <th>Дата публикации</th>
+                                <th>Количество страниц</th>
+                                <th>ISBN</th>
+                                <th>Комментарии</th>
+                                <th>Краткое содержание</th>
+                                <th>Ссылка</th>
+                                <th>Количество</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in info %}
+                                <tr id="{{book.id}}book">
+                                    <td>{{ book.id }}</td>
+                                    <td>{{ book.name }}</td>
+                                    <td>{{ book.authors }}</td>
+                                    <td>{{ book.series }}</td>
+                                    <td>{{ book.categories }}</td>
+                                    <td>{{ book.publishing_date }}</td>
+                                    <td>{{ book.pages_count }}</td>
+                                    <td>{{ book.isbn }}</td>
+                                    <td>{{ book.comments }}</td>
+                                    <td>{{ book.summary }}</td>
+                                    <td>{{ book.link }}</td>
+                                    <td><input id="{{book.id}}books_count" min="0" formmethod="post" placeholder="введите наличие" required type="number" value="{{book.count}}"></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="list__pagination pagination" id="pagination_container">
+                        <ul class="pagination__list list-reset" id="pagination">
+                            <li class="pagination__item disabled">
+                                &bull;
+                            </li>
+                            {% for p in pagination.iter_pages() %}
+                                {% if p %}
+                                    <li class="pagination__item active">
+                                        <a id="{{p}}books_info_p" data-url="/books-maintaining/get-page/{{ p }}">{{ p }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="pagination__item disabled">
+                                &bull;
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer__container container">
+            <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+            </div>
+        </footer>
+    </body>
+</html>

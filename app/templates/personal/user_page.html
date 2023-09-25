@@ -79,9 +79,7 @@
           <a class="main__bottom-item" href="#3">Мои списки книг</a>
           <a class="main__bottom-item" href="{{url_for('auth.change_password_try')}}">Сменить пароль</a>
         </div>
-        <a class="main__form-btn btn"
-          href="{{url_for('personal.add_new_book', username=current_user.username)}}">Добавить
-          новую книгу</a>
+        <a class="main__form-btn btn" href="{{url_for('personal.add_new_book', username=current_user.username)}}">Добавить новую книгу</a>
       </div>
     </section>
 
