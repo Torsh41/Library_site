@@ -202,6 +202,7 @@
                                     <td>{{ book.summary }}</td>
                                     <td>{{ book.link }}</td>
                                     <td><input id="{{book.id}}books_count" min="0" formmethod="post" placeholder="введите наличие" required type="number" value="{{book.count}}"></td>
+                                    <td><input id="{{book.id}}del_book" formmethod="post" type="submit" value="удалить из списка"></td>
                                 </tr>
                             {% endfor %}
                         </tbody>

@@ -603,3 +603,16 @@ def change_books_count():
     database.session.add(book)
     database.session.commit()
     return jsonify(dict(count=book.count))
+
+
+@main.route('/books-maintaining/del-book', methods=['POST'])
+@admin_required
+@check_actual_password
+def book_del():
+    try:
+        book = BooksMaintaining.query.filter_by(id=int(request.form.get('id'))).first()
+        database.session.delete(book)
+        database.session.commit()
+        return jsonify(dict(result=True))
+    except:
+        return jsonify(dict(result=False))

@@ -16,6 +16,7 @@ function show_new_data(books_info)
                     <td>${book_info.summary}</td>
                     <td>${book_info.link}</td>
                     <td><input id="${book_info.id}books_count" min="0" formmethod="post" placeholder="введите наличие" required type="number" value="${book_info.count}"></td>
+                    <td><input id="${book_info.id}del_book" formmethod="post" type="submit" value="удалить из списка"></td>
                 </tr>`;
     })
     html += '</tbody>';
@@ -207,7 +208,7 @@ $(function() {
         }
     });
 
-    $("#main_table").on("keyup", function(event) {
+    $("#main_table").on("keyup click", function(event) {
         let target = event.target;
         if (target.tagName === "INPUT" && target.id.includes('books_count') && event.which == 13)
         {
@@ -227,6 +228,35 @@ $(function() {
                     console.log(error);
                 }
             });
+        }
+        else if (target.tagName === "INPUT" && target.id.includes('del_book') && (event.which == 13 || event.which == 1))
+        {
+            if (confirm("Подтвердите действие")) 
+            {
+                let data = new FormData();
+                data.append("id", target.id.split('del_book')[0]);
+                $.ajax({
+                    method: 'post',
+                    url: '/books-maintaining/del-book',
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function(response) {
+                        if (response.result)
+                        {
+                            $(`#${data.get('id')}book`).remove();
+                        }
+                        else
+                        {
+                            alert('Что-то пошло не так:(');
+                        }
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
         }
     });
 });
