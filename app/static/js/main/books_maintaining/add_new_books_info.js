@@ -67,10 +67,12 @@ $(function() {
 
     $('#add_info').on('click', function(event) {
         $('#add_info_sec').css('display', 'block');
+        $('#sel_file').val("");
     });
     
     $('#close_form').on('click', function(event) {
         $('#add_info_sec').css('display', 'none');
+        $('#sel_file').val("");
     });
 
     $('#new_books_info').on('click', function(event) {
@@ -86,14 +88,21 @@ $(function() {
                 $('section').filter(function() {
                     return this.id.match("not_found");
                 }).remove();
-
                 let books_info = Array.from(response);
-                show_new_data(books_info);
-                document.getElementById("add_info_sec").style.display = "none";
-                document.getElementById("sel_file").value = "";
+                if (!books_info[0].result)
+                {
+                    alert('Проверьте файл на соответствие шаблону!');
+                    $('#sel_file').val("");
+                }
+                else
+                {
+                    show_new_data(books_info);
+                    document.getElementById("add_info_sec").style.display = "none";
+                    $('#sel_file').val("");
 
-                // перестроим пагинацию 
-                build_pagination(books_info[0].cur_page, books_info[0].pages);
+                    // перестроим пагинацию 
+                    build_pagination(books_info[0].cur_page, books_info[0].pages);
+                }
             },
             error: function(error) {
                 console.log(error);

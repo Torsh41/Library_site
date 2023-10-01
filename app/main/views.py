@@ -523,10 +523,13 @@ def books_relevance():
 @check_actual_password
 def add_new_books_info():
     file = request.files['data_file']
-    # file.save(application.root_path + '\\static\\excel\\' + file.filename)
-    # with application.open_resource(application.root_path + url_for('static', filename='excel/'), 'w') as f:
-    #         self.avatar = f.read()
+    if file.filename.split('.')[-1] != "xlsx":
+        return jsonify([dict(result=False)])
+    
     data = parse_excel(file)
+    if not data:
+        return jsonify([dict(result=False)])
+    
     for book_info in data:
         book_obj = BooksMaintaining(name=book_info[0], authors=book_info[1], series=book_info[2], 
                         categories=book_info[3], publishing_date=book_info[4], publishing_house=book_info[5],
@@ -534,6 +537,7 @@ def add_new_books_info():
                         link=book_info[10], count=book_info[11])
         database.session.add(book_obj)
     database.session.commit()
+    
     data = BooksMaintaining.query.all(); data_len = len(data); data = data[data_len - BOOKS_MAINTAINING_PER_PAGE:]
     
     # найдем количество страниц
@@ -541,7 +545,7 @@ def add_new_books_info():
     if data_len % BOOKS_MAINTAINING_PER_PAGE > 0:
         pages += 1
     
-    return jsonify([dict(pages=pages, cur_page=pages, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+    return jsonify([dict(result=True, pages=pages, cur_page=pages, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
                         categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
                         pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
                         link=book_info.link, count=book_info.count) for book_info in data])
