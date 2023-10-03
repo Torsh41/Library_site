@@ -225,7 +225,7 @@ class SearchResult(database.Model, SerializerMixin):
 class BooksMaintaining(database.Model, SerializerMixin):
     __tablename__ = "books_maintaining"     
     id = database.Column(database.Integer, primary_key=True)  
-    name = database.Column(database.String(128), unique=False, index=True)
+    name = database.Column(database.String(128), unique=True, index=True)
     authors = database.Column(database.String(128), unique=False, default=None)
     series = database.Column(database.String(128), unique=False, default=None)
     categories = database.Column(database.String(128), unique=False, default=False)

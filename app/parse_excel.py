@@ -8,12 +8,7 @@ def parse_excel(file) -> list | bool:
     data = list(); columns_count = sheet.max_column
     if columns_count != HEADERS_COUNT:
         return False
-    # count = 0
-    # head_row = 0
-    # for header_elem in sheet[head_row]:
-    #     headers[str(header_elem.value).strip()] = count
-    #     count += 1
-    
+
     row_index = 0; headers_set = set()
     for row in sheet:  
         # проверяем на соответствие нашим ожиданиям входной файл 
@@ -35,8 +30,10 @@ def parse_excel(file) -> list | bool:
             val = row[index].value
             if type(val) == int or type(val) == float:
                 cur_book.append(val)
-            else:
+            elif type(val) == str:
                 cur_book.append(str(val).strip().lower())
+            else:
+                cur_book.append(str("неизвестно"))
            
         cur_book.append(count)    
         data.append(copy(cur_book)) 

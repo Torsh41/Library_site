@@ -7,6 +7,7 @@ from app.decorators import admin_required, check_actual_password
 from app.parse_excel import *
 import copy
 from operator import itemgetter
+from sqlalchemy.exc import IntegrityError
 ELEMS_COUNT = 10
 TOP_BOOKS_COUNT = 3
 BOOKS_MAINTAINING_PER_PAGE = 70
@@ -531,10 +532,13 @@ def add_new_books_info():
         return jsonify([dict(result=False)])
     
     for book_info in data:
+        if BooksMaintaining.query.filter_by(name=book_info[0]).first():
+            continue
         book_obj = BooksMaintaining(name=book_info[0], authors=book_info[1], series=book_info[2], 
                         categories=book_info[3], publishing_date=book_info[4], publishing_house=book_info[5],
                         pages_count=book_info[6], isbn=book_info[7], comments=book_info[8], summary=book_info[9], 
                         link=book_info[10], count=book_info[11])
+        
         database.session.add(book_obj)
     database.session.commit()
     
