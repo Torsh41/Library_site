@@ -41,8 +41,15 @@ $(function() {
                 }
               }
             },
-            error: function(error) {
-                console.log(error);
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
             }
           });
         }

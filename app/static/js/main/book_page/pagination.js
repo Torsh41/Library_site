@@ -56,8 +56,15 @@ function get_comments_page(url_path)
               }
             }
         },
-        error: function(error) {
-            console.log(error);
+        error: function(jqXHR, exception) {
+            if (exception === 'parsererror')
+            {
+                window.location.href = '/auth/login';
+            }
+            else
+            {
+                console.log(exception);
+            }
         }
     });
 }
@@ -89,9 +96,16 @@ function edit_comment_ajax()
               document.getElementById("edit_comment_field").value = "";
               document.getElementById("edit_comment_sec").style.display = "none";
             },
-            error: function(error) {
-                console.log(error);
-            }
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
+              }
         });
     }
     else if (document.getElementById('edit_comment_field').value.trim().length > 200)
@@ -147,8 +161,15 @@ $(function() {
                   
                   document.getElementById('comments_pagination_container').innerHTML = html;
                 },
-                error: function(error) {
-                    console.log(error);
+                error: function(jqXHR, exception) {
+                    if (exception === 'parsererror')
+                    {
+                        window.location.href = '/auth/login';
+                    }
+                    else
+                    {
+                        console.log(exception);
+                    }
                 }
             });
           }

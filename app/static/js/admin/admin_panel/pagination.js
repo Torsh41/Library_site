@@ -37,9 +37,16 @@ function get_user_search_page(url_path, pagination_id)
               }
             }
         },
-        error: function(error) {
-            console.log(error);
-        }
+        error: function(jqXHR, exception) {
+            if (exception === 'parsererror')
+            {
+                window.location.href = '/auth/login';
+            }
+            else
+            {
+                console.log(exception);
+            }
+          }
     });
 }
 
@@ -86,8 +93,15 @@ function del_user(url_path, pagination_id)
         
         document.getElementById('user_pagination_container').innerHTML = html;
       },
-      error: function(error) {
-          console.log(error);
+      error: function(jqXHR, exception) {
+        if (exception === 'parsererror')
+        {
+          window.location.href = '/auth/login';
+        }
+        else
+        {
+          console.log(exception);
+        }
       }
     });
   }
@@ -132,8 +146,15 @@ function get_category_page(url_path, pagination_id)
             }
           }
         },
-        error: function(error) {
-            console.log(error);
+        error: function(jqXHR, exception) {
+            if (exception === 'parsererror')
+            {
+                window.location.href = '/auth/login';
+            }
+            else
+            {
+                console.log(exception);
+            }
         }
     });
 }
@@ -182,8 +203,15 @@ function del_category(url_path, pagination_id)
         
         document.getElementById('category_pagination_container').innerHTML = html;
       },
-      error: function(error) {
-          console.log(error);
+      error: function(jqXHR, exception) {
+          if (exception === 'parsererror')
+          {
+              window.location.href = '/auth/login';
+          }
+          else
+          {
+              console.log(exception);
+          }
       }
     });
   }
@@ -320,8 +348,15 @@ function search_books_on_category()
                 document.getElementById('search_res_id').value = "";
             }
           },
-          error: function(error) {
-              console.log(error);
+          error: function(jqXHR, exception) {
+              if (exception === 'parsererror')
+              {
+                  window.location.href = '/auth/login';
+              }
+              else
+              {
+                  console.log(exception);
+              }
         }
       });
     }
@@ -382,8 +417,15 @@ function get_books_page_on_admin_panel(url_path)
                     }
           }
         },
-        error: function(error) {
-            console.log(error);
+        error: function(jqXHR, exception) {
+            if (exception === 'parsererror')
+            {
+                window.location.href = '/auth/login';
+            }
+            else
+            {
+                console.log(exception);
+            }
         }
     });
 }
@@ -429,8 +471,15 @@ function del_book_from_site(url_path)
             ul = document.getElementById('list_res');
             ul.insertAdjacentHTML('afterend', html);  
             },
-            error: function(error) {
-                console.log(error);
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
             }
         });
     }

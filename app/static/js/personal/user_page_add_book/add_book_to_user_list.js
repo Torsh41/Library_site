@@ -33,8 +33,15 @@ function get_lists_page_to_add_book(url_path, read_state, book_id)
         }
       }
     },
-    error: function(error) {
-        console.log(error);
+    error: function(jqXHR, exception) {
+        if (exception === 'parsererror')
+        {
+            window.location.href = '/auth/login';
+        }
+        else
+        {
+            console.log(exception);
+        }
     }
   });
 }

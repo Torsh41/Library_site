@@ -332,8 +332,15 @@ function get_posts_page(url_path)
            }
          }
     },
-    error: function(error) {
-        console.log(error);
+    error: function(jqXHR, exception) {
+        if (exception === 'parsererror')
+        {
+            window.location.href = '/auth/login';
+        }
+        else
+        {
+            console.log(exception);
+        }
     }
   });
 }

@@ -1,4 +1,5 @@
 $(function() {
+
     $('#open_popup_form').on('click', function(event) {
         document.getElementById("popupForm").style.display = "block";
     });
@@ -97,7 +98,7 @@ $(function() {
                             html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;    
                             // 
 
-                            html += ` <div class="list__end">
+                            html += `<div class="list__end">
                                         <a class="list__delete-btn" id='${cataloge.id}del_list' data-url='/user/${cataloge.username}/delete-list/${cataloge.id}/${cataloge.pages}'>
                                             Удалить список
                                         </a></div></div></div></section>`;
@@ -146,8 +147,15 @@ $(function() {
                 alert('Различных списков может быть не больше 6');
             }
             },
-            error: function(error) {
-                console.log(error);
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
             }
         });
         }

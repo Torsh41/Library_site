@@ -83,8 +83,15 @@ $(function() {
             li = document.getElementById(comments[0].id_of_added_comment + 'comment_info');
             li.scrollIntoView(); // Прокрутка до верхней границы
           },
-          error: function(error) {
-              console.log(error);
+          error: function(jqXHR, exception) {
+              if (exception === 'parsererror')
+              {
+                  window.location.href = '/auth/login';
+              }
+              else
+              {
+                  console.log(exception);
+              }
           }
       });
     }

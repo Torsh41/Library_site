@@ -44,8 +44,15 @@ function get_topics_page_on_forum(url_path, category_id)
         }
       }
     },
-    error: function(error) {
-        console.log(error);
+    error: function(jqXHR, exception) {
+        if (exception === 'parsererror')
+        {
+            window.location.href = '/auth/login';
+        }
+        else
+        {
+            console.log(exception);
+        }
     }
   });
 }
@@ -158,8 +165,15 @@ $(function() {
                   }
                 }
             },
-            error: function(error) {
-                console.log(error);
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
             }
           });
         }
@@ -217,8 +231,15 @@ $(function() {
                         div.insertAdjacentHTML('afterend', html);
                         document.getElementById(category_id + 'topics_count').textContent = `Всего тем: ${response.topics_count}`;
                     },
-                    error: function(error) {
-                        console.log(error);
+                    error: function(jqXHR, exception) {
+                        if (exception === 'parsererror')
+                        {
+                          window.location.href = '/auth/login';
+                        }
+                        else
+                        {
+                          console.log(exception);
+                        }
                     }
                 });
             }
@@ -311,8 +332,15 @@ $(function() {
                 alert(`Такая тема уже имеется в данном разделе`);
               }
             },
-            error: function(error) {
-                console.log(error);
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
             }
           });
         }

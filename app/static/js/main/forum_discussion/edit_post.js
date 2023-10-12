@@ -35,8 +35,15 @@ function edit_post_ajax()
             document.getElementById("edit_post_field").value = "";
             document.getElementById("edit_post_sec").style.display = "none";
           },
-          error: function(error) {
-              console.log(error);
+          error: function(jqXHR, exception) {
+              if (exception === 'parsererror')
+              {
+                  window.location.href = '/auth/login';
+              }
+              else
+              {
+                  console.log(exception);
+              }
           }
       });
     }

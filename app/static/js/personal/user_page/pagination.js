@@ -99,8 +99,15 @@ function get_lists_page(url_path)
           }
         }
       },
-      error: function(error) {
-          console.log(error);
+      error: function(jqXHR, exception) {
+          if (exception === 'parsererror')
+          {
+              window.location.href = '/auth/login';
+          }
+          else
+          {
+              console.log(exception);
+          }
       }
   });
 }
@@ -146,8 +153,15 @@ function get_books_page(url_path, cataloge_id)
         }
       }
     },
-    error: function(error) {
-        console.log(error);
+    error: function(jqXHR, exception) {
+        if (exception === 'parsererror')
+        {
+            window.location.href = '/auth/login';
+        }
+        else
+        {
+            console.log(exception);
+        }
     }
   });
 }
@@ -202,8 +216,15 @@ $(function() {
             html += `<li class="pagination__item disabled">&bull;</li></ul>`;
             document.getElementById('pagination_container').innerHTML = html;
           },
-          error: function(error) {
-              console.log(error);
+          error: function(jqXHR, exception) {
+              if (exception === 'parsererror')
+              {
+                  window.location.href = '/auth/login';
+              }
+              else
+              {
+                  console.log(exception);
+              }
           }
         });
       }
@@ -255,8 +276,15 @@ $(function() {
             
             document.getElementById(cataloge_id + 'books_pagination_container').innerHTML = html;
           },
-          error: function(error) {
-              console.log(error);
+          error: function(jqXHR, exception) {
+              if (exception === 'parsererror')
+              {
+                  window.location.href = '/auth/login';
+              }
+              else
+              {
+                  console.log(exception);
+              }
           }
         });
       }

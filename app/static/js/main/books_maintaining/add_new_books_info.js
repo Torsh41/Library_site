@@ -104,8 +104,15 @@ $(function() {
                     build_pagination(books_info[0].cur_page, books_info[0].pages);
                 }
             },
-            error: function(error) {
-                console.log(error);
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
             }
         });
     });
@@ -136,8 +143,15 @@ $(function() {
                         }
                     }
                 },
-                error: function(error) {
-                    console.log(error);
+                error: function(jqXHR, exception) {
+                    if (exception === 'parsererror')
+                    {
+                        window.location.href = '/auth/login';
+                    }
+                    else
+                    {
+                        console.log(exception);
+                    }
                 }
             });
         }
@@ -210,8 +224,15 @@ $(function() {
                         table.scrollIntoView();
                     }
                 },
-                error: function(error) {
-                    console.log(error);
+                error: function(jqXHR, exception) {
+                    if (exception === 'parsererror')
+                    {
+                        window.location.href = '/auth/login';
+                    }
+                    else
+                    {
+                        console.log(exception);
+                    }
                 }
             });
         }
@@ -261,8 +282,15 @@ $(function() {
                             alert('Что-то пошло не так:(');
                         }
                     },
-                    error: function(error) {
-                        console.log(error);
+                    error: function(jqXHR, exception) {
+                        if (exception === 'parsererror')
+                        {
+                            window.location.href = '/auth/login';
+                        }
+                        else
+                        {
+                            console.log(exception);
+                        }
                     }
                 });
             }
