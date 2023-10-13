@@ -59,11 +59,11 @@ function del_user(url_path, pagination_id)
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        url = url_path.split('/'); //user_id_for_del = url[url.length - 2];
-        get_user_search_page(`/admin/get_user_search_page/${response.cur_page}`);
+        //let url = url_path.split('/'); user_id_for_del = url[url.length - 2];
         // $('li').filter(function() {
         //   return this.id.match(user_id_for_del + "user_info");
         // }).remove();
+        get_user_search_page(`/admin/get_user_search_page/${response.cur_page}`);
 
         $('ul').filter(function() {
           return this.id.match(pagination_id);
@@ -159,6 +159,31 @@ function get_category_page(url_path, pagination_id)
     });
 }
 
+function edit_elem_state(id)
+{
+    if (document.getElementById(id).style.display == "block")
+    {
+        document.getElementById(id).style.display = "none";
+        if (id == "book_categories")
+          document.getElementById("book_search_in_a_category").style.display = "none";
+        if (id == "users_search")
+        {
+            $('ul').filter(function() {
+                return this.id.match("users_search_list");
+            }).remove();
+            $('h2').filter(function() {
+                return this.id.match("nothing_found");
+            }).remove();
+            document.getElementById("username_field").value = "";
+        }
+    }
+    else
+    {
+        document.getElementById(id).style.display = "block";
+        document.getElementById(id).scrollIntoView();
+    }
+}
+
 function del_category(url_path, pagination_id) 
 {
   if (confirm('Подтвердите действие'))
@@ -169,15 +194,14 @@ function del_category(url_path, pagination_id)
       dataType: 'json',
       success: function(response) {
         get_category_page(`/admin/${response.username}/get_category_search_page/${response.cur_page}`, `${pagination_id}`);
-        url = url_path.split('/'); //category_id_for_del = url[url.length - 2];
-        // $('li').filter(function() {
-        //   return this.id.match(category_id_for_del + "category_info");
-        // }).remove();
-
+    
         $('ul').filter(function() {
           return this.id.match(pagination_id);
         }).remove();
-        html = `<ul class="pagination__list list-reset" id="${pagination_id}">`;
+
+        edit_elem_state('book_search_in_a_category');
+        
+        let html = `<ul class="pagination__list list-reset" id="${pagination_id}">`;
         html += `<li class="pagination__item disabled">&bull;</li>`;
 
         if (response.has_elems) 
@@ -215,31 +239,6 @@ function del_category(url_path, pagination_id)
       }
     });
   }
-}
-
-function edit_elem_state(id)
-{
-    if (document.getElementById(id).style.display == "block")
-    {
-        document.getElementById(id).style.display = "none";
-        if (id == "book_categories")
-          document.getElementById("book_search_in_a_category").style.display = "none";
-        if (id == "users_search")
-        {
-            $('ul').filter(function() {
-                return this.id.match("users_search_list");
-            }).remove();
-            $('h2').filter(function() {
-                return this.id.match("nothing_found");
-            }).remove();
-            document.getElementById("username_field").value = "";
-        }
-    }
-    else
-    {
-        document.getElementById(id).style.display = "block";
-        document.getElementById(id).scrollIntoView();
-    }
 }
 
 function open_book_panel(username, category)
