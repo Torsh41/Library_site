@@ -1,7 +1,7 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from .init import database, login_manager, application
-from flask import current_app, url_for
+from flask import current_app, url_for, session
 from datetime import datetime, timedelta
 from jose import jwt
 from sqlalchemy_serializer import SerializerMixin
@@ -18,15 +18,17 @@ class User(UserMixin, database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.String(64), unique=True, index=True)
     username = database.Column(database.String(64), unique=True, index=True)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     avatar = database.Column(database.LargeBinary, default=False)
     city = database.Column(database.String(64), default=False)
     gender = database.Column(database.String(4), default=False)
     age = database.Column(database.Integer, default=False)
-    about_me = database.Column(database.Text, default=False)
+    about_me = database.Column(database.Text(), default=False)
     password_hash = database.Column(database.String(128))
     books = database.relationship('Book', backref='user')
     grades = database.relationship('BookGrade', backref='user', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='user', cascade="all, delete, delete-orphan")
+    posts_from_all_topics = database.relationship('TopicPost', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
     role = database.Column(database.Boolean, default=False)
@@ -42,6 +44,32 @@ class User(UserMixin, database.Model, SerializerMixin):
         }
         access_token = jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm=current_app.config['JWT_ALGORITHM'])
         return access_token
+    
+    def generate_change_token(self): #30 минут время действия токена
+        now = datetime.utcnow()
+        payload = {
+            'iat': 0,
+            'ref': 0,
+            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'scope': 'access_token',
+            'user': self.id,
+        }
+        change_token = jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm=current_app.config['JWT_ALGORITHM'])
+        return change_token
+    
+    @staticmethod
+    def change_password(token, new_password):
+        try:
+            payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=current_app.config['JWT_ALGORITHM'])
+        except:
+            return False
+        user = User.query.filter_by(id=payload.get('user')).first()
+        if user is None:
+            return False
+        user.password = new_password
+        database.session.add(user)
+        session['password_hash'] = user.password_hash
+        return True
     
     def confirm(self, token):
         try:
@@ -85,25 +113,45 @@ class User(UserMixin, database.Model, SerializerMixin):
 class Category(database.Model, SerializerMixin):
     __tablename__ = "categories"    
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(64), unique=True, index=True)
-    books = database.relationship('Book', backref='category', cascade="all, delete, delete-orphan")
-    
+    name = database.Column(database.String(256), unique=True, index=True)
+    books = database.relationship('Book', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
+    topics = database.relationship('DiscussionTopic', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
+
+
+class DiscussionTopic(database.Model, SerializerMixin):
+    __tablename__ = "topics"
+    id = database.Column(database.Integer, primary_key=True)
+    name = database.Column(database.String(1024), unique=False, index=True)
+    category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
+    posts = database.relationship('TopicPost', backref='topic', lazy='dynamic', cascade="all, delete, delete-orphan")
+
+
+class TopicPost(database.Model, SerializerMixin):
+    __tablename__ = "posts"
+    id = database.Column(database.Integer, primary_key=True)
+    body = database.Column(database.String(1024), index=True)
+    file = database.Column(database.LargeBinary, default=False)
+    answer_to_post = database.Column(database.Integer, default=False)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
+    user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+    discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
+
     
 class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary, default=False)
     isbn = database.Column(database.String(64), unique=False)
-    name = database.Column(database.String(64), unique=True, index=True)
-    author = database.Column(database.String(64), unique=False)
-    publishing_house = database.Column(database.String(64), unique=False)
-    description = database.Column(database.Text(), unique=False)
+    name = database.Column(database.String(128), unique=True, index=True)
+    author = database.Column(database.String(128), unique=False)
+    publishing_house = database.Column(database.String(128), unique=False)
+    description = database.Column(database.Text(512), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
     cataloge_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
-    grades = database.relationship('BookGrade', backref='book', cascade="all, delete, delete-orphan")
+    grades = database.relationship('BookGrade', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
     def default_cover(self):
@@ -114,7 +162,7 @@ class Book(database.Model, SerializerMixin):
 class BookGrade(database.Model, SerializerMixin):
     __tablename__ = "grades"
     id = database.Column(database.Integer, primary_key=True)
-    grade = database.Column(database.Integer)
+    grade = database.Column(database.Integer, default=0)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
 
@@ -122,7 +170,7 @@ class BookGrade(database.Model, SerializerMixin):
 class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.Text)
+    body = database.Column(database.Text(512))
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -157,7 +205,8 @@ class SearchResult(database.Model, SerializerMixin):
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
-    def __init__(self, book):
+    grade = database.Column(database.Integer, unique=False)
+    def __init__(self, book: Book):
         self.id = book.id
         self.cover = book.cover
         self.isbn = book.isbn
@@ -167,8 +216,29 @@ class SearchResult(database.Model, SerializerMixin):
         self.description = book.description
         self.release_date = book.release_date
         self.count_of_chapters = book.count_of_chapters
+        try:
+            self.grade = round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)
+        except:
+            self.grade = 0
     
-        
+
+class BooksMaintaining(database.Model, SerializerMixin):
+    __tablename__ = "books_maintaining"     
+    id = database.Column(database.Integer, primary_key=True)  
+    name = database.Column(database.String(128), unique=True, index=True)
+    authors = database.Column(database.String(128), unique=False, default=None)
+    series = database.Column(database.String(128), unique=False, default=None)
+    categories = database.Column(database.String(128), unique=False, default=False)
+    publishing_date = database.Column(database.Integer, unique=False, default=False)
+    publishing_house = database.Column(database.String(128), unique=False, default=False)
+    pages_count = database.Column(database.Integer, unique=False, default=False)
+    isbn = database.Column(database.String(64), unique=False, default=False)
+    comments = database.Column(database.String(64), unique=False, default=False)
+    summary = database.Column(database.Text(), unique=False, default=False)
+    link = database.Column(database.String(256), unique=False, default=False)
+    count = database.Column(database.Integer, unique=False, default=False)
+    
+    
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)

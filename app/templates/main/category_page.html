@@ -9,46 +9,49 @@
   <title>{{ name }}</title> <!-- Название категории-->
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
-  <link rel="icon" href="img/favicon.svg">
-  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script> 
-  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
 <body>
   <header class="header">
     <div class="header__container container">
-      <a class="header__logo" href="index.html">
-        <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+      <a class="header__logo" href="{{url_for('main.index')}}">
+        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+          alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
-      <nav class="nav header__nav">
-        <ul class="nav__list list-reset">
-          <li class="nav__item"><a class="nav__link" href="#">Меню
-              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="black" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="black" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="black" />
-              </svg>
+      <div class="header__right">
+        <span class="header__menu">Меню</span>
+        <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+          <span class="hamburger__box">
+            <span class="hamburger__inner"></span>
+          </span>
+        </button>
+      </div>
 
-            </a>
-            <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              {% if current_user.is_anonymous %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
-              {% endif %}
-              {% if current_user.is_authenticated %}
-              <li class="nav__subitem"><a class="nav__link"
-                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              {% else %}
-              <li class="nav__subitem"><a class="nav__link"
-                href="{{url_for('auth.login')}}">Личный кабинет</a></li>
-              {% endif %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
-            </ul>
-          </li>
-        </ul>
+      <nav class="nav header__nav">
+        <div class="nav__menu js-menu-wrap">
+          <ul class="nav__list list-reset">
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+            {% if current_user.is_anonymous %}
+            <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+            {% endif %}
+            {% if current_user.is_authenticated %}
+            <li class="nav__item"><a class="nav__link"
+                href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+            {% else %}
+            <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+            {% endif %}
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
+          </ul>
+        </div>
+
       </nav>
+
     </div>
   </header>
 
@@ -57,11 +60,13 @@
       <div class="main__container container">
 
         <div class="main__top">
-          <span class="main__span">{{ name }}</span>
+
+
           <h1 class="main__title">Поиск книги</h1>
 
-          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+          <svg class="main__svg" width="461" height="1" viewBox="0 0 461 1" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
           </svg>
 
         </div>
@@ -70,11 +75,12 @@
           <form class="main__form" action="" method="post">
 
             <label class="main__form-label">
-              <svg class="main__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg class="main__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_6_94)">
                   <path
                     d="M25.5 24.5556L18.1443 17.4723M18.1443 17.4723C19.9088 15.7732 21 13.426 21 10.8333C21 5.64801 16.6349 1.44446 11.25 1.44446C5.86523 1.44446 1.5 5.64801 1.5 10.8333C1.5 16.0188 5.86523 20.2222 11.25 20.2222C13.9424 20.2222 16.3798 19.1714 18.1443 17.4723Z"
-                    stroke="#768298" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    stroke="#332f2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                 </g>
                 <defs>
                   <clipPath id="clip0_6_94">
@@ -83,34 +89,34 @@
                 </defs>
               </svg>
 
-              <input type="text" class="main__form-input" name="search_result" placeholder="Введите название книги или автора..">
+              <input type="text" class="main__form-input" name="search_result"
+                placeholder="Введите название книги или автора.." required>
             </label>
-            <div>
-              <span class="form__help">Для просмотра всех книг из данной категории введите слово все</span>
-            </div>
-          
-            <div>
-              <span class="form__help">Для просмотра всех книг введите *</span>
-            </div>
-            
+
+            <span class="main__help">Для просмотра всех книг из данной категории введите слово все</span>
+
+
+
+            <span class="main__help-end">Для просмотра всех книг введите *</span>
+
+
             <div class="main__form-wrap">
-             
+
               <select name="release_date" id="" class="main__form-select">
-                <option>Дата издания</option>
+                <option value="#">Дата издания</option>
                 {% for date in date_list %}
-                  <option value="{{ date }}">{{ date }}</option>
+                <option value="{{ date }}">{{ date }}</option>
                 {% endfor %}
               </select>
 
             </div>
 
-            <button class="main__form-btn btn">Найти</button>
+            <button class="main__form-btn btn" id="find_books_button">Найти</button>
 
           </form>
         </div>
       </div>
     </section>
-
 
     <!--Информация о книгах сразу при переходе пользователя на эту страницу-->
     {% if search_result and search_result != 404 %}
@@ -119,54 +125,96 @@
         <div class="list__wrap">
           <h2 class="list__title title">Вот, что есть в данной категории</h2>
           <span class="list__results"> Всего результатов: {{ len(all_search_result) }} </span>
-          <ul class="list__books list-reset">
+          <ul class="list__books list-reset" id="book_search_res_ul">
 
             {% for book in search_result %}
+            <!--Найденные книги-->
+
+            <li class="list__book" id="{{book.id}}search_books_info">
+
+              <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
+
+                <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
+              </a>
 
 
-              <!--Найденные книги-->
-
-              <li class="list__book">
-                
-                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__book-set">
-                  <img class="list__book-set" src="{{url_for('main.cover', name=book.name)}}" alt="">
-                </a>
-                
-
-                <div class="list__book-wrap">
-                  {% if current_user.is_authenticated %}
-                    <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id, list_id=list_id)}}" class="list__link">Добавить в список</a>
-                  {% endif %}
-                  <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link">Книга: {{ book.name }}</a>
-                  <span class="list__link">Автор: {{ book.author }}</span>
-                </div>
-              </li>
-
-              {% endfor %}
+              <div class="list__book-wrap">
+                {% if current_user.is_authenticated %}
+                <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id, list_id=list_id)}}"
+                  class="list__book-delete-btn">Добавить в список</a>
+                {% endif %}
+                <a href="{{url_for('main.book_page', name=book.name)}}" class="list__link-book">Книга: {{book.name}}</a>
+                <span class="list__link">Автор: {{ book.author }}</span>
+              </div>
+            </li>
+            {% endfor %}
           </ul>
-          </div>
+
           <div class="list__pagination pagination">
-              {{ macros.pagination_widget(page_count=page_count, range=range, name=name, list_id=list_id) }}
+            {{macros.pagination_widget(page_count=page_count, range=range, name=name, list_id=list_id)}}
+            <script>scroll('find_books_button')</script>
           </div>
         </div>
-      </section>
-      {% elif search_result == 404 %}
-      <section class="list">
-        <div class="container list__container">
-          <div class="list__wrap">
-            <h2 class="list__title title">Ничего не найдено</h2>
-          </div>
-        </div>
-      </section>
-      {% endif %}
+
+      </div>
+    </section>
 
 
-          </ul>
-        </div>
-        <div class="list__pagination pagination">
+    {% elif search_result == 404 %}
+    <section class="list">
+      <div class="container list__container">
+        <div class="list__wrap">
+          <h2 class="list__title title">Ничего не найдено</h2>
         </div>
       </div>
     </section>
+    {% endif %}
+
+    <!-- <span class="main__span">{{ name }}</span> -->
+    <section class="list">
+      <div class=" container list__container">
+        <div class="list__wrap">
+          <h2 class="list__title title">Лучшее за последнее время</h2>
+
+          <ul class="list__books list-reset">
+
+            <!--Подборка лучших книг-->
+            {% for book in top_books %}
+            <li class="list__book">
+
+              <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__book-set">
+                <img class="list__book-set" src="{{url_for('main.cover', name=book[0].name)}}" alt="">
+              </a>
+
+
+              <div class="list__book-wrap">
+
+
+                {% if current_user.is_authenticated %}
+                <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
+                  class="list__book-delete-btn">Добавить в список</a>
+                {% endif %}
+                <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__link">Книга:
+                  {{book[0].name}}</a>
+                <span class="list__link">Автор: {{book[0].author}}</span>
+                <div class="list__mark-star">
+                  <span class="list__mark-visible">Оценка {{book[1]}}</span>
+                  <img src="{{url_for('static', filename='styles/img/star1.svg')}}" alt="" class="list__star">
+                </div>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!--pagination - по 4 элемента только на одном слайдере -->
+      </div>
+    </section>
+
+    <div class="list__pagination pagination">
+    </div>
+
+
 
 
     <!--Найденные книги при доп.поиске книг-->

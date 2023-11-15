@@ -1,3 +1,4 @@
+{% import "lists_macro.html" as macros %}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -8,43 +9,51 @@
   <title>Просмотр категорий</title>
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
-  <link rel="icon" href="img/favicon.svg">
+  <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/categories/pagination.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
 <body>
   <header class="header">
     <div class="header__container container">
-      <a class="header__logo" href="index.html">
-        <img src="img/Logo.svg" alt="Логотип MAGIC BOOK KEEPER">
+      <a class="header__logo" href="{{url_for('main.index')}}">
+        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+          alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
-      <nav class="nav header__nav">
-        <ul class="nav__list list-reset">
-          <li class="nav__item"><a class="nav__link" href="#">Меню
-              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="black" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="black" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="black" />
-              </svg>
+      <div class="header__right">
+        <span class="header__menu">Меню</span>
+        <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+          <span class="hamburger__box">
+            <span class="hamburger__inner"></span>
+          </span>
+        </button>
+      </div>
 
-            </a>
-            <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              {% if current_user.is_anonymous %}
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
-              {% endif %}
-              {% if current_user.is_authenticated %}
-              <li class="nav__subitem"><a class="nav__link"
-                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              {% else %}
-              <li class="nav__subitem"><a class="nav__link"
-                href="{{url_for('auth.login')}}">Личный кабинет</a></li>
-              {% endif %}
-            </ul>
-          </li>
-        </ul>
+      <nav class="nav header__nav">
+        <div class="nav__menu js-menu-wrap">
+          <ul class="nav__list list-reset">
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+            {% if current_user.is_anonymous %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+            {% endif %}
+            {% if current_user.is_authenticated %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+            {% else %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+            {% endif %}
+            {% if current_user.role == Role.ADMIN %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
       </nav>
+
+
     </div>
   </header>
 
@@ -54,10 +63,10 @@
 
         <div class="main__top">
           <!-- <span class="main__span">Welcome!</span> -->
-          <h1 class="main__title">Категории</h1>
+          <h1 class="main__title">Категории книг</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+            <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
           </svg>
 
         </div>
@@ -71,43 +80,42 @@
       </div>
     </section>
 
-    <!-- <section id="1" class="about">
-      <div class="about__container container">
-        <ul class="about__cat-list list-reset">
-          {% for category in categories %}
-            <li class="about__cat-elem"><a href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}" class="about__book-link">{{ category.name }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-    </section> -->
-
-    <!--Проверь как работает эта секция-->
-    <section class="category">
+    <section id="1" class="category">
       <div class="category__container container">
-        <ul class="category__list list-reset">
-          {% for category in categories %}
-          <!-- <a href="#" class="category__book-link">
-            <li class="category__elem">
-              <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_139_2)">
-                  <rect x="35" width="8" height="78" fill="#D9D9D9" />
-                  <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_139_2">
-                    <rect width="78" height="78" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </li>
-          </a> -->
-
-          <li class="category__elem"><a href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}" class="category__book-link">{{ category.name }}</a></li>
-          {% endfor %}
-        </ul>
+        <div class="category__wrap">
+          <ul class="category__list list-reset" id="categories_block">
+            {% for category in categories %}
+            <li class="category__elem" id="{{category.id}}category_info"><a
+                href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}"
+                class="category__book-link">
+                <div class="category__block">{{ category.name }}</div>
+              </a></li>
+            {% endfor %}
+          </ul>
+          {% if category_pagination %}
+          <div class="list__pagination pagination" id="user_pagination_container">
+            <ul class="pagination__list list-reset" id="pagination">
+              <li class="pagination__item disabled">
+                  &bull;
+              </li>
+              {% for p in category_pagination.iter_pages() %}
+                  {% if p %}
+                    <li class="pagination__item active">
+                        <a id="{{p}}list_pagi" data-url="/get_categories_page/{{p}}">{{ p }}</a>
+                    </li>
+                  {% else %}
+                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                  {% endif %}
+              {% endfor %}
+              <li class="pagination__item disabled">
+                  &bull; 
+              </li>
+            </ul>
+          </div>
+          {% endif %}
+        </div>
       </div>
     </section>
-
   </main>
 
   <footer class="footer">
@@ -116,5 +124,4 @@
     </div>
   </footer>
 </body>
-
 </html>

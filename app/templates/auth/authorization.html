@@ -12,33 +12,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
-<body class="image-1">
+<body>
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
         <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
-      <nav class="nav header__nav">
-        <ul class="nav__list list-reset">
-          <li class="nav__item"><a class="nav__link" href="#">Меню
-              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
-              </svg>
+      <div class="header__right">
+        <span class="header__menu">Меню</span>
+        <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+          <span class="hamburger__box">
+            <span class="hamburger__inner"></span>
+          </span>
+        </button>
+      </div>
 
-            </a>
-            <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-              <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
-            </ul>
-          </li>
-        </ul>
+      <nav class="nav header__nav">
+        <div class="nav__menu js-menu-wrap">
+          <ul class="nav__list list-reset">
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+          </ul>
+        </div>
+
       </nav>
     </div>
   </header>
@@ -48,24 +49,17 @@
       <div class="main__container container">
 
         <div class="main__top">
-          <!-- <span class="main__span">Welcome!</span> -->
           <h1 class="main__title">Личный кабинет</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
+            <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
           </svg>
-
         </div>
-
-        <!-- <div class="main__bottom">
-          <a class="main__bottom-item" href="#">Регистрация</a>
-          <a class="main__bottom-item" href="#">Личный кабинет</a>
-        </div> -->
 
       </div>
     </section>
 
-    <section class="form background-book_page">
+    <section class="form">
       <div class="form__container container">
         <form class="form__wrap" action="" method="post">
           {{form.hidden_tag()}}
@@ -73,7 +67,7 @@
            <span class="form__span">Ваш email</span>
            {% if form.email.errors %}
            {{form.email(class="form__input", placeholder='Введите email')}} 
-           <span> 
+           <span class="form__help"> 
             {% for msg in form.email.errors %}
             {{ msg }}
             {% endfor %}
@@ -87,7 +81,7 @@
            <span class="form__span">Ваш пароль</span>
            {% if form.password.errors %}
            {{form.password(class="form__input", placeholder='Введите пароль')}}
-           <span> 
+           <span class="form__help"> 
             {% for msg in form.password.errors %}
             {{ msg }}
             {% endfor %}
@@ -97,23 +91,14 @@
            {% endif %}
           </label>
 
-          <button class="btn form__btn ">Войти</button>
-        </form>
-        <p>Забыли пароль? <a class="form__forget" href="{{url_for('auth.change_password')}}">Нажмите здесь, чтобы заменить его</a>.</p>
-        <!--<form class="form__wrap" action="" method="post">
-          
           <label  class="form__label">
-            <span class="form__span">Ваш email</span>
-            <input type="text" class="form__input" name="email">
-          </label> 
-
-          <label  class="form__label">
-            <span class="form__span">Ваш пароль</span>
-            <input type="password" class="form__input" name="password" placeholder="Введите пароль" required>
+            <span class="form__span">Запомнить меня</span>
+            {{form.remember_me(class="form__input")}}
           </label>
 
           <button class="btn form__btn ">Войти</button>
-        </form>-->
+        </form>
+        <p>Забыли пароль? <a class="form__forget" href="{{url_for('auth.change_password_try')}}">Нажмите здесь, чтобы заменить его</a>.</p>
       </div>
     </section>
   </main>

@@ -12,40 +12,45 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/personal/user_page_add_book/add_book_to_user_list.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
-<body class="image-2">
+<body>
   <header class="header style-1">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
-        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
+        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+          alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
-      <nav class="nav header__nav">
-        <ul class="nav__list list-reset">
-          <li class="nav__item"><a class="nav__link" href="#">Меню
-              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
-              </svg>
+      <div class="header__right">
+        <span class="header__menu">Меню</span>
+        <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+          <span class="hamburger__box">
+            <span class="hamburger__inner"></span>
+          </span>
+        </button>
+      </div>
 
-            </a>
-            <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-              <!-- <li class="nav__subitem"><a class="nav__link" href="#">Рейтинг пользователей</a></li> -->
-            </ul>
-          </li>
-        </ul>
+      <nav class="nav header__nav">
+        <div class="nav__menu js-menu-wrap">
+          <ul class="nav__list list-reset">
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+          </ul>
+        </div>
+
       </nav>
+
     </div>
   </header>
 
   <main>
-    <section class="main style-1">
+    <section class="main style-1" id="cataloges_hat">
       <div class="main__container container">
 
         <div class="main__top">
@@ -60,35 +65,52 @@
         </div>
 
         <div class="main__bottom">
-          <a class="main__bottom-item" href="{{url_for('personal.person', username=current_user.username)}}">Мой профиль</a>
+          <a class="main__bottom-item" href="{{url_for('personal.person', username=current_user.username)}}">Мой
+            профиль</a>
         </div>
       </div>
     </section>
 
-    <div class="background-book_page">
-      <!--место для списков-->
-      {% if not catalogues %}
-      <section class="list__list">
-        <div class="container lists__catalog">
-          <div class="list__wrap">
-            <a class="title list__name" href="{{url_for('personal.person', username=current_user.username)}}">У вас пока нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.</a>
-          </div>
+
+    <!--место для списков-->
+    {% if not catalogues %}
+    <section class="list__list">
+      <div class="container lists__catalog">
+        <div class="list__wrap">
+          <a class="title list__name" href="{{url_for('personal.person', username=current_user.username)}}">У вас пока
+            нет созданных списков книг, пожалуйста, перейдите в свой профиль и сделайте это.</a>
         </div>
-      </section>
-      {% else %}
-      {% for cataloge_value in catalogues %}
-      <section class="list__list">
-        <div class="container lists__catalog">
-          <div class="list__wrap ">
-            <a class="title list__name"
-              href="{{url_for('personal.add_book_in_list', username=current_user.username, list_id=cataloge_value.id, book_id=book_id, read_state=read_state)}}">{{
-              cataloge_value.name }}</a>
-          </div>
-        </div>
-      </section>
-      {% endfor %}
-      {% endif %}
+      </div>
+    </section>
+    {% else %}
+    {% for cataloge_value in catalogues %}
+    <section class="list__list" id="{{cataloge_value.id}}cataloge_info">
+      <div class="container lists__catalog">
+        <!-- <div class="list__wrap "> -->
+          <a class="title list__name"
+            href="{{url_for('personal.add_book_in_list', username=current_user.username, list_id=cataloge_value.id, book_id=book_id, read_state=read_state)}}">{{
+            cataloge_value.name }}</a>
+        <!-- </div> -->
+      </div>
+    </section>
+    {% endfor %}
+    <div class="list__pagination pagination" id="comments_pagination_container">
+      <ul class="pagination__list list-reset" id="pagination">
+        <li class="pagination__item disabled">
+          &bull;
+        </li>
+        {% for p in catalogues_pagination.iter_pages() %}
+        <li class="pagination__item active">
+          <a id="{{p}}lists_p" data-url="/user/{{current_user.username}}/get_lists_page_to_add_book/{{p}}" data-readstate="{{read_state}}" data-bookid="{{book_id}}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        <li class="pagination__item disabled">
+          &bull;
+        </li>
+      </ul>
     </div>
+    {% endif %}
+
 
   </main>
 

@@ -5,10 +5,12 @@ from .main import main as main_blueprint
 from .admin import admin as admin_blueprint
 from .personal import personal as personal_blueprint
 
-
+  
+#manager = Manager(app)
 def create_app(config_name):
   application.config.from_object(config[config_name])
   config[config_name].init_app(application)
+  socketio.init_app(application)
   mail.init_app(application)
   moment.init_app(application)
   login_manager.init_app(application)

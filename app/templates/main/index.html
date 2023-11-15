@@ -5,62 +5,77 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MAGIC BOOK KEEPER</title>
+  <title>Библиотека</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
 <body>
-  <header class="header style-1">
+  <header class="header">
     <div class="header__container container">
       <a class="header__logo" href="{{url_for('main.index')}}">
         <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
           alt="Логотип MAGIC BOOK KEEPER">
       </a>
 
-      <nav class="nav header__nav">
-        <ul class="nav__list list-reset">
-          <li class="nav__item"><a class="nav__link" href="#">Меню
-              <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
-                <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
-                <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
-              </svg>
+      <div class="header__right">
+        <span class="header__menu">Меню</span>
+        <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+          <span class="hamburger__box">
+            <span class="hamburger__inner"></span>
+          </span>
+        </button>
+      </div>
 
-            </a>
-            <ul class="nav__sublist list-reset">
-              <li class="nav__subitem"><a class="nav__link" href="#1">О нас</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="#2">Контакты</a></li>
-              <li class="nav__subitem"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-            </ul>
-          </li>
-        </ul>
+      <nav class="nav header__nav">
+        <div class="nav__menu js-menu-wrap">
+          <ul class="nav__list list-reset">
+            <!-- <li class="nav__item"><a class="nav__link" href="#2">Контакты</a></li>
+            <li class="nav__item"><a class="nav__link" href="#1">О нас</a></li> -->
+
+            {% if current_user.is_anonymous %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+            {% endif %}
+
+            {% if current_user.is_authenticated %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+            {% else %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+            {% endif %}
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+            {% if current_user.role == Role.ADMIN %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
       </nav>
     </div>
   </header>
 
   <main>
 
-    <section class="main style-1">
+    <section class="main">
       <div class="main__container container">
 
         <div class="main__top">
-          <span class="main__span">Welcome!</span>
-          <h1 class="main__title ">MAGIC BOOK KEEPER</h1>
+          <span class="main__span">Цифровая кафедра РХТУ</span>
+          <h1 class="main__title ">Библиотека</h1>
 
           <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
+            <line y1="0.5" x2="461" y2="0.5" stroke="#e6e2de" />
           </svg>
 
         </div>
 
         <div class="main__bottom">
-          {% if current_user.is_anonymous %}
+          <!-- {% if current_user.is_anonymous %}
           <a class="main__bottom-item" href="{{url_for('auth.register')}}">Регистрация</a>
           {% else %}
           <a class="main__bottom-item" href="#">Регистрация</a>
@@ -71,60 +86,69 @@
             кабинет</a>
           {% else %}
           <a class="main__bottom-item" href="{{url_for('auth.login')}}">Личный кабинет</a>
-          {% endif %}
+          {% endif %} -->
+
+          <a class="main__bottom-item" href="#1">О нас</a>
+          <a class="main__bottom-item" href="#2">Контакты</a>
         </div>
       </div>
     </section>
 
-    <div class="background-index">
-      <section id="1" class="about">
-        <div class="about__container container">
-          <div class="about__wrap">
-            <h2 class="about__title title">О нас</h2>
+    <section id="1" class="about">
+      <div class="about__container container">
+        <div class="about__wrap">
+          <h2 class="about__title title">О нас</h2>
 
-            <p class="about__text">
-              MBK - это удобный поисковик, в котором переплетаются такие возможности, как добаление разнообразных книг в
-              общую библиотеку, так и поиск уже существующих.
-              На нашем сайте Вы можете вести собственную библиотеку в своём профиле.
-              <br>MBK позволит Вам не только прочитать всю доступную информацию о книге, но и ознакомиться с отзывами к ней
-              от других читателей, а также оставить свой.
-              Если Вы обнаружите ошибку в работе сайта, или недостоверную информацию по книге, или у Вас будут
-              предложения по улучшению данного проекта, то свяжитесь с нами в следующих соцсетях: 
-            </p>
+          <p class="about__text">
+            Mы удобный поисковик, в котором переплетаются такие возможности, как добаление разнообразных книг в
+            общую библиотеку, так и поиск уже существующих.
+            На нашем сайте Вы можете вести собственную библиотеку в своём профиле.
+            наша библиотека позволит Вам не только прочитать всю доступную информацию о книге, но и ознакомиться с отзывами к
+            ней
+            от других читателей, а также оставить свой.
+            Если Вы обнаружите ошибку в работе сайта, или недостоверную информацию по книге, или у Вас будут
+            предложения по улучшению данного проекта, то свяжитесь с нами в следующих соцсетях:
+          </p>
 
-            <ul class="about__icons list-reset">
-               <li class="about__icon"><a href="https://vk.com/public217965443" class="about__icon-link" target="_blank"><img src="{{url_for('static', filename='styles/img/vk.svg')}}" alt="VK" class="about__icon-photo"></a></li>
-               <li class="about__icon"><a href="t.me/headhuntersweb (https://t.me/headhuntersweb)" class="about__icon-link" target="_blank"><img src="{{url_for('static', filename='styles/img/telegram.svg')}}" alt="Telegram" class="about__icon-photo"></a></li>
-               <li class="about__icon"><a href="https://github.com/SimpleMaking/Library_site" class="about__icon-link" target="_blank"><img src="{{url_for('static', filename='styles/img/github.svg')}}" alt="Github" class="about__icon-photo"></a></li>
-            </ul>
-
-          </div>
-
-        </div>
-      </section>
-
-      <section id="2" class="contacts">
-        <div class="contacts__container container">
-          <div class="contacts__wrap">
-            <h2 class="contacts__title title">Контакты</h2>
-
-            <p class="contacts__email">
-              headhunters@gmail.com
-            </p>
-
-            <p class="contacts__phone">
-              +79999999999
-            </p>
-
-            <div class="contacts__icons">
-
-            </div>
-          </div>
+          <ul class="about__icons list-reset">
+            <li class="about__icon"><a href="https://vk.com/public217965443" class="about__icon-link"
+                target="_blank"><img src="{{url_for('static', filename='styles/img/vk.svg')}}" alt="VK"
+                  class="about__icon-photo"></a></li>
+            <li class="about__icon"><a href="t.me/headhuntersweb (https://t.me/headhuntersweb)" class="about__icon-link"
+                target="_blank"><img src="{{url_for('static', filename='styles/img/telegram.svg')}}" alt="Telegram"
+                  class="about__icon-photo"></a></li>
+            <li class="about__icon"><a href="https://github.com/SimpleMaking/Library_site" class="about__icon-link"
+                target="_blank"><img src="{{url_for('static', filename='styles/img/github.svg')}}" alt="Github"
+                  class="about__icon-photo"></a></li>
+          </ul>
 
         </div>
 
-      </section>
-    </div>
+      </div>
+    </section>
+
+    <section id="2" class="contacts">
+      <div class="contacts__container container">
+        <div class="contacts__wrap">
+          <h2 class="contacts__title title">Контакты</h2>
+
+          <p class="contacts__email">
+            headhunters@gmail.com
+          </p>
+
+          <p class="contacts__phone">
+            +79999999999
+          </p>
+
+          <div class="contacts__icons">
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
 
   </main>
 

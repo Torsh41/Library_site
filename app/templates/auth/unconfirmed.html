@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+    <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
 <body>
@@ -21,21 +22,27 @@
                 <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
                     alt="Логотип MAGIC BOOK KEEPER">
             </a>
+
+            <div class="header__right">
+                <span class="header__menu">Меню</span>
+                <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+                    <span class="hamburger__box">
+                        <span class="hamburger__inner"></span>
+                    </span>
+                </button>
+            </div>
+
             <nav class="nav header__nav">
-                <ul class="nav__list list-reset">
-                  <li class="nav__item"><a class="nav__link" href="#">Меню
-                      <svg class="nav__fa" width="62" height="37" viewBox="0 0 62 37" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <line x1="8" y1="4.5" x2="53" y2="4.5" stroke="#E9E6C3" />
-                        <line x1="8" y1="31.5" x2="53" y2="31.5" stroke="#E9E6C3" />
-                        <line x1="8" y1="18.5" x2="53" y2="18.5" stroke="#E9E6C3" />
-                      </svg></a>
-                    <ul class="nav__sublist list-reset">
-                      <li class="nav__subitem"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+                <div class="nav__menu js-menu-wrap">
+                    <ul class="nav__list list-reset">
+                        <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a>
+                        </li>
                     </ul>
-                  </li>
-                </ul>
+                </div>
+
             </nav>
+
+
         </div>
     </header>
 
@@ -45,12 +52,12 @@
 
                 <div class="main__top">
 
-                    <h1 class="main__title">Hello, {{ current_user.username }}! </h1>
+                    <h1 class="main__title">Привет, {{ current_user.username }}! </h1>
 
-                    <span class="main__span-confrim">You have not confirmed your account yet.</span>
+                    <span class="main__span-confrim" style="text-align: center;">Ваш аккаунт все еще не подтвержден.</span>
 
-                    <span class="main__span-confrim">Before you can access this site you need to confirm your account.
-                        Check your inbox, you should have received an email with a confirmation link.</span>
+                    <span class="main__span-confrim" style="text-align: center;">Прежде чем вы сможете получить доступ к этому сайту, вам необходимо подтвердить свою учетную запись. 
+                        Проверьте свой почтовый ящик, вам должно было прийти письмо со ссылкой для подтверждения.</span>
 
                     <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
@@ -59,8 +66,8 @@
 
                 <div class="main__bottom">
                     <p class="main__bottom-item">
-                        Need another confirmation email?
-                        <a class="main__link-confirm" href="{{ url_for('auth.resend_confirmation') }}">Click here</a>
+                        Нужно еще одно электронное письмо с подтверждением?
+                        <a class="main__link-confirm" href="{{ url_for('auth.resend_confirmation') }}">нажмите здесь</a>
                     </p>
 
                 </div>

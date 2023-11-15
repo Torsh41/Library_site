@@ -1,0 +1,185 @@
+/* * {
+  box-sizing: border-box;
+}
+
+.openBtn {
+  display: flex;
+  justify-content: left;
+}
+
+.openButton {
+  border: none;
+  border-radius: 5px;
+  background-color: #1c87c9;
+  color: white;
+  padding: 14px 20px;
+  cursor: pointer;
+  position: fixed;
+}
+
+.loginPopup {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.formPopup {
+  position: fixed;
+  left: 45%;
+  top: 5%;
+  transform: translate(-50%, 5%);
+  border: 6px solid #fdfde9;
+  z-index: 9;
+}
+
+.formContainer {
+  width: 600px;
+  padding: 20px;
+  background-color: #8f7d7d;
+}
+
+.formContainer input[type=text],
+.formContainer input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 20px 0;
+  border: none;
+  background: #eee;
+}
+
+.formContainer input[type=text]:focus,
+.formContainer input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* .formContainer .btn {
+  padding: 12px 20px;
+  border: none;
+  background-color: #8ebf42;
+  color: #fff;
+  cursor: pointer;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+
+.formContainer .cancel {
+  background-color: #cc0000;
+  margin-left: 20px;
+} */
+
+.formContainer .btn:hover,
+.openButton:hover {
+  opacity: 1;
+}
+
+.popup__btns {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup__btn {
+  margin-top: 20px;
+  padding: 3px;
+  background-color: transparent;
+  border: none;
+  width: 400px;
+  border-bottom: 1px solid #2E3033;
+  text-align: center;
+  cursor: pointer;
+  outline-offset: 5px;
+  outline: none;
+  transition: background-color 0.3s linear, color 0.3s linear, border-bottom 0.3s linear;
+}
+
+.popup__btn:hover {
+  background-color: #fdfde9;
+  border-bottom: 1px solid #fdfde9;
+}
+
+.popup__btn:focus {
+  color: #fdfde9;
+  background-color: #2E3033;
+  border-bottom: 1px solid #2E3033;
+}
+
+.popup__btn:active {
+  color: #fdfde9;
+  background-color: #989185;
+  border-bottom: 1px solid #989185;
+}
+
+.popup__btn-end {
+  width: 400px;
+  text-align: center;
+  background-color: transparent;
+  cursor: pointer;
+  outline-offset: 5px;
+  outline: none;
+  border: none;
+  transition: background-color 0.3s linear;
+}
+
+.popup__btn-end:hover {
+  background-color: #fdfde9;
+  border: none;
+}
+
+.popup__btn-end:focus {
+  color: #fdfde9;
+  background-color: #2E3033;
+  border: none;
+}
+
+.popup__btn-end:active {
+  color: #fdfde9;
+  background-color: #989185;
+  border: none;
+}
+
+/*Forum-discussion*/
+
+
+.popup {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.popup__formPopup {
+  position: fixed;
+  left: 50%;
+  top: 5%;
+  transform: translate(-50%, 5%);
+  border: 6px solid #fdfde9;
+  z-index: 9;
+  background-color: #a59494;
+}
+
+.popup__formContainer {
+  width: 600px;
+  padding: 20px;
+  background-color: #a59494;
+}
+
+.popup__formContainer input[type=text],
+.popup__formContainer input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 20px 0;
+  border: none;
+  background: #eee;
+}
+
+.popup__formContainer input[type=text]:focus,
+.popup__formContainer input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+
+.popup__formContainer .btn:hover {
+  opacity: 1;
+}
