@@ -182,7 +182,18 @@
   margin-top: 0;
   font-weight: 700;
 }
-  
+
 .book__text {
   word-break: break-all;
+}
+
+.book__count {
+  background-color: #fdfde9;
+  width: 30px;
+}
+
+.book__td {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }

@@ -22,10 +22,18 @@
   background-color: #cec8bd;
 }
 
+
+
 .form__label {
   display: flex;
   flex-direction: column;
   margin-bottom: 26px;
+}
+
+.form__remember {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* .form__label:not(:last-child) {
@@ -44,6 +52,10 @@
 
 .form__span {
   color: #332f2e;
+}
+
+.span {
+  margin-left: 10px;
 }
 
 .form__span-genre {
@@ -162,7 +174,8 @@
   cursor: pointer;
   outline-offset: 5px;
   outline: none;
-  transition: background-color 0.3s linear, color 0.3s linear, border-bottom 0.3s linear;;
+  transition: background-color 0.3s linear, color 0.3s linear, border-bottom 0.3s linear;
+  ;
 }
 
 
@@ -178,6 +191,93 @@
 }
 
 .form__exit-btn:active {
+  color: #fdfde9;
+  background-color: #989185;
+  border-bottom: 1px solid #989185;
+}
+
+
+.form__maintaining {
+  display: flex;
+  flex-direction: column;
+  padding: 50px 100px;
+  margin-bottom: 50px;
+  border-radius: 15px;
+  background-color: #cec8bd;
+
+}
+
+.form__book {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 60px;
+  line-height: 18px;
+}
+
+.form__info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #fdfde9;
+  background-color: #bcb7ad;
+
+}
+
+.form__span-title {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 50%;
+  text-transform: uppercase;
+  color: #F5F5DC;
+  font-weight: 800;
+}
+
+.form__span-info {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 50%;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.form__book-delete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.form__delete-btn {
+  margin-top: 20px;
+  padding: 3px;
+  background-color: transparent;
+  border: none;
+  width: 400px;
+  border-bottom: 1px solid #2E3033;
+  text-align: center;
+  cursor: pointer;
+  outline-offset: 5px;
+  outline: none;
+  transition: background-color 0.3s linear, color 0.3s linear, border-bottom 0.3s linear;
+}
+
+
+.form__delete-btn:hover {
+  background-color: #fdfde9;
+  border-bottom: 1px solid #fdfde9;
+}
+
+.form__delete-btn:focus {
+  color: #fdfde9;
+  background-color: #2E3033;
+  border-bottom: 1px solid #2E3033;
+}
+
+.form__delete-btn:active {
   color: #fdfde9;
   background-color: #989185;
   border-bottom: 1px solid #989185;
