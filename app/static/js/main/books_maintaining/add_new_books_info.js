@@ -1,28 +1,68 @@
 function show_new_data(books_info)
 {
-    $('tbody').remove();
-    let html = '<tbody>';
+    $('#table_head').remove();
+    let html = '<div id="table_head" class="form__maintaining">';
     books_info.forEach(book_info => {
-        html += `<tr id="${book_info.id}book">
-                    <td>${book_info.id}</td>
-                    <td>${book_info.name}</td>
-                    <td>${book_info.authors}</td>
-                    <td>${book_info.series}</td>
-                    <td>${book_info.categories}</td>
-                    <td>${book_info.publishing_date}</td>
-                    <td>${book_info.pages_count}</td>
-                    <td>${book_info.isbn}</td>
-                    <td>${book_info.comments}</td>
-                    <td>${book_info.summary}</td>
-                    <td>${book_info.link}</td>
-                    <td><input id="${book_info.id}books_count" min="0" formmethod="post" placeholder="введите наличие" required type="number" value="${book_info.count}"></td>
-                    <td><input id="${book_info.id}del_book" formmethod="post" type="submit" value="удалить из списка"></td>
-                </tr>`;
+        html += `<div class="form__book" id="${book_info.id}book">
+                    <div class="form__info form__book-id">
+                        <span class="form__span-title">ID</span>
+                        <span class="form__span-info">${book_info.id}</span>
+                    </div>
+                    <div class="form__info form__book-name">
+                        <span class="form__span-title">Название</span>
+                        <span class="form__span-info">${book_info.name}</span>
+                    </div>
+                    <div class="form__info form__book-author">
+                        <span class="form__span-title">Авторы</span>
+                        <span class="form__span-info">${book_info.authors}</span>
+                    </div>
+                    <div class="form__info form__book-part">
+                        <span class="form__span-title">Серии</span> 
+                        <span class="form__span-info">${book_info.series}</span>
+                    </div>
+                    <div class="form__info form__book-category">
+                        <span class="form__span-title">Категории</span>
+                        <span class="form__span-info">${book_info.categories}</span>
+                    </div>
+                    <div class="form__info form__book-date">
+                        <span class="form__span-title">Дата публикации</span>
+                        <span class="form__span-info">${book_info.publishing_date}</span>
+                    </div>
+                    <div class="form__info form__book-countpages">
+                        <span class="form__span-title">Количество страниц</span>
+                        <span class="form__span-info">${book_info.pages_count}</span>
+                    </div>
+                    <div class="form__info form__book-isbn">
+                        <span class="form__span-title">ISBN</span>
+                        <span class="form__span-info">${book_info.isbn}</span>
+                    </div>
+                    <div class="form__info form__book-comments">
+                        <span class="form__span-title">Комментарии</span>
+                        <span class="form__span-info">${book_info.comments}</span>
+                    </div>
+                    <div class="form__info form__book-info">
+                        <span class="form__span-title">Краткое содержание</span>
+                        <span class="form__span-info">${book_info.summary}</span>
+                    </div>
+                    <div class="form__info form__book-link">
+                        <span class="form__span-title">Ссылка</span>
+                        <span class="form__span-info">${book_info.link}</span>
+                    </div>
+                    <div class="form__info form__book-count">
+                        <span class="form__span-title">Количество</span>
+                        <span class="form__span-info"><input class="book__count" id="${book_info.id}books_count" min="0"
+                                formmethod="post" placeholder="введите наличие" required type="number"
+                                value="${book_info.count}"></span>
+                    </div>
+                    <div class="form__book-delete">
+                        <input class="form__delete-btn" id="${book_info.id}del_book" formmethod="post" type="submit"
+                            value="удалить из списка">
+                    </div>
+                </div>`;
     })
-    html += '</tbody>';
-  
-    let thead = document.getElementById('table_head');
-    thead.insertAdjacentHTML('afterend', html);
+    html += '</div>';
+    let thead = document.getElementById('main_table');
+    thead.insertAdjacentHTML('afterbegin', html);
     thead.scrollIntoView();
 }
 
@@ -183,7 +223,7 @@ $(function() {
                         show_new_data(books_info);
                         let found_elem = document.getElementById(books_info[0].id_of_found_elem + 'book');
                         found_elem.scrollIntoView();
-                        $(`#${books_info[0].id_of_found_elem}book`).css("opacity", ".4").animate({ opacity: "1" }, "slow");
+                        $(`#${books_info[0].id_of_found_elem}book`).css("opacity", ".15").animate({ opacity: "1" }, "slow");
                         document.getElementById("name_field").value = "";
 
                         // перестроим пагинацию 
@@ -205,7 +245,7 @@ $(function() {
                     }
                     else
                     {
-                        $('tbody').remove();
+                        $('#table_head').remove();
                         $('section').filter(function() {
                             return this.id.match("not_found");
                         }).remove();
@@ -219,7 +259,7 @@ $(function() {
                                         </div>
                                     </section>`;
                         let table = document.getElementById('main_table');
-                        table.insertAdjacentHTML('afterend', html);
+                        table.insertAdjacentHTML('afterbegin', html);
                         document.getElementById("name_field").value = "";
                         table.scrollIntoView();
                     }

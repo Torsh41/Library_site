@@ -168,9 +168,11 @@
   }
 
   .form__wrap,
+  .form__maintaining,
   .users__wrap {
     padding: 52px 52px;
   }
+
 
   .list__book:not(:nth-child(2n)) {
     margin-right: 0;
@@ -473,11 +475,19 @@
   .fraction__wrap,
   .discussion__wrap,
   .users__wrap,
-  .form__wrap {
+  .form__wrap,
+  .form__maintaining {
     padding: 20px;
   }
 
+  .form__maintaining {
+    font-size: 10px;
+    line-height: 11px;
+  }
 
+  .form__book {
+    max-width: 200px;
+  }
 
   .comments__label {
     border: none;
