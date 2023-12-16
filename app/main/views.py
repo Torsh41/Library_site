@@ -10,7 +10,7 @@ from operator import itemgetter
 from sqlalchemy.exc import IntegrityError
 ELEMS_COUNT = 10
 TOP_BOOKS_COUNT = 3
-BOOKS_MAINTAINING_PER_PAGE = 70
+BOOKS_MAINTAINING_PER_PAGE = 20
 months_dict = {
     1: 'января',
     2: 'февраля',
