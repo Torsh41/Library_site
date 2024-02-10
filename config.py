@@ -40,7 +40,7 @@ class TestingConfig(Config):
         
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-    "postgresql://rootroot:rootroot@localhost/" + "prod_db.db"
+    "postgresql://postgres:rootroot@localhost/" + "prod_db"
         
 config = {
     'development': DevelopmentConfig,

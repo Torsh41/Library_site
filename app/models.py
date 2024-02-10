@@ -145,7 +145,7 @@ class Book(database.Model, SerializerMixin):
     name = database.Column(database.String(128), unique=True, index=True)
     author = database.Column(database.String(128), unique=False)
     publishing_house = database.Column(database.String(128), unique=False)
-    description = database.Column(database.Text(512), unique=False)
+    description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -170,7 +170,7 @@ class BookGrade(database.Model, SerializerMixin):
 class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.Text(512))
+    body = database.Column(database.Text())
     timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
