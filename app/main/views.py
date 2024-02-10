@@ -1,13 +1,16 @@
 from . import main
 from app.init import database
-from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicPost, DiscussionTopic, Role
+from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicPost, DiscussionTopic, Role, BooksMaintaining
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from flask_login import current_user, login_required
 from app.decorators import admin_required, check_actual_password
+from app.parse_excel import *
 import copy
 from operator import itemgetter
+from sqlalchemy.exc import IntegrityError
 ELEMS_COUNT = 10
 TOP_BOOKS_COUNT = 3
+BOOKS_MAINTAINING_PER_PAGE = 20
 months_dict = {
     1: 'января',
     2: 'февраля',
@@ -86,6 +89,8 @@ def get_comments_page(book_name, page):
 @login_required
 @check_actual_password
 def add_comment(username, book_name):
+    if current_user.username != username:
+        return render_template('403.html')
     book = Book.query.filter_by(name=book_name).first()
     comment = Comment(body=str(request.form.get('comment')).strip().replace(
         "'", ""), book=book, user=current_user._get_current_object())
@@ -96,18 +101,20 @@ def add_comment(username, book_name):
     id_of_added_comment = comments[-1].id
     if len(comments) % ELEMS_COUNT > 0:
         last_page += 1
-    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(
-        last_page, per_page=ELEMS_COUNT, error_out=False).items
+    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(last_page, per_page=ELEMS_COUNT, error_out=False).items
+    user_is_admin = True if current_user.role == Role.ADMIN else False
     users = list()
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(pages=last_page, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(pages=last_page, user_is_admin=user_is_admin, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
 
 
 @main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
 @login_required
 @check_actual_password
 def edit_comment(username, comment_id, book_name):
+    if current_user.username != username:
+        return render_template('403.html')
     comment = Comment.query.filter_by(id=comment_id).first()
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
     database.session.add(comment)
@@ -119,6 +126,8 @@ def edit_comment(username, comment_id, book_name):
 @login_required
 @check_actual_password
 def give_grade(username, book_id, grade):
+    if current_user.username != username:
+        return render_template('403.html')
     book = Book.query.filter_by(id=book_id).first()
     previous_grade = BookGrade.query.filter_by(
         user=current_user, book=book).first()
@@ -135,6 +144,8 @@ def give_grade(username, book_id, grade):
 @login_required
 @check_actual_password
 def comment_delete(username, book_name, comment_id, page):
+    if current_user.username != username:
+        return render_template('403.html')
     page = int(page)
     book = Book.query.filter_by(name=book_name).first()
     comment = book.comments.filter_by(id=comment_id).first()
@@ -288,6 +299,10 @@ def forum():
 def topic(topic_id):
     posts_page = request.args.get('posts_page', 1, type=int)
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
+    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+        user_is_admin = 1
+    else:
+        user_is_admin = 0
     posts_pagination = topic.posts.order_by().paginate(
         posts_page, per_page=ELEMS_COUNT, error_out=False)
     posts = list()
@@ -304,66 +319,7 @@ def topic(topic_id):
         else:
             posts.append({"this_is_answer": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
                          "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
-    return render_template('main/forum_discussion.html', topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str, display="none")
-
-
-@main.route('/<username>/<discussion_topic_id>/add_post', methods=['POST'])
-@login_required
-@check_actual_password
-def add_post(username, discussion_topic_id):
-    topic = DiscussionTopic.query.filter_by(id=discussion_topic_id).first()
-    if request.files['screenshot'].filename != '':
-        post = TopicPost(body=str(request.form.get('post_body')).strip().replace(
-            "'", ""), user=current_user, topic=topic, file=request.files['screenshot'].read())
-    else:
-        post = TopicPost(body=str(request.form.get('post_body')).strip().replace(
-            "'", ""), user=current_user, topic=topic, file=bytes(False))
-    if post_id_for_answer := request.args.get('post_id_to_answer', None, type=int):
-        post.answer_to_post = post_id_for_answer
-    else:
-        post.answer_to_post = 0
-    database.session.add(post)
-    database.session.commit()
-    posts_for_pagi = topic.posts.all()
-    last_page = len(posts_for_pagi) // ELEMS_COUNT
-    if len(posts_for_pagi) % ELEMS_COUNT > 0:
-        last_page += 1
-    posts_pagination = topic.posts.order_by().paginate(
-        last_page, per_page=ELEMS_COUNT, error_out=False)
-    if current_user.role == Role.ADMIN:
-        user_is_admin = True
-    else:
-        user_is_admin = False
-    posts = list()
-    for post in posts_pagination.items:
-        user = User.query.filter_by(id=post.user_id).first()
-        if post.file:
-            if post.answer_to_post:
-                post_from = topic.posts.filter_by(
-                    id=post.answer_to_post).first()
-                if post_from:
-                    posts.append(dict(this_is_answer=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date(
-                    ).month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
-                else:
-                    posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
-            else:
-                posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                    post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
-        else:
-            if post.answer_to_post:
-                post_from = topic.posts.filter_by(
-                    id=post.answer_to_post).first()
-                if post_from:
-                    posts.append(dict(this_is_answer=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date(
-                    ).month], post_year=str(post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
-                else:
-                    posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
-            else:
-                posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), topic_id=topic.id, cur_page=posts_pagination.page, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                    post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
-    return jsonify(posts)
+    return render_template('main/forum_discussion.html', user_is_admin=user_is_admin, topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str, display="none")
 
 
 @main.route('/get_categories_page_on_forum/<page>', methods=['GET'])
@@ -440,29 +396,6 @@ def get_posts_page(topic_id, page):
     return jsonify(posts)
 
 
-@main.route('/<username>/del_post/<topic_id>/<post_id>/<page>', methods=['GET'])
-@login_required
-@check_actual_password
-def post_delete(username, topic_id, post_id, page):
-    page = int(page)
-    post = TopicPost.query.filter_by(id=post_id).first()
-    database.session.delete(post)
-    database.session.commit()
-    topic = DiscussionTopic.query.filter_by(id=topic_id).first()
-    if posts := topic.posts.all():
-        has_elems = True
-        posts_pagination = topic.posts.order_by().paginate(
-            page, per_page=ELEMS_COUNT, error_out=False)
-        pages = posts_pagination.pages
-        if not posts_pagination.items:
-            page -= 1
-    else:
-        page = 1
-        pages = 1
-        has_elems = False
-    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, posts_count=len(posts)))
-
-
 @main.route('/search_category_on_forum', methods=['POST'])
 def search_category_on_forum():
     category_name = str(request.form.get('category_name')).strip().lower()
@@ -499,6 +432,8 @@ def search_category_on_forum():
 @login_required
 @check_actual_password
 def add_topic(username, category_name):
+    if current_user.username != username:
+        return render_template('403.html')
     page = request.args.get('page', 1, type=int)
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
     cur_category = Category.query.filter_by(name=category_name).first()
@@ -542,6 +477,8 @@ def get_topics_page_on_forum(category_id, page):
 @login_required
 @check_actual_password
 def edit_post(username, topic_id, post_id):
+    if current_user.username != username:
+        return render_template('403.html')
     post = TopicPost.query.filter_by(id=post_id).first()
     post.body = str(request.form.get('newComment')).strip().replace("'", "")
     database.session.add(post)
@@ -572,3 +509,118 @@ def topic_delete(category_id, topic_id, page):
         pages = 1
         has_elems = False
     return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, topics_count=len(topics)))
+
+
+@main.route('/books-maintaining', methods=['GET'])
+@admin_required
+@check_actual_password
+def books_relevance():
+    pagination = BooksMaintaining.query.order_by().paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    return render_template('main/books_maintaining.html', info=pagination.items, pagination=pagination)
+
+
+@main.route('/books-maintaining/add-file', methods=['POST'])
+@admin_required
+@check_actual_password
+def add_new_books_info():
+    file = request.files['data_file']
+    if file.filename.split('.')[-1] != "xlsx":
+        return jsonify([dict(result=False)])
+    
+    data = parse_excel(file)
+    if not data:
+        return jsonify([dict(result=False)])
+    
+    for book_info in data:
+        if BooksMaintaining.query.filter_by(name=book_info[0]).first():
+            continue
+        book_obj = BooksMaintaining(name=book_info[0], authors=book_info[1], series=book_info[2], 
+                        categories=book_info[3], publishing_date=book_info[4], publishing_house=book_info[5],
+                        pages_count=book_info[6], isbn=book_info[7], comments=book_info[8], summary=book_info[9], 
+                        link=book_info[10], count=book_info[11])
+        
+        database.session.add(book_obj)
+    database.session.commit()
+    
+    data = BooksMaintaining.query.all(); data_len = len(data); data = data[data_len - BOOKS_MAINTAINING_PER_PAGE:]
+    
+    # найдем количество страниц
+    pages = data_len // BOOKS_MAINTAINING_PER_PAGE
+    if data_len % BOOKS_MAINTAINING_PER_PAGE > 0:
+        pages += 1
+    
+    return jsonify([dict(result=True, pages=pages, cur_page=pages, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                        categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                        pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                        link=book_info.link, count=book_info.count) for book_info in data])
+    # Название - 0
+    # Авторы - 1
+    # серия - 2
+    # категории - 3
+    # дата публикации - 4
+    # Издательство - 5
+    # Количество страниц - 6
+    # ISBN - 7
+    # Комментарии - 8
+    # Описание - 9
+    # Ссылка - 10
+    
+
+@main.route('/books-maintaining/search', methods=['POST'])
+@admin_required
+@check_actual_password
+def search_book():
+    book_name = str(request.form.get('search_result')).strip().lower()
+    book = BooksMaintaining.query.filter(BooksMaintaining.name.like("%{}%".format(book_name))).first()
+    if not book:
+        return jsonify([dict(result=False)])
+    
+    pagination = BooksMaintaining.query.paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    if book in pagination.items:
+        return jsonify([dict(result=True, cur_page=1, pages=pagination.pages, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                            categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                            pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                            link=book_info.link, count=book_info.count) for book_info in pagination.items])
+    for page in range(2, pagination.pages + 1):  
+        items = BooksMaintaining.query.paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False).items
+        if book in items:
+            return jsonify([dict(result=True, cur_page=page, pages=pagination.pages, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                                categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                                pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                                link=book_info.link, count=book_info.count) for book_info in items])
+            
+
+@main.route('/books-maintaining/get-page/<page>', methods=['GET'])
+@admin_required
+@check_actual_password
+def get_books_info_page(page):
+    page = int(page)
+    data = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False).items
+    return jsonify([dict(cur_page=page, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+                        categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
+                        pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
+                        link=book_info.link, count=book_info.count) for book_info in data])
+    
+
+@main.route('/books-maintaining/change-count', methods=['POST'])
+@admin_required
+@check_actual_password
+def change_books_count():
+    book = BooksMaintaining.query.filter_by(id=int(request.form.get('id'))).first()
+    book.count = int(request.form.get('new_count'))
+    database.session.add(book)
+    database.session.commit()
+    return jsonify(dict(count=book.count))
+
+
+@main.route('/books-maintaining/del-book', methods=['POST'])
+@admin_required
+@check_actual_password
+def book_del():
+    try:
+        book = BooksMaintaining.query.filter_by(id=int(request.form.get('id'))).first()
+        database.session.delete(book)
+        database.session.commit()
+        return jsonify(dict(result=True))
+    except:
+        return jsonify(dict(result=False))

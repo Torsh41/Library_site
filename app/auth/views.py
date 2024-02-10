@@ -11,11 +11,14 @@ from app.email import send_email
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        next_url = request.args.get('next', '')
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user is not None and user.verify_password(form.password.data):
-            login_user(user)  # , form.remember_me.data)
+            login_user(user, form.remember_me.data)
             session['username'] = user.username
             session['password_hash'] = user.password_hash
+            if next_url:
+                return redirect(next_url)
             return redirect(url_for('personal.person', username=current_user.username))
 
         # неправильная почта или пароль

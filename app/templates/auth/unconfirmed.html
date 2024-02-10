@@ -52,12 +52,12 @@
 
                 <div class="main__top">
 
-                    <h1 class="main__title">Hello, {{ current_user.username }}! </h1>
+                    <h1 class="main__title">Привет, {{ current_user.username }}! </h1>
 
-                    <span class="main__span-confrim">You have not confirmed your account yet.</span>
+                    <span class="main__span-confrim" style="text-align: center;">Ваш аккаунт все еще не подтвержден.</span>
 
-                    <span class="main__span-confrim">Before you can access this site you need to confirm your account.
-                        Check your inbox, you should have received an email with a confirmation link.</span>
+                    <span class="main__span-confrim" style="text-align: center;">Прежде чем вы сможете получить доступ к этому сайту, вам необходимо подтвердить свою учетную запись. 
+                        Проверьте свой почтовый ящик, вам должно было прийти письмо со ссылкой для подтверждения.</span>
 
                     <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
@@ -66,8 +66,8 @@
 
                 <div class="main__bottom">
                     <p class="main__bottom-item">
-                        Need another confirmation email?
-                        <a class="main__link-confirm" href="{{ url_for('auth.resend_confirmation') }}">Click here</a>
+                        Нужно еще одно электронное письмо с подтверждением?
+                        <a class="main__link-confirm" href="{{ url_for('auth.resend_confirmation') }}">нажмите здесь</a>
                     </p>
 
                 </div>

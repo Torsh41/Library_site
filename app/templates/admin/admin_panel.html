@@ -10,12 +10,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-  <script src="{{ url_for('static', filename='js/admin/show_page_elems.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/admin/book_search_in_a_category_act.js')}}"></script>
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/admin/admin_panel/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/admin/admin_panel/search_users.js')}}"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/admin/pagination.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/admin/search_users.js')}}"></script>
 </head>
 
 <body>
@@ -57,10 +55,10 @@
           <nav class=" header__nav">
             <ul class="nav__admin-list list-reset">
               <li class="nav__admin-item">
-                <a class="nav__admin-link" onclick="edit_elem_state('users_search')">Список пользователей</a>
+                <a id="users_list" class="nav__admin-link" data-info="users_search">Список пользователей</a>
               </li>
               <li class="nav__admin-item">
-                <a class="nav__admin-link" onclick="edit_elem_state('book_categories')">Список категорий книг</a>
+                <a id="categories_list" class="nav__admin-link" data-info="book_categories">Список категорий книг</a>
               </li>
               <li class="nav__admin-item">
                 <a class="nav__admin-link">Настройки</a>
@@ -77,8 +75,7 @@
           <div class="users__wrap" id="main_users_container">
             <h2 class="users__title title">Список пользователей</h2>
 
-            <form class="list__form" action="{{url_for('admin.user_search', username=current_user.username)}}"
-              id="search_users_form" method="post">
+            <form class="list__form" action="{{url_for('admin.user_search', username=current_user.username)}}" id="search_users_form" method="post">
               <label class="list__form-label">
                 <svg class="list__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
                   xmlns="http://www.w3.org/2000/svg">
@@ -96,11 +93,9 @@
                 <input type="text" name="users_search_result" class="list__form-input" id="username_field"
                   placeholder="Введите имя пользователя..">
               </label>
-              <input class="list__btn-search" type="button" value="Найти" id="get_users"
-                onclick="search_users_on_forum()">
+              <input class="list__btn-search" type="button" value="Найти" id="get_users">
             </form>
           </div>
-
         </div>
       </section>
 
@@ -124,7 +119,7 @@
             {% endif %}
             <div class="popup__btns">
               <button class="popup__btn" id="add_category">Добавить</button>
-              <button type="button" class="popup__btn-end" onclick="closeCategoryForm()">Отменить</button>
+              <button type="button" class="popup__btn-end" id="close_cat_form">Отменить</button>
             </div>
           </form>
         </div>
@@ -136,7 +131,6 @@
           <div class="category__wrap">
             <h2 class="list__title title">Cписок категорий</h2>
             <ul class="category__list list-reset" id="categories_search_list">
-              <a class="category__book-link" onclick="openCategoryForm()">
                 <li class="category__elem">
                   <svg class="list__svg" width="78" height="78" viewBox="0 0 78 78" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -144,20 +138,12 @@
                       <rect x="35" width="8" height="78" fill="#cec8bd" />
                       <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#cec8bd" />
                     </g>
-                    <defs>
-                      <clipPath id="clip0_139_2">
-                        <rect width="78" height="78" fill="white" />
-                      </clipPath>
-                    </defs>
                   </svg>
                 </li>
-              </a>
               {% for category in categories %}
               <li class="category__elem" id="{{category.id}}category_info">
-                <a class="category__book-link"
-                  onclick="open_book_panel('{{current_user.username}}', '{{category.name}}')">{{ category.name }}</a>
-                <a onclick="del_category('/admin/{{current_user.username}}/category_delete/{{category.id}}/{{1}}', '2pagination')"
-                  class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
+                <a id="{{category.id}}show_books" class="category__book-link" data-username="{{current_user.username}}" data-catname="{{category.name}}">{{ category.name }}</a>
+                <a data-url="/admin/{{current_user.username}}/category_delete/{{category.id}}/{{1}}" data-pagi="2pagination" class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
               </li>
               {% endfor %}
             </ul>
@@ -169,7 +155,7 @@
                 </li>
                 {% for p in category_pagination.iter_pages() %}
                   <li class="pagination__item active">
-                    <a onclick="get_category_page('/admin/{{current_user.username}}/get_category_search_page/{{p}}', '2pagination')">{{ p }}</a>
+                    <a id="{{p}}categories_p" data-url="/admin/{{current_user.username}}/get_category_search_page/{{p}}" data-pagi="2pagination">{{ p }}</a>
                   </li>
                 {% endfor %}
                 <li class="pagination__item disabled">
@@ -179,7 +165,6 @@
             </div>
             {% endif %}
           </div>
-
         </div>
       </section>
 
@@ -208,7 +193,7 @@
               <input type="text" id="search_res_id" name="search_result" class="list__form-input"
                 placeholder="Введите название книги или автора, либо слово все...">
             </label>
-            <input class="list__btn-search" type="button" value="Найти" onclick="search_books_on_category()">
+            <input id="find_book" class="list__btn-search" type="button" value="Найти">
           </form>
 
           <ul class="list__books list-reset" id="list_res">
@@ -241,6 +226,5 @@
       <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
     </div>
   </footer>
-
 </body>
 </html>

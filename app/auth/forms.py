@@ -7,7 +7,7 @@ from ..models import User
 
 class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired('Поля не должны быть пустыми.'), Length(
-        1, 64), Email('Неверный email адрес.')])
+        1, 64), Email('Неверный почтовый адрес.')])
     username = StringField('Username', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0,
                                                                                                                                               'Логин содержит только буквы, цифры, точки или символы подчеркивания.')])
     password = PasswordField('Password', validators=[DataRequired('Поля не должны быть пустыми.'), EqualTo(
@@ -40,7 +40,7 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(
         'Поля не должны быть пустыми.')])
     remember_me = BooleanField('Keep me logged in')
-    submit = SubmitField('Log In')
+    submit = SubmitField('Log in')
 
 
 class ChangePasswordForm(FlaskForm):
@@ -50,9 +50,9 @@ class ChangePasswordForm(FlaskForm):
         'password2', message='Пароли должны совпадать.'), Length(6, 20, message='Пароль должен быть от 6 до 20 символов включительно.')])
     password2 = PasswordField('Confirm new password', validators=[
                               DataRequired('Поля не должны быть пустыми.')])
-    submit = SubmitField('Update Password')
+    submit = SubmitField('Change password')
     
 class ConfirmEmailToChangePasswordForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired('Поля не должны быть пустыми.'), Length(
         1, 64), Email('Неверный email адрес.'), validate_user])
-    submit = SubmitField('Confirm Email')
+    submit = SubmitField('Confirm email')

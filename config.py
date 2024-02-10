@@ -5,6 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     REMEMBER_COOKIE_DURATION = timedelta(days=10)
+    PERMANENT_SESSION_LIFETIME = REMEMBER_COOKIE_DURATION
     SECRET_KEY = 'I am number one'
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY') or 'I am Mister Max'
     JWT_ALGORITHM = 'HS256'
@@ -39,7 +40,7 @@ class TestingConfig(Config):
         
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-    "postgresql://rootroot:rootroot@localhost/" + "prod_db.db"
+    "postgresql://postgres:rootroot@localhost/" + "prod_db"
         
 config = {
     'development': DevelopmentConfig,

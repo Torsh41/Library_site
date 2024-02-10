@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-  <script src="{{ url_for('static', filename='js/main/pagination.js')}}"></script>
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/categories/pagination.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
@@ -38,13 +38,15 @@
             <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
             <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
             {% if current_user.is_anonymous %}
-            <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
             {% endif %}
             {% if current_user.is_authenticated %}
-            <li class="nav__item"><a class="nav__link"
-                href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
             {% else %}
-            <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+            {% endif %}
+            {% if current_user.role == Role.ADMIN %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
             {% endif %}
           </ul>
         </div>
@@ -92,12 +94,26 @@
           </ul>
           {% if category_pagination %}
           <div class="list__pagination pagination" id="user_pagination_container">
-            {{ macros.pagination_widget(pagination=category_pagination, url_path='/get_categories_page/',
-            func_name='get_categories_page') }}
+            <ul class="pagination__list list-reset" id="pagination">
+              <li class="pagination__item disabled">
+                  &bull;
+              </li>
+              {% for p in category_pagination.iter_pages() %}
+                  {% if p %}
+                    <li class="pagination__item active">
+                        <a id="{{p}}list_pagi" data-url="/get_categories_page/{{p}}">{{ p }}</a>
+                    </li>
+                  {% else %}
+                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                  {% endif %}
+              {% endfor %}
+              <li class="pagination__item disabled">
+                  &bull; 
+              </li>
+            </ul>
           </div>
           {% endif %}
         </div>
-        
       </div>
     </section>
   </main>
@@ -108,5 +124,4 @@
     </div>
   </footer>
 </body>
-
 </html>

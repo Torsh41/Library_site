@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-  <script src="{{ url_for('static', filename='js/personal/pagination.js')}}"></script>
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/personal/add_book/book_adding_pagination.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
@@ -68,7 +68,7 @@
       </div>
     </section>
 
-    <section class="form ">
+    <section class="form">
       <div class="form__container container">
         {% if len(categories) > 0 %}
           <form class="form__wrap" enctype="multipart/form-data" method="post">
@@ -199,7 +199,7 @@
                 <ul class="pagination__list list-reset" id="pagination">
                   {% for p in pagination.iter_pages() %}
                     <li class="pagination__item active">
-                      <a onclick="get_categories_page_for_book_adding('/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}')">{{ p }}</a>
+                      <a data-url="/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}">{{ p }}</a>
                     </li>
                   {% endfor %}
                 </ul>
