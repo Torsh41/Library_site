@@ -45,11 +45,32 @@ function get_lists_page(url_path)
                           </a>
                         
                           <div class="list__book-wrap">
-                            <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
-                            <a href="/book-page/${item.name}" class="list__link-plan"><u>Состояние чтения:</u> ${ item.read_state }</a>
-                            <a class="list__book-delete-btn" data-url='/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}' id='${cataloge.id}del_book'>Удалить книгу из списка</a>
-                          </div>
-                        </li>`;
+                            <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
+                html += `<select name="read_state" class="book__select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
+                          if (item.read_state == "Планирую")
+                            html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
+                                      <option class="book__state book__read" value="Читаю">Читаю</option>
+                                      <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                      <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                          else if (item.read_state == "Читаю")
+                            html += `<option class="book__state book__plan" value="Планирую">Палнирую</option>
+                                      <option class="book__state book__read" value="Читаю" selected>Читаю</option>
+                                      <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                      <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                          else if (item.read_state == "Заброшено")
+                            html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
+                                      <option class="book__state book__read" value="Читаю">Читаю</option>
+                                      <option class="book__state book__fuck" value="Заброшено" selected>Заброшено</option>
+                                      <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                          else if (item.read_state == "Прочитано")
+                            html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
+                                      <option class="book__state book__read" value="Читаю">Читаю</option>
+                                      <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                      <option class="book__state book__done" value="Прочитано" selected>Прочитано</option>`;
+                html += `</select>`;            
+                html += `<a class="list__book-delete-btn" data-url='/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}' id='${cataloge.id}del_book'>Удалить книгу из списка</a>
+                        </div>
+                      </li>`;
                 });
                 html += `</ul>`;
 
@@ -133,10 +154,32 @@ function get_books_page(url_path, cataloge_id)
                     
                     <div class="list__book-wrap">
                       <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
-                      <a href="/book-page/${book.name}" class="list__link-plan"><u>Состояние чтения:</u> ${book.read_state}</a>
-                      <a class="list__book-delete-btn" data-url='/user/${book.username_of_cur_user}/delete-item/${cataloge_id}/${book.id}/${url[url.length - 1]}' id='${cataloge_id}del_book'>Удалить книгу из списка</a>
-                    </div>
-                  </li>`;
+                      <select name="read_state" class="book__select" id="${cataloge_id}${book.id}state" data-itemid="${book.id}">`;
+                        if (book.read_state == "Планирую")
+                          html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
+                                    <option class="book__state book__read" value="Читаю">Читаю</option>
+                                    <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                    <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                        else if (book.read_state == "Читаю")
+                          html += `<option class="book__state book__plan" value="Планирую">Палнирую</option>
+                                    <option class="book__state book__read" value="Читаю" selected>Читаю</option>
+                                    <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                    <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                        else if (book.read_state == "Заброшено")
+                          html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
+                                    <option class="book__state book__read" value="Читаю">Читаю</option>
+                                    <option class="book__state book__fuck" value="Заброшено" selected>Заброшено</option>
+                                    <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                        else if (book.read_state == "Прочитано")
+                          html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
+                                    <option class="book__state book__read" value="Читаю">Читаю</option>
+                                    <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                    <option class="book__state book__done" value="Прочитано" selected>Прочитано</option>`;
+        html += `</select>`;
+                      
+        html += `<a class="list__book-delete-btn" data-url='/user/${book.username_of_cur_user}/delete-item/${cataloge_id}/${book.id}/${url[url.length - 1]}' id='${cataloge_id}del_book'>Удалить книгу из списка</a>
+                  </div>
+                </li>`;
       });
       document.getElementById(cataloge_id + 'books_info_container').innerHTML += html;
       pagi = document.getElementById(cataloge_id + 'books_pagination');

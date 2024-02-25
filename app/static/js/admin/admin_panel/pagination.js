@@ -179,8 +179,11 @@ function edit_elem_state(id)
     }
     else
     {
-        document.getElementById(id).style.display = "block";
-        document.getElementById(id).scrollIntoView();
+        if (id != 'book_search_in_a_category')
+        {
+          document.getElementById(id).style.display = "block";
+          document.getElementById(id).scrollIntoView();
+        }
     }
 }
 

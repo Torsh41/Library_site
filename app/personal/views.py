@@ -314,3 +314,19 @@ def get_categories_page_for_book_adding(username, page):
     categories = Category.query.paginate(
         page, per_page=CATEGORIES_COUNT, error_out=False).items
     return jsonify([dict(cur_page=page, id=category.id, name=category.name) for category in categories])
+
+
+# изменение состояния чтения книги
+@personal.route('/change_read_state/', methods=['POST'])
+@login_required
+@check_actual_password
+def change_read_state():
+    try:
+        item = Item.query.filter_by(id=request.form.get('item_id')).first()
+        item.read_state = str(request.form.get('read_state')).strip()
+        database.session.add(item)
+        database.session.commit()
+        return jsonify(dict(read_state=item.read_state))
+    except:
+        return jsonify(dict(read_state=False))
+ 
