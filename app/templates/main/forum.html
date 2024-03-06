@@ -221,13 +221,13 @@
                   &bull;
                 </li>
                 {% for p in topics_pagination.iter_pages() %}
-                {% if p %}
-                <li class="pagination__item active">
-                  <a id="{{p}}topics_p" data-url="/get_topics_page_on_forum/{{category.id}}/{{p}}" data-catid="{{category.id}}">{{p}}</a>
-                </li>
-                {% else %}
-                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-                {% endif %}
+                  {% if p %}
+                    <li class="pagination__item active">
+                      <a id="{{p}}topics_p" data-url="/get_topics_page_on_forum/{{category.id}}/{{p}}" data-catid="{{category.id}}">{{p}}</a>
+                    </li>
+                  {% else %}
+                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                  {% endif %}
                 {% endfor %}
                 <li class="pagination__item disabled">
                   &bull;
@@ -248,13 +248,13 @@
           &bull;
         </li>
         {% for p in category_pagination.iter_pages() %}
-        {% if p %}
-        <li class="pagination__item active">
-          <a id="{{p}}category_p" data-url="/get_categories_page_on_forum/{{p}}">{{ p }}</a>
-        </li>
-        {% else %}
-        <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-        {% endif %}
+          {% if p %}
+            <li class="pagination__item active">
+              <a id="{{p}}category_p" data-url="/get_categories_page_on_forum/{{p}}">{{ p }}</a>
+            </li>
+          {% else %}
+            <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+          {% endif %}
         {% endfor %}
         <li class="pagination__item disabled">
           &bull;

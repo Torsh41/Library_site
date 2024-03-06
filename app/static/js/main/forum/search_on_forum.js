@@ -70,31 +70,37 @@ function search_category_on_forum()
                                   <li class="pagination__item disabled">
                                     &bull;
                                   </li>`;
-                    try
+                    if (topics[0])
                     {
-                      for (let i = 1; i <= topics[0].pages; i++)
-                      {
-                        if (topics[0].pages > 1 && i == topics[0].cur_page)
+                      topics[0].pages_count.forEach(page =>{
+                        if (page)
                         {
-                          html += `<li class="pagination__item_cur_page">
-                                      <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${i}' data-catid='${category.id}'>${i}</a>
-                                    </li>`;
+                          if (topics[0].pages > 1 && page == topics[0].cur_page)
+                          {
+                            html += `<li class="pagination__item_cur_page">
+                                        <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${page}' data-catid='${category.id}'>${page}</a>
+                                      </li>`;
+                          }
+                          else
+                          {
+                            html += `<li class="pagination__item active">
+                              <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${page}' data-catid='${category.id}'>${page}</a>
+                              </li>`;
+                          }
                         }
                         else
                         {
-                          html += `<li class="pagination__item active">
-                                      <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${i}' data-catid='${category.id}'>${i}</a>
-                                    </li>`;
+                          html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                         }
-                      }
+                      });
                     }
-                    catch {}
+
                     html += `<li class="pagination__item disabled">
                                     &bull;
                                   </li>
                               </ul></div>`;
                     html += `</div></div></section>`;
-                });
+              });
                 section = document.getElementById('categories_container');
                 section.insertAdjacentHTML('afterbegin', html);
                 section = document.getElementById(categories[0].id_of_found_elem + 'category_info');

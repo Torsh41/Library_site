@@ -8,7 +8,7 @@ from app.parse_excel import *
 import copy
 from operator import itemgetter
 from sqlalchemy.exc import IntegrityError
-ELEMS_COUNT = 10
+ELEMS_COUNT = 8
 TOP_BOOKS_COUNT = 3
 BOOKS_MAINTAINING_PER_PAGE = 20
 months_dict = {
@@ -325,14 +325,15 @@ def topic(topic_id):
 @main.route('/get_categories_page_on_forum/<page>', methods=['GET'])
 def get_categories_page_on_forum(page):
     page = int(page)
-    categories = Category.query.order_by().paginate(
-        page, per_page=ELEMS_COUNT, error_out=False).items
+    categories_pagination = Category.query.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    pages_count = list(categories_pagination.iter_pages())
+    categories = categories_pagination.items
     categories_topics = dict()
     for category in categories:
         topics_pagination = category.topics.order_by().paginate(
             1, per_page=ELEMS_COUNT, error_out=False)
         category_topics = [dict(id=topic.id, name=topic.name, cur_page=1,
-                                topic_pages=topics_pagination.pages) for topic in topics_pagination.items]
+                                topic_pages=list(topics_pagination.iter_pages())) for topic in topics_pagination.items]
         categories_topics[category.id] = copy.deepcopy(category_topics)
 
     if current_user.is_authenticated:
@@ -345,7 +346,7 @@ def get_categories_page_on_forum(page):
         username_of_cur_user = False
         is_admin = False
 
-    return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, username_of_cur_user=username_of_cur_user, id=category.id, name=category.name, topics=topics, topics_count=len(category.topics.all())) for category, topics in zip(categories, categories_topics.values())])
+    return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, pages_count=pages_count, username_of_cur_user=username_of_cur_user, id=category.id, name=category.name, topics=topics, topics_count=len(category.topics.all())) for category, topics in zip(categories, categories_topics.values())])
 
 
 @main.route('/get_posts_page/<topic_id>/<page>', methods=['GET'])
@@ -413,10 +414,9 @@ def search_category_on_forum():
 
         categories_topics = dict()
         for category in cur_page_items:
-            topics_pagination = category.topics.order_by().paginate(
-                1, per_page=ELEMS_COUNT, error_out=False)
+            topics_pagination = category.topics.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
             category_topics = [dict(id=topic.id, name=topic.name, cur_page=1,
-                                    pages=topics_pagination.pages) for topic in topics_pagination.items]
+                                    pages_count=list(topics_pagination.iter_pages())) for topic in topics_pagination.items]
             categories_topics[category.id] = copy.deepcopy(category_topics)
 
         if current_user.is_authenticated:
@@ -450,13 +450,15 @@ def add_topic(username, category_name):
         last_page = len(topics_for_cur_category) // ELEMS_COUNT
         if len(topics_for_cur_category) % ELEMS_COUNT > 0:
             last_page += 1
-        topics_for_cur_category_by_page = cur_category.topics.order_by().paginate(
-            last_page, per_page=ELEMS_COUNT, error_out=False).items
+            
+        topics_pagination = cur_category.topics.order_by().paginate(last_page, per_page=ELEMS_COUNT, error_out=False)
+        pages_count = list(topics_pagination.iter_pages())
+        topics_for_cur_category_by_page = topics_pagination.items
         if current_user.role == Role.ADMIN:
             is_admin = True
         else:
             is_admin = False
-        return jsonify([dict(result=result, cur_user_is_admin=is_admin, topic_pages=last_page, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category_by_page)) for topic in topics_for_cur_category_by_page])
+        return jsonify([dict(result=result, cur_user_is_admin=is_admin, pages_count=pages_count, topic_pages=last_page, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category_by_page)) for topic in topics_for_cur_category_by_page])
     return jsonify([dict(result=result)])
 
 
@@ -468,9 +470,10 @@ def get_topics_page_on_forum(category_id, page):
     else:
         is_admin = False
     category = Category.query.filter_by(id=category_id).first()
-    topics = category.topics.order_by().paginate(
-        page, per_page=ELEMS_COUNT, error_out=False).items
-    return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, id=topic.id, name=topic.name) for topic in topics])
+    topics_pagination = category.topics.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    pages_count = list(topics_pagination.iter_pages())
+    topics = topics_pagination.items
+    return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, id=topic.id, name=topic.name, pages_count=pages_count) for topic in topics])
 
 
 @main.route('/<username>/edit_post/<topic_id>/<post_id>', methods=['POST'])
@@ -499,16 +502,15 @@ def topic_delete(category_id, topic_id, page):
 
     if topics := category.topics.all():
         has_elems = True
-        topics_pagination = category.topics.order_by().paginate(
-            page, per_page=ELEMS_COUNT, error_out=False)
-        pages = topics_pagination.pages
+        topics_pagination = category.topics.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        pages_count = list(topics_pagination.iter_pages())
         if not topics_pagination.items:
             page -= 1
     else:
         page = 1
-        pages = 1
+        pages_count = 1
         has_elems = False
-    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, topics_count=len(topics)))
+    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, topics_count=len(topics)))
 
 
 @main.route('/books-maintaining', methods=['GET'])

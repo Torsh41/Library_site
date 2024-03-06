@@ -1,3 +1,31 @@
+// функция перестройки пагинации пользователей для ее правильного отображения
+function users_pagination_update(pages)
+{
+  $('ul').filter(function() {
+    return this.id.match('1pagination');
+  }).remove();
+  let html = `<ul class="pagination__list list-reset" id="1pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item_cur_page">
+                  <a id='${p}users_p' data-url='/admin/get_user_search_page/${p}' data-pagid='1pagination'>${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById("user_pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
 function get_user_search_page(url_path, pagination_id)
 {
     $.ajax({
@@ -23,6 +51,11 @@ function get_user_search_page(url_path, pagination_id)
                         </li>`;
             });
             document.getElementById("users_search_list").innerHTML = html;
+
+            // перестройка пагинации
+            users_pagination_update(users[0].pages_count);
+
+            // выделение текущей страницы
             pagi = document.getElementById('1pagination');
             pagi_li = pagi.querySelector('.pagination__item_cur_page');
             if (pagi_li)
@@ -72,22 +105,45 @@ function del_user(url_path, pagination_id)
 
         if (response.has_elems) 
         {
-          for (let i = 1; i <= response.pages; i++)
-          {
-            if (response.pages > 1 && i == response.cur_page)
+          response.pages_count.forEach((page) => {
+            if (page)
             {
-              html += ` <li class="pagination__item_cur_page">
-                          <a id="${i}users_p" data-url='/admin/get_user_search_page/${i}' data-pagid='${pagination_id}'>${i}</a>
-                        </li>`;
+              if (page == response.cur_page)
+              {
+                html += `<li class="pagination__item_cur_page">
+                            <a id="${page}users_p" data-url='/admin/get_user_search_page/${page}' data-pagid='${pagination_id}'>${page}</a>
+                          </li>`;
+              }
+              else
+              {
+                html += `<li class="pagination__item active">
+                            <a id="${page}users_p" data-url='/admin/get_user_search_page/${page}' data-pagid='${pagination_id}'>${page}</a>
+                          </li>`;
+              }
             }
             else
             {
-              html += ` <li class="pagination__item active">
-                          <a id="${i}users_p" data-url='/admin/get_user_search_page/${i}' data-pagid='${pagination_id}'>${i}</a>
-                        </li>`;
+              html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
             }
-          }
+          
+          });
         }
+          // for (let i = 1; i <= response.pages; i++)
+          // {
+          //   if (response.pages > 1 && i == response.cur_page)
+          //   {
+          //     html += ` <li class="pagination__item_cur_page">
+          //                 <a id="${i}users_p" data-url='/admin/get_user_search_page/${i}' data-pagid='${pagination_id}'>${i}</a>
+          //               </li>`;
+          //   }
+          //   else
+          //   {
+          //     html += ` <li class="pagination__item active">
+          //                 <a id="${i}users_p" data-url='/admin/get_user_search_page/${i}' data-pagid='${pagination_id}'>${i}</a>
+          //               </li>`;
+          //   }
+          // }
+        
 
         html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         
@@ -105,6 +161,34 @@ function del_user(url_path, pagination_id)
       }
     });
   }
+}
+
+// функция перестройки пагинации категорий для ее правильного отображения
+function categories_pagination_update(pages, username)
+{
+  $('ul').filter(function() {
+    return this.id.match('2pagination');
+  }).remove();
+  let html = `<ul class="pagination__list list-reset" id="2pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item active">
+                <a id="${p}categories_p" data-url="/admin/${username}/get_category_search_page/${p}" data-pagi="2pagination">${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById("category_pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
 }
 
 function get_category_page(url_path, pagination_id)
@@ -132,6 +216,11 @@ function get_category_page(url_path, pagination_id)
           action = action.split('?');
           path = action[0] + `?category_page=${url[url.length - 1]}`;
           form.setAttribute('action', path);
+
+          // перестройка пагинации
+          categories_pagination_update(categories[0].pages_count, categories[0].username);
+
+          // выделение текущей страницы
           pagi = document.getElementById('2pagination');
           pagi_li = pagi.querySelector('.pagination__item_cur_page');
           if (pagi_li)
@@ -171,9 +260,13 @@ function edit_elem_state(id)
             $('ul').filter(function() {
                 return this.id.match("users_search_list");
             }).remove();
+            $('div').filter(function() {
+              return this.id.match("user_pagination_container");
+            }).remove();
             $('h2').filter(function() {
                 return this.id.match("nothing_found");
             }).remove();
+            
             document.getElementById("username_field").value = "";
         }
     }
@@ -182,7 +275,7 @@ function edit_elem_state(id)
         if (id != 'book_search_in_a_category')
         {
           document.getElementById(id).style.display = "block";
-          document.getElementById(id).scrollIntoView();
+          document.getElementById(id).scrollIntoView(); // Прокрутка до верхней границы
         }
     }
 }
@@ -209,22 +302,44 @@ function del_category(url_path, pagination_id)
 
         if (response.has_elems) 
         {
-          for (let i = 1; i <= response.pages; i++)
-          {
-            if (response.pages > 1 && i == response.cur_page)
-            {
-              html += ` <li class="pagination__item_cur_page">
-                          <a id='${i}categories_p' data-url='/admin/${response.username}/get_category_search_page/${i}' data-pagi='${pagination_id}'>${i}</a>
-                        </li>`;
+          response.pages_count.forEach(page => {
+            if (page)
+            { 
+              if (page == response.cur_page)
+              {
+                html += `<li class="pagination__item_cur_page">
+                        <a id='${page}categories_p' data-url='/admin/${response.username}/get_category_search_page/${page}' data-pagi='${pagination_id}'>${page}</a>
+                      </li>`;
+              }
+              else
+              {
+                html += `<li class="pagination__item active">
+                    <a id='${page}categories_p' data-url='/admin/${response.username}/get_category_search_page/${page}' data-pagi='${pagination_id}'>${page}</a>
+                    </li>`;
+              }
             }
             else
             {
-              html += ` <li class="pagination__item active">
-                          <a id='${i}categories_p' data-url='/admin/${response.username}/get_category_search_page/${i}' data-pagi='${pagination_id}'>${i}</a>
-                        </li>`;
+              html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
             }
-          }
+           
+          });
         }
+          // for (let i = 1; i <= response.pages; i++)
+          // {
+          //   if (response.pages > 1 && i == response.cur_page)
+          //   {
+          //     html += ` <li class="pagination__item_cur_page">
+          //                 <a id='${i}categories_p' data-url='/admin/${response.username}/get_category_search_page/${i}' data-pagi='${pagination_id}'>${i}</a>
+          //               </li>`;
+          //   }
+          //   else
+          //   {
+          //     html += ` <li class="pagination__item active">
+          //                 <a id='${i}categories_p' data-url='/admin/${response.username}/get_category_search_page/${i}' data-pagi='${pagination_id}'>${i}</a>
+          //               </li>`;
+          //   }
+          // }
 
         html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         
@@ -291,8 +406,8 @@ function search_books_on_category()
                 }).remove();
 
               html = "";
-              if (books[0].has_books)
-              {
+            if (books[0].has_books)
+            {
                 books.forEach(book => {
                     html += `<li class="list__book" id="${book.id}book_info">
                                 
@@ -316,24 +431,49 @@ function search_books_on_category()
                 // собираем пагинацию
                 html = `<div class="list__pagination pagination" id="3pagination_container">
                             <ul class="pagination__list list-reset" id="3pagination">
-                <li class="pagination__item disabled">&bull;</li>`;
-                try {
-                    for (let i = 1; i <= books[0].pages; i++) {
-                        if (books[0].pages > 1 && i == books[0].cur_page)
-                        {
-                            html += `<li class="pagination__item_cur_page">
-                                        <a id="${i}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${i}'>${i}</a>
-                                     </li>`;
-                        }
-                        else
-                        {
-                            html += `<li class="pagination__item active">
-                                        <a id="${i}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${i}'>${i}</a>
-                                    </li>`;
-                        }
+                        <li class="pagination__item disabled">&bull;</li>`;
+
+                books[0].pages_count.forEach((page) => {
+                  if (page)
+                  {
+                    if (page == books[0].cur_page)
+                    {
+                      html += `<li class="pagination__item_cur_page">
+                                  <a id="${page}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${page}'>${page}</a>
+                              </li>`;
                     }
-                }
-                catch {}
+                    else
+                    {
+                      
+                      html += `<li class="pagination__item active">
+                                <a id="${page}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${page}'>${page}</a>
+                                </li>`;
+                    }
+                  }
+                  else
+                  {
+                      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+                  }
+                });
+
+
+                // try {
+                //     for (let i = 1; i <= books[0].pages; i++) {
+                //         if (books[0].pages > 1 && i == books[0].cur_page)
+                //         {
+                //             html += `<li class="pagination__item_cur_page">
+                //                         <a id="${i}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${i}'>${i}</a>
+                //                      </li>`;
+                //         }
+                //         else
+                //         {
+                //             html += `<li class="pagination__item active">
+                //                         <a id="${i}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${i}'>${i}</a>
+                //                     </li>`;
+                //         }
+                //     }
+                // }
+                // catch {}
                 html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                 div = document.getElementById('2cont');
                 div.insertAdjacentHTML('beforeend', html);
@@ -373,6 +513,35 @@ function search_books_on_category()
     }
 }
 
+
+// функция перестройки пагинации книг для ее правильного отображения
+function books_pagination_update(pages, username, category)
+{
+  $('ul').filter(function() {
+    return this.id.match('3pagination');
+  }).remove();
+  let html = `<ul class="pagination__list list-reset" id="3pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item_cur_page">
+                  <a id="${p}get_books_p" data-url='/admin/${username}/search_books_on_admin_panel/${category}?page=${p}'>${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById("3pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
 function get_books_page_on_admin_panel(url_path)
 {
     $.ajax({
@@ -404,6 +573,10 @@ function get_books_page_on_admin_panel(url_path)
                     });
                     ul = document.getElementById('list_res');
                     ul.insertAdjacentHTML('beforeend', html);
+                    // перестройка пагинации
+                    books_pagination_update(books[0].pages_count, books[0].username, books[0].category);
+
+                    // выделение текущей страницы
                     pagi = document.getElementById('3pagination');
                     pagi_li = pagi.querySelector('.pagination__item_cur_page');
                     if (pagi_li)
@@ -451,24 +624,45 @@ function del_book_from_site(url_path)
     
             if (response.has_elems) 
             {
-                for (let i = 1; i <= response.pages; i++)
+              response.pages_count.forEach(page => {
+                if (page)
                 {
-                    if (response.pages > 1 && i == response.cur_page)
-                    {
-                          
-                        html += `<li class="pagination__item_cur_page">
-                                    <a id='${i}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${i}'>${i}</a>
-                                </li>`;
-                    }
-                    else
-                    {
-                        html += `<li class="pagination__item active">
-                                    <a id='${i}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${i}'>${i}</a>
-                                </li>`;
-                    }
+                  if (page == response.cur_page)
+                  {
+                      html += `<li class="pagination__item_cur_page">
+                                  <a id='${page}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${page}'>${page}</a>
+                              </li>`;
+                  }
+                  else
+                  {
+                      html += `<li class="pagination__item active">
+                                  <a id='${page}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${page}'>${page}</a>
+                              </li>`;
+                  }
                 }
+                else
+                {
+                  html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+                }
+              });
             }
-    
+                // for (let i = 1; i <= response.pages; i++)
+                // {
+                //     if (response.pages > 1 && i == response.cur_page)
+                //     {
+                          
+                //         html += `<li class="pagination__item_cur_page">
+                //                     <a id='${i}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${i}'>${i}</a>
+                //                 </li>`;
+                //     }
+                //     else
+                //     {
+                //         html += `<li class="pagination__item active">
+                //                     <a id='${i}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${i}'>${i}</a>
+                //                 </li>`;
+                //     }
+                // }
+            
             html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
             ul = document.getElementById('list_res');
             ul.insertAdjacentHTML('afterend', html);  
