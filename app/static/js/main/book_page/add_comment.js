@@ -59,25 +59,28 @@ $(function() {
             }).remove();
             html = `<ul class="pagination__list list-reset" id="comments_pagination">
             <li class="pagination__item disabled">&bull;</li>`;
-            try
-            {
-              for (let i = 1; i <= comments[0].pages; i++)
-              {
-                if (comments[0].pages > 1 && i == comments[0].pages)
+            comments[0].pages_count.forEach((page) => {
+                if (page)
                 {
-                  html += `<li class="pagination__item_cur_page">
-                              <a id='${i}comments_p' data-url='/get_comments_page/${comments[0].book_name}/${i}'>${i}</a>
-                            </li>`;
+                    if (page == comments[0].cur_page)
+                    {
+                        html += `<li class="pagination__item_cur_page">
+                                    <a id='${page}comments_p' data-url='/get_comments_page/${comments[0].book_name}/${page}'>${page}</a>
+                                </li>`;
+                    }
+                    else
+                    {
+                        html += `<li class="pagination__item active">
+                                    <a id='${page}comments_p' data-url='/get_comments_page/${comments[0].book_name}/${page}'>${page}</a>
+                                </li>`;
+                    }
                 }
                 else
                 {
-                  html += `<li class="pagination__item active">
-                            <a id='${i}comments_p' data-url='/get_comments_page/${comments[0].book_name}/${i}'>${i}</a>
-                          </li>`;
+                    html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                 }
-              }
-            }
-            catch {}
+            });
+            
             html += `<li class="pagination__item disabled">&bull;</li></ul>`;
             document.getElementById('comments_pagination_container').innerHTML = html;
             li = document.getElementById(comments[0].id_of_added_comment + 'comment_info');

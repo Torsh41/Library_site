@@ -1,6 +1,6 @@
 from flask_socketio import emit
-from app.begin_to_app import socketio
-from app.init import database
+from .. import socketio
+from app import database
 from app.models import User, TopicPost, DiscussionTopic
 from flask_login import current_user, login_required
 from app.decorators import check_actual_password

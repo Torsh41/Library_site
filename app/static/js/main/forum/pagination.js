@@ -13,11 +13,11 @@ function topics_pagination_update(pages, category_id)
     {
       html += `<li class="pagination__item active">
                 <a id="${p}topics_p" data-url="/get_topics_page_on_forum/${category_id}/${p}" data-catid="${category_id}">${p}</a>
-              </li>`
+              </li>`;
     }
     else
     {
-      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
     }
    
   });

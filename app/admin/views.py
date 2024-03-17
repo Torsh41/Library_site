@@ -1,7 +1,7 @@
 from . import admin
 from flask_login import current_user
 from flask import render_template, redirect, url_for, request, jsonify
-from ..begin_to_app import database
+from .. import database
 from app.models import User, Book, Category, SearchResult
 from .forms import AddCategoryForm
 from app.decorators import admin_required, check_actual_password

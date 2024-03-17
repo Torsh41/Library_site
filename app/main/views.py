@@ -1,5 +1,5 @@
 from . import main
-from app.init import database
+from .. import database
 from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicPost, DiscussionTopic, Role, BooksMaintaining
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from flask_login import current_user, login_required
@@ -75,14 +75,15 @@ def book_page(name):
 def get_comments_page(book_name, page):
     page = int(page)
     book = Book.query.filter_by(name=book_name).first()
-    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(
-        page, per_page=ELEMS_COUNT, error_out=False).items
+    comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    pages_count = list(comments_pagination.iter_pages())
+    comments = comments_pagination.items
     users = list()
     user_is_admin = True if (current_user.is_authenticated and current_user.role == Role.ADMIN) else False
     name_of_current_user = current_user.username if (current_user.is_authenticated) else None
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(cur_page=page, user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=name_of_current_user, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(cur_page=page, pages_count=pages_count, user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=name_of_current_user, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
 
 
 @main.route('/<username>/<book_name>/add_comment', methods=['POST'])
@@ -92,8 +93,7 @@ def add_comment(username, book_name):
     if current_user.username != username:
         return render_template('403.html')
     book = Book.query.filter_by(name=book_name).first()
-    comment = Comment(body=str(request.form.get('comment')).strip().replace(
-        "'", ""), book=book, user=current_user._get_current_object())
+    comment = Comment(body=str(request.form.get('comment')).strip().replace("'", ""), book=book, user=current_user._get_current_object())
     database.session.add(comment)
     database.session.commit()
     comments = book.comments.all()
@@ -101,12 +101,14 @@ def add_comment(username, book_name):
     id_of_added_comment = comments[-1].id
     if len(comments) % ELEMS_COUNT > 0:
         last_page += 1
-    comments = book.comments.order_by(Comment.timestamp.asc()).paginate(last_page, per_page=ELEMS_COUNT, error_out=False).items
+    comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(last_page, per_page=ELEMS_COUNT, error_out=False)
+    pages_count = list(comments_pagination.iter_pages())
+    comments = comments_pagination.items
     user_is_admin = True if current_user.role == Role.ADMIN else False
     users = list()
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(pages=last_page, user_is_admin=user_is_admin, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(pages=last_page, user_is_admin=user_is_admin, pages_count=pages_count, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
 
 
 @main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
@@ -153,16 +155,13 @@ def comment_delete(username, book_name, comment_id, page):
     database.session.commit()
     if book.comments.all():
         has_elems = True
-        comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(
-            page, per_page=ELEMS_COUNT, error_out=False)
-        pages = comments_pagination.pages
+        comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        pages_count = list(comments_pagination.iter_pages())
         if not comments_pagination.items:
             page -= 1
     else:
-        page = 1
-        pages = 1
-        has_elems = False
-    return jsonify(dict(cur_page=page, pages=pages, has_elems=has_elems, username=current_user.username, book_name=book_name))
+        page = 1; pages_count = [1]; has_elems = False
+    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, book_name=book_name))
 
 
 @main.route('/categories', methods=['GET'])
@@ -177,9 +176,10 @@ def categories():
 @main.route('/get_categories_page/<page>', methods=['GET'])
 def get_categories_page(page):
     page = int(page)
-    categories = Category.query.order_by().paginate(
-        page, per_page=ELEMS_COUNT, error_out=False).items
-    return jsonify([dict(cur_page=page, id=category.id, name=category.name) for category in categories])
+    categories_pagination = Category.query.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    pages_count = list(categories_pagination.iter_pages())
+    categories = categories_pagination.items
+    return jsonify([dict(cur_page=page, id=category.id, pages_count=pages_count, name=category.name) for category in categories])
 
 
 @main.route('/category/<name>/search', methods=['GET', 'POST'])
@@ -187,8 +187,9 @@ def search_by_category(name):
     list_id = request.args.get('list_id', None, type=int)
     page_count = 1
     category = Category.query.filter_by(name=name).first()
+    if category is None:
+        return render_template('404.html')
     res = category.books.all()
-    books = Book.query.all()
     date_list = list()
     if res:
         top_books = list()
@@ -211,10 +212,6 @@ def search_by_category(name):
         result = str(request.form.get('search_result')).strip().lower()
         if result == 'все':
             search_result = res
-
-        elif result == '*':
-            search_result = books
-
         else:
             release_date = request.form.get('release_date')
             if release_date != '#':
@@ -255,7 +252,7 @@ def search_by_category(name):
                 search_result = search_result[:ELEMS_COUNT]
             else:
                 page_count = 1
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, top_books=top_books, len=len, page_count=page_count, page=1, range=range, name=name, list_id=list_id, all_search_result=all_search_result)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, top_books=top_books, len=len, page_count=page_count, page=1, range=range, name=category.name, list_id=list_id, all_search_result=all_search_result)
 
     elif page := request.args.get('page', None, type=int):
         cur_result = SearchResult.query.all()
@@ -279,7 +276,7 @@ def search_by_category(name):
             search_result = search_result[page]
         except:
             return render_template('main/category_page.html', name=name, search_result=0, date_list=date_list, top_books=top_books, list_id=list_id, len=len)
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, top_books=top_books, len=len, page_count=page_count, page=page, range=range, name=name, list_id=list_id, all_search_result=cur_result)
+        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, top_books=top_books, len=len, page_count=page_count, page=page, range=range, name=category.name, list_id=list_id, all_search_result=cur_result)
     return render_template('main/category_page.html', name=name, search_result=0, date_list=date_list, top_books=top_books, list_id=list_id, len=len)
 
 
@@ -544,14 +541,17 @@ def add_new_books_info():
         database.session.add(book_obj)
     database.session.commit()
     
-    data = BooksMaintaining.query.all(); data_len = len(data); data = data[data_len - BOOKS_MAINTAINING_PER_PAGE:]
-    
+    data_len = BooksMaintaining.query.count()
     # найдем количество страниц
     pages = data_len // BOOKS_MAINTAINING_PER_PAGE
     if data_len % BOOKS_MAINTAINING_PER_PAGE > 0:
         pages += 1
+    # pages - она же последняя страница
+    data_pagination = BooksMaintaining.query.order_by().paginate(pages, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    pages_count_arr = list(data_pagination.iter_pages())
+    data = data_pagination.items
     
-    return jsonify([dict(result=True, pages=pages, cur_page=pages, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+    return jsonify([dict(result=True, pages_count_arr=pages_count_arr, cur_page=pages, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
                         categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
                         pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
                         link=book_info.link, count=book_info.count) for book_info in data])
@@ -579,14 +579,17 @@ def search_book():
     
     pagination = BooksMaintaining.query.paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     if book in pagination.items:
-        return jsonify([dict(result=True, cur_page=1, pages=pagination.pages, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+        pages_count_arr = list(pagination.iter_pages())
+        return jsonify([dict(result=True, cur_page=1, pages_count_arr=pages_count_arr, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
                             categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
                             pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
                             link=book_info.link, count=book_info.count) for book_info in pagination.items])
     for page in range(2, pagination.pages + 1):  
-        items = BooksMaintaining.query.paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False).items
+        items_pagination = BooksMaintaining.query.paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+        items = items_pagination.items
         if book in items:
-            return jsonify([dict(result=True, cur_page=page, pages=pagination.pages, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+            pages_count_arr = list(items_pagination.iter_pages())
+            return jsonify([dict(result=True, cur_page=page, pages_count_arr=pages_count_arr, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
                                 categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
                                 pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
                                 link=book_info.link, count=book_info.count) for book_info in items])
@@ -597,8 +600,10 @@ def search_book():
 @check_actual_password
 def get_books_info_page(page):
     page = int(page)
-    data = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False).items
-    return jsonify([dict(cur_page=page, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
+    data_pagination = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    pages_count_arr = list(data_pagination.iter_pages())
+    data = data_pagination.items
+    return jsonify([dict(cur_page=page, pages_count_arr=pages_count_arr, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
                         categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
                         pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
                         link=book_info.link, count=book_info.count) for book_info in data])
@@ -620,9 +625,19 @@ def change_books_count():
 @check_actual_password
 def book_del():
     try:
+        page = int(request.form.get('page'))
         book = BooksMaintaining.query.filter_by(id=int(request.form.get('id'))).first()
         database.session.delete(book)
         database.session.commit()
-        return jsonify(dict(result=True))
+        
+        # получаем данные для перестройки пагинации
+        if BooksMaintaining.query.all():
+            data_pagination = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+            pages_count_arr = list(data_pagination.iter_pages())
+            if not data_pagination.items:
+                page -= 1
+            return jsonify(dict(result=True, cur_page=page, pages_count_arr=pages_count_arr))
+        else:
+            return jsonify(dict(result=False))
     except:
         return jsonify(dict(result=False))
