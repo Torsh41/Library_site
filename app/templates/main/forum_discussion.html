@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js" crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/posts_manipulations.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/edit_post.js')}}"></script>
@@ -140,18 +140,24 @@
 
               <div class="message__right" id="{{post["id"]}}msg_write_id">
                 {% if post["this_is_answer"] %}
-                <div class="message__answer" id="{{post["id"]}}base_to_answer">
-                  <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
-                  <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
-                </div>
+                  {% if post["basic_post_exist"] %}
+                    <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                      <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
+                      <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
+                    </div>
+                  {% else %}
+                    <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                      <span class="message__span-answer">Сообщение удалено</span>
+                    </div>
+                  {% endif %}
                 {% endif %}
                 <p class="message__text" id="{{post["id"]}}post_body">
                   {{post["body"]}} <!--Сообщение пользователя-->
                 </p>
                 {% if post["file"] %}
-                <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
-                  onmouseout="this.style.width='80px'; this.style.height='80px'"
-                  src="{{url_for('main.post_screenshot', post_id=post["id"])}}" />
+                  <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
+                    onmouseout="this.style.width='80px'; this.style.height='80px'"
+                    src="{{url_for('main.post_screenshot', post_id=post["id"])}}"/>
                 {% endif %}
 
                 <!--This block for user (only for his messages)-->

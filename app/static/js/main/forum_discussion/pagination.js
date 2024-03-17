@@ -1,3 +1,32 @@
+// функция перестройки пагинации постов для ее правильного отображения
+function posts_pagination_update(pages, topic_id)
+{
+  $('ul').filter(function() {
+    return this.id.match("pagination");
+  }).remove();
+  let html = `<ul class="pagination__list list-reset" id="pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item active">
+                <a id="${p}posts_p" data-url="/get_posts_page/${topic_id}/${p}">${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById("posts_pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
+
 $(function() {
     $('#posts_pagination_container').on('click', function(event) {
         let target = event.target;
@@ -9,7 +38,8 @@ $(function() {
             url: url_path,
             dataType: 'json',
             success: function(response) {
-                posts = Array.from(response);
+                posts = Array.from(response.posts);
+                pages_count = Array.from(response.pages_count);
                 $('div').filter(function() {
                     return this.id.match(/discussion_post/);
                 }).remove();
@@ -103,6 +133,10 @@ $(function() {
                   action = action.split('?')[0];
                   write_post_form.setAttribute('action', action);
                  }
+                // перестройка пагинации
+                posts_pagination_update(pages_count, posts[0].topic_id);
+
+                // выделение текущей страницы
                  pagi = document.getElementById('pagination');
                  pagi_li = pagi.querySelector('.pagination__item_cur_page');
                  if (pagi_li)
