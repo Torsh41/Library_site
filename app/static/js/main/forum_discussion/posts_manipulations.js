@@ -101,33 +101,47 @@ function add_post_on_forum(posts) {
                           </div>
         
                           <div class="message__right" id="${post.id}msg_write_id">`;
-    if (post.this_is_answer) {
-      html += `<div class="message__answer" id="${post.id}base_to_answer">
+    if (post.this_is_answer) 
+    {
+      if (post.basic_post_exist) 
+      {
+        html += `<div class="message__answer" id="${post.id}base_to_answer">
                                         <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
                                         <p class="message__text-answer">${post.body_of_post_from}</p>
                                       </div>`;
+      }
+      else
+      {
+        html += `<div class="message__answer" id="${post.id}base_to_answer">
+                                        <span class="message__span-answer">Сообщение удалено</span>
+                                      </div>`;
+      }
     }
     html += `<p class="message__text" id="${post.id}post_body">
                             ${post.body} <!--Сообщение пользователя-->
                             </p>`;
-    if (post.file) {
+    if (post.file) 
+    {
       html += `<img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
                               onmouseout="this.style.width='80px'; this.style.height='80px'" src="/${post.id}/get-post_screenshot">`;
     }
 
-    if (post.username == cur_username) {
+    if (post.username == cur_username) 
+    {
       html += `<div class="message__admin" id="${post.id}personal_cont">
                                   <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
                                   <a class="message__admin-btn" id="${post.id}edit_post_a" data-url='/${cur_username}/edit_post/${post.topic_id}/${post.id}' data-body='${post.body}'>Редактировать</a>
                                   <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                                   </div>`;
-    } else if (cur_user_is_admin) {
+    } else if (cur_user_is_admin) 
+    {
       html += `<div class="message__admin" id="${post.id}personal_cont">
                                     <a class="comments__command">Админ</a>
                                     <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
                                     <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                                   </div>`;
-    } else if (cur_username) {
+    } else if (cur_username) 
+    {
       html += `<div class="message__admin" id="${post.id}personal_cont">
             <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
             </div>`;
@@ -136,6 +150,7 @@ function add_post_on_forum(posts) {
   });
   div = document.getElementById("disc_posts_container");
   div.insertAdjacentHTML("afterbegin", html);
+  div.scrollIntoView(false); // Прокрутка до нижней границы
 
   // собираем пагинацию
   $("ul")
@@ -145,19 +160,28 @@ function add_post_on_forum(posts) {
     .remove();
   html = `<ul class="pagination__list list-reset" id="pagination">
             <li class="pagination__item disabled">&bull;</li>`;
-  try {
-    for (let i = 1; i <= posts[0].pages; i++) {
-      if (posts[0].pages > 1 && i == posts[0].pages) {
+  posts[0].pages_count.forEach(p => {
+    if (p)
+    {
+      if (p == posts[0].cur_page)
+      {
         html += `<li class="pagination__item_cur_page">
-                            <a id='${i}posts_p' data-url='/get_posts_page/${posts[0].topic_id}/${i}'>${i}</a>
-                          </li>`;
-      } else {
+                    <a id="${p}posts_p" data-url='/get_posts_page/${posts[0].topic_id}/${p}'>${p}</a>
+                  </li>`;
+      }
+      else
+      {
         html += `<li class="pagination__item active">
-                            <a id='${i}posts_p' data-url='/get_posts_page/${posts[0].topic_id}/${i}'>${i}</a>
-                          </li>`;
+                  <a id="${p}posts_p" data-url='/get_posts_page/${posts[0].topic_id}/${p}'>${p}</a>
+                </li>`;
       }
     }
-  } catch {}
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+  });
+
   html += `<li class="pagination__item disabled">&bull;</li></ul>`;
   document.getElementById("posts_pagination_container").innerHTML = html;
   document.getElementById("post_body_id").value = "";
@@ -181,19 +205,30 @@ function del_post(response, topic_id, post_id)
       return this.id.match("pagination");
     }).remove();
 
-  html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;
-  if (response.has_elems) {
-    for (let i = 1; i <= response.pages; i++) {
-      if (response.pages > 1 && i == response.cur_page) {
-        html += `<li class="pagination__item_cur_page">
-                        <a id='${i}posts_p' data-url='/get_posts_page/${topic_id}/${i}'>${i}</a>
-                      </li>`;
-      } else {
-        html += `<li class="pagination__item active">
-                        <a id='${i}posts_p' data-url='/get_posts_page/${topic_id}/${i}'>${i}</a>
-                        </li>`;
+  let html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;
+  if (response.has_elems) 
+  {
+    response.pages_count.forEach(p => {
+      if (p)
+      {
+        if (p == response.cur_page)
+        {
+          html += `<li class="pagination__item_cur_page">
+                      <a id='${p}posts_p' data-url='/get_posts_page/${topic_id}/${p}'>${p}</a>
+                    </li>`;
+        }
+        else
+        {
+          html += `<li class="pagination__item active">
+                      <a id='${p}posts_p' data-url='/get_posts_page/${topic_id}/${p}'>${p}</a>
+                    </li>`;
+        }
       }
-    }
+      else
+      {
+        html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+      }
+    });
   }
   html += `<li class="pagination__item disabled">&bull;</li></ul>`;
   document.getElementById("posts_pagination_container").innerHTML = html;
@@ -217,18 +252,20 @@ function answer_on_post(topic_id, post_id)
   $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
 }
 
-function get_posts_page(url_path)
+
+function get_posts_page(url_path, post_id=undefined)
 {
   $.ajax({
     method: 'get',
     url: url_path,
     dataType: 'json',
     success: function(response) {
-        posts = Array.from(response);
+        posts = Array.from(response.posts);
+        pages_count = Array.from(response.pages_count);
         $('div').filter(function() {
-            return this.id.match(/discussion_post/);
+          return this.id.match(/discussion_post/);
         }).remove();
-        html = "";
+        let html = "";
         posts.forEach(post => {
         html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
                       <div class="message__left">
@@ -271,10 +308,19 @@ function get_posts_page(url_path)
                       <div class="message__right" id="${post.id}msg_write_id">`;
                       if (post.this_is_answer)
                       {
-                        html += `<div class="message__answer" id="${post.id}base_to_answer">
-                                  <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
-                                  <p class="message__text-answer">${post.body_of_post_from}</p>
-                                </div>`;
+                        if (post.basic_post_exist)
+                        {
+                          html += `<div class="message__answer" id="${post.id}base_to_answer">
+                                    <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
+                                    <p class="message__text-answer">${post.body_of_post_from}</p>
+                                  </div>`;
+                        }
+                        else
+                        {
+                          html += `<div class="message__answer" id="${post.id}base_to_answer">
+                                    <span class="message__span-answer">Сообщение удалено</span>
+                                  </div>`;
+                        }
                       }
                       html += `<p class="message__text" id="${post.id}post_body">
                       ${post.body} <!--Сообщение пользователя-->
@@ -308,29 +354,29 @@ function get_posts_page(url_path)
                     </div>`;
                   }
                  html += `</div></div>`;
-         });
-         div = document.getElementById('disc_posts_container');
-         div.insertAdjacentHTML('afterbegin', html);
-         write_post_form = document.getElementById('add_post_form');
-         if (write_post_form)
-         {
-          action = write_post_form.getAttribute('action');
-          action = action.split('?')[0];
-          write_post_form.setAttribute('action', action);
-         }
-         pagi = document.getElementById('pagination');
-         pagi_li = pagi.querySelector('.pagination__item_cur_page');
-         if (pagi_li)
-         {
-           pagi_li.className = 'pagination__item active';
-         }
-         for (const child of pagi.children)
-         {
-           if (posts.length && posts[0].cur_page == child.textContent)
-           {
-             child.className = 'pagination__item_cur_page';
-           }
-         }
+        });
+        let div = document.getElementById('disc_posts_container');
+        div.insertAdjacentHTML('afterbegin', html);
+        write_post_form = document.getElementById('add_post_form');
+        if (write_post_form)
+        {
+        action = write_post_form.getAttribute('action');
+        action = action.split('?')[0];
+        write_post_form.setAttribute('action', action);
+        }
+        pagi = document.getElementById('pagination');
+        pagi_li = pagi.querySelector('.pagination__item_cur_page');
+        if (pagi_li)
+        {
+          pagi_li.className = 'pagination__item active';
+        }
+        for (const child of pagi.children)
+        {
+          if (posts.length && posts[0].cur_page == child.textContent)
+          {
+            child.className = 'pagination__item_cur_page';
+          }
+        }
     },
     error: function(jqXHR, exception) {
         if (exception === 'parsererror')

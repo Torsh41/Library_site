@@ -140,18 +140,24 @@
 
               <div class="message__right" id="{{post["id"]}}msg_write_id">
                 {% if post["this_is_answer"] %}
-                <div class="message__answer" id="{{post["id"]}}base_to_answer">
-                  <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
-                  <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
-                </div>
+                  {% if post["basic_post_exist"] %}
+                    <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                      <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
+                      <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
+                    </div>
+                  {% else %}
+                    <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                      <span class="message__span-answer">Сообщение удалено</span>
+                    </div>
+                  {% endif %}
                 {% endif %}
                 <p class="message__text" id="{{post["id"]}}post_body">
                   {{post["body"]}} <!--Сообщение пользователя-->
                 </p>
                 {% if post["file"] %}
-                <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
-                  onmouseout="this.style.width='80px'; this.style.height='80px'"
-                  src="{{url_for('main.post_screenshot', post_id=post["id"])}}" />
+                  <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
+                    onmouseout="this.style.width='80px'; this.style.height='80px'"
+                    src="{{url_for('main.post_screenshot', post_id=post["id"])}}"/>
                 {% endif %}
 
                 <!--This block for user (only for his messages)-->
