@@ -184,7 +184,10 @@ function add_post_on_forum(posts) {
 
   html += `<li class="pagination__item disabled">&bull;</li></ul>`;
   document.getElementById("posts_pagination_container").innerHTML = html;
-  document.getElementById("post_body_id").value = "";
+  if (document.getElementById("post_body_id"))
+  {
+    document.getElementById("post_body_id").value = "";
+  }
 
   $("span")
     .filter(function () {
@@ -194,7 +197,10 @@ function add_post_on_forum(posts) {
   html = `<span class="main__span-forum" id="posts_count">Сообщений: ${posts[0].posts_count}</span>`;
   div = document.getElementById("main_container");
   div.insertAdjacentHTML("beforeend", html);
-  document.getElementById("file_input_id").value = "";
+  if (document.getElementById("file_input_id"))
+  {
+    document.getElementById("file_input_id").value = "";
+  }
 }
 
 function del_post(response, topic_id, post_id) 
