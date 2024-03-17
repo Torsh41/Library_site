@@ -2,7 +2,7 @@ from . import personal
 from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, request, make_response, jsonify
 from .forms import EditProfileForm, AddNewBookForm
-from ..begin_to_app import database
+from .. import database
 from app.models import User, Cataloge, Book, Item, Category, Role
 from app.decorators import check_actual_password
 import copy

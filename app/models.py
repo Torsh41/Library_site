@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from .init import database, login_manager, application
+from . import database, login_manager, app
 from flask import current_app, url_for, session
 from datetime import datetime, timedelta
 from jose import jwt
@@ -18,7 +18,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.String(64), unique=True, index=True)
     username = database.Column(database.String(64), unique=True, index=True)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     avatar = database.Column(database.LargeBinary, default=False)
     city = database.Column(database.String(64), default=False)
     gender = database.Column(database.String(4), default=False)
@@ -34,7 +34,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     role = database.Column(database.Boolean, default=False)
     
     def generate_confirmation_token(self): #30 минут время действия токена
-        now = datetime.utcnow()
+        now = datetime.now()
         payload = {
             'iat': 0,
             'ref': 0,
@@ -46,7 +46,7 @@ class User(UserMixin, database.Model, SerializerMixin):
         return access_token
     
     def generate_change_token(self): #30 минут время действия токена
-        now = datetime.utcnow()
+        now = datetime.now()
         payload = {
             'iat': 0,
             'ref': 0,
@@ -106,7 +106,7 @@ class User(UserMixin, database.Model, SerializerMixin):
             self.role = False
             
     def default_ava(self):
-        with application.open_resource(application.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
+        with app.open_resource(app.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
             self.avatar = f.read()
             
             
@@ -132,7 +132,7 @@ class TopicPost(database.Model, SerializerMixin):
     body = database.Column(database.String(1024), index=True)
     file = database.Column(database.LargeBinary, default=False)
     answer_to_post = database.Column(database.Integer, default=False)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
 
@@ -155,7 +155,7 @@ class Book(database.Model, SerializerMixin):
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
     def default_cover(self):
-        with application.open_resource(application.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
+        with app.open_resource(app.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
             self.cover = f.read()
     
 
@@ -171,7 +171,7 @@ class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.Text())
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.utcnow)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     book_id = database.Column(database.Integer, database.ForeignKey('books.id'))

@@ -168,7 +168,7 @@
                                         value="{{book.count}}"></span>
                             </div>
                             <div class="form__book-delete">
-                                <input class="form__delete-btn" id="{{book.id}}del_book" formmethod="post" type="submit"
+                                <input class="form__delete-btn" id="{{book.id}}del_book" data-page="{{1}}" formmethod="post" type="submit"
                                     value="удалить из списка">
                             </div>
                         </div>
@@ -180,13 +180,13 @@
                             &bull;
                         </li>
                         {% for p in pagination.iter_pages() %}
-                        {% if p %}
-                        <li class="pagination__item active">
-                            <a id="{{p}}books_info_p" data-url="/books-maintaining/get-page/{{ p }}">{{ p }}</a>
-                        </li>
-                        {% else %}
-                        <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-                        {% endif %}
+                            {% if p %}
+                                <li class="pagination__item active">
+                                    <a id="{{p}}books_info_p" data-url="/books-maintaining/get-page/{{ p }}">{{ p }}</a>
+                                </li>
+                            {% else %}
+                                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                            {% endif %}
                         {% endfor %}
                         <li class="pagination__item disabled">
                             &bull;
