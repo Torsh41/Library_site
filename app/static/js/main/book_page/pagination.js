@@ -1,3 +1,32 @@
+// функция перестройки пагинации комментариев для ее правильного отображения
+function comments_pagination_update(pages, bookname)
+{
+  $('ul').filter(function() {
+    return this.id.match("comments_pagination");
+  }).remove();
+  let html = `<ul class="pagination__list list-reset" id="comments_pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item active">
+                <a id="${p}comments_p" data-url="/get_comments_page/${bookname}/${p}">${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById("comments_pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
+
 function get_comments_page(url_path)
 {
     $.ajax({
@@ -42,6 +71,11 @@ function get_comments_page(url_path)
                 
             });
             document.getElementById("comments_info_container").innerHTML = html;
+
+            // перестройка пагинации
+            comments_pagination_update(comments[0].pages_count, comments[0].book_name);
+
+            // выделение текущей страницы
             pagi = document.getElementById('comments_pagination');
             pagi_li = pagi.querySelector('.pagination__item_cur_page');
             if (pagi_li)
@@ -140,21 +174,27 @@ $(function() {
                   html = `<ul class="pagination__list list-reset" id="comments_pagination"><li class="pagination__item disabled"> &bull;</li>`;
                   if (response.has_elems) 
                   {
-                    for (let i = 1; i <= response.pages; i++)
-                    {
-                      if (response.pages > 1 && i == response.cur_page)
+                    response.pages_count.forEach(page => {
+                      if (page)
                       {
-                        html += `<li class="pagination__item_cur_page">
-                                  <a id="${i}comments_p" data-url='/get_comments_page/${response.book_name}/${i}'>${i}</a>
-                                 </li>`;
+                        if (page == response.cur_page)
+                        {
+                          html += `<li class="pagination__item_cur_page">
+                                    <a id="${page}comments_p" data-url='/get_comments_page/${response.book_name}/${page}'>${page}</a>
+                                  </li>`;
+                        }
+                        else
+                        {
+                          html += `<li class="pagination__item active>
+                                    <a id="${page}comments_p" data-url='/get_comments_page/${response.book_name}/${page}'>${page}</a>
+                                  </li>`;
+                        }
                       }
                       else
                       {
-                        html += `<li class="pagination__item active">
-                                    <a id="${i}comments_p" data-url='/get_comments_page/${response.book_name}/${i}'>${i}</a>
-                                 </li>`;
+                        html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                       }
-                    }
+                    });
                   }
           
                   html += `<li class="pagination__item disabled">&bull;</li></ul>`;

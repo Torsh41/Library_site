@@ -39,22 +39,44 @@ function search_users_on_forum()
                 }).remove();
                 html = `<div class="list__pagination pagination" id="user_pagination_container">
                         <ul class="pagination__list list-reset" id="1pagination"><li class="pagination__item disabled">&bull;</li>`;
-        
-                for (let i = 1; i <= users[0].page; i++)
-                {
-                    if (users[0].page > 1 && i == users[0].cur_page)
+                
+                users[0].pages_count.forEach((page) => {
+                    if (page)
                     {
+                        if (page == users[0].cur_page)
+                        {
                         html += `<li class="pagination__item_cur_page">
-                                    <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
+                                    <a id='${page}users_p' data-url='/admin/get_user_search_page/${page}' data-pagid='1pagination'>${page}</a>
                                 </li>`;
+                        }
+                        else
+                        {
+                        html +=  `<li class="pagination__item active">
+                                    <a id='${page}users_p' data-url='/admin/get_user_search_page/${page}' data-pagid='1pagination'>${page}</a>
+                                </li>`;
+                        }
                     }
                     else
                     {
-                        html += `<li class="pagination__item active">
-                                    <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
-                                </li>`;
+                        html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                     }
-                }
+                });
+                
+                // for (let i = 1; i <= users[0].page; i++)
+                // {
+                //     if (users[0].page > 1 && i == users[0].cur_page)
+                //     {
+                //         html += `<li class="pagination__item_cur_page">
+                //                     <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
+                //                 </li>`;
+                //     }
+                //     else
+                //     {
+                //         html += `<li class="pagination__item active">
+                //                     <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
+                //                 </li>`;
+                //     }
+                // }
                 html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                 div.insertAdjacentHTML("beforeend", html);
                 document.getElementById('username_field').value = '';
@@ -64,6 +86,13 @@ function search_users_on_forum()
                 $('h2').filter(function() {
                     return this.id.match("nothing_found");
                 }).remove();
+                $('ul').filter(function() {
+                    return this.id.match("users_search_list");
+                }).remove();
+                $('div').filter(function() {
+                    return this.id.match("user_pagination_container");
+                }).remove();
+               
                 html = `<h2 class="list__title title" id="nothing_found">Ничего не найдено</h2>`;
                 div.insertAdjacentHTML("beforeend", html);
                 document.getElementById('username_field').value = '';

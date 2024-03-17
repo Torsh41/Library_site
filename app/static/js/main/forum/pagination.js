@@ -1,3 +1,61 @@
+// функция перестройки пагинации тем конкретной категории для ее правильного отображения
+function topics_pagination_update(pages, category_id)
+{
+  $('ul').filter(function() {
+    return this.id.match(`${category_id}topics_pagi`);
+  }).remove();
+  let html = `<ul class="pagination__list list-reset" id="${category_id}topics_pagi">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item active">
+                <a id="${p}topics_p" data-url="/get_topics_page_on_forum/${category_id}/${p}" data-catid="${category_id}">${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById(category_id + "topics_pagi_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
+
+// функция перестройки пагинации категорий для ее правильного отображения
+function categories_pagination_update(pages)
+{
+  $('ul').filter(function() {
+    return this.id.match('pagination');
+  }).remove();
+  let html = `<ul class="pagination__list list-reset" id="pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item active">
+                <a id="${p}category_p" data-url="/get_categories_page_on_forum/${p}">${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById("pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
+
 function get_topics_page_on_forum(url_path, category_id)
 {
   $.ajax({
@@ -30,6 +88,11 @@ function get_topics_page_on_forum(url_path, category_id)
       });
       div = document.getElementById(category_id + "grid_container");
       div.insertAdjacentHTML('beforeend', html);
+
+      // перестройка пагинации
+      topics_pagination_update(topics[0].pages_count, category_id);
+
+      // выделение текущей страницы
       pagi = document.getElementById(category_id + 'topics_pagi');
       pagi_li = pagi.querySelector('.pagination__item_cur_page');
       if (pagi_li)
@@ -127,23 +190,32 @@ $(function() {
                             }
                             html += `</li>`;
                         });
-                    html += `</ul>
-                            <div class="list__pagination pagination" id="${category.id}topics_pagi_container">
-                              <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
-                              <li class="pagination__item disabled">
-                                &bull;
-                              </li>`;
-                    try
-                    {
-                      for (let i = 1; i <= topics[0].topic_pages; i++)
+                      html += `</ul>
+                              <div class="list__pagination pagination" id="${category.id}topics_pagi_container">
+                                <ul class="pagination__list list-reset" id="${category.id}topics_pagi">
+                                <li class="pagination__item disabled">
+                                  &bull;
+                                </li>`;
+                    // try
+                    // {
+                      if (topics[0])
                       {
-                          html +=`<li class="pagination__item active">
-                                    <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${i}' data-catid='${category.id}'>${i}</a>
+                        topics[0].topic_pages.forEach(page => {
+                          if (page)
+                          {
+                            html +=`<li class="pagination__item active">
+                                    <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${page}' data-catid='${category.id}'>${page}</a>
                                   </li>`;
+                          }
+                          else
+                          {
+                            html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+                          }
+                        });
                       }
-                    }
-                    catch
-                    {}
+                    // }
+                    // catch
+                    // {}
                     html += `<li class="pagination__item disabled">
                                 &bull;
                               </li>
@@ -151,6 +223,11 @@ $(function() {
                 });
                 section = document.getElementById('categories_container');
                 section.insertAdjacentHTML('afterbegin', html);
+
+                // перестройка пагинации
+                categories_pagination_update(categories[0].pages_count);
+
+                // выделение текущей страницы
                 pagi = document.getElementById('pagination');
                 pagi_li = pagi.querySelector('.pagination__item_cur_page');
                 if (pagi_li)
@@ -210,22 +287,45 @@ $(function() {
                                 <ul class="pagination__list list-reset" id="${category_id}topics_pagi"><li class="pagination__item disabled"> &bull;</li>`;                            
                         if (response.has_elems) 
                         {
-                        for (let i = 1; i <= response.pages; i++)
-                        {
-                            if (response.pages > 1 && i == response.cur_page)
+                          response.pages_count.forEach(page => {
+                            if (page)
                             {
-                            html += `<li class="pagination__item_cur_page">
-                                        <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${i}' data-catid='${category_id}'>${i}</a>
-                                    </li>`;
+                              if (page == response.cur_page)
+                              {
+                                html +=`<li class="pagination__item_cur_page">
+                                          <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${page}' data-catid='${category_id}'>${page}</a>
+                                        </li>`;
+                              }
+                              else
+                              {
+                                html +=`<li class="pagination__item active">
+                                          <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${page}' data-catid='${category_id}'>${page}</a>
+                                        </li>`;
+                              }
                             }
                             else
                             {
-                            html += `<li class="pagination__item active">
-                                        <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${i}' data-catid='${category_id}'>${i}</a>
-                                      </li>`;
+                              html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                             }
+                          });
                         }
-                        }
+
+                        // for (let i = 1; i <= response.pages; i++)
+                        // {
+                        //     if (response.pages > 1 && i == response.cur_page)
+                        //     {
+                        //     html += `<li class="pagination__item_cur_page">
+                        //                 <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${i}' data-catid='${category_id}'>${i}</a>
+                        //             </li>`;
+                        //     }
+                        //     else
+                        //     {
+                        //     html += `<li class="pagination__item active">
+                        //                 <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${i}' data-catid='${category_id}'>${i}</a>
+                        //               </li>`;
+                        //     }
+                        // }
+      
                         html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                         div = document.getElementById(category_id + 'grid_container');
                         div.insertAdjacentHTML('afterend', html);
@@ -304,23 +404,30 @@ $(function() {
                 // собираем пагинацию
                 html = `<div class="list__pagination pagination" id="${topics_for_cur_category[0].category_id}topics_pagi_container">
                         <ul class="pagination__list list-reset" id="${topics_for_cur_category[0].category_id}topics_pagi">
-                          <li class="pagination__item disabled">
-                            &bull;
-                          </li>`;
-                for (let i = 1; i <= topics_for_cur_category[0].topic_pages; i++)
+                          <li class="pagination__item disabled">&bull;</li>`;
+                if (topics_for_cur_category[0])
                 {
-                  if (topics_for_cur_category[0].topic_pages > 1 && i == topics_for_cur_category[0].topic_pages)
-                  {
-                    html += `<li class="pagination__item_cur_page">
-                              <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${i}' data-catid='${topics_for_cur_category[0].category_id}'>${i}</a>
-                            </li>`;
-                  }
-                  else
-                  {
-                    html += `<li class="pagination__item active">
-                              <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${i}' data-catid='${topics_for_cur_category[0].category_id}'>${i}</a>
-                           </li>`;
-                  }
+                  topics_for_cur_category[0].pages_count.forEach(page => {
+                    if (page)
+                    {
+                      if (topics_for_cur_category[0].topic_pages > 1 && page == topics_for_cur_category[0].topic_pages)
+                      {
+                          html +=`<li class="pagination__item_cur_page">
+                          <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${page}' data-catid='${topics_for_cur_category[0].category_id}'>${page}</a>
+                          </li>`;
+                      }
+                      else
+                      {
+                          html +=`<li class="pagination__item active">
+                                <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${topics_for_cur_category[0].category_id}/${page}' data-catid='${topics_for_cur_category[0].category_id}'>${page}</a>
+                              </li>`;
+                      }
+                    }
+                    else
+                    {
+                      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+                    }
+                  });
                 }
                 html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                 div.insertAdjacentHTML('afterend', html);

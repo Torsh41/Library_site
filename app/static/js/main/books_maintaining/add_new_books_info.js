@@ -1,4 +1,4 @@
-function show_new_data(books_info)
+function show_new_data(books_info, page)
 {
     $('#table_head').remove();
     let html = '<div id="table_head" class="form__maintaining">';
@@ -55,7 +55,7 @@ function show_new_data(books_info)
                                 value="${book_info.count}"></span>
                     </div>
                     <div class="form__book-delete">
-                        <input class="form__delete-btn" id="${book_info.id}del_book" formmethod="post" type="submit"
+                        <input class="form__delete-btn" id="${book_info.id}del_book" data-page="${page}" formmethod="post" type="submit"
                             value="удалить из списка">
                     </div>
                 </div>`;
@@ -75,26 +75,28 @@ function build_pagination(cur_page, pages)
                         &bull;
                     </li>`;
     
-    for (let i = 1; i <= pages; i++)
-    {
-        if (cur_page == i)
+    pages.forEach(p => {
+        if (p)
         {
-            html += `<li class="pagination__item_cur_page">
-                        <a id="${i}books_info_p" data-url="/books-maintaining/get-page/${i}">${i}</a>
-                    </li>`;
+            if (p == cur_page)
+            {
+                html += `<li class="pagination__item_cur_page">
+                            <a id="${p}books_info_p" data-url="/books-maintaining/get-page/${p}">${p}</a>
+                        </li>`;
+            }
+            else
+            {
+                html += `<li class="pagination__item active">
+                            <a id="${p}books_info_p" data-url="/books-maintaining/get-page/${p}">${p}</a>
+                        </li>`;
+            }
         }
         else
         {
-            html += `<li class="pagination__item active">
-                        <a id="${i}books_info_p" data-url="/books-maintaining/get-page/${i}">${i}</a>
-                    </li>`;
+            html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
         }
-    
-    }
-    html += `<li class="pagination__item disabled">
-                &bull;
-            </li>
-            </ul>`;
+    });
+    html += `<li class="pagination__item disabled">&bull;</li></ul>`;
     let pagi_div = document.getElementById('pagination_container');
     pagi_div.insertAdjacentHTML('afterbegin', html);
 }
@@ -136,12 +138,12 @@ $(function() {
                 }
                 else
                 {
-                    show_new_data(books_info);
+                    show_new_data(books_info, books_info[0].cur_page);
                     document.getElementById("add_info_sec").style.display = "none";
                     $('#sel_file').val("");
 
                     // перестроим пагинацию 
-                    build_pagination(books_info[0].cur_page, books_info[0].pages);
+                    build_pagination(books_info[0].cur_page, books_info[0].pages_count_arr);
                 }
             },
             error: function(jqXHR, exception) {
@@ -168,7 +170,11 @@ $(function() {
                 dataType: 'json',
                 success: function(response) {
                     let books_info = Array.from(response);
-                    show_new_data(books_info);
+                    show_new_data(books_info, books_info[0].cur_page);
+
+                    // перестроим пагинацию 
+                    build_pagination(books_info[0].cur_page, books_info[0].pages_count_arr);
+
                     pagi = document.getElementById('pagination');
                     pagi_li = pagi.querySelector('.pagination__item_cur_page');
                     if (pagi_li)
@@ -220,14 +226,14 @@ $(function() {
                             return this.id.match("not_found");
                         }).remove();
 
-                        show_new_data(books_info);
+                        show_new_data(books_info, books_info[0].cur_page);
                         let found_elem = document.getElementById(books_info[0].id_of_found_elem + 'book');
                         found_elem.scrollIntoView();
                         $(`#${books_info[0].id_of_found_elem}book`).css("opacity", ".15").animate({ opacity: "1" }, "slow");
                         document.getElementById("name_field").value = "";
 
                         // перестроим пагинацию 
-                        build_pagination(books_info[0].cur_page, books_info[0].pages);
+                        build_pagination(books_info[0].cur_page, books_info[0].pages_count_arr);
 
                         pagi = document.getElementById('pagination');
                         pagi_li = pagi.querySelector('.pagination__item_cur_page');
@@ -304,7 +310,7 @@ $(function() {
             if (confirm("Подтвердите действие")) 
             {
                 let data = new FormData();
-                data.append("id", target.id.split('del_book')[0]);
+                data.append("id", target.id.split('del_book')[0]); data.append("page", target.dataset?.page);
                 $.ajax({
                     method: 'post',
                     url: '/books-maintaining/del-book',
@@ -316,6 +322,9 @@ $(function() {
                         if (response.result)
                         {
                             $(`#${data.get('id')}book`).remove();
+
+                            // перестроим пагинацию 
+                            build_pagination(response.cur_page, response.pages_count_arr);
                         }
                         else
                         {
