@@ -207,9 +207,7 @@ function del_post(response, topic_id, post_id)
 {
   get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
   
-  $("ul").filter(function () {
-      return this.id.match("pagination");
-    }).remove();
+  $("#pagination").remove();
 
   let html = `<ul class="pagination__list list-reset" id="pagination"><li class="pagination__item disabled"> &bull;</li>`;
   if (response.has_elems) 

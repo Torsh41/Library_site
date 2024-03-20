@@ -94,15 +94,19 @@
       </div>
     </section>
     {% endfor %}
-    <div class="list__pagination pagination" id="comments_pagination_container">
+    <div class="list__pagination pagination" id="categories_pagination_container">
       <ul class="pagination__list list-reset" id="pagination">
         <li class="pagination__item disabled">
           &bull;
         </li>
         {% for p in catalogues_pagination.iter_pages() %}
-        <li class="pagination__item active">
-          <a id="{{p}}lists_p" data-url="/user/{{current_user.username}}/get_lists_page_to_add_book/{{p}}" data-readstate="{{read_state}}" data-bookid="{{book_id}}">{{ p }}</a>
-        </li>
+          {% if p %}
+            <li class="pagination__item active">
+              <a id="{{p}}lists_p" data-url="/user/{{current_user.username}}/get_lists_page_to_add_book/{{p}}" data-readstate="{{read_state}}" data-bookid="{{book_id}}">{{ p }}</a>
+            </li>
+          {% else %}
+            <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+          {% endif %}
         {% endfor %}
         <li class="pagination__item disabled">
           &bull;

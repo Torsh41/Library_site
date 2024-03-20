@@ -1,9 +1,7 @@
 // функция перестройки пагинации пользователей для ее правильного отображения
 function users_pagination_update(pages)
 {
-  $('ul').filter(function() {
-    return this.id.match('1pagination');
-  }).remove();
+  $('#1pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="1pagination">
               <li class="pagination__item disabled">
                 &bull;
@@ -166,9 +164,7 @@ function del_user(url_path, pagination_id)
 // функция перестройки пагинации категорий для ее правильного отображения
 function categories_pagination_update(pages, username)
 {
-  $('ul').filter(function() {
-    return this.id.match('2pagination');
-  }).remove();
+  $('#2pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="2pagination">
               <li class="pagination__item disabled">
                 &bull;
@@ -325,21 +321,6 @@ function del_category(url_path, pagination_id)
            
           });
         }
-          // for (let i = 1; i <= response.pages; i++)
-          // {
-          //   if (response.pages > 1 && i == response.cur_page)
-          //   {
-          //     html += ` <li class="pagination__item_cur_page">
-          //                 <a id='${i}categories_p' data-url='/admin/${response.username}/get_category_search_page/${i}' data-pagi='${pagination_id}'>${i}</a>
-          //               </li>`;
-          //   }
-          //   else
-          //   {
-          //     html += ` <li class="pagination__item active">
-          //                 <a id='${i}categories_p' data-url='/admin/${response.username}/get_category_search_page/${i}' data-pagi='${pagination_id}'>${i}</a>
-          //               </li>`;
-          //   }
-          // }
 
         html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         
@@ -456,24 +437,6 @@ function search_books_on_category()
                   }
                 });
 
-
-                // try {
-                //     for (let i = 1; i <= books[0].pages; i++) {
-                //         if (books[0].pages > 1 && i == books[0].cur_page)
-                //         {
-                //             html += `<li class="pagination__item_cur_page">
-                //                         <a id="${i}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${i}'>${i}</a>
-                //                      </li>`;
-                //         }
-                //         else
-                //         {
-                //             html += `<li class="pagination__item active">
-                //                         <a id="${i}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${i}'>${i}</a>
-                //                     </li>`;
-                //         }
-                //     }
-                // }
-                // catch {}
                 html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                 div = document.getElementById('2cont');
                 div.insertAdjacentHTML('beforeend', html);
@@ -517,9 +480,7 @@ function search_books_on_category()
 // функция перестройки пагинации книг для ее правильного отображения
 function books_pagination_update(pages, username, category)
 {
-  $('ul').filter(function() {
-    return this.id.match('3pagination');
-  }).remove();
+  $('#3pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="3pagination">
               <li class="pagination__item disabled">
                 &bull;
@@ -646,23 +607,7 @@ function del_book_from_site(url_path)
                 }
               });
             }
-                // for (let i = 1; i <= response.pages; i++)
-                // {
-                //     if (response.pages > 1 && i == response.cur_page)
-                //     {
-                          
-                //         html += `<li class="pagination__item_cur_page">
-                //                     <a id='${i}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${i}'>${i}</a>
-                //                 </li>`;
-                //     }
-                //     else
-                //     {
-                //         html += `<li class="pagination__item active">
-                //                     <a id='${i}get_books_p' data-url='/admin/${response.username}/search_books_on_admin_panel/${response.category}?page=${i}'>${i}</a>
-                //                 </li>`;
-                //     }
-                // }
-            
+              
             html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
             ul = document.getElementById('list_res');
             ul.insertAdjacentHTML('afterend', html);  

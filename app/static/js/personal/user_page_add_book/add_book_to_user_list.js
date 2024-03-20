@@ -1,3 +1,30 @@
+// функция перестройки пагинации категорий книг для ее правильного отображения
+function categories_pagination_update(pages, username, read_state, book_id)
+{
+  $('#pagination').remove();
+  let html = `<ul class="pagination__list list-reset" id="pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item active">
+                <a id="${p}lists_p" data-url="/user/${username}/get_lists_page_to_add_book/${p}" data-readstate="${read_state}" data-bookid="${book_id}">${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  let div = document.getElementById("categories_pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
+
 function get_lists_page_to_add_book(url_path, read_state, book_id)
 {
   $.ajax({
@@ -19,6 +46,10 @@ function get_lists_page_to_add_book(url_path, read_state, book_id)
       });
       div = document.getElementById('cataloges_hat');
       div.insertAdjacentHTML('afterend', html);
+      // перестройка пагинации
+      categories_pagination_update(cataloges[0].pages_count, cataloges[0].username, read_state, book_id);
+
+      // выделение текущей страницы
       pagi = document.getElementById('pagination');
       pagi_li = pagi.querySelector('.pagination__item_cur_page');
       if (pagi_li)
@@ -47,7 +78,7 @@ function get_lists_page_to_add_book(url_path, read_state, book_id)
 }
 
 $(function() {
-    $('#comments_pagination_container').on('click', function(event) {
+    $('#categories_pagination_container').on('click', function(event) {
        let target = event.target;
        if (target.tagName === 'A' && target.id.includes('lists_p'))
        {

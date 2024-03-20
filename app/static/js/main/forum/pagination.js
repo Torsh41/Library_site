@@ -1,9 +1,7 @@
 // функция перестройки пагинации тем конкретной категории для ее правильного отображения
 function topics_pagination_update(pages, category_id)
 {
-  $('ul').filter(function() {
-    return this.id.match(`${category_id}topics_pagi`);
-  }).remove();
+  $("#" + category_id + "topics_pagi").remove();
   let html = `<ul class="pagination__list list-reset" id="${category_id}topics_pagi">
               <li class="pagination__item disabled">
                 &bull;
@@ -30,9 +28,7 @@ function topics_pagination_update(pages, category_id)
 // функция перестройки пагинации категорий для ее правильного отображения
 function categories_pagination_update(pages)
 {
-  $('ul').filter(function() {
-    return this.id.match('pagination');
-  }).remove();
+  $('#pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="pagination">
               <li class="pagination__item disabled">
                 &bull;
@@ -196,8 +192,7 @@ $(function() {
                                 <li class="pagination__item disabled">
                                   &bull;
                                 </li>`;
-                    // try
-                    // {
+                  
                       if (topics[0])
                       {
                         topics[0].topic_pages.forEach(page => {
@@ -213,9 +208,7 @@ $(function() {
                           }
                         });
                       }
-                    // }
-                    // catch
-                    // {}
+        
                     html += `<li class="pagination__item disabled">
                                 &bull;
                               </li>
@@ -309,22 +302,6 @@ $(function() {
                             }
                           });
                         }
-
-                        // for (let i = 1; i <= response.pages; i++)
-                        // {
-                        //     if (response.pages > 1 && i == response.cur_page)
-                        //     {
-                        //     html += `<li class="pagination__item_cur_page">
-                        //                 <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${i}' data-catid='${category_id}'>${i}</a>
-                        //             </li>`;
-                        //     }
-                        //     else
-                        //     {
-                        //     html += `<li class="pagination__item active">
-                        //                 <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category_id}/${i}' data-catid='${category_id}'>${i}</a>
-                        //               </li>`;
-                        //     }
-                        // }
       
                         html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                         div = document.getElementById(category_id + 'grid_container');
