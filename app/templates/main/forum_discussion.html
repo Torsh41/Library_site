@@ -208,11 +208,11 @@
               </li>
               {% for p in posts_pagination.iter_pages() %}
                 {% if p %}
-                <li class="pagination__item active">
-                  <a id="{{p}}posts_p" data-url="/get_posts_page/{{topic_id}}/{{p}}">{{ p }}</a>
-                </li>
+                  <li class="pagination__item active">
+                    <a id="{{p}}posts_p" data-url="/get_posts_page/{{topic_id}}/{{p}}">{{ p }}</a>
+                  </li>
                 {% else %}
-                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                  <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
                 {% endif %}
               {% endfor %}
               <li class="pagination__item disabled">

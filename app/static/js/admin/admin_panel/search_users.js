@@ -62,21 +62,6 @@ function search_users_on_forum()
                     }
                 });
                 
-                // for (let i = 1; i <= users[0].page; i++)
-                // {
-                //     if (users[0].page > 1 && i == users[0].cur_page)
-                //     {
-                //         html += `<li class="pagination__item_cur_page">
-                //                     <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
-                //                 </li>`;
-                //     }
-                //     else
-                //     {
-                //         html += `<li class="pagination__item active">
-                //                     <a id='${i}users_p' data-url='/admin/get_user_search_page/${i}' data-pagid='1pagination'>${i}</a>
-                //                 </li>`;
-                //     }
-                // }
                 html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
                 div.insertAdjacentHTML("beforeend", html);
                 document.getElementById('username_field').value = '';

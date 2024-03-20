@@ -1,9 +1,7 @@
 // функция перестройки пагинации категорий для ее правильного отображения
 function categories_pagination_update(pages)
 {
-  $('ul').filter(function() {
-    return this.id.match("pagination");
-  }).remove();
+  $('#pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="pagination">
               <li class="pagination__item disabled">
                 &bull;
