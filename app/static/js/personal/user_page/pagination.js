@@ -1,3 +1,57 @@
+// функция перестройки пагинации списков пользователей для ее правильного отображения
+function lists_pagination_update(pages, username)
+{
+  $('#pagination').remove();
+  let html = `<ul class="pagination__list list-reset" id="pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item_cur_page">
+                  <a data-url='/user/${username}/get_lists_page/${p}'>${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  let div = document.getElementById("pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
+
+// функция перестройки пагинации элементов списка пользователя для ее правильного отображения
+function items_pagination_update(pages, username, cataloge_id)
+{
+  $("#" + cataloge_id + "books_pagination").remove();
+  let html = `<ul class="pagination__list list-reset" id="${cataloge_id}books_pagination">
+              <li class="pagination__item disabled">
+                &bull;
+              </li>`;
+  pages.forEach(p => {
+    if (p)
+    {
+      html += `<li class="pagination__item_cur_page">
+                <a data-url='/user/${username}/get_books_page/${cataloge_id}/${p}' id='${cataloge_id}books_page'>${p}</a>
+              </li>`;
+    }
+    else
+    {
+      html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+    }
+   
+  });
+  html += `<li class="pagination__item disabled">&bull;</li></ul>`;
+  div = document.getElementById(cataloge_id + "books_pagination_container");
+  div.insertAdjacentHTML('afterbegin', html);    
+}
+
+
 function get_lists_page(url_path)
 {
     $.ajax({
@@ -5,7 +59,7 @@ function get_lists_page(url_path)
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        cataloges = Array.from(response);
+        let cataloges = Array.from(response);
         $('section').filter(function() {
           return this.id.match(/cataloge_info/);
         }).remove();
@@ -37,75 +91,83 @@ function get_lists_page(url_path)
                     </div>
                   </a>
                 </li>`;
-                items = Array.from(cataloge.items);
+                let items = Array.from(cataloge.items);
                 items.forEach(item => {
-                html += `<li class="list__book" id="${cataloge.id}book_info">
-                          <a href="/book-page/${item.name}" class="list__book-set">
-                            <img class="list__book-set" src="/${item.name}/get-cover" alt="">
-                          </a>
-                        
-                          <div class="list__book-wrap">
-                            <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
-                html += `<select name="read_state" class="book__select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
-                          if (item.read_state == "Планирую")
-                            html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
-                                      <option class="book__state book__read" value="Читаю">Читаю</option>
-                                      <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
-                                      <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
-                          else if (item.read_state == "Читаю")
-                            html += `<option class="book__state book__plan" value="Планирую">Палнирую</option>
-                                      <option class="book__state book__read" value="Читаю" selected>Читаю</option>
-                                      <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
-                                      <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
-                          else if (item.read_state == "Заброшено")
-                            html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
-                                      <option class="book__state book__read" value="Читаю">Читаю</option>
-                                      <option class="book__state book__fuck" value="Заброшено" selected>Заброшено</option>
-                                      <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
-                          else if (item.read_state == "Прочитано")
-                            html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
-                                      <option class="book__state book__read" value="Читаю">Читаю</option>
-                                      <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
-                                      <option class="book__state book__done" value="Прочитано" selected>Прочитано</option>`;
-                html += `</select>`;            
-                html += `<a class="list__book-delete-btn" data-url='/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}' id='${cataloge.id}del_book'>Удалить книгу из списка</a>
-                        </div>
-                      </li>`;
+                  html += `<li class="list__book" id="${cataloge.id}book_info">
+                            <a href="/book-page/${item.name}" class="list__book-set">
+                              <img class="list__book-set" src="/${item.name}/get-cover" alt="">
+                            </a>
+                          
+                            <div class="list__book-wrap">
+                              <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
+                  html += `<select name="read_state" class="book__select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
+                            if (item.read_state == "Планирую")
+                              html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
+                                        <option class="book__state book__read" value="Читаю">Читаю</option>
+                                        <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                        <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                            else if (item.read_state == "Читаю")
+                              html += `<option class="book__state book__plan" value="Планирую">Палнирую</option>
+                                        <option class="book__state book__read" value="Читаю" selected>Читаю</option>
+                                        <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                        <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                            else if (item.read_state == "Заброшено")
+                              html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
+                                        <option class="book__state book__read" value="Читаю">Читаю</option>
+                                        <option class="book__state book__fuck" value="Заброшено" selected>Заброшено</option>
+                                        <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
+                            else if (item.read_state == "Прочитано")
+                              html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
+                                        <option class="book__state book__read" value="Читаю">Читаю</option>
+                                        <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
+                                        <option class="book__state book__done" value="Прочитано" selected>Прочитано</option>`;
+                  html += `</select>`;            
+                  html += `<a class="list__book-delete-btn" data-url='/user/${cataloge.username}/delete-item/${cataloge.id}/${item.id}/${1}' id='${cataloge.id}del_book'>Удалить книгу из списка</a>
+                          </div>
+                        </li>`;
                 });
                 html += `</ul>`;
 
                 // собираем пагинацию книг каждого списка
                 html += `<div class="list__pagination pagination" id="${cataloge.id}books_pagination_container">
-                          <ul class="pagination__list list-reset" id="${cataloge.id}books_pagination">
-                            <li class="pagination__item disabled">&bull;</li>`;
-                try
+                            <ul class="pagination__list list-reset" id="${cataloge.id}books_pagination">
+                              <li class="pagination__item disabled">&bull;</li>`;
+                if (items.length != 0)
                 {
-                    for (let i = 1; i <= items[0].pages; i++)
-                    {
-                      if (items[0].pages > 1 && i == 1)
+                  items[0].pages_count.forEach(p => {
+                      if (p)
                       {
+                        if (p == 1)
+                        {
                           html += `<li class="pagination__item_cur_page">
-                                    <a data-url='/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}' id='${cataloge.id}books_page'>${i}</a>
+                                    <a data-url='/user/${cataloge.username}/get_books_page/${cataloge.id}/${p}' id='${cataloge.id}books_page'>${p}</a>
                                   </li>`;
+                        }
+                        else
+                        {
+                          html += `<li class="pagination__item active">
+                                      <a data-url='/user/${cataloge.username}/get_books_page/${cataloge.id}/${p}' id='${cataloge.id}books_page'>${p}</a>
+                                    </li>`;
+                        }
                       }
                       else
                       {
-                        html += `<li class="pagination__item active">
-                                  <a data-url='/user/${cataloge.username}/get_books_page/${cataloge.id}/${i}' id='${cataloge.id}books_page'>${i}</a>
-                                </li>`;
+                        html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                       }
-                    }
+                  });
                 }
-                catch
-                {}
+            
                 html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;    
-                // 
-
                 html += `<div class="list__end">
                           <a class="list__delete-btn" id="${cataloge.id}del_list" data-url="/user/${cataloge.username}/delete-list/${cataloge.id}/${url[url.length - 1]}">Удалить список
                           </a></div></div></div></section>`;
         }); 
-        document.getElementById('lists_container').innerHTML = html;
+        let div = document.getElementById('lists_container');
+        div.insertAdjacentHTML('afterbegin', html);
+        // перестройка пагинации
+        lists_pagination_update(cataloges[0].pages_count, cataloges[0].username);
+
+        // выделение текущей страницы
         pagi = document.getElementById('pagination');
         pagi_li = pagi.querySelector('.pagination__item_cur_page');
         if (pagi_li)
@@ -145,7 +207,7 @@ function get_books_page(url_path, cataloge_id)
         return this.id.match(cataloge_id + 'book_info');
       }).remove();
       url = url_path.split('/');
-      html = '';
+      let html = '';
       books.forEach(book => {
         html += `<li class="list__book" id="${cataloge_id}book_info">
                     <a href="/book-page/${book.name}" class="list__book-set">
@@ -161,7 +223,7 @@ function get_books_page(url_path, cataloge_id)
                                     <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
                                     <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
                         else if (book.read_state == "Читаю")
-                          html += `<option class="book__state book__plan" value="Планирую">Палнирую</option>
+                          html += `<option class="book__state book__plan" value="Планирую">Планирую</option>
                                     <option class="book__state book__read" value="Читаю" selected>Читаю</option>
                                     <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
                                     <option class="book__state book__done" value="Прочитано">Прочитано</option>`;
@@ -175,13 +237,17 @@ function get_books_page(url_path, cataloge_id)
                                     <option class="book__state book__read" value="Читаю">Читаю</option>
                                     <option class="book__state book__fuck" value="Заброшено">Заброшено</option>
                                     <option class="book__state book__done" value="Прочитано" selected>Прочитано</option>`;
-        html += `</select>`;
+                        html += `</select>`;
                       
         html += `<a class="list__book-delete-btn" data-url='/user/${book.username_of_cur_user}/delete-item/${cataloge_id}/${book.id}/${url[url.length - 1]}' id='${cataloge_id}del_book'>Удалить книгу из списка</a>
                   </div>
                 </li>`;
       });
       document.getElementById(cataloge_id + 'books_info_container').innerHTML += html;
+      // перестройка пагинации
+      items_pagination_update(books[0].pages_count, books[0].username_of_cur_user, cataloge_id);
+
+      // выделение текущей страницы
       pagi = document.getElementById(cataloge_id + 'books_pagination');
       pagi_li = pagi.querySelector('.pagination__item_cur_page');
       if (pagi_li)
@@ -236,26 +302,33 @@ $(function() {
               return this.id.match('pagination');
             }).remove();
             html = `<ul class="pagination__list list-reset" id="pagination">
-            <li class="pagination__item disabled">&bull;</li>`;
+                      <li class="pagination__item disabled">&bull;</li>`;
 
             if (response.has_elems) 
             {
-              for (let i = 1; i <= response.pages; i++)
-              {
-                if (response.pages > 1 && i == response.cur_page)
+              response.pages_count.forEach(page => {
+                if (page)
                 {
-                  html += `<li class="pagination__item_cur_page">
-                            <a data-url="/user/${response.username}/get_lists_page/${i}">${i}</a>
-                          </li>`;
+                  if (page == response.cur_page)
+                  {
+                    html += `<li class="pagination__item_cur_page">
+                              <a data-url="/user/${response.username}/get_lists_page/${page}">${page}</a>
+                            </li>`;
+                  }
+                  else
+                  {
+                    html += `<li class="pagination__item active">
+                              <a data-url="/user/${response.username}/get_lists_page/${page}">${page}</a>
+                            </li>`;
+                  }
                 }
                 else
                 {
-                  html += `<li class="pagination__item active">
-                            <a data-url="/user/${response.username}/get_lists_page/${i}">${i}</a>
-                           </li>`;
+                  html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                 }
-              }
+              });
             }
+          
             html += `<li class="pagination__item disabled">&bull;</li></ul>`;
             document.getElementById('pagination_container').innerHTML = html;
           },
@@ -294,25 +367,31 @@ $(function() {
             $('ul').filter(function() {
               return this.id.match(cataloge_id + 'books_pagination');
             }).remove();
-            html = `<ul class="pagination__list list-reset" id="${cataloge_id}books_pagination"><li class="pagination__item disabled">&bull;</li>`;
+            let html = `<ul class="pagination__list list-reset" id="${cataloge_id}books_pagination"><li class="pagination__item disabled">&bull;</li>`;
             
             if (response.has_elems) 
             {
-              for (let i = 1; i <= response.pages; i++)
-              {
-                if (response.pages > 1 && i == response.cur_page)
+              response.pages_count.forEach(page => {
+                if (page)
                 {
-                  html += `<li class="pagination__item_cur_page">
-                              <a data-url='/user/${response.username}/get_books_page/${cataloge_id}/${i}' id='${cataloge_id}books_page'>${i}</a>
+                  if (page == response.cur_page)
+                  {
+                    html += `<li class="pagination__item_cur_page">
+                              <a data-url='/user/${response.username}/get_books_page/${cataloge_id}/${page}' id='${cataloge_id}books_page'>${page}</a>
                             </li>`;
+                  }
+                  else
+                  {
+                    html += `<li class="pagination__item active">
+                              <a data-url='/user/${response.username}/get_books_page/${cataloge_id}/${page}' id='${cataloge_id}books_page'>${page}</a>
+                            </li>`;
+                  }
                 }
                 else
                 {
-                  html += `<li class="pagination__item active">
-                              <a data-url='/user/${response.username}/get_books_page/${cataloge_id}/${i}' id='${cataloge_id}books_page'>${i}</a>
-                            </li>`;
+                  html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
                 }
-              }
+              });
             }
 
             html += `<li class="pagination__item disabled">&bull;</li></ul>`;

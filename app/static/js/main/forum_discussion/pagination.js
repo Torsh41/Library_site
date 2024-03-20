@@ -1,9 +1,7 @@
 // функция перестройки пагинации постов для ее правильного отображения
 function posts_pagination_update(pages, topic_id)
 {
-  $('ul').filter(function() {
-    return this.id.match("pagination");
-  }).remove();
+  $('#pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="pagination">
               <li class="pagination__item disabled">
                 &bull;

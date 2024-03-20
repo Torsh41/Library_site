@@ -1,9 +1,7 @@
 // функция перестройки пагинации комментариев для ее правильного отображения
 function comments_pagination_update(pages, bookname)
 {
-  $('ul').filter(function() {
-    return this.id.match("comments_pagination");
-  }).remove();
+  $('#comments_pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="comments_pagination">
               <li class="pagination__item disabled">
                 &bull;
@@ -22,7 +20,7 @@ function comments_pagination_update(pages, bookname)
    
   });
   html += `<li class="pagination__item disabled">&bull;</li></ul>`;
-  div = document.getElementById("comments_pagination_container");
+  let div = document.getElementById("comments_pagination_container");
   div.insertAdjacentHTML('afterbegin', html);    
 }
 
