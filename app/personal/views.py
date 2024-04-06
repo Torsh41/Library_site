@@ -70,14 +70,15 @@ def edit(username):
     if form.validate_on_submit():
         if request.files['avatar']:
             current_user.avatar = bytes(request.files['avatar'].read())
+        current_user.username = form.username.data.strip()
         current_user.city = form.city.data
         current_user.gender = str(request.form.get('gender'))
         current_user.age = form.age.data
-        current_user.about_me = form.description.data
+        current_user.about_me = str(request.form.get('description')).strip()
         database.session.add(current_user._get_current_object())
         database.session.commit()
-        return redirect(url_for('.person', username=username))
-    return render_template('personal/edit_user_page_profile.html', form=form)
+        return redirect(url_for('.person', username=current_user.username))
+    return render_template('personal/edit_user_page_profile.html', form=form, city=current_user.city, gender=current_user.gender, age=current_user.age, about_me=current_user.about_me)
 
 
 @personal.route('/<username>/add-list', methods=['POST'])

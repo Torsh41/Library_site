@@ -473,19 +473,6 @@ def get_topics_page_on_forum(category_id, page):
     return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, id=topic.id, name=topic.name, pages_count=pages_count) for topic in topics])
 
 
-@main.route('/<username>/edit_post/<topic_id>/<post_id>', methods=['POST'])
-@login_required
-@check_actual_password
-def edit_post(username, topic_id, post_id):
-    if current_user.username != username:
-        return render_template('403.html')
-    post = TopicPost.query.filter_by(id=post_id).first()
-    post.body = str(request.form.get('newComment')).strip().replace("'", "")
-    database.session.add(post)
-    database.session.commit()
-    return jsonify(dict(topic_id=topic_id, post_id=post_id, post_body=post.body, username=current_user.username))
-
-
 @main.route('/delete-topic/<category_id>/<topic_id>/<page>', methods=['GET'])
 @admin_required
 @check_actual_password
