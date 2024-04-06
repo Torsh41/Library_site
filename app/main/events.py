@@ -98,3 +98,14 @@ def post_delete(data):
         has_elems = False
     response = dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, posts_count=len(users_posts)); 
     return emit('del post response', {'response': response, 'topic_id': topic_id, 'post_id': data['post_id']}, broadcast=True)
+
+
+@socketio.on('edit post')
+@login_required
+@check_actual_password
+def edit_post(topic_id, post_id, new_comment):
+    post = TopicPost.query.filter_by(id=post_id).first()
+    post.body = str(new_comment).strip().replace("'", "")
+    database.session.add(post)
+    database.session.commit()
+    return emit('edit post response', {'topic_id': topic_id, 'post_id': post_id, 'post_body': post.body, 'username': current_user.username}, broadcast=True)

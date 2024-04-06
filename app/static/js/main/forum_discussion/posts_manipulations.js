@@ -130,7 +130,7 @@ function add_post_on_forum(posts) {
     {
       html += `<div class="message__admin" id="${post.id}personal_cont">
                                   <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                                  <a class="message__admin-btn" id="${post.id}edit_post_a" data-url='/${cur_username}/edit_post/${post.topic_id}/${post.id}' data-body='${post.body}'>Редактировать</a>
+                                  <a class="message__admin-btn" id="${post.id}edit_post_a" data-topicid='${post.topic_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
                                   <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                                   </div>`;
     } else if (cur_user_is_admin) 
@@ -339,7 +339,7 @@ function get_posts_page(url_path, post_id=undefined)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
                               <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                              <a class="message__admin-btn" id="${post.id}edit_post_a" data-url='/${cur_username}/edit_post/${post.topic_id}/${post.id}' data-body='${post.body}'>Редактировать</a>
+                              <a class="message__admin-btn" id="${post.id}edit_post_a" data-topicid='${post.topic_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
                               <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                               </div>`;
                   }
@@ -395,6 +395,61 @@ function get_posts_page(url_path, post_id=undefined)
   });
 }
 
+
+function edit_post_on_forum_discussion(topic_id, post_id, post_body, username)
+{
+  $('p').filter(function() {
+      return this.id.match(post_id + "post_body");
+    }).remove();
+  $('a').filter(function() {
+      return this.id.match(post_id + "edit_post_a");
+    }).remove();
+    
+
+  let html = `  <p class="message__text" id="${post_id}post_body">
+              ${post_body} <!--Сообщение пользователя-->
+            </p>`;
+  let div = document.getElementById(post_id + 'base_to_answer');
+  if (div)
+  {
+    div.insertAdjacentHTML('afterend', html);
+  }
+  else
+  {
+    div = document.getElementById(post_id + 'msg_write_id');
+    div.insertAdjacentHTML('afterbegin', html);
+  }
+  if (username == cur_username)
+  {
+    let div_ = document.getElementById(post_id + 'answer_on');
+    html = `<a class="message__admin-btn" id="${post_id}edit_post_a" data-topicid="${topic_id}" data-postid="${post_id}" data-body="${post_body}">Редактировать</a>`;
+    div_.insertAdjacentHTML('afterend', html)
+  }
+  document.getElementById("edit_post_field").value = "";
+  document.getElementById("edit_post_sec").style.display = "none";
+}
+
+
+function edit_post_socket(topic_id, post_id)
+{
+  if (document.getElementById('edit_post_field').value.trim() && document.getElementById('edit_post_field').value.trim().length <= 200)
+  {
+    form = document.getElementById("edit_post_form");
+    var formData = new FormData(form);
+    socket.emit("edit post", topic_id, post_id, formData.get("newComment"));
+  } 
+  else if (document.getElementById('edit_post_field').value.trim().length > 200)
+  {
+    alert('Слишком длинный пост');
+  }
+  else
+  {
+    alert('Заполните поле');
+    document.getElementById('edit_post_field').value = '';
+  }
+}
+
+
 let socket = io(); 
 let cur_username = '';
 let cur_user_is_admin;
@@ -426,11 +481,17 @@ $(function() {
       cur_username = username;
     }
   }
+
   socket.on("add post", function (posts) {
     add_post_on_forum(posts.data);
   });
+
   socket.on("del post response", function (response) {
     del_post(response.response, response.topic_id, response.post_id);
+  });
+
+  socket.on("edit post response", function (data) {
+    edit_post_on_forum_discussion(data.topic_id, data.post_id, data.post_body, data.username);
   });
 
   $('#disc_posts_container').on('click', function(event) {
@@ -448,6 +509,24 @@ $(function() {
         let post_id = target.dataset?.postid;
         answer_on_post(topic_id, post_id);
       }
+  });
+
+  $('#disc_posts_container').on('click', function(event) {
+    let target = event.target;
+    if (target.tagName === 'A' && target.id.includes('edit_post_a'))
+    {
+      let topic_id = target.dataset?.topicid;
+      let post_id = target.dataset?.postid;
+      let post_body = target.dataset?.body;
+      document.getElementById("edit_post_sec").style.display = "block";
+      document.getElementById("edit_post_field").value = post_body;
+      document.getElementById("edit_post").setAttribute("onclick", `edit_post_socket(${topic_id}, ${post_id})`);
+    }
+  });
+
+  $('#close_edit_post_form').click(function(event) {
+    document.getElementById("edit_post_field").value = "";
+    document.getElementById("edit_post_sec").style.display = "none";
   });
 });
 

@@ -6,11 +6,11 @@ from ..models import Book
 
 
 class EditProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0, 'Логин содержит только буквы, цифры, точки или символы подчеркивания.')])
     avatar = FileField('Photo')
     city = StringField('City', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название города должно содержать только буквы и пробелы.')])
     age = IntegerField('Age', validators=[DataRequired('Поле не должно быть пустым.'), NumberRange(1, 100, message='Здесь невозможно ошибиться:)')])
-    description = TextAreaField('Description', validators=[DataRequired('Поля не должны быть пустыми.')])
     submit = SubmitField('Сохранить')
     
               
