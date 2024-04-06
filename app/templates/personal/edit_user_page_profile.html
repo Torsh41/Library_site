@@ -55,18 +55,19 @@
               <!--Тут добавленная фотка пользователем-->
               <input class="profile__foto" type="file" name="avatar" multiple accept="image/*,image/jpeg">
             </div>
-            {{form.city(class="profile__input", placeholder="Введите город..")}}
+            {{form.username(class="profile__input", value=current_user.username, placeholder="Введите ваше имя на сайте..")}}
+            {{form.city(class="profile__input", value=city, placeholder="Введите город..")}}
   
             <label class="profile__info">
               <span class="profile__span">Пол:</span>
               <select name="gender" id="" class="profile__select">
-                <option value="муж">муж</option>
-                <option value="жен">жен</option>
+                <option value="муж" {%if gender == "муж"%}selected{%endif%}>муж</option>
+                <option value="жен" {%if gender == "жен"%}selected{%endif%}>жен</option>
               </select>
             </label>
   
-            {{form.age(class="profile__input", placeholder="Введите возраст..")}}
-            {{form.description(class="profile__text", rows="5", placeholder="Расскажите о себе..")}}
+            {{form.age(class="profile__input", value=age, placeholder="Введите возраст..")}}
+            <textarea class="profile__text" default="Love that" id="description" maxlength="100" name="description" placeholder="Расскажите о себе.." required="" rows="5">{{ about_me }}</textarea>
             {{form.submit(class="profile__edit-btn")}}
           </form>
   

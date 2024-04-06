@@ -13,7 +13,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js" crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/posts_manipulations.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/forum_discussion/edit_post.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
@@ -90,7 +89,7 @@
             placeholder="напишите новый пост..."></textarea>
 
           <div class="popup__btns">
-            <input class="popup__btn" id="edit_post" type="button" value="Изменить" onclick="edit_post_ajax()">
+            <input class="popup__btn" id="edit_post" type="button" value="Изменить">
             <button id="close_edit_post_form" type="button" class="popup__btn-end">Отменить</button>
           </div>
         </form>
@@ -164,7 +163,7 @@
                 {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
                 <div class="message__admin" id="{{post["id"]}}personal_cont">
                   <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}">Ответить</a>
-                  <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" data-url="/{{current_user.username}}/edit_post/{{topic_id}}/{{post["id"]}}" data-body="{{post["body"]}}">Редактировать</a>
+                  <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}" data-body="{{post["body"]}}">Редактировать</a>
                   <a id="{{post.id}}post_d" class="message__admin-btn" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
                 </div>
                 {% elif current_user.role == Role.ADMIN %}
