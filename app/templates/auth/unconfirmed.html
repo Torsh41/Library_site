@@ -16,67 +16,70 @@
 </head>
 
 <body>
-    <header class="header">
-        <div class="header__container container">
-            <a class="header__logo" href="{{url_for('main.index')}}">
-                <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-                    alt="Логотип MAGIC BOOK KEEPER">
-            </a>
-
-            <div class="header__right">
-                <span class="header__menu">Меню</span>
-                <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-                    <span class="hamburger__box">
-                        <span class="hamburger__inner"></span>
-                    </span>
-                </button>
+    <div class="content">
+        <header class="header">
+            <div class="header__container container">
+                <a class="header__logo" href="{{url_for('main.index')}}">
+                    <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+                        alt="Логотип MAGIC BOOK KEEPER">
+                </a>
+    
+                <div class="header__right">
+                    <span class="header__menu">Меню</span>
+                    <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+                        <span class="hamburger__box">
+                            <span class="hamburger__inner"></span>
+                        </span>
+                    </button>
+                </div>
+    
+                <nav class="nav header__nav">
+                    <div class="nav__menu js-menu-wrap">
+                        <ul class="nav__list list-reset">
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a>
+                            </li>
+                        </ul>
+                    </div>
+    
+                </nav>
+    
+    
             </div>
-
-            <nav class="nav header__nav">
-                <div class="nav__menu js-menu-wrap">
-                    <ul class="nav__list list-reset">
-                        <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a>
-                        </li>
-                    </ul>
+        </header>
+    
+        <main>
+            <section class="main">
+                <div class="main__container container">
+    
+                    <div class="main__top">
+    
+                        <h1 class="main__title">Привет, {{ current_user.username }}! </h1>
+    
+                        <span class="main__span-confrim" style="text-align: center;">Ваш аккаунт все еще не подтвержден.</span>
+    
+                        <span class="main__span-confrim" style="text-align: center;">Прежде чем вы сможете получить доступ к этому сайту, вам необходимо подтвердить свою учетную запись. 
+                            Проверьте свой почтовый ящик, вам должно было прийти письмо со ссылкой для подтверждения.</span>
+    
+                        <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
+                        </svg>
+                    </div>
+    
+                    <div class="main__bottom">
+                        <p class="main__bottom-item">
+                            Нужно еще одно электронное письмо с подтверждением?
+                            <a class="main__link-confirm" href="{{ url_for('auth.resend_confirmation') }}">нажмите здесь</a>
+                        </p>
+    
+                    </div>
+    
                 </div>
-
-            </nav>
-
-
-        </div>
-    </header>
-
-    <main>
-        <section class="main">
-            <div class="main__container container">
-
-                <div class="main__top">
-
-                    <h1 class="main__title">Привет, {{ current_user.username }}! </h1>
-
-                    <span class="main__span-confrim" style="text-align: center;">Ваш аккаунт все еще не подтвержден.</span>
-
-                    <span class="main__span-confrim" style="text-align: center;">Прежде чем вы сможете получить доступ к этому сайту, вам необходимо подтвердить свою учетную запись. 
-                        Проверьте свой почтовый ящик, вам должно было прийти письмо со ссылкой для подтверждения.</span>
-
-                    <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
-                    </svg>
-                </div>
-
-                <div class="main__bottom">
-                    <p class="main__bottom-item">
-                        Нужно еще одно электронное письмо с подтверждением?
-                        <a class="main__link-confirm" href="{{ url_for('auth.resend_confirmation') }}">нажмите здесь</a>
-                    </p>
-
-                </div>
-
-            </div>
-        </section>
-
-
-    </main>
+            </section>
+    
+    
+        </main>
+    </div>
+    
 
     <footer class="footer">
         <div class="footer__container container">

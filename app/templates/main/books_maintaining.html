@@ -19,183 +19,186 @@
 </head>
 
 <body>
-    <header class="header">
-        <div class="header__container container">
-            <a class="header__logo" href="{{url_for('main.index')}}">
-                <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-                    alt="Логотип MAGIC BOOK KEEPER">
-            </a>
-
-            <div class="header__right">
-                <span class="header__menu">Меню</span>
-                <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-                    <span class="hamburger__box">
-                        <span class="hamburger__inner"></span>
-                    </span>
-                </button>
-            </div>
-
-            <nav class="nav header__nav">
-                <div class="nav__menu js-menu-wrap">
-                    <ul class="nav__list list-reset">
-                        <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-                        <li class="nav__item"><a class="nav__link"
-                                href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a>
-                        </li>
-                        <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории
-                                книг</a></li>
-                        <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
-                    </ul>
+    <div class="content">
+        <header class="header">
+            <div class="header__container container">
+                <a class="header__logo" href="{{url_for('main.index')}}">
+                    <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+                        alt="Логотип MAGIC BOOK KEEPER">
+                </a>
+    
+                <div class="header__right">
+                    <span class="header__menu">Меню</span>
+                    <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+                        <span class="hamburger__box">
+                            <span class="hamburger__inner"></span>
+                        </span>
+                    </button>
                 </div>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <section class="popup" id="add_info_sec" style="display: none;">
-            <div class="popup__formPopup">
-                <h2 class="popup__title title">Добавление информации о книгах</h2>
-                <form id="new_info_form" class="popup__formContainer" enctype="multipart/form-data" method="post">
-                    <div class="popup__profile profile__image profile__image-edit">
-                        <input id="sel_file" class="popup__profile-foto profile__foto" type="file" name="data_file"
-                            multiple accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            required>
+    
+                <nav class="nav header__nav">
+                    <div class="nav__menu js-menu-wrap">
+                        <ul class="nav__list list-reset">
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+                            <li class="nav__item"><a class="nav__link"
+                                    href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a>
+                            </li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории
+                                    книг</a></li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+                        </ul>
                     </div>
-                    <div class="popup__btns">
-                        <input id="new_books_info" class="popup__btn" type="button"
-                            value="Добавить информацию о книгах">
-                        <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
-                    </div>
-
-                </form>
+                </nav>
             </div>
-        </section>
-
-        <section class="main">
-            <div class="main__container container">
-                <div class="main__top">
-                    <h1 class="main__title">Поиск</h1>
-                    <svg class="main__svg" width="461" height="1" viewBox="0 0 461 1" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
-                    </svg>
-                </div>
-
-                <div class="main__bottom">
-                    <form id="search_form" class="main__form" method="post">
-                        <label class="main__form-label">
-                            <svg class="main__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_6_94)">
-                                    <path
-                                        d="M25.5 24.5556L18.1443 17.4723M18.1443 17.4723C19.9088 15.7732 21 13.426 21 10.8333C21 5.64801 16.6349 1.44446 11.25 1.44446C5.86523 1.44446 1.5 5.64801 1.5 10.8333C1.5 16.0188 5.86523 20.2222 11.25 20.2222C13.9424 20.2222 16.3798 19.1714 18.1443 17.4723Z"
-                                        stroke="#332f2e" stroke-width="1.8" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_6_94">
-                                        <rect width="27" height="26" fill="white" />
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                            <input id="name_field" type="text" class="main__form-input" name="search_result"
-                                placeholder="Введите название книги или часть названия">
-                        </label>
-                        <button id="find_books_button" class="main__form-btn btn">Найти</button>
-
-                        <a id="add_info" class="main__form-btn btn">Добавить информацию</a>
-                    </form>
-
-
-                </div>
-
-            </div>
-        </section>
-
-        <section class="form">
-            <div id="main_table" class="form__container container">
-                <div id="table_head" class="form__maintaining">
-                    {% for book in info %}
-                        <div class="form__book" id="{{book.id}}book">
-                            <div class="form__info form__book-id">
-                                <span class="form__span-title">ID</span>
-                                <span class="form__span-info">{{ book.id }}</span>
-                            </div>
-                            <div class="form__info form__book-name">
-                                <span class="form__span-title">Название</span>
-                                <span class="form__span-info">{{ book.name }}</span>
-                            </div>
-                            <div class="form__info form__book-author">
-                                <span class="form__span-title">Авторы</span>
-                                <span class="form__span-info">{{ book.authors }}</span>
-                            </div>
-                            <div class="form__info form__book-part">
-                                <span class="form__span-title">Серии</span> 
-                                <span class="form__span-info">{{ book.series }}</span>
-                            </div>
-                            <div class="form__info form__book-category">
-                                <span class="form__span-title">Категории</span>
-                                <span class="form__span-info">{{ book.categories }}</span>
-                            </div>
-                            <div class="form__info form__book-date">
-                                <span class="form__span-title">Дата публикации</span>
-                                <span class="form__span-info">{{ book.publishing_date }}</span>
-                            </div>
-                            <div class="form__info form__book-countpages">
-                                <span class="form__span-title">Количество страниц</span>
-                                <span class="form__span-info">{{ book.pages_count }}</span>
-                            </div>
-                            <div class="form__info form__book-isbn">
-                                <span class="form__span-title">ISBN</span>
-                                <span class="form__span-info">{{ book.isbn }}</span>
-                            </div>
-                            <div class="form__info form__book-comments">
-                                <span class="form__span-title">Комментарии</span>
-                                <span class="form__span-info">{{ book.comments }}</span>
-                            </div>
-                            <div class="form__info form__book-info">
-                                <span class="form__span-title">Краткое содержание</span>
-                                <span class="form__span-info">{{ book.summary }}</span>
-                            </div>
-                            <div class="form__info form__book-link">
-                                <span class="form__span-title">Ссылка</span>
-                                <span class="form__span-info">{{ book.link }}</span>
-                            </div>
-                            <div class="form__info form__book-count">
-                                <span class="form__span-title">Количество</span>
-                                <span class="form__span-info"><input class="book__count" id="{{book.id}}books_count" min="0"
-                                        formmethod="post" placeholder="введите наличие" required type="number"
-                                        value="{{book.count}}"></span>
-                            </div>
-                            <div class="form__book-delete">
-                                <input class="form__delete-btn" id="{{book.id}}del_book" data-page="{{1}}" formmethod="post" type="submit"
-                                    value="удалить из списка">
-                            </div>
+        </header>
+    
+        <main>
+            <section class="popup" id="add_info_sec" style="display: none;">
+                <div class="popup__formPopup">
+                    <h2 class="popup__title title">Добавление информации о книгах</h2>
+                    <form id="new_info_form" class="popup__formContainer" enctype="multipart/form-data" method="post">
+                        <div class="popup__profile profile__image profile__image-edit">
+                            <input id="sel_file" class="popup__profile-foto profile__foto" type="file" name="data_file"
+                                multiple accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                required>
                         </div>
-                    {% endfor %}
+                        <div class="popup__btns">
+                            <input id="new_books_info" class="popup__btn" type="button"
+                                value="Добавить информацию о книгах">
+                            <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
+                        </div>
+    
+                    </form>
                 </div>
-                <div class="list__pagination pagination" id="pagination_container">
-                    <ul class="pagination__list list-reset" id="pagination">
-                        <li class="pagination__item disabled">
-                            &bull;
-                        </li>
-                        {% for p in pagination.iter_pages() %}
-                            {% if p %}
-                                <li class="pagination__item active">
-                                    <a id="{{p}}books_info_p" data-url="/books-maintaining/get-page/{{ p }}">{{ p }}</a>
-                                </li>
-                            {% else %}
-                                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-                            {% endif %}
+            </section>
+    
+            <section class="main">
+                <div class="main__container container">
+                    <div class="main__top">
+                        <h1 class="main__title">Поиск</h1>
+                        <svg class="main__svg" width="461" height="1" viewBox="0 0 461 1" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
+                        </svg>
+                    </div>
+    
+                    <div class="main__bottom">
+                        <form id="search_form" class="main__form" method="post">
+                            <label class="main__form-label">
+                                <svg class="main__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_6_94)">
+                                        <path
+                                            d="M25.5 24.5556L18.1443 17.4723M18.1443 17.4723C19.9088 15.7732 21 13.426 21 10.8333C21 5.64801 16.6349 1.44446 11.25 1.44446C5.86523 1.44446 1.5 5.64801 1.5 10.8333C1.5 16.0188 5.86523 20.2222 11.25 20.2222C13.9424 20.2222 16.3798 19.1714 18.1443 17.4723Z"
+                                            stroke="#332f2e" stroke-width="1.8" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_6_94">
+                                            <rect width="27" height="26" fill="white" />
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                                <input id="name_field" type="text" class="main__form-input" name="search_result"
+                                    placeholder="Введите название книги или часть названия">
+                            </label>
+                            <button id="find_books_button" class="main__form-btn btn">Найти</button>
+    
+                            <a id="add_info" class="main__form-btn btn">Добавить информацию</a>
+                        </form>
+    
+    
+                    </div>
+    
+                </div>
+            </section>
+    
+            <section class="form">
+                <div id="main_table" class="form__container container">
+                    <div id="table_head" class="form__maintaining">
+                        {% for book in info %}
+                            <div class="form__book" id="{{book.id}}book">
+                                <div class="form__info form__book-id">
+                                    <span class="form__span-title">ID</span>
+                                    <span class="form__span-info">{{ book.id }}</span>
+                                </div>
+                                <div class="form__info form__book-name">
+                                    <span class="form__span-title">Название</span>
+                                    <span class="form__span-info">{{ book.name }}</span>
+                                </div>
+                                <div class="form__info form__book-author">
+                                    <span class="form__span-title">Авторы</span>
+                                    <span class="form__span-info">{{ book.authors }}</span>
+                                </div>
+                                <div class="form__info form__book-part">
+                                    <span class="form__span-title">Серии</span> 
+                                    <span class="form__span-info">{{ book.series }}</span>
+                                </div>
+                                <div class="form__info form__book-category">
+                                    <span class="form__span-title">Категории</span>
+                                    <span class="form__span-info">{{ book.categories }}</span>
+                                </div>
+                                <div class="form__info form__book-date">
+                                    <span class="form__span-title">Дата публикации</span>
+                                    <span class="form__span-info">{{ book.publishing_date }}</span>
+                                </div>
+                                <div class="form__info form__book-countpages">
+                                    <span class="form__span-title">Количество страниц</span>
+                                    <span class="form__span-info">{{ book.pages_count }}</span>
+                                </div>
+                                <div class="form__info form__book-isbn">
+                                    <span class="form__span-title">ISBN</span>
+                                    <span class="form__span-info">{{ book.isbn }}</span>
+                                </div>
+                                <div class="form__info form__book-comments">
+                                    <span class="form__span-title">Комментарии</span>
+                                    <span class="form__span-info">{{ book.comments }}</span>
+                                </div>
+                                <div class="form__info form__book-info">
+                                    <span class="form__span-title">Краткое содержание</span>
+                                    <span class="form__span-info">{{ book.summary }}</span>
+                                </div>
+                                <div class="form__info form__book-link">
+                                    <span class="form__span-title">Ссылка</span>
+                                    <span class="form__span-info">{{ book.link }}</span>
+                                </div>
+                                <div class="form__info form__book-count">
+                                    <span class="form__span-title">Количество</span>
+                                    <span class="form__span-info"><input class="book__count" id="{{book.id}}books_count" min="0"
+                                            formmethod="post" placeholder="введите наличие" required type="number"
+                                            value="{{book.count}}"></span>
+                                </div>
+                                <div class="form__book-delete">
+                                    <input class="form__delete-btn" id="{{book.id}}del_book" data-page="{{1}}" formmethod="post" type="submit"
+                                        value="удалить из списка">
+                                </div>
+                            </div>
                         {% endfor %}
-                        <li class="pagination__item disabled">
-                            &bull;
-                        </li>
-                    </ul>
+                    </div>
+                    <div class="list__pagination pagination" id="pagination_container">
+                        <ul class="pagination__list list-reset" id="pagination">
+                            <li class="pagination__item disabled">
+                                &bull;
+                            </li>
+                            {% for p in pagination.iter_pages() %}
+                                {% if p %}
+                                    <li class="pagination__item active">
+                                        <a id="{{p}}books_info_p" data-url="/books-maintaining/get-page/{{ p }}">{{ p }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="pagination__item disabled">
+                                &bull;
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
+    </div>
+    
 
     <footer class="footer">
         <div class="footer__container container">

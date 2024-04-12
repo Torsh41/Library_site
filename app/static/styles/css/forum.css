@@ -205,6 +205,11 @@
   justify-content: flex-start;
 }
 
+.message__info {
+  display: flex;
+  flex-direction: column;
+}
+
 .discussion__btn {
   display: flex;
   flex-direction: column;
