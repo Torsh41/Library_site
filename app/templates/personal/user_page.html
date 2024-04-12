@@ -19,6 +19,9 @@
   <script src="{{ url_for('static', filename='js/personal/user_page/add_list_on_user_page.js')}}"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
   <script src="{{ url_for('static', filename='js/personal/change_read_state/change_read_state.js')}}"></script>
+  {% if current_user.role == Role.ADMIN %}
+    <script src="{{ url_for('static', filename='js/personal/user_page/add_many_books.js')}}"></script>
+  {% endif %}
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
@@ -82,9 +85,32 @@
           <a class="main__bottom-item" href="{{url_for('auth.change_password_try')}}">Сменить пароль</a>
         </div>
         <a class="main__form-btn btn" href="{{url_for('personal.add_new_book', username=current_user.username)}}">Добавить новую книгу</a>
+        {% if current_user.role == Role.ADMIN %}
+          <a id="add_info" class="main__form-btn btn">Добавить множество книг</a>
+        {% endif %}
       </div>
     </section>
 
+    {% if current_user.role == Role.ADMIN %}
+      <section class="popup" id="add_many_books_sec" style="display: none;">
+        <div class="popup__formPopup">
+            <h2 class="popup__title title">Добавление информации о книгах</h2>
+            <form id="add_many_books_form" class="popup__formContainer" enctype="multipart/form-data" method="post">
+                <div class="popup__profile profile__image profile__image-edit">
+                    <input id="sel_file" class="popup__profile-foto profile__foto" type="file" name="data_file"
+                        multiple accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        required>
+                </div>
+                <div class="popup__btns">
+                    <input id="many_books_info" class="popup__btn" type="button"
+                        value="Добавить информацию о книгах">
+                    <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
+                </div>
+
+            </form>
+        </div>
+      </section>
+    {% endif %}
 
     <section id="1" class="profile" id="user_page_main_container">
       <div class="profile__container container">

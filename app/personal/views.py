@@ -4,8 +4,11 @@ from flask import render_template, redirect, url_for, request, make_response, js
 from .forms import EditProfileForm, AddNewBookForm
 from .. import database
 from app.models import User, Cataloge, Book, Item, Category, Role
-from app.decorators import check_actual_password
+from app.decorators import admin_required, check_actual_password
+from app.parse_excel import add_many_books
+from datetime import datetime
 import copy
+import codecs
 LISTS_COUNT = 2
 BOOKS_COUNT = 5
 CATEGORIES_COUNT = 5
@@ -324,4 +327,41 @@ def change_read_state():
         return jsonify(dict(read_state=item.read_state))
     except:
         return jsonify(dict(read_state=False))
- 
+
+
+# множественная загрузка книг
+@personal.route('/add-books', methods=['POST'])
+@admin_required
+@check_actual_password
+def add_new_books():
+    file = request.files['data_file']
+    if file.filename.split('.')[-1] != "xlsx":
+        return jsonify(dict(result=False))
+    
+    data : list | bool = add_many_books(file)
+    if not data:
+        return jsonify(dict(result=False))
+    
+    count = 0
+    for book in data:
+        category = Category.query.filter_by(name=str(book[8])).first()
+        if Book.query.filter_by(name=book[1]).first() or not category:
+            continue
+        try:
+            datetime.strptime(book[6], "%d.%m.%Y")
+        except:
+            book[6] = datetime.today()
+            
+        book_obj = Book(cover=False, name=book[1], isbn=book[2], author=book[3], publishing_house=book[4], description=book[5], release_date=book[6], count_of_chapters=book[7], 
+                        category=category, user=current_user._get_current_object())
+        
+        if not book_obj.cover:
+            book_obj.default_cover()
+            
+        database.session.add(book_obj)
+        count += 1
+    database.session.commit()
+    
+    return jsonify(dict(result=True, count=count))
+   
+    

@@ -119,10 +119,13 @@ function edit_comment_ajax()
                 }).remove();
               
 
-              html = `<p class="comments__text" id="${response.id}com_body">${response.body}</p>`;
-              p =  document.getElementById(response.id + 'date');
-              div = document.getElementById(response.id + 'com_commands_cont');
+              let html = `<p class="comments__text" id="${response.id}com_body">${response.body}</p>`;
+              let p = document.getElementById(response.id + 'date');
+              let div = document.getElementById(response.id + 'com_commands_cont');
+
               p.insertAdjacentHTML('afterend', html);
+              p.textContent = response.day + " " + response.month + " " + response.year;
+
               html = `<a id="${response.id}edit_com_a" data-combody="${response.body}" data-username="${response.username}" data-bookname="${response.book_name}" data-comid="${response.id}" class="comments__command">Редактировать</a>`;
               div.insertAdjacentHTML('afterbegin', html)
               document.getElementById("edit_comment_field").value = "";
