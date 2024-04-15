@@ -1,3 +1,10 @@
+@media (min-width: 1921px) {
+  .nav__menu {
+    width: 600px;
+  }
+}
+
+
 @media (max-width: 1920px) {
   .nav__menu {
     width: 600px;
@@ -186,6 +193,7 @@
   }
 
   .list__book,
+  .list__book-best,
   .list__add,
   .list__block-add {
     width: 200px;
@@ -259,6 +267,14 @@
   .list__btn-search {
     margin-top: 20px;
     width: 200px;
+  }
+  .list-best__wrap:not(:last-child) {
+    margin-right: 0;
+  }
+
+
+  .list-best__wrapper {
+    flex-direction: column;
   }
 }
 
@@ -619,8 +635,8 @@
   .main__title {
     margin-top: 0;
     margin-bottom: 10px;
-    font-size: 34px;
-    line-height: 34px;
+    font-size: 22px;
+    line-height: 24px;
   }
 
   .main__span {
@@ -746,6 +762,7 @@
   }
 
   .list__book,
+  .list__book-best,
   .list__add,
   .list__block-add {
     width: 150px;
@@ -935,5 +952,18 @@
   .popup__btn {
     width: 100px;
     line-height: 12px;
+  }
+
+  .list-best__wrap {
+    padding: 10px;
+  }
+
+  .list-best__wrap {
+    padding-top: 30px;
+  }
+
+  .list__wrapper-best {
+    padding-left: 30px;
+    padding-right: 30px;
   }
 }

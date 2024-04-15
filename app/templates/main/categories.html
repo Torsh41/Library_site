@@ -15,107 +15,110 @@
 </head>
 
 <body>
-  <header class="header">
-    <div class="header__container container">
-      <a class="header__logo" href="{{url_for('main.index')}}">
-        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-          alt="Логотип MAGIC BOOK KEEPER">
-      </a>
-
-      <div class="header__right">
-        <span class="header__menu">Меню</span>
-        <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-          <span class="hamburger__box">
-            <span class="hamburger__inner"></span>
-          </span>
-        </button>
-      </div>
-
-      <nav class="nav header__nav">
-        <div class="nav__menu js-menu-wrap">
-          <ul class="nav__list list-reset">
-            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
-            {% if current_user.is_anonymous %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
-            {% endif %}
-            {% if current_user.is_authenticated %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-            {% else %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
-            {% endif %}
-            {% if current_user.role == Role.ADMIN %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
-            {% endif %}
-          </ul>
+  <div class="content">
+    <header class="header">
+      <div class="header__container container">
+        <a class="header__logo" href="{{url_for('main.index')}}">
+          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+            alt="Логотип MAGIC BOOK KEEPER">
+        </a>
+  
+        <div class="header__right">
+          <span class="header__menu">Меню</span>
+          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+            <span class="hamburger__box">
+              <span class="hamburger__inner"></span>
+            </span>
+          </button>
         </div>
-
-      </nav>
-
-
-    </div>
-  </header>
-
-  <main>
-    <section class="main">
-      <div class="main__container container">
-
-        <div class="main__top">
-          <!-- <span class="main__span">Welcome!</span> -->
-          <h1 class="main__title">Категории книг</h1>
-
-          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
-          </svg>
-
-        </div>
-
-        <div class="main__bottom">
-
-
-
-        </div>
-
-      </div>
-    </section>
-
-    <section id="1" class="category">
-      <div class="category__container container">
-        <div class="category__wrap">
-          <ul class="category__list list-reset" id="categories_block">
-            {% for category in categories %}
-            <li class="category__elem" id="{{category.id}}category_info"><a
-                href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}"
-                class="category__book-link">
-                <div class="category__block">{{ category.name }}</div>
-              </a></li>
-            {% endfor %}
-          </ul>
-          {% if category_pagination %}
-          <div class="list__pagination pagination" id="user_pagination_container">
-            <ul class="pagination__list list-reset" id="pagination">
-              <li class="pagination__item disabled">
-                  &bull;
-              </li>
-              {% for p in category_pagination.iter_pages() %}
-                  {% if p %}
-                    <li class="pagination__item active">
-                        <a id="{{p}}list_pagi" data-url="/get_categories_page/{{p}}">{{ p }}</a>
-                    </li>
-                  {% else %}
-                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-                  {% endif %}
-              {% endfor %}
-              <li class="pagination__item disabled">
-                  &bull; 
-              </li>
+  
+        <nav class="nav header__nav">
+          <div class="nav__menu js-menu-wrap">
+            <ul class="nav__list list-reset">
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+              {% if current_user.is_anonymous %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
+              {% endif %}
+              {% if current_user.is_authenticated %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              {% else %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+              {% endif %}
+              {% if current_user.role == Role.ADMIN %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+              {% endif %}
             </ul>
           </div>
-          {% endif %}
-        </div>
+  
+        </nav>
+  
+  
       </div>
-    </section>
-  </main>
+    </header>
+  
+    <main>
+      <section class="main">
+        <div class="main__container container">
+  
+          <div class="main__top">
+            <!-- <span class="main__span">Welcome!</span> -->
+            <h1 class="main__title">Категории книг</h1>
+  
+            <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
+            </svg>
+  
+          </div>
+  
+          <div class="main__bottom">
+  
+  
+  
+          </div>
+  
+        </div>
+      </section>
+  
+      <section id="1" class="category">
+        <div class="category__container container">
+          <div class="category__wrap">
+            <ul class="category__list list-reset" id="categories_block">
+              {% for category in categories %}
+              <li class="category__elem" id="{{category.id}}category_info"><a
+                  href="{{url_for('main.search_by_category', name=category.name, list_id=list_id)}}"
+                  class="category__book-link">
+                  <div class="category__block">{{ category.name }}</div>
+                </a></li>
+              {% endfor %}
+            </ul>
+            {% if category_pagination %}
+            <div class="list__pagination pagination" id="user_pagination_container">
+              <ul class="pagination__list list-reset" id="pagination">
+                <li class="pagination__item disabled">
+                    &bull;
+                </li>
+                {% for p in category_pagination.iter_pages() %}
+                    {% if p %}
+                      <li class="pagination__item active">
+                          <a id="{{p}}list_pagi" data-url="/get_categories_page/{{p}}">{{ p }}</a>
+                      </li>
+                    {% else %}
+                      <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="pagination__item disabled">
+                    &bull; 
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  
 
   <footer class="footer">
     <div class="footer__container container">
