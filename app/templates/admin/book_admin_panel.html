@@ -12,131 +12,134 @@
 </head>
 
 <body>
-  <header class="header">
-    <div class="header__container container">
-      <a class="header__logo" href="{{url_for('main.index')}}">
-        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
-      </a>
-
-      <div class="header__admin admin">
-        <a href="admin_panel.html" class="admin__back">Вернуться назад</a>
-
-        <a href="#" class="admin__link">
-          <div class="admin__set">
-            <img src="img/default_avatar.jpg" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
-          </div>
-          Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
+  <div class="content">
+    <header class="header">
+      <div class="header__container container">
+        <a class="header__logo" href="{{url_for('main.index')}}">
+          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
         </a>
-
-
-      </div>
-
-
-
-
-    </div>
-  </header>
-
-  <main>
-    <section class="main">
-      <div class="main__container container">
-
-        <div class="main__top">
-
-          <h1 class="main__title">Название выбранной книги</h1>
-
-          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="black" />
-          </svg>
-
+  
+        <div class="header__admin admin">
+          <a href="admin_panel.html" class="admin__back">Вернуться назад</a>
+  
+          <a href="#" class="admin__link">
+            <div class="admin__set">
+              <img src="img/default_avatar.jpg" alt="" class="admin__img"> <!--Фото админа из его личного кабинета-->
+            </div>
+            Леонард <!--Имя админа и ссылка обратно в личный кабинет-->
+          </a>
+  
+  
         </div>
-
-        <div class="main__bottom">
-          <a class="main__bottom-item" href="#">Средняя оценка - </a> <!--Пример: Средняя оценка - 4.5 из 5-->
-        </div>
-
+  
+  
+  
+  
       </div>
-    </section>
-
-    <section class="book">
-      <div class="book__container container">
-        <div class="book__top">
-          <div class="book__image">
-            <!--Тут фотка книги-->
-
-            <!--Выборка доступна только авторизированным пользователям-->
-            
+    </header>
+  
+    <main>
+      <section class="main">
+        <div class="main__container container">
+  
+          <div class="main__top">
+  
+            <h1 class="main__title">Название выбранной книги</h1>
+  
+            <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="461" y2="0.5" stroke="black" />
+            </svg>
+  
           </div>
-
-          <div class="book__info">
-            <!--характеристики книги текстом-->
+  
+          <div class="main__bottom">
+            <a class="main__bottom-item" href="#">Средняя оценка - </a> <!--Пример: Средняя оценка - 4.5 из 5-->
           </div>
+  
         </div>
-
-        <div class="book__bottom">
-          <p class="book__text">Описание</p>
-          <!--описание книги текстом-->
-
-
+      </section>
+  
+      <section class="book">
+        <div class="book__container container">
+          <div class="book__top">
+            <div class="book__image">
+              <!--Тут фотка книги-->
+  
+              <!--Выборка доступна только авторизированным пользователям-->
+              
+            </div>
+  
+            <div class="book__info">
+              <!--характеристики книги текстом-->
+            </div>
+          </div>
+  
+          <div class="book__bottom">
+            <p class="book__text">Описание</p>
+            <!--описание книги текстом-->
+  
+  
+          </div>
+  
         </div>
-
-      </div>
-    </section>
-
-
-
-    <!--Блок комментирования книги-->
-    <section class="comments">
-      <div class="comments__container container">
-        <h2 class="comments__title title">Комментарии</h2>
-
-
-        <!--Здесь список оставленных комментариев-->
-        <ul class="comments__info list-reset">
-
-          <!--Элемент - комментарий-->
-          <li class="comments__comment">
-            <div class="comments__top">
-              <div class="comments__image">
-                <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
-                <!--Тут добавленная фотка пользователем-->
-
+      </section>
+  
+  
+  
+      <!--Блок комментирования книги-->
+      <section class="comments">
+        <div class="comments__container container">
+          <h2 class="comments__title title">Комментарии</h2>
+  
+  
+          <!--Здесь список оставленных комментариев-->
+          <ul class="comments__info list-reset">
+  
+            <!--Элемент - комментарий-->
+            <li class="comments__comment">
+              <div class="comments__top">
+                <div class="comments__image">
+                  <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
+                  <!--Тут добавленная фотка пользователем-->
+  
+                </div>
+                <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">Леонард</a>
               </div>
-              <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">Леонард</a>
-            </div>
-
-            <p class="comments__text">Книга супер </p> <!--Тут коммент введенный пользователем-->
-
-            <div class="comments__list">
-
-              <a class="comments__command" href="#">Удалить</a>
-
-            </div>
-          </li>
-
-          <li class="comments__comment">
-            <div class="comments__top">
-              <div class="comments__image">
-                <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
-                <!--Тут добавленная фотка пользователем-->
-
+  
+              <p class="comments__text">Книга супер </p> <!--Тут коммент введенный пользователем-->
+  
+              <div class="comments__list">
+  
+                <a class="comments__command" href="#">Удалить</a>
+  
               </div>
-              <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">Леонард</a>
-            </div>
-
-            <p class="comments__text">Книга супер </p> <!--Тут коммент введенный пользователем-->
-
-            <div class="comments__list">
-
-              <a class="comments__command" href="#">Удалить</a>
-
-            </div>
-          </li>
-        </ul>
-
-      </div>
-    </section>
-  </main>
+            </li>
+  
+            <li class="comments__comment">
+              <div class="comments__top">
+                <div class="comments__image">
+                  <img class="comments__image-set" src="{{url_for('personal.avatar', username=comment.user.username)}}">
+                  <!--Тут добавленная фотка пользователем-->
+  
+                </div>
+                <a href="{{url_for('personal.person', username=current_user.username)}}" class="comments__link">Леонард</a>
+              </div>
+  
+              <p class="comments__text">Книга супер </p> <!--Тут коммент введенный пользователем-->
+  
+              <div class="comments__list">
+  
+                <a class="comments__command" href="#">Удалить</a>
+  
+              </div>
+            </li>
+          </ul>
+  
+        </div>
+      </section>
+    </main>
+  </div>
+  
 
   <footer class="footer">
     <div class="footer__container container">
