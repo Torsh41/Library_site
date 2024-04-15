@@ -8,6 +8,7 @@ from app.parse_excel import *
 import copy
 from operator import itemgetter
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 ELEMS_COUNT = 8
 TOP_BOOKS_COUNT = 3
 BOOKS_MAINTAINING_PER_PAGE = 20
@@ -119,9 +120,10 @@ def edit_comment(username, comment_id, book_name):
         return render_template('403.html')
     comment = Comment.query.filter_by(id=comment_id).first()
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
+    comment.timestamp = datetime.now()
     database.session.add(comment)
     database.session.commit()
-    return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_name=book_name))
+    return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_name=book_name, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year)))
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>')
