@@ -16,74 +16,73 @@
 </head>
 
 <body>
-  <header class="header style-1">
-    <div class="header__container container">
-      <a class="header__logo" href="{{url_for('main.index')}}">
-        <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-          alt="Логотип MAGIC BOOK KEEPER">
-      </a>
-    </div>
-  </header>
-
-  <main>
-    <section class="main style-1">
-      <div class="main__container container">
-
-        <div class="main__top">
-          <!-- <span class="main__span">Welcome!</span> -->
-          <h1 class="main__title">Hello, {{ current_user.username }}!</h1>
-          <!--Hello, имя пользователя!-->
-
-          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
-          </svg>
-
-        </div>
-
+  <div class="content">
+    <header class="header style-1">
+      <div class="header__container container">
+        <a class="header__logo" href="{{url_for('main.index')}}">
+          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+            alt="Логотип MAGIC BOOK KEEPER">
+        </a>
       </div>
-    </section>
-
-
-    <section class="profile">
-      <div class="profile__container container">
-        <div class="profile__wrap">
-          <form class="profile__form" enctype="multipart/form-data" method="post">
-            <!--Вопрос по поводу enctype(action?)-->
-            {{form.hidden_tag()}}
-            <span class="profile__span">Фото профиля</span>
-            <div class="profile__image profile__image-edit">
-              <!--Тут добавленная фотка пользователем-->
-              <input class="profile__foto" type="file" name="avatar" multiple accept="image/*,image/jpeg">
-            </div>
-            {{form.username(class="profile__input", value=current_user.username, placeholder="Введите ваше имя на сайте..")}}
-            {{form.city(class="profile__input", value=city, placeholder="Введите город..")}}
+    </header>
   
-            <label class="profile__info">
-              <span class="profile__span">Пол:</span>
-              <select name="gender" id="" class="profile__select">
-                <option value="муж" {%if gender == "муж"%}selected{%endif%}>муж</option>
-                <option value="жен" {%if gender == "жен"%}selected{%endif%}>жен</option>
-              </select>
-            </label>
+    <main>
+      <section class="main style-1">
+        <div class="main__container container">
   
-            {{form.age(class="profile__input", value=age, placeholder="Введите возраст..")}}
-            <textarea class="profile__text" default="Love that" id="description" maxlength="100" name="description" placeholder="Расскажите о себе.." required="" rows="5">{{ about_me }}</textarea>
-            {{form.submit(class="profile__edit-btn")}}
-          </form>
+          <div class="main__top">
+            <!-- <span class="main__span">Welcome!</span> -->
+            <h1 class="main__title">Hello, {{ current_user.username }}!</h1>
+            <!--Hello, имя пользователя!-->
   
+            <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
+            </svg>
   
-          <a class="profile__exit" href="{{url_for('personal.person', username=current_user.username)}}">Отмена</a>
+          </div>
+  
         </div>
-        
-
-      </div>
-
-    </section>
-
-
-
-
-  </main>
+      </section>
+  
+  
+      <section class="profile">
+        <div class="profile__container container">
+          <div class="profile__wrap">
+            <form class="profile__form" enctype="multipart/form-data" method="post">
+              <!--Вопрос по поводу enctype(action?)-->
+              {{form.hidden_tag()}}
+              <span class="profile__span">Фото профиля</span>
+              <div class="profile__image profile__image-edit">
+                <!--Тут добавленная фотка пользователем-->
+                <input class="profile__foto" type="file" name="avatar" multiple accept="image/*,image/jpeg">
+              </div>
+              {{form.username(class="profile__input", value=current_user.username, placeholder="Введите ваше имя на сайте..")}}
+              {{form.city(class="profile__input", value=city, placeholder="Введите город..")}}
+    
+              <label class="profile__info">
+                <span class="profile__span">Пол:</span>
+                <select name="gender" id="" class="profile__select">
+                  <option value="муж" {%if gender == "муж"%}selected{%endif%}>муж</option>
+                  <option value="жен" {%if gender == "жен"%}selected{%endif%}>жен</option>
+                </select>
+              </label>
+    
+              {{form.age(class="profile__input", value=age, placeholder="Введите возраст..")}}
+              <textarea class="profile__text" id="description" maxlength="40" name="description" placeholder="Расскажите о себе.." required="" rows="5">{{ about_me }}</textarea>
+              {{form.submit(class="profile__edit-btn")}}
+            </form>
+    
+    
+            <a class="profile__exit" href="{{url_for('personal.person', username=current_user.username)}}">Отмена</a>
+          </div>
+          
+  
+        </div>
+  
+      </section>
+    </main>
+  </div>
+  
 
   <footer class="footer">
     <div class="footer__container container">

@@ -8,6 +8,7 @@ from app.parse_excel import *
 import copy
 from operator import itemgetter
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 ELEMS_COUNT = 8
 TOP_BOOKS_COUNT = 3
 BOOKS_MAINTAINING_PER_PAGE = 20
@@ -119,9 +120,10 @@ def edit_comment(username, comment_id, book_name):
         return render_template('403.html')
     comment = Comment.query.filter_by(id=comment_id).first()
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
+    comment.timestamp = datetime.now()
     database.session.add(comment)
     database.session.commit()
-    return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_name=book_name))
+    return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_name=book_name, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year)))
 
 
 @main.route('/<username>/give-grade/<book_id>/<grade>')
@@ -182,102 +184,76 @@ def get_categories_page(page):
     return jsonify([dict(cur_page=page, id=category.id, pages_count=pages_count, name=category.name) for category in categories])
 
 
-@main.route('/category/<name>/search', methods=['GET', 'POST'])
-def search_by_category(name):
+@main.route('/category/<name>', methods=['GET'])
+def category(name):
     list_id = request.args.get('list_id', None, type=int)
-    page_count = 1
     category = Category.query.filter_by(name=name).first()
     if category is None:
         return render_template('404.html')
     res = category.books.all()
-    date_list = list()
+    date_list = list(); top_books = list(); new_books = list()
     if res:
-        top_books = list()
         for book in res:
             try:
-                top_books.append([book, round(
-                    sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
+                top_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
+                new_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
             except:
                 top_books.append([book, 0])
+                new_books.append([book, 0])
             if not book.release_date in date_list:
                 date_list.append(book.release_date)
+                
         if len(top_books) > TOP_BOOKS_COUNT:
-            top_books = sorted(top_books, key=itemgetter(1))[-TOP_BOOKS_COUNT:]
+            top_books = sorted(top_books, key=lambda value: value[1], reverse=True)[:TOP_BOOKS_COUNT]
+            new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)[:TOP_BOOKS_COUNT]
         else:
-            top_books = sorted(top_books, key=itemgetter(1))
+            top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
+            new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
+        
+    return render_template('main/category_page.html', date_list=date_list, top_books=top_books, new_books=new_books, name=category.name, list_id=list_id)
+        
+        
+@main.route('/category/<name>/search', methods=['POST'])
+def search_by_category(name):
+    if current_user.is_authenticated:
+        current_user_is_auth = True; username = current_user.username
     else:
-        top_books = list()
-
-    if request.method == 'POST':
-        result = str(request.form.get('search_result')).strip().lower()
-        if result == 'все':
-            search_result = res
-        else:
-            release_date = request.form.get('release_date')
-            if release_date != '#':
-                search_result = category.books.filter_by(
-                    release_date=release_date).all()
-
-            elif result:
-                search_result = category.books.filter((Book.name.like("%{}%".format(result))) | (
-                    Book.author.like("%{}%".format(result)))).all()
+        current_user_is_auth = False; username = None
+ 
+    category = Category.query.filter_by(name=name).first()
+    if category is None:
+        return render_template('404.html')
+    res = category.books.all()
+    result = str(request.form.get('search_result')).strip().lower()
+    if result == 'все':
+        search_result = res
+    else:
+        search_result = list(); release_date = request.form.get('release_date')
+        if release_date != '#':
+            search_result = category.books.filter_by(release_date=release_date).all()
+        search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
+    
+    if search_result:
+        search_result_fin = []
+        [search_result_fin.append(value) for value in search_result if value and value not in search_result_fin]
+        search_result = search_result_fin
+        results_count = len(search_result)
+        pages_count = len(search_result) // ELEMS_COUNT
+        if len(search_result) % ELEMS_COUNT > 0:
+            pages_count += 1
+        
+        books = list(); res = dict()
+        for book in search_result:
+            if book_grades := book.grades.all():
+                book_grade = round(sum([value.grade for value in book_grades]) / len(book_grades), 1)
             else:
-                search_result = None
-
-            if search_result:
-                search_result_fin = []
-                [search_result_fin.append(
-                    value) for value in search_result if value and value not in search_result_fin]
-                search_result = search_result_fin
-            else:
-                page_count = None
-
-        if not search_result:
-            search_result = 404
-        all_search_result = search_result
-
-        if search_result != 404:
-            old_books_result = SearchResult.query.all()
-            if old_books_result:
-                for elem in old_books_result:
-                    database.session.delete(elem)
-            for book in search_result:
-                book_for_cur_result = SearchResult(book)
-                database.session.add(book_for_cur_result)
-            database.session.commit()
-            if len(search_result) > ELEMS_COUNT:
-                page_count = len(search_result) // ELEMS_COUNT
-                if len(search_result) % ELEMS_COUNT > 0:
-                    page_count += 1
-                search_result = search_result[:ELEMS_COUNT]
-            else:
-                page_count = 1
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, top_books=top_books, len=len, page_count=page_count, page=1, range=range, name=category.name, list_id=list_id, all_search_result=all_search_result)
-
-    elif page := request.args.get('page', None, type=int):
-        cur_result = SearchResult.query.all()
-        page_count = 1
-        temp_arr = list()
-        search_result = dict()
-        counter = 0
-        for book in cur_result:
-            counter += 1
-            temp_arr.append(book)
-            if counter % ELEMS_COUNT == 0:
-                search_result[page_count] = copy.copy(temp_arr)
-                page_count += 1
-                temp_arr = list()
-
-        if counter % ELEMS_COUNT > 0:
-            search_result[page_count] = temp_arr
-        else:
-            page_count -= 1
-        try:
-            search_result = search_result[page]
-        except:
-            return render_template('main/category_page.html', name=name, search_result=0, date_list=date_list, top_books=top_books, list_id=list_id, len=len)
-        return render_template('main/category_page.html', search_result=search_result, date_list=date_list, top_books=top_books, len=len, page_count=page_count, page=page, range=range, name=category.name, list_id=list_id, all_search_result=cur_result)
-    return render_template('main/category_page.html', name=name, search_result=0, date_list=date_list, top_books=top_books, list_id=list_id, len=len)
+                book_grade = 0
+            books.append(dict(result=True, id=book.id, name=book.name, grade=book_grade, category_id=category.id, current_user_is_auth=current_user_is_auth, username=username, author=book.author, pages_count=pages_count, results_count=results_count))
+        for page in range(1, pages_count + 1):
+            res[page] = books[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
+            
+        return jsonify(dict(result=True, data=res))
+    return jsonify(dict(result=False))
 
 
 @main.route('/forum')
