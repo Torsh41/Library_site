@@ -36,9 +36,6 @@
         <nav class="nav header__nav">
           <div class="nav__menu js-menu-wrap">
             <ul class="nav__list list-reset">
-              <!-- <li class="nav__item"><a class="nav__link" href="#2">Контакты</a></li>
-              <li class="nav__item"><a class="nav__link" href="#1">О нас</a></li> -->
-  
               {% if current_user.is_anonymous %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
               {% endif %}
@@ -52,6 +49,7 @@
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               {% if current_user.role == Role.ADMIN %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
               {% endif %}
             </ul>
           </div>

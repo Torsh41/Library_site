@@ -41,7 +41,7 @@ $(function() {
                 $('div').filter(function() {
                     return this.id.match(/discussion_post/);
                 }).remove();
-                html = "";
+                let html = "";
                 posts.forEach(post => {
                 html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
                               <div class="message__left">
@@ -94,8 +94,11 @@ $(function() {
                               </p>`;
                               if (post.file)
                               {
-                                html += `<img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
-                                onmouseout="this.style.width='80px'; this.style.height='80px'" src="/${post.id}/get-post_screenshot">`;
+                                html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post_screenshot" data-postid="${post.id}"/>
+                                          <div id="${post.id}modal" class="modal">
+                                            <span class="close" onclick="document.getElementById('${post.id}modal').style.display='none'">&times;</span>
+                                            <img class="modal-content" id="${post.id}modal_img">
+                                          </div>`;
                               }
         
                           if (post.username == post.current_username)

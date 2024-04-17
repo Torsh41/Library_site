@@ -54,7 +54,7 @@ function add_post_on_forum(posts) {
       return this.id.match(/discussion_post/);
     })
     .remove();
-  html = "";
+  let html = "";
   posts.forEach((post) => {
     html += `<div class="discussion__message message" id="${post.id}discussion_post"> 
                           <div class="message__left">
@@ -122,8 +122,11 @@ function add_post_on_forum(posts) {
                             </p>`;
     if (post.file) 
     {
-      html += `<img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
-                              onmouseout="this.style.width='80px'; this.style.height='80px'" src="/${post.id}/get-post_screenshot">`;
+      html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post_screenshot" data-postid="${post.id}"/>
+                <div id="${post.id}modal" class="modal">
+                  <span class="close" onclick="document.getElementById('${post.id}modal').style.display='none'">&times;</span>
+                  <img class="modal-content" id="${post.id}modal_img">
+                </div>`;
     }
 
     if (post.username == cur_username) 
@@ -331,8 +334,11 @@ function get_posts_page(url_path, post_id=undefined)
                       </p>`;
                       if (post.file)
                       {
-                        html += `<img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
-                        onmouseout="this.style.width='80px'; this.style.height='80px'" src="/${post.id}/get-post_screenshot">`;
+                        html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post_screenshot" data-postid="${post.id}"/>
+                                  <div id="${post.id}modal" class="modal">
+                                    <span class="close" onclick="document.getElementById('${post.id}modal').style.display='none'">&times;</span>
+                                    <img class="modal-content" id="${post.id}modal_img">
+                                  </div>`;
                       }
 
                   if (post.username == post.current_username)
@@ -521,6 +527,14 @@ $(function() {
       document.getElementById("edit_post_sec").style.display = "block";
       document.getElementById("edit_post_field").value = post_body;
       document.getElementById("edit_post").setAttribute("onclick", `edit_post_socket(${topic_id}, ${post_id})`);
+    }
+    else if (target.tagName === 'IMG' && target.id.includes('img'))
+    {
+      let post_id = target.dataset?.postid;
+      let modal = document.getElementById(post_id + 'modal');
+      let modal_img = document.getElementById(post_id + 'modal_img');
+      modal.style.display = "block";
+      modal_img.src = target.src;
     }
   });
 

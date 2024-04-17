@@ -14,6 +14,45 @@
   <script src="{{ url_for('static', filename='js/main/forum_discussion/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/forum_discussion/posts_manipulations.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+  <style>
+    /* Style for the modal (popup) image */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1; 
+        padding-top: 100px; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        overflow: auto; 
+        background-color: rgb(0,0,0); 
+        background-color: rgba(0,0,0,0.9); 
+    }
+
+    .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .close:hover, .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
@@ -48,6 +87,10 @@
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               {% if current_user.role == Role.ADMIN %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
+              {% endif %}
+              {% if current_user.is_authenticated %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               {% endif %}
             </ul>
           </div>
@@ -111,7 +154,7 @@
                         {% endif %}
                         <div class="message__set">
                           <img src="{{url_for('personal.avatar', username=post["username"])}}" alt="" class="message__img">
-                          <!--Фото админа из его личного кабинета-->
+                          <!--Фото пользователя из его личного кабинета-->
                         </div>
                         {{post['username']}}
                       </a>
@@ -155,9 +198,11 @@
                     {{post["body"]}} <!--Сообщение пользователя-->
                   </p>
                   {% if post["file"] %}
-                    <img style="width: 80px; height: 80px" onclick="this.style.width='300px'; this.style.height='300px'"
-                      onmouseout="this.style.width='80px'; this.style.height='80px'"
-                      src="{{url_for('main.post_screenshot', post_id=post["id"])}}"/>
+                    <img id="{{post.id}}img" style="width: 80px; height: 80px" src="{{url_for('main.post_screenshot', post_id=post["id"])}}" data-postid="{{post.id}}"/>
+                    <div id="{{post.id}}modal" class="modal">
+                      <span class="close" onclick="document.getElementById('{{post.id}}modal').style.display='none'">&times;</span>
+                      <img class="modal-content" id="{{post.id}}modal_img">
+                    </div>
                   {% endif %}
   
                   <!--This block for user (only for his messages)-->

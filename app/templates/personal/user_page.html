@@ -28,70 +28,57 @@
 <body onload="book_added();">
   <div class="content">
     <header class="header style-1">
-      <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
-  
-        <div class="header__right">
-          <span class="header__menu">Меню</span>
-          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-            <span class="hamburger__box">
-              <span class="hamburger__inner"></span>
-            </span>
-          </button>
-        </div>
+          <div class="header__container container">
+            <a class="header__logo" href="{{url_for('main.index')}}">
+              <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+                alt="Логотип MAGIC BOOK KEEPER">
+            </a>
+      
+            <div class="header__right">
+              <span class="header__menu">Меню</span>
+              <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+                <span class="hamburger__box">
+                  <span class="hamburger__inner"></span>
+                </span>
+              </button>
+            </div>
+          </div>
+          <nav class="nav header__nav">
+            <div class="nav__menu js-menu-wrap">
+              <ul class="nav__list list-reset">
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+                {% if current_user.role == Role.ADMIN %}
+                  <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                  <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
+                {% endif %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
+              </ul>
+            </div>
+    
+          </nav>
 
-        <div class="main__bottom">
-          <a class="main__bottom-item" href="#1">Мой профиль</a>
-          <a class="main__bottom-item" href="#3">Мои списки книг</a>
-          <a class="main__bottom-item" href="{{url_for('auth.change_password_try')}}">Сменить пароль</a>
-        </div>
-        <a class="main__form-btn btn" href="{{url_for('personal.add_new_book', username=current_user.username)}}">Добавить новую книгу</a>
         {% if current_user.role == Role.ADMIN %}
-          <a id="add_info" class="main__form-btn btn">Добавить множество книг</a>
+          <section class="popup" id="add_many_books_sec" style="display: none;">
+            <div class="popup__formPopup">
+                <h2 class="popup__title title">Добавление информации о книгах</h2>
+                <form id="add_many_books_form" class="popup__formContainer" enctype="multipart/form-data" method="post">
+                    <div class="popup__profile profile__image profile__image-edit">
+                        <input id="sel_file" class="popup__profile-foto profile__foto" type="file" name="data_file"
+                            multiple accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            required>
+                    </div>
+                    <div class="popup__btns">
+                        <input id="many_books_info" class="popup__btn" type="button"
+                            value="Добавить информацию о книгах">
+                        <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
+                    </div>
+
+                </form>
+            </div>
+          </section>
         {% endif %}
-      </div>
-    </section>
-
-    {% if current_user.role == Role.ADMIN %}
-      <section class="popup" id="add_many_books_sec" style="display: none;">
-        <div class="popup__formPopup">
-            <h2 class="popup__title title">Добавление информации о книгах</h2>
-            <form id="add_many_books_form" class="popup__formContainer" enctype="multipart/form-data" method="post">
-                <div class="popup__profile profile__image profile__image-edit">
-                    <input id="sel_file" class="popup__profile-foto profile__foto" type="file" name="data_file"
-                        multiple accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        required>
-                </div>
-                <div class="popup__btns">
-                    <input id="many_books_info" class="popup__btn" type="button"
-                        value="Добавить информацию о книгах">
-                    <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
-                </div>
-
-            </form>
-        </div>
-      </section>
-    {% endif %}
-
-    <section id="1" class="profile" id="user_page_main_container">
-      <div class="profile__container container">
-        <div class="profile__wrap">
-          <div class="profile__image">
-            <img class="profile__image-set" src="{{url_for('personal.avatar', username=current_user.username)}}">
-            <!--Тут добавленная фотка пользователем-->
-          </div>
-          <!-- <span class="profile__span">Фото профиля</span> -->
-
-          <div class="profile__info">
-            <span class="profile__span">Город: </span>
-            <!--Тут информация введенная пользователем в редактировании профиля-->
-            {% if user.city %}{{ user.city }}{% endif %}
-          </div>
-        </nav>
-      </div>
     </header>
   
     <main>
@@ -115,6 +102,9 @@
             <a class="main__bottom-item" href="{{url_for('auth.change_password_try')}}">Сменить пароль</a>
           </div>
           <a class="main__form-btn btn" href="{{url_for('personal.add_new_book', username=current_user.username)}}">Добавить новую книгу</a>
+          {% if current_user.role == Role.ADMIN %}
+            <a id="add_info" class="main__form-btn btn">Добавить множество книг</a>
+          {% endif %}
         </div>
       </section>
   

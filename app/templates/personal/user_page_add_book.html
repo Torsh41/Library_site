@@ -42,6 +42,10 @@
               <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+              {% if current_user.role == Role.ADMIN %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
+              {% endif %}
             </ul>
           </div>
   

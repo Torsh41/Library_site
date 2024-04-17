@@ -40,12 +40,10 @@
                     <div class="nav__menu js-menu-wrap">
                         <ul class="nav__list list-reset">
                             <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-                            <li class="nav__item"><a class="nav__link"
-                                    href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a>
-                            </li>
-                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории
-                                    книг</a></li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
                             <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
                         </ul>
                     </div>
                 </nav>
