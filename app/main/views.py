@@ -219,7 +219,7 @@ def search_by_category(name):
         current_user_is_auth = True; username = current_user.username
     else:
         current_user_is_auth = False; username = None
-    # list_id = request.args.get('list_id', None, type=int)
+ 
     category = Category.query.filter_by(name=name).first()
     if category is None:
         return render_template('404.html')
@@ -228,16 +228,11 @@ def search_by_category(name):
     if result == 'все':
         search_result = res
     else:
-        release_date = request.form.get('release_date')
+        search_result = list(); release_date = request.form.get('release_date')
         if release_date != '#':
             search_result = category.books.filter_by(release_date=release_date).all()
-
-        elif result:
-            search_result = category.books.filter((Book.name.like("%{}%".format(result))) | (
-                Book.author.like("%{}%".format(result)))).all()
-        else:
-            search_result = None
-
+        search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
+    
     if search_result:
         search_result_fin = []
         [search_result_fin.append(value) for value in search_result if value and value not in search_result_fin]
