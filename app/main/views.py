@@ -244,7 +244,11 @@ def search_by_category(name):
         
         books = list(); res = dict()
         for book in search_result:
-            books.append(dict(result=True, id=book.id, name=book.name, category_id=category.id, current_user_is_auth=current_user_is_auth, username=username, author=book.author, pages_count=pages_count, results_count=results_count))
+            if book_grades := book.grades.all():
+                book_grade = round(sum([value.grade for value in book_grades]) / len(book_grades), 1)
+            else:
+                book_grade = 0
+            books.append(dict(result=True, id=book.id, name=book.name, grade=book_grade, category_id=category.id, current_user_is_auth=current_user_is_auth, username=username, author=book.author, pages_count=pages_count, results_count=results_count))
         for page in range(1, pages_count + 1):
             res[page] = books[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
             

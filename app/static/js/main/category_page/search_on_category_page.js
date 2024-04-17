@@ -25,7 +25,7 @@ function search_books_on_category_page(category_name, list_id=undefined)
                 html += `<section id="search_result" class="list">
                             <div class="container list__container">
                                 <div class="list__wrap">
-                                <h2 class="list__title title">Вот, что есть в данной категории</h2>
+                                <h2 class="list__title title">Вот, что нашлось</h2>
                                 <span class="list__results"> Всего результатов: ${books[1][0].results_count} </span>
                                 <ul class="list__books list-reset" id="book_search_res_ul">`;
                 books[1].forEach(book => {
@@ -41,6 +41,10 @@ function search_books_on_category_page(category_name, list_id=undefined)
                     }
                     html += `<a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
                                 <span class="list__link">Автор: ${book.author}</span>
+                                <div class="list__mark-star">
+                                    <span class="list__mark-visible">Оценка ${book.grade}</span>
+                                    <img src="/static/styles/img/star1.svg" alt="" class="list__star">
+                                </div>
                                 </div>
                             </li>`;
                 });
@@ -142,6 +146,10 @@ function get_books_page_on_category(page, list_id=undefined)
         }
         html += `<a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
                     <span class="list__link">Автор: ${book.author}</span>
+                    <div class="list__mark-star">
+                        <span class="list__mark-visible">Оценка ${book.grade}</span>
+                        <img src="/static/styles/img/star1.svg" alt="" class="list__star">
+                    </div>
                     </div>
                 </li>`;
     });
@@ -184,7 +192,7 @@ $(function() {
         event.preventDefault();
     });
 
-    $('#find_books_button').click(function(event) {
+    $('#find_books_button').on('click', function(event) {
         search_books_on_category_page(category_name, list_id);
     });
 
