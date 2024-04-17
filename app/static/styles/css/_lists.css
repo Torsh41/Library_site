@@ -10,6 +10,7 @@
 }
 
 .list-best__wrap {
+  /* position: relative; */
   padding: 52px;
 }
 
@@ -75,6 +76,18 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  /* align-items: center; */
+}
+
+.list__wrapBest {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 600px;
+  padding: 52px 52px;
+  border-radius: 15px;
+  background-color: #cec8bd;
 }
 
 .list__books {
@@ -96,6 +109,8 @@
   background-color: #fdfde9;
   transition: background-color 0.3s linear, border 0.3s linear;
   cursor: pointer;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .list__book-best {
@@ -436,6 +451,9 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+
 
 }
 
