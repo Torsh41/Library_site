@@ -78,6 +78,7 @@ function search_books_on_category_page(category_name, list_id=undefined)
                 let section = document.getElementById('first_section');
                 section.insertAdjacentHTML('afterend', html);
                 section = document.getElementById('search_result');
+                document.getElementById('books_data_field').value = "#";
                 section.scrollIntoView(); // Прокрутка до верхней границы
           }
           else

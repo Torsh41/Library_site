@@ -42,7 +42,7 @@ $(function() {
             }).remove();
             html = "";
             categories.forEach(category => {
-                html += `<li class="category__elem" id="${category.id}category_info"><a href="/category/${category.name}/search" class="about__book-link"><div class="category__block">${category.name}</div></a></li>`;
+                html += `<li class="category__elem" id="${category.id}category_info"><a href="/category/${category.name}" class="about__book-link"><div class="category__block">${category.name}</div></a></li>`;
             });
             document.getElementById("categories_block").innerHTML = html;
             // перестройка пагинации
