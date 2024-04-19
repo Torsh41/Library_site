@@ -81,30 +81,30 @@ function search_books_on_category_page(category_name, list_id=undefined)
                     document.getElementById('books_data_field').value = '';
                     document.getElementById('description_field').value = '';
                     section.scrollIntoView(); // Прокрутка до верхней границы
-            }
-            else
-            {
-                $('section').filter(function() {
-                return this.id.match("search_result");
-                }).remove();
-                $('section').filter(function() {
-                return this.id.match("nothing_found");
-                }).remove();
-                $('#pagination_container').remove();
-                document.getElementById("books_find_field").value = "";
-                html = `<section id="nothing_found" class="list">
-                            <div class="container list__container">
-                            <div class="list__wrap">
-                                <h2 class="list__title title">Ничего не найдено</h2>
-                            </div>
-                            </div>
-                        </section>`;
-                let section = document.getElementById('first_section');
-                section.insertAdjacentHTML('afterend', html);
-                document.getElementById('books_data_field').value = '';
-                document.getElementById('description_field').value = '';
-                document.getElementById('nothing_found').scrollIntoView(); // Прокрутка до верхней границы
-            }
+                }
+                else
+                {
+                    $('section').filter(function() {
+                    return this.id.match("search_result");
+                    }).remove();
+                    $('section').filter(function() {
+                    return this.id.match("nothing_found");
+                    }).remove();
+                    $('#pagination_container').remove();
+                    document.getElementById("books_find_field").value = "";
+                    html = `<section id="nothing_found" class="list">
+                                <div class="container list__container">
+                                <div class="list__wrap">
+                                    <h2 class="list__title title">Ничего не найдено</h2>
+                                </div>
+                                </div>
+                            </section>`;
+                    let section = document.getElementById('first_section');
+                    section.insertAdjacentHTML('afterend', html);
+                    document.getElementById('books_data_field').value = '';
+                    document.getElementById('description_field').value = '';
+                    document.getElementById('nothing_found').scrollIntoView(); // Прокрутка до верхней границы
+                }
             },
             error: function(jqXHR, exception) {
                 if (exception === 'parsererror')
@@ -120,10 +120,10 @@ function search_books_on_category_page(category_name, list_id=undefined)
     }
     else if (!document.getElementById('books_find_field').value.trim() && !document.getElementById('books_data_field').value.trim() && !document.getElementById('description_field').value.trim())
     {
-        alert('Заполните хотя бы одно поле поиска');
         document.getElementById('books_find_field').value = '';
         document.getElementById('books_data_field').value = '';
         document.getElementById('description_field').value = '';
+        alert('Заполните хотя бы одно поле поиска');
     }
 }      
 
