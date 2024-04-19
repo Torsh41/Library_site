@@ -191,7 +191,7 @@ def category(name):
     if category is None:
         return render_template('404.html')
     res = category.books.all()
-    date_list = list(); top_books = list(); new_books = list()
+    top_books = list(); new_books = list()
     if res:
         for book in res:
             try:
@@ -200,17 +200,14 @@ def category(name):
             except:
                 top_books.append([book, 0])
                 new_books.append([book, 0])
-            if not book.release_date in date_list:
-                date_list.append(book.release_date)
-                
+           
         if len(top_books) > TOP_BOOKS_COUNT:
             top_books = sorted(top_books, key=lambda value: value[1], reverse=True)[:TOP_BOOKS_COUNT]
             new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)[:TOP_BOOKS_COUNT]
         else:
             top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
             new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
-        
-    return render_template('main/category_page.html', date_list=date_list, top_books=top_books, new_books=new_books, name=category.name, list_id=list_id)
+    return render_template('main/category_page.html', top_books=top_books, new_books=new_books, name=category.name, list_id=list_id)
         
         
 @main.route('/category/<name>/search', methods=['POST'])
@@ -228,15 +225,16 @@ def search_by_category(name):
     if result == 'все':
         search_result = res
     else:
-        search_result = list(); release_date = request.form.get('release_date')
-        if release_date != '#':
-            search_result = category.books.filter_by(release_date=release_date).all()
-        search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
-    
+        search_result = list(); release_date = request.form.get('release_date').strip(); description = request.form.get('description').strip()
+        if result:
+            search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
+        if release_date:
+            search_result += category.books.filter((Book.release_date.like("%{}%".format(release_date)))).all()
+        if description:
+            search_result += category.books.filter((Book.description.like("%{}%".format(description)))).all()
+            
     if search_result:
-        search_result_fin = []
-        [search_result_fin.append(value) for value in search_result if value and value not in search_result_fin]
-        search_result = search_result_fin
+        search_result = list(set(search_result))
         results_count = len(search_result)
         pages_count = len(search_result) // ELEMS_COUNT
         if len(search_result) % ELEMS_COUNT > 0:
