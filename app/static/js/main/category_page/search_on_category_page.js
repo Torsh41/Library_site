@@ -30,7 +30,7 @@ function search_books_on_category_page(category_name, list_id=undefined)
                                     <ul class="list__books list-reset" id="book_search_res_ul">`;
                     books[1].forEach(book => {
                         html += `<li class="list__book" id="${book.id}search_books_info">
-                                    <a href="/book-page/${book.name}" class="list__book-set">
+                                    <a href="/book-page/${book.name}?list_id=${list_id}" class="list__book-set">
                                         <img class="list__book-set" src="/${book.name}/get-cover" alt="">
                                     </a>
                                 <div class="list__book-wrap">`;
@@ -39,7 +39,7 @@ function search_books_on_category_page(category_name, list_id=undefined)
                         {
                             html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
                         }
-                        html += `<a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
+                        html += `<a href="/book-page/${book.name}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
                                     <span class="list__link">Автор: ${book.author}</span>
                                     <div class="list__mark-star">
                                         <span class="list__mark-visible">Оценка ${book.grade}</span>
@@ -137,7 +137,7 @@ function get_books_page_on_category(page, list_id=undefined)
     let html = '';
     search_result[page].forEach(book => {
         html += `<li class="list__book" id="${book.id}search_books_info">
-                    <a href="/book-page/${book.name}" class="list__book-set">
+                    <a href="/book-page/${book.name}?list_id=${list_id}" class="list__book-set">
                         <img class="list__book-set" src="/${book.name}/get-cover" alt="">
                     </a>
                 <div class="list__book-wrap">`;
@@ -146,7 +146,7 @@ function get_books_page_on_category(page, list_id=undefined)
         {
                 html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
         }
-        html += `<a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
+        html += `<a href="/book-page/${book.name}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
                     <span class="list__link">Автор: ${book.author}</span>
                     <div class="list__mark-star">
                         <span class="list__mark-visible">Оценка ${book.grade}</span>

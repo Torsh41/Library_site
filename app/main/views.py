@@ -59,6 +59,7 @@ def index():
 
 @main.route('/book-page/<name>', methods=['GET'])
 def book_page(name):
+    list_id = request.args.get('list_id', None, type=int)
     book = Book.query.filter_by(name=name).first()
     pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(
         1, per_page=ELEMS_COUNT, error_out=False)
@@ -69,7 +70,7 @@ def book_page(name):
             sum([value.grade for value in grades]) / len(grades), 1)
     except:
         fin_grade = 0
-    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=len(grades), int=int, display="none")
+    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=len(grades), int=int, list_id=list_id, display="none")
 
 
 @main.route('/get_comments_page/<book_name>/<page>', methods=['GET'])
@@ -188,7 +189,7 @@ def get_categories_page(page):
 def category(name):
     list_id = request.args.get('list_id', None, type=int)
     category = Category.query.filter_by(name=name).first()
-    if category is None:
+    if not category:
         return render_template('404.html')
     res = category.books.all()
     top_books = list(); new_books = list()

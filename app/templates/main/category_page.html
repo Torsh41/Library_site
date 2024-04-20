@@ -121,7 +121,7 @@
                   {% for book in top_books %}
                     <div class="swiper-slide hero__slide hero__slide--one">
                       <li class="list__book-best">
-                        <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__book-set">
+                        <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__book-set">
                           <img class="list__book-set" src="{{url_for('main.cover', name=book[0].name)}}" alt="">
                         </a>
                         <div class="list__book-wrap">
@@ -129,7 +129,7 @@
                           <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
                             class="list__book-delete-btn">Добавить в список</a>
                           {% endif %}
-                          <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__link">Книга:
+                          <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__link">Книга:
                             {{book[0].name.title()}}</a>
                           <span class="list__link">Автор: {{book[0].author.title()}}</span>
                           <div class="list__mark-star">
@@ -159,7 +159,7 @@
                   {% for book in new_books %}
                     <div class="swiper-slide hero__slide hero__slide--one">
                       <li class="list__book-best">
-                        <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__book-set">
+                        <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__book-set">
                           <img class="list__book-set" src="{{url_for('main.cover', name=book[0].name)}}" alt="">
                         </a>
                         <div class="list__book-wrap">
@@ -167,7 +167,7 @@
                           <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
                             class="list__book-delete-btn">Добавить в список</a>
                           {% endif %}
-                          <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__link">Книга:
+                          <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__link">Книга:
                             {{book[0].name.title()}}</a>
                           <span class="list__link">Автор: {{book[0].author.title()}}</span>
                           <div class="list__mark-star">
