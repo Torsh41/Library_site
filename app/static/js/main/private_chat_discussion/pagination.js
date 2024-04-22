@@ -1,5 +1,5 @@
 // функция перестройки пагинации постов для ее правильного отображения
-function posts_pagination_update(pages, topic_id)
+function posts_pagination_update(pages, chat_id)
 {
   $('#pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="pagination">
@@ -10,7 +10,7 @@ function posts_pagination_update(pages, topic_id)
     if (p)
     {
       html += `<li class="pagination__item active">
-                <a id="${p}posts_p" data-url="/get_posts_page/${topic_id}/${p}">${p}</a>
+                <a id="${p}posts_p" data-url="/get_posts_page_on_chat_disc/${chat_id}/${p}">${p}</a>
               </li>`;
     }
     else
@@ -94,7 +94,7 @@ $(function() {
                               </p>`;
                               if (post.file)
                               {
-                                html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post-screenshot" data-postid="${post.id}"/>
+                                html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post-screenshot-on-private-chat" data-postid="${post.id}"/>
                                           <div id="${post.id}modal" class="modal">
                                             <span class="close" onclick="document.getElementById('${post.id}modal').style.display='none'">&times;</span>
                                             <img class="modal-content" id="${post.id}modal_img">
@@ -104,23 +104,23 @@ $(function() {
                           if (post.username == post.current_username)
                           {
                             html += `<div class="message__admin" id="${post.id}personal_cont">
-                                      <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                                      <a class="message__admin-btn" id="${post.id}edit_post_a" data-topicid='${post.topic_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
-                                      <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
+                                      <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
+                                      <a class="message__admin-btn" id="${post.id}edit_post_a" data-chatid='${post.chat_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
+                                      <a class="message__admin-btn" id="${post.id}post_d" data-chatid='${post.chat_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                                       </div>`;
                           }
                           else if (post.user_is_admin)
                           {
                             html += `<div class="message__admin" id="${post.id}personal_cont">
                             <a class="comments__command">Админ</a>
-                            <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                            <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
+                            <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
+                            <a class="message__admin-btn" id="${post.id}post_d" data-chatid='${post.chat_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                             </div>`;
                           }
                           else if (post.current_username)
                           {
                             html += `<div class="message__admin" id="${post.id}personal_cont">
-                            <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
+                            <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
                             </div>`;
                           }
                          html += `</div></div>`;
@@ -135,7 +135,7 @@ $(function() {
                   write_post_form.setAttribute('action', action);
                  }
                 // перестройка пагинации
-                posts_pagination_update(pages_count, posts[0].topic_id);
+                posts_pagination_update(pages_count, posts[0].chat_id);
 
                 // выделение текущей страницы
                  pagi = document.getElementById('pagination');

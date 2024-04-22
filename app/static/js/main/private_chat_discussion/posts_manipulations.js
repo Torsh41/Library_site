@@ -1,4 +1,4 @@
-function write_post_socket(topic_id, post_id_to_answer = false) 
+function write_post_socket(chat_id, post_id_to_answer = false) 
 {
   if (document.getElementById("post_body_id").value.trim() && document.getElementById("post_body_id").value.trim().length <= 200) 
   {
@@ -8,14 +8,11 @@ function write_post_socket(topic_id, post_id_to_answer = false)
       post_body: formData.get("post_body"),
       filename: formData.get("screenshot").name,
       screenshot: formData.get("screenshot"),
-      topic_id: topic_id,
+      chat_id: chat_id,
       post_id_to_answer: post_id_to_answer,
     });
 
-    // $('#add_post_button').on('click', function(event) {
-    //   write_post_socket(topic_id);
-    // });
-    document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
+    document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${chat_id}')`);
   } 
   else if (document.getElementById("post_body_id").value.trim().length > 200) 
   {
@@ -29,20 +26,16 @@ function write_post_socket(topic_id, post_id_to_answer = false)
 }
 
 
-function del_post_socket(topic_id, post_id, page) 
+function del_post_socket(chat_id, post_id, page) 
 {
   if (confirm("Подтвердите действие")) 
   {
     socket.emit("del post", {
-      topic_id: topic_id,
+      chat_id: chat_id,
       post_id: post_id,
       page: page,
     });
-
-    // $('#add_post_button').on('click', function(event) {
-    //   write_post_socket(topic_id);
-    // });
-    document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
+    document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${chat_id}')`);
   }
 }
 
@@ -122,7 +115,7 @@ function add_post_on_forum(posts) {
                             </p>`;
     if (post.file) 
     {
-      html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post-screenshot" data-postid="${post.id}"/>
+      html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post-screenshot-on-private-chat" data-postid="${post.id}"/>
                 <div id="${post.id}modal" class="modal">
                   <span class="close" onclick="document.getElementById('${post.id}modal').style.display='none'">&times;</span>
                   <img class="modal-content" id="${post.id}modal_img">
@@ -132,21 +125,21 @@ function add_post_on_forum(posts) {
     if (post.username == cur_username) 
     {
       html += `<div class="message__admin" id="${post.id}personal_cont">
-                                  <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                                  <a class="message__admin-btn" id="${post.id}edit_post_a" data-topicid='${post.topic_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
-                                  <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
+                                  <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
+                                  <a class="message__admin-btn" id="${post.id}edit_post_a" data-chatid='${post.chat_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
+                                  <a class="message__admin-btn" id="${post.id}post_d" data-chatid='${post.chat_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                                   </div>`;
     } else if (cur_user_is_admin) 
     {
       html += `<div class="message__admin" id="${post.id}personal_cont">
                                     <a class="comments__command">Админ</a>
-                                    <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                                    <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
+                                    <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
+                                    <a class="message__admin-btn" id="${post.id}post_d" data-chatid='${post.chat_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                                   </div>`;
     } else if (cur_username) 
     {
       html += `<div class="message__admin" id="${post.id}personal_cont">
-            <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
+            <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
             </div>`;
     }
     html += `</div></div>`;
@@ -169,13 +162,13 @@ function add_post_on_forum(posts) {
       if (p == posts[0].cur_page)
       {
         html += `<li class="pagination__item_cur_page">
-                    <a id="${p}posts_p" data-url='/get_posts_page/${posts[0].topic_id}/${p}'>${p}</a>
+                    <a id="${p}posts_p" data-url='/get_posts_page_on_chat_disc/${posts[0].chat_id}/${p}'>${p}</a>
                   </li>`;
       }
       else
       {
         html += `<li class="pagination__item active">
-                  <a id="${p}posts_p" data-url='/get_posts_page/${posts[0].topic_id}/${p}'>${p}</a>
+                  <a id="${p}posts_p" data-url='/get_posts_page_on_chat_disc/${posts[0].chat_id}/${p}'>${p}</a>
                 </li>`;
       }
     }
@@ -192,23 +185,21 @@ function add_post_on_forum(posts) {
     document.getElementById("post_body_id").value = "";
   }
 
-  $("span")
-    .filter(function () {
+  $("span").filter(function () {
       return this.id.match("posts_count");
-    })
-    .remove();
+    }).remove();
   html = `<span class="main__span-forum" id="posts_count">Сообщений: ${posts[0].posts_count}</span>`;
-  div = document.getElementById("main_container");
-  div.insertAdjacentHTML("beforeend", html);
+  let span = document.getElementById("participants_count");
+  span.insertAdjacentHTML("beforebegin", html);
   if (document.getElementById("file_input_id"))
   {
     document.getElementById("file_input_id").value = "";
   }
 }
 
-function del_post(response, topic_id, post_id) 
+function del_post(response, chat_id, post_id) 
 {
-  get_posts_page(`/get_posts_page/${topic_id}/${response.cur_page}`);
+  get_posts_page(`/get_posts_page_on_chat_disc/${chat_id}/${response.cur_page}`);
   
   $("#pagination").remove();
 
@@ -221,13 +212,13 @@ function del_post(response, topic_id, post_id)
         if (p == response.cur_page)
         {
           html += `<li class="pagination__item_cur_page">
-                      <a id='${p}posts_p' data-url='/get_posts_page/${topic_id}/${p}'>${p}</a>
+                      <a id='${p}posts_p' data-url='/get_posts_page_on_chat_disc/${chat_id}/${p}'>${p}</a>
                     </li>`;
         }
         else
         {
           html += `<li class="pagination__item active">
-                      <a id='${p}posts_p' data-url='/get_posts_page/${topic_id}/${p}'>${p}</a>
+                      <a id='${p}posts_p' data-url='/get_posts_page_on_chat_disc/${chat_id}/${p}'>${p}</a>
                     </li>`;
         }
       }
@@ -239,22 +230,17 @@ function del_post(response, topic_id, post_id)
   }
   html += `<li class="pagination__item disabled">&bull;</li></ul>`;
   document.getElementById("posts_pagination_container").innerHTML = html;
-  $("span")
-    .filter(function () {
+  $("span").filter(function () {
       return this.id.match("posts_count");
-    })
-    .remove();
+    }).remove();
   html = `<span class="main__span-forum" id="posts_count">Сообщений: ${response.posts_count}</span>`;
-  div = document.getElementById("main_container");
-  div.insertAdjacentHTML("beforeend", html);
+  let span = document.getElementById("participants_count");
+  span.insertAdjacentHTML("beforebegin", html);
 }
 
-function answer_on_post(topic_id, post_id) 
+function answer_on_post(chat_id, post_id) 
 {
-  document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}', '${post_id}')`);
-  // $('#add_post_button').on('click', function(event) {
-  //   write_post_socket(topic_id, post_id);
-  // });
+  document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${chat_id}', '${post_id}')`);
   document.getElementById("add_post_form").scrollIntoView();
   $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
 }
@@ -334,7 +320,7 @@ function get_posts_page(url_path, post_id=undefined)
                       </p>`;
                       if (post.file)
                       {
-                        html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post-screenshot" data-postid="${post.id}"/>
+                        html += `<img id="${post.id}img" style="width: 80px; height: 80px" src="/${post.id}/get-post-screenshot-on-private-chat" data-postid="${post.id}"/>
                                   <div id="${post.id}modal" class="modal">
                                     <span class="close" onclick="document.getElementById('${post.id}modal').style.display='none'">&times;</span>
                                     <img class="modal-content" id="${post.id}modal_img">
@@ -344,35 +330,35 @@ function get_posts_page(url_path, post_id=undefined)
                   if (post.username == post.current_username)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
-                              <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                              <a class="message__admin-btn" id="${post.id}edit_post_a" data-topicid='${post.topic_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
-                              <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
+                              <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
+                              <a class="message__admin-btn" id="${post.id}edit_post_a" data-chatid='${post.chat_id}' data-postid='${post.id}' data-body='${post.body}'>Редактировать</a>
+                              <a class="message__admin-btn" id="${post.id}post_d" data-chatid='${post.chat_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                               </div>`;
                   }
                   else if (post.user_is_admin)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
                     <a class="comments__command">Админ</a>
-                    <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
-                    <a class="message__admin-btn" id="${post.id}post_d" data-topicid='${post.topic_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
+                    <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
+                    <a class="message__admin-btn" id="${post.id}post_d" data-chatid='${post.chat_id}' data-postid='${post.id}' data-page='${post.cur_page}'>Удалить</a>
                     </div>`;
                   }
                   else if (post.current_username)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
-                    <a class="message__admin-btn" id="${post.id}answer_on" data-topicid='${post.topic_id}' data-postid='${post.id}'>Ответить</a>
+                    <a class="message__admin-btn" id="${post.id}answer_on" data-chatid='${post.chat_id}' data-postid='${post.id}'>Ответить</a>
                     </div>`;
                   }
                  html += `</div></div>`;
         });
         let div = document.getElementById('disc_posts_container');
         div.insertAdjacentHTML('afterbegin', html);
-        write_post_form = document.getElementById('add_post_form');
+        let write_post_form = document.getElementById('add_post_form');
         if (write_post_form)
         {
-        action = write_post_form.getAttribute('action');
-        action = action.split('?')[0];
-        write_post_form.setAttribute('action', action);
+          action = write_post_form.getAttribute('action');
+          action = action.split('?')[0];
+          write_post_form.setAttribute('action', action);
         }
         pagi = document.getElementById('pagination');
         pagi_li = pagi.querySelector('.pagination__item_cur_page');
@@ -402,7 +388,7 @@ function get_posts_page(url_path, post_id=undefined)
 }
 
 
-function edit_post_on_forum_discussion(topic_id, post_id, post_body, username)
+function edit_post_on_forum_discussion(chat_id, post_id, post_body, username)
 {
   $('p').filter(function() {
       return this.id.match(post_id + "post_body");
@@ -412,9 +398,9 @@ function edit_post_on_forum_discussion(topic_id, post_id, post_body, username)
     }).remove();
     
 
-  let html = `  <p class="message__text" id="${post_id}post_body">
-              ${post_body} <!--Сообщение пользователя-->
-            </p>`;
+  let html = `<p class="message__text" id="${post_id}post_body">
+                ${post_body}
+              </p>`;
   let div = document.getElementById(post_id + 'base_to_answer');
   if (div)
   {
@@ -428,7 +414,7 @@ function edit_post_on_forum_discussion(topic_id, post_id, post_body, username)
   if (username == cur_username)
   {
     let div_ = document.getElementById(post_id + 'answer_on');
-    html = `<a class="message__admin-btn" id="${post_id}edit_post_a" data-topicid="${topic_id}" data-postid="${post_id}" data-body="${post_body}">Редактировать</a>`;
+    html = `<a class="message__admin-btn" id="${post_id}edit_post_a" data-chatid="${chat_id}" data-postid="${post_id}" data-body="${post_body}">Редактировать</a>`;
     div_.insertAdjacentHTML('afterend', html)
   }
   document.getElementById("edit_post_field").value = "";
@@ -436,13 +422,13 @@ function edit_post_on_forum_discussion(topic_id, post_id, post_body, username)
 }
 
 
-function edit_post_socket(topic_id, post_id)
+function edit_post_socket(chat_id, post_id)
 {
   if (document.getElementById('edit_post_field').value.trim() && document.getElementById('edit_post_field').value.trim().length <= 200)
   {
     form = document.getElementById("edit_post_form");
     var formData = new FormData(form);
-    socket.emit("edit post", topic_id, post_id, formData.get("newComment"));
+    socket.emit("edit post", {chat_id: chat_id, post_id: post_id, new_post: formData.get("newComment")});
   } 
   else if (document.getElementById('edit_post_field').value.trim().length > 200)
   {
@@ -456,64 +442,55 @@ function edit_post_socket(topic_id, post_id)
 }
 
 
-let socket = io(); 
+let socket = io('/private_chat'); 
 let cur_username = '';
 let cur_user_is_admin;
 $(function() {
-  let a = $("#write_msg");
-  if (a && a.length > 0) 
-  {
-    let topic_id = a.data('username').split(';')[2];
-    let write_post_form = document.getElementById("add_post_form");
-    if (write_post_form)
-    {
-      // $('#add_post_button').on('click', function(event) {
-      //   write_post_socket(topic_id);
-      // });
-      document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
-      a.on('click', function () {
-        document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
-        // $('#add_post_button').on('click', function(event) {
-        //   write_post_socket(topic_id);
-        // });
-        write_post_form.scrollIntoView();
-        $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
-      });
-    }
-    let username = a.data('username').split(';')[0];
-    cur_user_is_admin = Number(a.data('username').split(';')[1]);
-    if (username.length > 0)
-    {
-      cur_username = username;
-    }
-  }
 
+  let a = $("#write_msg");
+  let chat_id = a.data('username').split(';')[2];
+  socket.emit('join', {room: chat_id});
+  let write_post_form = document.getElementById("add_post_form");
+  document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${chat_id}')`);
+  a.on('click', function () {
+    document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${chat_id}')`);
+    write_post_form.scrollIntoView();
+    $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
+  });
+  
+  let username = a.data('username').split(';')[0];
+  cur_user_is_admin = Number(a.data('username').split(';')[1]);
+  if (username.length > 0)
+  {
+    cur_username = username;
+  }
+  
   socket.on("add post", function (posts) {
     add_post_on_forum(posts.data);
   });
 
   socket.on("del post response", function (response) {
-    del_post(response.response, response.topic_id, response.post_id);
+    del_post(response.response, response.chat_id, response.post_id);
   });
 
   socket.on("edit post response", function (data) {
-    edit_post_on_forum_discussion(data.topic_id, data.post_id, data.post_body, data.username);
+    edit_post_on_forum_discussion(data.chat_id, data.post_id, data.post_body, data.username);
   });
 
   $('#disc_posts_container').on('click', function(event) {
       let target = event.target;
       if (target.tagName === 'A' && target.id.includes('post_d'))
       {
-        let topic_id = target.dataset?.topicid;
+        let chat_id = target.dataset?.chatid;
         let post_id = target.dataset?.postid;
         let page = target.dataset?.page;
-        del_post_socket(topic_id, post_id, page);
+        del_post_socket(chat_id, post_id, page);
       }
       else if (target.tagName === 'A' && target.id.includes('answer_on'))
       {
-        let topic_id = target.dataset?.topicid;
+        let chat_id = target.dataset?.chatid;
         let post_id = target.dataset?.postid;
-        answer_on_post(topic_id, post_id);
+        answer_on_post(chat_id, post_id);
       }
   });
 
@@ -521,12 +498,12 @@ $(function() {
     let target = event.target;
     if (target.tagName === 'A' && target.id.includes('edit_post_a'))
     {
-      let topic_id = target.dataset?.topicid;
+      let chat_id = target.dataset?.chatid;
       let post_id = target.dataset?.postid;
       let post_body = target.dataset?.body;
       document.getElementById("edit_post_sec").style.display = "block";
       document.getElementById("edit_post_field").value = post_body;
-      document.getElementById("edit_post").setAttribute("onclick", `edit_post_socket(${topic_id}, ${post_id})`);
+      document.getElementById("edit_post").setAttribute("onclick", `edit_post_socket(${chat_id}, ${post_id})`);
     }
     else if (target.tagName === 'IMG' && target.id.includes('img'))
     {

@@ -135,6 +135,7 @@
               {% endif %}
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.category', name=book.category.name, list_id=list_id)}}">Поиск книг в категории</a></li>
               {% if current_user.is_authenticated %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               {% endif %}
             </ul>
@@ -290,62 +291,64 @@
   
         <!--После нажатия кнопки - открываются созданные пользователем в своем лк списки, пользователь выбирает в какой свой список добавить -->
         {% if current_user.is_authenticated %}
-        <div class="container lists__create">
-          <button class="lists__btn">Добавить в список
-            <svg class="list__svg" width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g clip-path="url(#clip0_139_2)">
-                <rect x="35" width="8" height="78" fill="#D9D9D9" />
-                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
-              </g>
-              <defs>
-                <clipPath id="clip0_139_2">
-                  <rect width="78" height="78" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
-          </button>
-        </div>
+          <div class="container lists__create">
+            <button class="lists__btn">Добавить в список
+              <svg class="list__svg" width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_139_2)">
+                  <rect x="35" width="8" height="78" fill="#D9D9D9" />
+                  <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#D9D9D9" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_139_2">
+                    <rect width="78" height="78" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+            </button>
+          </div>
         {% endif %}
       </form>
-  
-      <section class="loginPopup" id="edit_comment_sec" style="display: {{ display }}">
-        <div class="formPopup">
-          <h2 class="comments__title title">Редактирование комментария</h2>
-          <form class="formContainer-comments" action="" id="edit_comment_form" method="post">
-  
-            <label class="comments__label-popup">
-              <textarea type="text" class="comments__textarea-popup" id="edit_comment_field" rows="5" name="newComment"
-                placeholder="введите новый комментарий..."></textarea>
-            </label>
-  
-            <div class="popup__btns">
-              <input class="popup__btn" id="edit_comment" type="button" value="Изменить">
-              <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
-            </div>
-          </form>
-        </div>
-      </section>
-  
+      
+      {% if current_user.is_authenticated %}
+        <section class="loginPopup" id="edit_comment_sec" style="display: {{ display }}">
+          <div class="formPopup">
+            <h2 class="comments__title title">Редактирование комментария</h2>
+            <form class="formContainer-comments" action="" id="edit_comment_form" method="post">
+    
+              <label class="comments__label-popup">
+                <textarea type="text" class="comments__textarea-popup" id="edit_comment_field" rows="5" name="newComment"
+                  placeholder="введите новый комментарий..."></textarea>
+              </label>
+    
+              <div class="popup__btns">
+                <input class="popup__btn" id="edit_comment" type="button" value="Изменить">
+                <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      {% endif %}
+
       <!--Блок комментирования книги-->
       <section class="comments">
         <div class="comments__container container">
           <div class="comments__wrap">
             <h2 class="comments__title title">Комментарии</h2>
             {% if current_user.is_authenticated %}
-            <form class="comments__form" action="" id="add_comment_form" method="post">
-    
-              <label class="comments__label">
-                <span class="comments__span">Ваш комментарий</span>
-                <textarea type="text" id="comment_body_id" name="comment" class="comments__textarea" rows="7"
-                  placeholder="Введите свой комментарий.."></textarea>
-              </label>
-    
-              <input class="comments__btn btn" type="button" value="Отправить" id="send_comment" data-user="{{current_user.username}}" data-book="{{book.name}}">
-            </form>
+              <form class="comments__form" action="" id="add_comment_form" method="post">
+      
+                <label class="comments__label">
+                  <span class="comments__span">Ваш комментарий</span>
+                  <textarea type="text" id="comment_body_id" name="comment" class="comments__textarea" rows="7"
+                    placeholder="Введите свой комментарий.."></textarea>
+                </label>
+      
+                <input class="comments__btn btn" type="button" value="Отправить" id="send_comment" data-user="{{current_user.username}}" data-book="{{book.name}}">
+              </form>
             {% else %}
-            <div class="book__footer">
-              <h2 class="book__error">Оставлять комментарии могут только авторизованные пользователи.</h2>
-            </div>
+              <div class="book__footer">
+                <h2 class="book__error">Оставлять комментарии могут только авторизованные пользователи.</h2>
+              </div>
             {% endif %}
     
     

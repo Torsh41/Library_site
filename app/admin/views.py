@@ -5,7 +5,6 @@ from .. import database
 from app.models import User, Book, Category, SearchResult
 from .forms import AddCategoryForm
 from app.decorators import admin_required, check_actual_password
-import copy
 RESULT_COUNT = 8
 
 
@@ -178,12 +177,7 @@ def search_books_on_admin_panel(username, category_name):
                              
             # удаление прошлых результатов поиска из бд
             database.session.query(SearchResult).delete()
-            
-            # old_books_result = SearchResult.query.all()
-            # if old_books_result:
-            #     for elem in old_books_result:
-            #         database.session.delete(elem)
-            
+                 
             books_grades = list()
             for book in books:
                 book_for_cur_result = SearchResult(book)
@@ -204,23 +198,7 @@ def search_books_on_admin_panel(username, category_name):
         cur_result_pagination = SearchResult.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(cur_result_pagination.iter_pages())
         cur_result = cur_result_pagination.items
-        #cur_result_for_pagi = SearchResult.query.all()
         if cur_result:
-        # if cur_result_for_pagi:
-        #     page_count = 1
-        #     temp_arr = list()
-        #     books = dict()
-        #     counter = 0
-        #     for book in cur_result_for_pagi:
-        #         counter += 1
-        #         temp_arr.append(book)
-        #         if counter % RESULT_COUNT == 0:
-        #             books[page_count] = copy.copy(temp_arr)
-        #             page_count += 1
-        #             temp_arr = list()
-
-        #     if counter % RESULT_COUNT > 0:
-        #         books[page_count] = temp_arr
             return jsonify([dict(has_books=True, cur_page=page, pages_count=pages_count, username=current_user.username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book.grade) for book in cur_result])#books[page]])
         else:
             return jsonify([dict(has_books=False)])
