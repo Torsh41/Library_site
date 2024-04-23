@@ -599,7 +599,6 @@ def book_del():
 @check_actual_password
 def create_private_chat():
     private_chat_name = request.form.get('private_chat_name').strip().lower()
-    private_chat = PrivateChat.query.filter_by(name=private_chat_name).first()
     if current_user.private_chats.filter_by(name=private_chat_name).first():
         return jsonify(dict(result=False))
     
