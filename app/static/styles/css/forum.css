@@ -39,7 +39,7 @@
 .fraction__wrap {
   padding: 52px 52px;
   border-radius: 15px;
-  background-color: #cec8bd;
+  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
 }
 
 .fraction__list-item:not(:nth-child(3n)) {
