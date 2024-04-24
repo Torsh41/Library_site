@@ -114,12 +114,11 @@ def edit_post(data):
 def invite(data):
     chat_invitations_count = PrivateChat.query.filter_by(id=int(data['chat_id'])).first().invitations.count()
     if chat_invitations_count >= MAX_INVITATIONS:
-        return emit('invitation', {'result': False}, to=int(data['chat_id']))
+        return emit('invitation', {'result': False}, to=int(data['chat_id']), broadcast=False)
     new_user = User.query.filter_by(id=int(data['user_id'])).first()
     invitation = ChatInvitation(user=new_user, private_chat=PrivateChat.query.filter_by(id=int(data['chat_id'])).first())
     database.session.add(invitation)
     database.session.commit()
-   
     return emit('invitation', {'result': True, 'new_user_name': new_user.username}, to=int(data['chat_id']))
 
 
