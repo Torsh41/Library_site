@@ -8,15 +8,20 @@ function create_private_chat()
             dataType: 'json',
             data: $('#new_private_chat_form').serialize(),
             success: function(response) {
-                if (response.result)
+                if (response.result === 2)
                 {
                     alert('Чат успешно создан!');
                     $('#add_info_sec').css('display', 'none');
                     $('#name_field').val("");
                 }
-                else
+                else if (response.result === 1)
                 {
                     alert('Вы уже создавали чат с такой темой!');
+                    $('#name_field').val("");
+                }
+                else
+                {
+                    alert('Можно создавать не более 10 приватных чатов для одного человека!');
                     $('#name_field').val("");
                 }
             },

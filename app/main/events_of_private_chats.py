@@ -1,6 +1,6 @@
 from flask_socketio import emit, join_room
 from .. import socketio
-from app.main import ELEMS_COUNT, months_dict
+from app.main import ELEMS_COUNT, months_dict, MAX_INVITATIONS
 from app import database
 from app.models import User, PrivateChatPost, PrivateChat, ChatInvitation
 from flask_login import current_user, login_required
@@ -108,11 +108,26 @@ def edit_post(data):
     return emit('edit post response', {'chat_id': data['chat_id'], 'post_id': data['post_id'], 'post_body': post.body, 'username': current_user.username}, to=room)
 
 
-@socketio.on('get invite', namespace='/private_chat/invitation')
+@socketio.on('get invite', namespace='/private_chat')
 @login_required
 @check_actual_password
 def invite(data):
-    invitation = ChatInvitation(user=User.query.filter_by(id=int(data['user_id'])).first(), private_chat=PrivateChat.query.filter_by(id=int(data['chat_id'])).first())
+    chat_invitations_count = len(PrivateChat.query.filter_by(id=int(data['chat_id'])).first().invitations.all())
+    if chat_invitations_count >= MAX_INVITATIONS:
+        return emit('invitation', {'result': False}, to=int(data['chat_id']))
+    new_user = User.query.filter_by(id=int(data['user_id'])).first()
+    invitation = ChatInvitation(user=new_user, private_chat=PrivateChat.query.filter_by(id=int(data['chat_id'])).first())
     database.session.add(invitation)
     database.session.commit()
-    socketio.emit('invitation', {'result': True})
+   
+    return emit('invitation', {'result': True, 'new_user_name': new_user.username}, to=int(data['chat_id']))
+
+
+@socketio.on('leave chat', namespace='/private_chat')
+@login_required
+@check_actual_password
+def leave_chat(data):
+    invitation = ChatInvitation.query.filter_by(user_id=current_user.id).filter_by(private_chat_id=int(data['chat_id'])).first()
+    database.session.delete(invitation)
+    database.session.commit()
+    return emit('left', {'result': True, 'username': current_user.username}, to=int(data['chat_id']))

@@ -275,6 +275,7 @@ function get_books_page(url_path, cataloge_id)
   });
 }
 
+
 $(function() {
   $('#pagination_container').on('click', function(event){
     let target = event.target;
@@ -413,13 +414,3 @@ $(function() {
     }
   });
 });
-
-// let observer = new MutationObserver(callback);
-
-// // наблюдать за всем, кроме атрибутов
-// observer.observe(document, {
-//   childList: true, // наблюдать за непосредственными детьми
-//   subtree: true, // и более глубокими потомками
-//   attributes: true,
-//   characterData: true
-// });

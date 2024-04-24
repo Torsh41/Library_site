@@ -600,12 +600,13 @@ def book_del():
 def create_private_chat():
     private_chat_name = request.form.get('private_chat_name').strip().lower()
     if current_user.private_chats.filter_by(name=private_chat_name).first():
-        return jsonify(dict(result=False))
-    
+        return jsonify(dict(result=1))
+    elif len(current_user.private_chats.all()) >= MAX_PRIVATE_CHATS:
+        return jsonify(dict(result=0))
     private_chat = PrivateChat(name=private_chat_name, creator=current_user._get_current_object())
     database.session.add(private_chat)
     database.session.commit()
-    return jsonify(dict(result=True))
+    return jsonify(dict(result=2))
 
 
 @main.route('/forum/private_chats', methods=['GET'])
@@ -739,7 +740,7 @@ def private_chat(chat_id):
         else:
             posts.append({"this_is_answer": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
                          "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
-    return render_template('main/private_chat_discussion.html', user_is_admin=user_is_admin, chat_id=chat.id, chat_name=chat.name, posts_count=len(chat.posts.all()), participants_count=participants_count, posts_pagination=posts_pagination, posts=posts, str=str)
+    return render_template('main/private_chat_discussion.html', chat_creator_id=chat.creator.id, user_is_admin=user_is_admin, chat_id=chat.id, chat_name=chat.name, posts_count=len(chat.posts.all()), participants_count=participants_count, posts_pagination=posts_pagination, posts=posts, str=str)
 
 
 @main.route('/get_posts_page_on_chat_disc/<chat_id>/<page>', methods=['GET'])
@@ -802,7 +803,7 @@ def get_users_page_to_invite(chat_id, page):
             return jsonify([dict(result=False)])
         
         invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
-        users_pagination = User.query.filter((User.id != current_user.id) & (User.id != chat.creator.id) & (User.id in invited_users_id_to_cur_chat)).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        users_pagination = User.query.filter(User.id != current_user.id).filter(User.id != chat.creator.id).filter(~User.id.in_(invited_users_id_to_cur_chat)).paginate(page, per_page=ELEMS_COUNT, error_out=False)
         if not users_pagination.items:
             return jsonify([dict(result=False)])
         pages_count = list(users_pagination.iter_pages())

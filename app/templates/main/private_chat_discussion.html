@@ -117,6 +117,9 @@
           <div class="main__bottom forum-main-bottom">
             <a class="main__bottom-item" href="{{url_for('main.forum')}}">Главная страница форума</a>
             <a id="invite_participant" class="main__bottom-item">Пригласить участника</a>
+            {% if current_user.id != chat_creator_id %}
+              <a id="leave_chat" class="main__bottom-item">Покинуть чат</a>
+            {% endif %}
             <a id="write_msg" data-username="{{current_user.username}};{{user_is_admin}};{{chat_id}}" class="main__bottom-item" href="#1">Написать сообщение</a>
           </div>
   
