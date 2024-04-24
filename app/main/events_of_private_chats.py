@@ -112,7 +112,7 @@ def edit_post(data):
 @login_required
 @check_actual_password
 def invite(data):
-    chat_invitations_count = len(PrivateChat.query.filter_by(id=int(data['chat_id'])).first().invitations.all())
+    chat_invitations_count = PrivateChat.query.filter_by(id=int(data['chat_id'])).first().invitations.count()
     if chat_invitations_count >= MAX_INVITATIONS:
         return emit('invitation', {'result': False}, to=int(data['chat_id']))
     new_user = User.query.filter_by(id=int(data['user_id'])).first()

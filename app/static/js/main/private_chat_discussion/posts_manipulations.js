@@ -477,6 +477,16 @@ $(function() {
     edit_post_on_forum_discussion(data.chat_id, data.post_id, data.post_body, data.username);
   });
 
+  socket.on('left', function (response) {
+    alert('Пользователь с именем ' + response.username + ' покинул чат!');
+    let participants_count = Number(document.getElementById('participants_count').textContent.split(' ')[1]);
+    document.getElementById('participants_count').textContent = 'Участников: ' + (participants_count - 1);
+    if (response.username == cur_username)
+    {
+      window.location.href = '/forum/private_chats';
+    }
+  });
+
   $('#disc_posts_container').on('click', function(event) {
       let target = event.target;
       if (target.tagName === 'A' && target.id.includes('post_d'))
@@ -524,12 +534,6 @@ $(function() {
     if (confirm('Вы уверены, что хотите покинуть чат?'))
     {
       socket.emit('leave chat', {chat_id: chat_id});
-      socket.on('left', function (response) {
-        alert('Пользователь с именем ' + response.username + ' покинул чат!');
-        let participants_count = Number(document.getElementById('participants_count').textContent.split(' ')[1]);
-        document.getElementById('participants_count').textContent = 'Участников: ' + (participants_count - 1);
-        window.location.href = '/forum/private_chats';
-      });
     }
   });
 });

@@ -114,20 +114,21 @@ $(function() {
                 user_id: user_id,
                 chat_id: chat_id
             });
-            socket.on("invitation", function (response) {
-               if (response.result)
-               {
-                    $('#invite_participant_sec').css('display', 'none');
-                    alert('К нам присоединился пользователь с именем ' + response.new_user_name + '!');
-                    let participants_count = Number(document.getElementById('participants_count').textContent.split(' ')[1]);
-                    document.getElementById('participants_count').textContent = 'Участников: ' + (participants_count + 1);
-               }
-               else
-               {
-                   $('#invite_participant_sec').css('display', 'none');
-                   alert('Участников чата может быть не более 30!');
-               }
-            });
+        }
+    });
+
+    socket.on("invitation", function (response) {
+        if (response.result)
+        {
+             $('#invite_participant_sec').css('display', 'none');
+             alert('К нам присоединился пользователь с именем ' + response.new_user_name + '!');
+             let participants_count = Number(document.getElementById('participants_count').textContent.split(' ')[1]);
+             document.getElementById('participants_count').textContent = 'Участников: ' + (participants_count + 1);
+        }
+        else
+        {
+            $('#invite_participant_sec').css('display', 'none');
+            alert('Участников чата может быть не более 30!');
         }
     });
 
