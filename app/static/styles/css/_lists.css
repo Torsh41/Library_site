@@ -6,7 +6,7 @@
 .list__wrap {
   padding: 52px 52px;
   border-radius: 15px;
-  background-color: #cec8bd;
+  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
 }
 
 .list-best__wrap {
@@ -25,8 +25,7 @@
   align-items: center;
   /* padding: 52px 52px; */
   border-radius: 15px;
-  background-color: #cec8bd;
-  background: linear-gradient(45deg, #e8e3db 30%, #c5beb2 60%);
+  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
 }
 
 .lists__create {
@@ -87,7 +86,7 @@
   width: 600px;
   padding: 52px 52px;
   border-radius: 15px;
-  background-color: #cec8bd;
+  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
 }
 
 .list__books {
@@ -105,6 +104,7 @@
   position: relative;
   width: 222px;
   height: 300px;
+  margin-left: 0;
   margin-bottom: 48px;
   background-color: #fdfde9;
   transition: background-color 0.3s linear, border 0.3s linear;
@@ -170,6 +170,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-left: 0;
   transition: background-color 0.3s linear;
   cursor: pointer;
 }
