@@ -1,24 +1,10 @@
 from flask_socketio import emit
 from .. import socketio
+from app.main import ELEMS_COUNT, months_dict
 from app import database
 from app.models import User, TopicPost, DiscussionTopic
 from flask_login import current_user, login_required
 from app.decorators import check_actual_password
-ELEMS_COUNT = 10
-months_dict = {
-    1: 'января',
-    2: 'февраля',
-    3: 'марта',
-    4: 'апреля',
-    5: 'мая',
-    6: 'июня',
-    7: 'июля',
-    8: 'августа',
-    9: 'сентября',
-    10: 'октября',
-    11: 'ноября',
-    12: 'декабря'
-}
 
 
 @socketio.on('send post')

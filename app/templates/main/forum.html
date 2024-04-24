@@ -12,6 +12,7 @@
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/forum/pagination.js')}}"></script>
   <script src="{{ url_for('static', filename='js/main/forum/search_on_forum.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/forum/create_private_chat.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
   <style>
     * {
@@ -107,28 +108,46 @@
               {% endif %}
               {% if current_user.role == Role.ADMIN %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
+              {% endif %}
+              {% if current_user.is_authenticated %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               {% endif %}
             </ul>
           </div>
-  
         </nav>
   
       </div>
     </header>
   
     <main id="main_block">
-      <section class="loginPopup" id="popupForm" style="display: {{ display }}">
-        <div class="formPopup">
-          <form id="add_topic_form" class="formContainer-comments" action="" method="post">
-  
-              <textarea type="text" id="topic_name_id_form" class="comments__textarea-popup" name="topic_name" rows="5"
-                placeholder="Введите название темы раздела.." required></textarea>
-  
-            <input class="popup__btn" type="button" id="add_topic_button" value="Добавить">
-            <button id="cl_form" type="button" class="popup__btn-end">Отменить</button>
-          </form>
-        </div>
-      </section>
+      {% if current_user.is_authenticated %}
+        <section class="loginPopup" id="popupForm" style="display: {{ display }}">
+          <div class="formPopup">
+            <form id="add_topic_form" class="formContainer-comments" action="" method="post">
+    
+                <textarea type="text" id="topic_name_id_form" class="comments__textarea-popup" name="topic_name" rows="5"
+                  placeholder="Введите название темы раздела.." required></textarea>
+    
+              <input class="popup__btn" type="button" id="add_topic_button" value="Добавить">
+              <button id="cl_form" type="button" class="popup__btn-end">Отменить</button>
+            </form>
+          </div>
+        </section>
+        <section class="popup" id="add_info_sec" style="display: none;">
+          <div class="popup__formPopup">
+              <h2 class="popup__title title">Создание приватного чата</h2>
+              <form id="new_private_chat_form" class="popup__formContainer" method="post">
+                <input id="name_field" type="text" class="main__form-input" name="private_chat_name" maxlength="120" placeholder="Введите тему приватного чата..">
+                  <div class="popup__btns">
+                      <input id="new_private_chat_but" class="popup__btn" type="button" value="Создать">
+                      <button id="close_form" type="button" class="popup__btn-end">Отменить</button>
+                  </div>
+              </form>
+          </div>
+        </section>
+      {% endif %}
   
       <section id="first_section" class="main">
         <div class="main__container container">
@@ -161,6 +180,9 @@
                   placeholder="Введите название раздела..">
               </label>
               <button id="found_category" class="main__form-btn btn">Найти</button>
+              {% if current_user.is_authenticated %}
+                <a id="add_private_chat" class="main__form-btn btn">Создать приватный чат</a>
+              {% endif %}
             </form>
           </div>
         </div>

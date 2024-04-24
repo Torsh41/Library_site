@@ -26,9 +26,12 @@ class User(UserMixin, database.Model, SerializerMixin):
     about_me = database.Column(database.Text(), default=False)
     password_hash = database.Column(database.String(128))
     books = database.relationship('Book', backref='user')
+    private_chats = database.relationship('PrivateChat', backref='creator', lazy='dynamic')
+    chats_invitations = database.relationship('ChatInvitation', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")
     grades = database.relationship('BookGrade', backref='user', cascade="all, delete, delete-orphan")
     comments = database.relationship('Comment', backref='user', cascade="all, delete, delete-orphan")
     posts_from_all_topics = database.relationship('TopicPost', backref='user', cascade="all, delete, delete-orphan")
+    posts_from_all_private_chats = database.relationship('PrivateChatPost', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")#, uselist=False)
     confirmed = database.Column(database.Boolean, default=False)
     role = database.Column(database.Boolean, default=False)
@@ -136,6 +139,34 @@ class TopicPost(database.Model, SerializerMixin):
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
 
+
+class PrivateChat(database.Model, SerializerMixin):
+    __tablename__ = "private_chats"
+    id = database.Column(database.Integer, primary_key=True)
+    name = database.Column(database.String(1024), unique=False, index=True)
+    activity = database.Column(database.DateTime, index=True, default=datetime.now)
+    posts = database.relationship('PrivateChatPost', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
+    invitations = database.relationship('ChatInvitation', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
+    creator_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+
+
+class PrivateChatPost(database.Model, SerializerMixin):
+    __tablename__ = "private_chat_posts"
+    id = database.Column(database.Integer, primary_key=True)
+    body = database.Column(database.Text(1024), index=True)
+    file = database.Column(database.LargeBinary, default=False)
+    answer_to_post = database.Column(database.Integer, default=False)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+    private_chat_id = database.Column(database.Integer, database.ForeignKey('private_chats.id')) 
+       
+
+class ChatInvitation(database.Model, SerializerMixin):
+    __tablename__ = "chats_invitations"
+    id = database.Column(database.Integer, primary_key=True)
+    user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+    private_chat_id = database.Column(database.Integer, database.ForeignKey('private_chats.id'))
+    
     
 class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
@@ -145,6 +176,7 @@ class Book(database.Model, SerializerMixin):
     name = database.Column(database.String(128), unique=True, index=True)
     author = database.Column(database.String(128), unique=False)
     publishing_house = database.Column(database.String(128), unique=False)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)

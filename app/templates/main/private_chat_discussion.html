@@ -5,14 +5,15 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Обсуждение темы</title>
+  <title>Приватный чат с обсуждением темы {{ chat_name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
   <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static', filename='js/main/forum_discussion/pagination.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/main/forum_discussion/posts_manipulations.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/private_chat_discussion/pagination.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/private_chat_discussion/posts_manipulations.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/main/private_chat_discussion/invite_participants.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
   <style>
     /* Style for the modal (popup) image */
@@ -104,7 +105,7 @@
         <div class="main__container container" id="main_container">
   
           <div class="main__top">
-            <h1 class="main__title">{{ topic_name }}</h1>
+            <h1 class="main__title">{{ chat_name }}</h1>
   
             <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
               <line y1="0.5" x2="461" y2="0.5" stroke="#fdfde9" />
@@ -115,18 +116,18 @@
   
           <div class="main__bottom forum-main-bottom">
             <a class="main__bottom-item" href="{{url_for('main.forum')}}">Главная страница форума</a>
-            {% if current_user.is_authenticated %}
-              <a id="write_msg" data-username="{{current_user.username}};{{user_is_admin}};{{topic_id}}" class="main__bottom-item" href="#1">Написать сообщение</a>
-            {% endif %}
+            <a id="invite_participant" class="main__bottom-item">Пригласить участника</a>
+            <a id="write_msg" data-username="{{current_user.username}};{{user_is_admin}};{{chat_id}}" class="main__bottom-item" href="#1">Написать сообщение</a>
           </div>
   
           <span class="main__span-forum" id="posts_count">Сообщений: {{posts_count}}</span>
+          <span class="main__span-forum" id="participants_count">Участников: {{participants_count}}</span>
           <!--Количество сообщений в этой теме-->
   
         </div>
       </section>
   
-      <section class="popup" id="edit_post_sec" style="display: {{ display }}">
+      <section class="popup" id="edit_post_sec" style="display: none">
         <div class="popup__formPopup">
           <h2 class="popup__title title">Редактирование поста</h2>
           <form class="popup__formContainer" action="" id="edit_post_form" method="post">
@@ -138,6 +139,13 @@
               <button id="close_edit_post_form" type="button" class="popup__btn-end">Отменить</button>
             </div>
           </form>
+        </div>
+      </section>
+
+      <section class="popup" id="invite_participant_sec" style="display: none">
+        <div class="popup__formPopup" id="invite_participant_div">
+          <h2 id="invite_title" class="popup__title title">Приглашение участников</h2>
+          <a id="close_invite_form" class="popup__btn-end">Отменить</a>
         </div>
       </section>
   
@@ -199,7 +207,7 @@
                     {{post["body"]}} <!--Сообщение пользователя-->
                   </p>
                   {% if post["file"] %}
-                    <img id="{{post.id}}img" style="width: 80px; height: 80px" src="{{url_for('main.post_screenshot', post_id=post["id"])}}" data-postid="{{post.id}}"/>
+                    <img id="{{post.id}}img" style="width: 80px; height: 80px" src="{{url_for('main.post_screenshot_on_private_chat', post_id=post["id"])}}" data-postid="{{post.id}}"/>
                     <div id="{{post.id}}modal" class="modal">
                       <span class="close" onclick="document.getElementById('{{post.id}}modal').style.display='none'">&times;</span>
                       <img class="modal-content" id="{{post.id}}modal_img">
@@ -209,27 +217,25 @@
                   <!--This block for user (only for his messages)-->
                   {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
                   <div class="message__admin" id="{{post["id"]}}personal_cont">
-                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}">Ответить</a>
-                    <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}" data-body="{{post["body"]}}">Редактировать</a>
-                    <a id="{{post.id}}post_d" class="message__admin-btn" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
+                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                    <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-body="{{post["body"]}}">Редактировать</a>
+                    <a id="{{post.id}}post_d" class="message__admin-btn" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
                   </div>
                   {% elif current_user.role == Role.ADMIN %}
                   <div class="message__admin" id="{{post["id"]}}personal_cont">
                     <a class="comments__command">Админ</a>
-                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}">Ответить</a>
-                    <a id="{{post.id}}post_d" class="message__admin-btn" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
+                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                    <a id="{{post.id}}post_d" class="message__admin-btn" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
                   </div>
                   {% elif current_user.is_authenticated %}
                   <div class="message__admin" id="{{post["id"]}}personal_cont">
-                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-topicid="{{topic_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
                   </div>
                   {% endif %}
                 </div>
               </div>
             {% endfor %}
   
-            <!--Этот блок есть всегда (только для авторизированных пользователей)-->
-            {% if current_user.is_authenticated %}
             <div id="1" class="discussion__btn button">
               <form action="#" enctype="multipart/form-data"
                 class="button__form" id="add_post_form" method="POST">
@@ -237,35 +243,30 @@
                   accept="image/*,image/jpeg">
                 <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text"
                   placeholder="Написать сообщение.."></textarea>
-                  <input id="add_post_button" class="button__write btn" data-topicid="{{topic_id}}" type="button" value="Отправить">
+                  <input id="add_post_button" class="button__write btn" data-chatid="{{chat_id}}" type="button" value="Отправить">
               </form>
             </div>
-            {% else %}
-            <div id="1" class="discussion__btn button">
-              <p class="discussion__help">Писать посты могут только авторизованные пользователи</p>
-            </div>
-            {% endif %}
-  
+         
             {% if posts_pagination %}
-            <div class="list__pagination pagination" id="posts_pagination_container">
-              <ul class="pagination__list list-reset" id="pagination">
-                <li class="pagination__item disabled">
-                  &bull;
-                </li>
-                {% for p in posts_pagination.iter_pages() %}
-                  {% if p %}
-                    <li class="pagination__item active">
-                      <a id="{{p}}posts_p" data-url="/get_posts_page/{{topic_id}}/{{p}}">{{ p }}</a>
-                    </li>
-                  {% else %}
-                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-                  {% endif %}
-                {% endfor %}
-                <li class="pagination__item disabled">
-                  &bull;
-                </li>
-              </ul>
-            </div>
+                <div class="list__pagination pagination" id="posts_pagination_container">
+                    <ul class="pagination__list list-reset" id="pagination">
+                        <li class="pagination__item disabled">
+                            &bull;
+                        </li>
+                        {% for p in posts_pagination.iter_pages() %}
+                        {% if p %}
+                                <li class="pagination__item active">
+                                    <a id="{{p}}posts_p" data-url="/get_posts_page_on_chat_disc/{{chat_id}}/{{p}}">{{ p }}</a>
+                                </li>
+                            {% else %}
+                                <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li class="pagination__item disabled">
+                            &bull;
+                        </li>
+                    </ul>
+                </div>
             {% endif %}
           </div>
         </div>

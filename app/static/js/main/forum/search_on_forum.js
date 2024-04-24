@@ -78,14 +78,14 @@ function search_category_on_forum()
                           if (topics[0].pages > 1 && page == topics[0].cur_page)
                           {
                             html += `<li class="pagination__item_cur_page">
-                                        <a id='${i}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${page}' data-catid='${category.id}'>${page}</a>
+                                        <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${page}' data-catid='${category.id}'>${page}</a>
                                       </li>`;
                           }
                           else
                           {
                             html += `<li class="pagination__item active">
-                              <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${page}' data-catid='${category.id}'>${page}</a>
-                              </li>`;
+                                      <a id='${page}topics_p' data-url='/get_topics_page_on_forum/${category.id}/${page}' data-catid='${category.id}'>${page}</a>
+                                    </li>`;
                           }
                         }
                         else
@@ -137,6 +137,7 @@ function search_category_on_forum()
                     </section>`;
             section = document.getElementById('first_section');
             section.insertAdjacentHTML('afterend', html);
+            document.getElementById('not_found').scrollIntoView(); // Прокрутка до верхней границы
           }
         },
         error: function(jqXHR, exception) {

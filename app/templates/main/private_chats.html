@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Приватные чаты {{ current_user.username }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
+        <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+        <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/main/forum/pagination.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/main/forum/search_on_forum.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/main/private_chats/pagination.js')}}"></script>
+        <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+    </head>
+
+    <body>
+        <div class="content">
+            <header class="header">
+            <div class="header__container container">
+                <a class="header__logo" href="{{url_for('main.index')}}">
+                <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}" alt="Логотип MAGIC BOOK KEEPER">
+                </a>
+        
+                <div class="header__right">
+                <span class="header__menu">Меню</span>
+                <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+                    <span class="hamburger__box">
+                    <span class="hamburger__inner"></span>
+                    </span>
+                </button>
+                </div>
+        
+                <nav class="nav header__nav">
+                    <div class="nav__menu js-menu-wrap">
+                        <ul class="nav__list list-reset">
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+                            {% if current_user.is_authenticated %}
+                                <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+                            {% else %}
+                                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
+                            {% endif %}
+                            {% if current_user.role == Role.ADMIN %}
+                                <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
+                            {% endif %}
+                            {% if current_user.is_authenticated %}
+                                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            </header>
+        
+            <main>
+                <section class="main">
+                <div class="main__container container">
+                    <div class="main__top">
+                    <h1 class="main__title">Все ваши приватные чаты, которые вы создали, и в которые вас пригласили</h1>
+                    <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
+                    </svg>
+                    </div>
+                    <div class="main__bottom">
+                    </div>
+                </div>
+                </section>
+            
+                <section id="chats_section" class="category">
+                    <div class="category__container container">
+                        <div class="category__wrap" id="chats_div">
+                            {% if chats_info %}
+                                <ul class="category__list list-reset" id="chats_block">
+                                    {% for chat_info in chats_info %}
+                                        <li id="{{chat_info[0]}}chat_block" class="category__elem"><a id="{{chat_info[0]}}chat_name" href="{{url_for('main.private_chat', chat_id=chat_info[0])}}" class="category__book-link">
+                                            <div class="category__block">{{ chat_info[1] }}</div></a>
+                                            {% if chat_info[2] == "created" %}
+                                                <a class="category__btn" id="{{chat_info[0]}}del_chat" data-page="1" data-chatid="{{chat_info[0]}}">Удалить чат</a>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="list__pagination pagination" id="chats_pagination_container">
+                                    <ul class="pagination__list list-reset" id="pagination">
+                                        <li class="pagination__item disabled">
+                                            &bull;
+                                        </li>
+                                        {% if pages %}
+                                            {% for p in range(1, pages + 1) %}
+                                                {% if p %}
+                                                    <li class="pagination__item active">
+                                                        <a id="{{p}}chats_pagi" data-url="/forum/get_chats_page/{{p}}">{{ p }}</a>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        <li class="pagination__item disabled">
+                                            &bull; 
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% else %}
+                                <div class="list__wrap">
+                                    <a class="title list__name" href="{{url_for('main.forum')}}">У вас пока нет приватных чатов, но вы можете создать их на странице форума</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    
+        <footer class="footer">
+            <div class="footer__container container">
+            <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+            </div>
+        </footer>
+    </body>
+</html>

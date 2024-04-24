@@ -68,7 +68,7 @@
               </label>
     
               {{form.age(class="profile__input", value=age, placeholder="Введите возраст..")}}
-              <textarea class="profile__text" default="Love that" id="description" maxlength="100" name="description" placeholder="Расскажите о себе.." required="" rows="5">{{ about_me }}</textarea>
+              <textarea class="profile__text" id="description" maxlength="40" name="description" placeholder="Расскажите о себе.." required="" rows="5">{{ about_me }}</textarea>
               {{form.submit(class="profile__edit-btn")}}
             </form>
     
