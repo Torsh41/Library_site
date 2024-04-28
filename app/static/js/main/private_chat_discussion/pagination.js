@@ -61,7 +61,7 @@ $(function() {
                                   </a>
                                 </div>
               
-                                <div class="message__name-info">
+                                <div class="message__name-info" id="${post.id}user_info">
                                   <p class="message__info">  
                                   <span class="message__span">
                                     ${post.age}
@@ -77,11 +77,13 @@ $(function() {
                                   </span>
                                   </p>
                                   <span class="message__span">На сайте с ${post.user_day + " " + post.user_month +
-                                  " " + post.user_year}</span>
-                                </div>
-                              </div>
-            
-                              <div class="message__right" id="${post.id}msg_write_id">`;
+                                  " " + post.user_year}</span>`;
+                                  if (post.edited)
+                                  {
+                                    html += `<span class="message__span" id="${post.id}edited">изменено</span>`;
+                                  }
+                              html += `</div></div>`;
+                              html += `<div class="message__right" id="${post.id}msg_write_id">`;
                               if (post.this_is_answer)
                               {
                                 html += `<div class="message__answer" id="${post.id}base_to_answer">

@@ -31,10 +31,11 @@ function get_users_page(chat_id, url_path=`/forum/private_chat/${chat_id}/get_us
         url: url_path,
         dataType: 'json',
         success: function (response) {
-            $('div').filter(function() {
+            users = Array.from(response); let html = "";
+            $('#invite_participant_sec').find('div').filter(function() {
                 return this.id.match(/user/) || this.id.match('not_found');
             }).remove();
-            users = Array.from(response); let html = "";
+
             if (users[0].result)
             {
                 users.forEach(user => {

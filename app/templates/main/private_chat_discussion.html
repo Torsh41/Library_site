@@ -126,7 +126,6 @@
           <span class="main__span-forum" id="posts_count">Сообщений: {{posts_count}}</span>
           <span class="main__span-forum" id="participants_count">Участников: {{participants_count}}</span>
           <!--Количество сообщений в этой теме-->
-  
         </div>
       </section>
   
@@ -172,7 +171,7 @@
                       </a>
                   </div>
   
-                  <div class="message__name-info">
+                  <div class="message__name-info" id="{{post.id}}user_info">
                     <p class="message__info">
                       <span class="message__span">
                         {{post["age"]}}
@@ -190,6 +189,11 @@
                     <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " +
                       months_dict[post["user_timestamp"].date().month] +
                       " " + str(post["user_timestamp"].date().year) }}</span>
+                    {% if post["edited"] %}
+                      <span class="message__span" id="{{post.id}}edited">
+                        изменено
+                      </span>
+                    {% endif %}
                   </div>
                 </div>
   

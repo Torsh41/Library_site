@@ -68,7 +68,7 @@ function add_post_on_forum(posts) {
                               </a>
                             </div>
           
-                            <div class="message__name-info">
+                            <div class="message__name-info" id="${post.id}user_info">
                               <p class="message__info">
                                 <span class="message__span">
                                   ${post.age}
@@ -89,11 +89,13 @@ function add_post_on_forum(posts) {
                                 post.user_month +
                                 " " +
                                 post.user_year
-                              }</span>
-                            </div>
-                          </div>
-        
-                          <div class="message__right" id="${post.id}msg_write_id">`;
+                              }</span>`;
+                              if (post.edited)
+                              {
+                                html += `<span class="message__span" id="${post.id}edited">изменено</span>`;
+                              }
+                        html += `</div></div>`;
+                        html += `<div class="message__right" id="${post.id}msg_write_id">`;
     if (post.this_is_answer) 
     {
       if (post.basic_post_exist) 
@@ -278,7 +280,7 @@ function get_posts_page(url_path, post_id=undefined)
                           </a>
                         </div>
       
-                        <div class="message__name-info">
+                        <div class="message__name-info" id="${post.id}user_info">
                           <p class="message__info">  
                           <span class="message__span">
                             ${post.age}
@@ -294,11 +296,13 @@ function get_posts_page(url_path, post_id=undefined)
                           </span>
                           </p>
                           <span class="message__span">На сайте с ${post.user_day + " " + post.user_month +
-                          " " + post.user_year}</span>
-                        </div>
-                      </div>
-    
-                      <div class="message__right" id="${post.id}msg_write_id">`;
+                          " " + post.user_year}</span>`;
+                          if (post.edited)
+                          {
+                            html += `<span class="message__span" id="${post.id}edited">изменено</span>`;
+                          }
+                      html += `</div></div>`;
+                      html += `<div class="message__right" id="${post.id}msg_write_id">`;
                       if (post.this_is_answer)
                       {
                         if (post.basic_post_exist)
@@ -396,7 +400,12 @@ function edit_post_on_forum_discussion(chat_id, post_id, post_body, username)
   $('a').filter(function() {
       return this.id.match(post_id + "edit_post_a");
     }).remove();
-    
+
+  let edited_span = document.getElementById(post_id + 'edited');
+  if (!edited_span)
+  {
+    document.getElementById(post_id + 'user_info').insertAdjacentHTML('beforeend', `<span class="message__span" id="${post_id}edited">изменено</span>`);
+  }
 
   let html = `<p class="message__text" id="${post_id}post_body">
                 ${post_body}
@@ -481,10 +490,6 @@ $(function() {
     alert('Пользователь с именем ' + response.username + ' покинул чат!');
     let participants_count = Number(document.getElementById('participants_count').textContent.split(' ')[1]);
     document.getElementById('participants_count').textContent = 'Участников: ' + (participants_count - 1);
-    if (response.username == cur_username)
-    {
-      window.location.href = '/forum/private_chats';
-    }
   });
 
   $('#disc_posts_container').on('click', function(event) {
@@ -534,6 +539,7 @@ $(function() {
     if (confirm('Вы уверены, что хотите покинуть чат?'))
     {
       socket.emit('leave chat', {chat_id: chat_id});
+      window.location.href = '/forum/private_chats';
     }
   });
 });

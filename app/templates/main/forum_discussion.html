@@ -125,21 +125,23 @@
   
         </div>
       </section>
-  
-      <section class="popup" id="edit_post_sec" style="display: {{ display }}">
-        <div class="popup__formPopup">
-          <h2 class="popup__title title">Редактирование поста</h2>
-          <form class="popup__formContainer" action="" id="edit_post_form" method="post">
-            <textarea type="text" class="popup__textarea" id="edit_post_field" rows="5" name="newComment"
-              placeholder="напишите новый пост..."></textarea>
-  
-            <div class="popup__btns">
-              <input class="popup__btn" id="edit_post" type="button" value="Изменить">
-              <button id="close_edit_post_form" type="button" class="popup__btn-end">Отменить</button>
-            </div>
-          </form>
-        </div>
-      </section>
+      
+      {% if current_user.is_authenticated %}
+        <section class="popup" id="edit_post_sec" style="display: none">
+          <div class="popup__formPopup">
+            <h2 class="popup__title title">Редактирование поста</h2>
+            <form class="popup__formContainer" action="" id="edit_post_form" method="post">
+              <textarea type="text" class="popup__textarea" id="edit_post_field" rows="5" name="newComment"
+                placeholder="напишите новый пост..."></textarea>
+    
+              <div class="popup__btns">
+                <input class="popup__btn" id="edit_post" type="button" value="Изменить">
+                <button id="close_edit_post_form" type="button" class="popup__btn-end">Отменить</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      {% endif %}
   
       <section class="discussion">
         <div class="discussion__container container">
@@ -161,7 +163,7 @@
                       </a>
                   </div>
   
-                  <div class="message__name-info">
+                  <div class="message__name-info" id="{{post.id}}user_info">
                     <p class="message__info">
                       <span class="message__span">
                         {{post["age"]}}
@@ -179,6 +181,11 @@
                     <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " +
                       months_dict[post["user_timestamp"].date().month] +
                       " " + str(post["user_timestamp"].date().year) }}</span>
+                    {% if post["edited"] %}
+                      <span class="message__span" id="{{post.id}}edited">
+                        изменено
+                      </span>
+                    {% endif %}
                   </div>
                 </div>
   
@@ -230,20 +237,20 @@
   
             <!--Этот блок есть всегда (только для авторизированных пользователей)-->
             {% if current_user.is_authenticated %}
-            <div id="1" class="discussion__btn button">
-              <form action="#" enctype="multipart/form-data"
-                class="button__form" id="add_post_form" method="POST">
-                <input class="profile__foto" type="file" id="file_input_id" name="screenshot" multiple
-                  accept="image/*,image/jpeg">
-                <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text"
-                  placeholder="Написать сообщение.."></textarea>
-                  <input id="add_post_button" class="button__write btn" data-topicid="{{topic_id}}" type="button" value="Отправить">
-              </form>
-            </div>
+              <div id="1" class="discussion__btn button">
+                <form action="#" enctype="multipart/form-data"
+                  class="button__form" id="add_post_form" method="POST">
+                  <input class="profile__foto" type="file" id="file_input_id" name="screenshot" multiple
+                    accept="image/*,image/jpeg">
+                  <textarea type="text" name="post_body" id="post_body_id" cols="70" rows="5" class="button__text"
+                    placeholder="Написать сообщение.."></textarea>
+                    <input id="add_post_button" class="button__write btn" data-topicid="{{topic_id}}" type="button" value="Отправить">
+                </form>
+              </div>
             {% else %}
-            <div id="1" class="discussion__btn button">
-              <p class="discussion__help">Писать посты могут только авторизованные пользователи</p>
-            </div>
+              <div id="1" class="discussion__btn button">
+                <p class="discussion__help">Писать посты могут только авторизованные пользователи</p>
+              </div>
             {% endif %}
   
             {% if posts_pagination %}

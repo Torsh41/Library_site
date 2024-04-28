@@ -1,4 +1,4 @@
-from flask_socketio import emit, join_room
+from flask_socketio import emit, join_room, leave_room
 from .. import socketio
 from app.main import ELEMS_COUNT, months_dict, MAX_INVITATIONS
 from app import database
@@ -24,10 +24,10 @@ def add_post(msg):
     chat = PrivateChat.query.filter_by(id=msg['chat_id']).first()
     if msg['filename'] != '':
         post = PrivateChatPost(body=str(msg['post_body']).strip().replace(
-            "'", ""), user=current_user, private_chat=chat, file=msg['screenshot'])
+            "'", ""), edited=False, user=current_user, private_chat=chat, file=msg['screenshot'])
     else:
         post = PrivateChatPost(body=str(msg['post_body']).strip().replace(
-            "'", ""), user=current_user, private_chat=chat, file=bytes(False))
+            "'", ""), edited=False, user=current_user, private_chat=chat, file=bytes(False))
     if post_id_for_answer := msg['post_id_to_answer']:
         post.answer_to_post = post_id_for_answer
     else:
@@ -49,26 +49,26 @@ def add_post(msg):
                     id=post.answer_to_post).first()
                 if post_from:
                     posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, posts_count=len(posts_for_pagi), chat_id=chat.id, cur_page=posts_pagination.page, pages_count=pages_count, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date(
-                    ).month], post_year=str(post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                    ).month], post_year=str(post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, posts_count=len(posts_for_pagi), chat_id=chat.id, cur_page=posts_pagination.page, pages_count=pages_count, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                        post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
             else:
                 posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), chat_id=chat.id, cur_page=posts_pagination.page, pages_count=pages_count, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                    post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                    post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
         else:
             if post.answer_to_post:
                 post_from = chat.posts.filter_by(
                     id=post.answer_to_post).first()
                 if post_from:
                     posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, posts_count=len(posts_for_pagi), chat_id=chat.id, cur_page=posts_pagination.page, pages_count=pages_count, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date(
-                    ).month], post_year=str(post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                    ).month], post_year=str(post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, posts_count=len(posts_for_pagi), chat_id=chat.id, cur_page=posts_pagination.page, pages_count=pages_count, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                        post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
             else:
                 posts.append(dict(this_is_answer=False, posts_count=len(posts_for_pagi), chat_id=chat.id, cur_page=posts_pagination.page, pages_count=pages_count, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                    post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                    post.timestamp.date().year), username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
 
     return emit('add post', {'data': posts}, to=room)
     
@@ -103,6 +103,7 @@ def edit_post(data):
     room = int(data['chat_id'])
     post = PrivateChatPost.query.filter_by(id=data['post_id']).first()
     post.body = str(data['new_post']).strip().replace("'", "")
+    post.edited = True
     database.session.add(post)
     database.session.commit()
     return emit('edit post response', {'chat_id': data['chat_id'], 'post_id': data['post_id'], 'post_body': post.body, 'username': current_user.username}, to=room)
@@ -114,7 +115,7 @@ def edit_post(data):
 def invite(data):
     chat_invitations_count = PrivateChat.query.filter_by(id=int(data['chat_id'])).first().invitations.count()
     if chat_invitations_count >= MAX_INVITATIONS:
-        return emit('invitation', {'result': False}, to=int(data['chat_id']), broadcast=False)
+        return emit('invitation', {'result': False}, to=int(data['chat_id']))
     new_user = User.query.filter_by(id=int(data['user_id'])).first()
     invitation = ChatInvitation(user=new_user, private_chat=PrivateChat.query.filter_by(id=int(data['chat_id'])).first())
     database.session.add(invitation)
@@ -129,4 +130,5 @@ def leave_chat(data):
     invitation = ChatInvitation.query.filter_by(user_id=current_user.id).filter_by(private_chat_id=int(data['chat_id'])).first()
     database.session.delete(invitation)
     database.session.commit()
+    leave_room(int(data['chat_id']))
     return emit('left', {'result': True, 'username': current_user.username}, to=int(data['chat_id']))
