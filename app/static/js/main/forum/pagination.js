@@ -68,17 +68,17 @@ function get_topics_page_on_forum(url_path, category_id)
       topics.forEach(topic => {
           html += `<li class="fraction__list-item" id="${category_id}topic_info">
                       <a href="/forum/${topic.id}" class="fraction__topic-link">
-                        <div class="fraction__topic">
-                          <p class="fraction__text-error">
+                        <div class="fraction__topic" id="${category_id}${topic.id}topic_name_div">
+                          <p class="fraction__text-error" id="${category_id}${topic.id}top_name">
                             ${topic.name}
                           </p> 
                         </div>
                       </a>`;
                     if (topic.cur_user_is_admin)
                     {
-                      html += `<a class="comments__command">Админ</a>
-                                <a id='${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category_id}/${topic.id}/${topic.cur_page}' data-catid='${category_id}'>Удалить</a>`;
-                           
+                      html += `<a class="comments__command" id="${category_id}${topic.id}admin_mark">Админ</a>
+                              <a id="${category_id}${topic.id}change_topic_name" class="comments__command" data-url="/change-topic-name/${category_id}/${topic.id}" data-name="${topic.name}">Редактировать</a>
+                              <a id='${category_id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category_id}/${topic.id}/${topic.cur_page}' data-catid='${category_id}'>Удалить</a>`;
                     }
         html += `</li>`;
       });
@@ -86,7 +86,10 @@ function get_topics_page_on_forum(url_path, category_id)
       div.insertAdjacentHTML('beforeend', html);
 
       // перестройка пагинации
-      topics_pagination_update(topics[0].pages_count, category_id);
+      if (topics.length)
+      {
+        topics_pagination_update(topics[0].pages_count, category_id);
+      }
 
       // выделение текущей страницы
       pagi = document.getElementById(category_id + 'topics_pagi');
@@ -115,6 +118,59 @@ function get_topics_page_on_forum(url_path, category_id)
     }
   });
 }
+
+
+function change_topic_name()
+{
+  if (document.getElementById('changed_topic_name_field').value.trim() && document.getElementById('changed_topic_name_field').value.trim().length <= 100)
+  {
+      $.ajax({
+          method: 'post',
+          url: $("#change_topic_name_form").attr('action'),
+          dataType: 'json',
+          data: $('#change_topic_name_form').serialize(),
+          success: function(response) {
+            $('p').filter(function() {
+              return this.id.match(response.category_id + response.topic_id + "top_name");
+            }).remove();
+            $('a').filter(function() {
+              return this.id.match(response.category_id + response.topic_id + "change_topic_name");
+            }).remove();
+          
+            let html = `<p class="fraction__text-error" id="${response.category_id}${response.topic_id}top_name"> ${response.name}</p>`;
+            let div = document.getElementById(response.category_id + response.topic_id + 'topic_name_div');
+            div.insertAdjacentHTML('afterbegin', html)
+            html = `<a id="${response.category_id}${response.topic_id}change_topic_name" class="comments__command" data-url="/change-topic-name/${response.category_id}/${response.topic_id}" data-name="${response.name}">Редактировать</a>`;
+            let a = document.getElementById(response.category_id + response.topic_id + 'admin_mark');
+            a.insertAdjacentHTML('afterend', html);
+
+            document.getElementById("changed_topic_name_field").value = "";
+            document.getElementById("change_topic_name_form").setAttribute("action", "");
+            document.getElementById("change_topic_name_sec").style.display = "none";
+          },
+          error: function(jqXHR, exception) {
+              if (exception === 'parsererror')
+              {
+                  window.location.href = '/auth/login';
+              }
+              else
+              {
+                  console.log(exception);
+              }
+            }
+      });
+  }
+  else if (document.getElementById('changed_topic_name_field').value.trim().length > 200)
+  {
+    alert('Слишком длинное название темы!');
+  }
+  else
+  {
+    alert('Заполните поле!');
+    document.getElementById('changed_topic_name_field').value = '';
+  }
+}
+
 
 $(function() {
     $('#pagination_container').on('click', function(event) {
@@ -147,11 +203,11 @@ $(function() {
                         if (category.username_of_cur_user)
                         {
                             html += `<li class="fraction__list-item">
-                                          <div class="fraction__topic" data-user='${category.username_of_cur_user}' data-category='${category.name}' data-pagi='${url[url.length - 1]}'>
-                                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg" data-user='${category.username_of_cur_user}' data-category='${category.name}' data-pagi='${url[url.length - 1]}'>
-                                              <g clip-path="url(#clip0_139_2)" data-user='${category.username_of_cur_user}' data-category='${category.name}' data-pagi='${url[url.length - 1]}'>
-                                                <rect x="35" width="8" height="78" fill="#F5F5DC" data-user='${category.username_of_cur_user}' data-category='${category.name}' data-pagi='${url[url.length - 1]}' />
-                                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" data-user='${category.username_of_cur_user}' data-category='${category.name}' data-pagi='${url[url.length - 1]}' />
+                                          <div class="fraction__topic" data-user='${category.username_of_cur_user}' data-category='${category.id}' data-pagi='${url[url.length - 1]}'>
+                                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg" data-user='${category.username_of_cur_user}' data-category='${category.id}' data-pagi='${url[url.length - 1]}'>
+                                              <g clip-path="url(#clip0_139_2)" data-user='${category.username_of_cur_user}' data-category='${category.id}' data-pagi='${url[url.length - 1]}'>
+                                                <rect x="35" width="8" height="78" fill="#F5F5DC" data-user='${category.username_of_cur_user}' data-category='${category.id}' data-pagi='${url[url.length - 1]}' />
+                                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" data-user='${category.username_of_cur_user}' data-category='${category.id}' data-pagi='${url[url.length - 1]}' />
                                               </g>
                                             </svg>
                                           </div>
@@ -173,16 +229,17 @@ $(function() {
                         topics.forEach(topic => {
                             html += `<li class="fraction__list-item" id="${category.id + 'topic_info'}">
                                         <a href="/forum/${topic.id}" class="fraction__topic-link">
-                                          <div class="fraction__topic">
-                                            <p class="fraction__text-error">
+                                          <div class="fraction__topic" id="${category.id}${topic.id}topic_name_div">
+                                            <p class="fraction__text-error" id="${category.id}${topic.id}top_name">
                                               ${topic.name}
                                             </p>
                                           </div>
                                         </a>`;
                             if (category.cur_user_is_admin)
                             {
-                              html += `<a class="comments__command">Админ</a>
-                                      <a id='${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category.id}/${topic.id}/${1}' data-catid='${category.id}'>Удалить</a>`;      
+                              html += `<a class="comments__command" id="${category.id}${topic.id}admin_mark">Админ</a>
+                                      <a id="${category.id}${topic.id}change_topic_name" class="comments__command" data-url="/change-topic-name/${category.id}/${topic.id}" data-name="${topic.name}">Редактировать</a>
+                                      <a id='${category.id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category.id}/${topic.id}/${1}' data-catid='${category.id}'>Удалить</a>`;      
                             }
                             html += `</li>`;
                         });
@@ -254,11 +311,11 @@ $(function() {
         if (target.tagName === 'div' || target.tagName === 'svg' || target.tagName === 'g' || target.tagName === 'rect') 
         {
           let username = target.dataset?.user;
-          let category_name = target.dataset?.category;
+          let category_id = target.dataset?.category;
           let page = target.dataset?.pagi;
           document.getElementById("popupForm").style.display = "block";
           form = document.getElementById("add_topic_form");
-          form.setAttribute("action", `/${username}/${category_name}/add_topic?page=${page}`);
+          form.setAttribute("action", `/${username}/${category_id}/add_topic?page=${page}`);
         }
         else if (target.tagName === 'A' && target.id.includes('topic_d'))
         {
@@ -321,6 +378,14 @@ $(function() {
                 });
             }
         }
+        else if (target.tagName === 'A' && target.id.includes('change_topic_name'))
+        {
+          let url_path = target.dataset?.url;
+          let cur_topic_name = target.dataset?.name;
+          document.getElementById("changed_topic_name_field").value = cur_topic_name;
+          document.getElementById("change_topic_name_form").setAttribute("action", url_path);
+          document.getElementById("change_topic_name_sec").style.display = "block";
+        }
         else if (target.tagName === 'A' && target.id.includes('topics_p')) 
         {
           let url_path = target.dataset?.url;
@@ -332,7 +397,20 @@ $(function() {
     $('#cl_form').on('click', function(event) {
         document.getElementById("popupForm").style.display = "none";
     });
+
+    $('#cl_change_topic_name_form').on('click', function(event) {
+      document.getElementById("change_topic_name_sec").style.display = "none";
+    });
+
+    $('#change_topic_name_button').on('click', function(event) {
+        change_topic_name();
+    });
     
+    $('#change_topic_name_button').submit(function(event) {
+      change_topic_name();
+      event.preventDefault();
+    });
+
     $('#add_topic_button').on('click', function(event) {
         if (document.getElementById('topic_name_id_form').value.trim() && document.getElementById('topic_name_id_form').value.trim().length <= 200)
         {
@@ -358,16 +436,17 @@ $(function() {
                 topics_for_cur_category.forEach(topic => {
                     html += `<li class="fraction__list-item" id="${topic.category_id + 'topic_info'}">
                                 <a href="/forum/${topic.topic_id}" class="fraction__topic-link">
-                                  <div class="fraction__topic">
-                                    <p class="fraction__text-error">
+                                  <div class="fraction__topic" id="${topic.category_id}${topic.topic_id}topic_name_div">
+                                    <p class="fraction__text-error" id="${topic.category_id}${topic.topic_id}top_name">
                                       ${topic.name}
                                     </p>
                                   </div>
                                 </a>`;
                     if (topic.cur_user_is_admin)
                     {
-                      html += `<a class="comments__command">Админ</a>
-                              <a id='${topic.topic_id}topic_d' class="comments__command" data-url='/delete-topic/${topic.category_id}/${topic.topic_id}/${topic.topic_pages}' data-catid='${topic.category_id}'>Удалить</a>`;      
+                      html += `<a class="comments__command" id="${topic.category_id}${topic.topic_id}admin_mark">Админ</a>
+                              <a id="${topic.category_id}${topic.topic_id}change_topic_name" class="comments__command" data-url="/change-topic-name/${topic.category_id}/${topic.topic_id}" data-name="${topic.name}">Редактировать</a>
+                              <a id='${topic.category_id}${topic.topic_id}topic_d' class="comments__command" data-url='/delete-topic/${topic.category_id}/${topic.topic_id}/${topic.topic_pages}' data-catid='${topic.category_id}'>Удалить</a>`;      
                     }
                     html += `</li>`;
                 });

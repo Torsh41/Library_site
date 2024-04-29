@@ -164,21 +164,24 @@ function get_lists_page(url_path)
         }); 
         let div = document.getElementById('lists_container');
         div.insertAdjacentHTML('afterbegin', html);
-        // перестройка пагинации
-        lists_pagination_update(cataloges[0].pages_count, cataloges[0].username);
+        if (cataloges.length)
+        {
+          // перестройка пагинации
+          lists_pagination_update(cataloges[0].pages_count, cataloges[0].username);
 
-        // выделение текущей страницы
-        pagi = document.getElementById('pagination');
-        pagi_li = pagi.querySelector('.pagination__item_cur_page');
-        if (pagi_li)
-        {
-          pagi_li.className = 'pagination__item active';
-        }
-        for (const child of pagi.children)
-        {
-          if (cataloges.length && cataloges[0].cur_page == child.textContent)
+          // выделение текущей страницы
+          pagi = document.getElementById('pagination');
+          pagi_li = pagi.querySelector('.pagination__item_cur_page');
+          if (pagi_li)
           {
-            child.className = 'pagination__item_cur_page';
+            pagi_li.className = 'pagination__item active';
+          }
+          for (const child of pagi.children)
+          {
+            if (cataloges.length && cataloges[0].cur_page == child.textContent)
+            {
+              child.className = 'pagination__item_cur_page';
+            }
           }
         }
       },
@@ -274,6 +277,7 @@ function get_books_page(url_path, cataloge_id)
     }
   });
 }
+
 
 $(function() {
   $('#pagination_container').on('click', function(event){
@@ -413,13 +417,3 @@ $(function() {
     }
   });
 });
-
-// let observer = new MutationObserver(callback);
-
-// // наблюдать за всем, кроме атрибутов
-// observer.observe(document, {
-//   childList: true, // наблюдать за непосредственными детьми
-//   subtree: true, // и более глубокими потомками
-//   attributes: true,
-//   characterData: true
-// });

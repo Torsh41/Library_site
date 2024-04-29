@@ -8,7 +8,6 @@ from app.decorators import admin_required, check_actual_password
 from app.parse_excel import add_many_books
 from datetime import datetime
 import copy
-import codecs
 LISTS_COUNT = 2
 BOOKS_COUNT = 5
 CATEGORIES_COUNT = 5
@@ -261,7 +260,7 @@ def list_delete(username, list_id, page):
     if current_user.username != username:
         return render_template('403.html')
     page = int(page)
-    cataloge = Cataloge.query.filter_by(id=list_id).first()
+    cataloge = current_user.cataloges.filter_by(id=list_id).first()
     database.session.delete(cataloge)
     database.session.commit()
     if cataloges := current_user.cataloges.all():

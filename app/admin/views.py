@@ -176,11 +176,11 @@ def search_books_on_admin_panel(username, category_name):
                 pages_count = list(range(1, pages + 1))      
                              
             # удаление прошлых результатов поиска из бд
-            database.session.query(SearchResult).delete()
+            database.session.query(SearchResult).filter_by(searcher_id=current_user.id).delete()
                  
             books_grades = list()
             for book in books:
-                book_for_cur_result = SearchResult(book)
+                book_for_cur_result = SearchResult(book, searcher_id=current_user.id)
                 database.session.add(book_for_cur_result)
                 grades = book.grades.all()
                 try:
@@ -195,7 +195,7 @@ def search_books_on_admin_panel(username, category_name):
             return jsonify([dict(has_books=False)])
 
     elif page := request.args.get('page', None, type=int):
-        cur_result_pagination = SearchResult.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        cur_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(cur_result_pagination.iter_pages())
         cur_result = cur_result_pagination.items
         if cur_result:
@@ -212,12 +212,12 @@ def del_book(username, category_name, book_id, page):
     page = int(page)
     book = Book.query.filter_by(id=book_id).first()
     database.session.delete(book)
-    book_for_search_result = SearchResult.query.filter_by(id=book_id).first()
+    book_for_search_result = SearchResult.query.filter_by(searcher_id=current_user.id).filter_by(id=book_id).first()
     database.session.delete(book_for_search_result)
     database.session.commit()
-    if books := SearchResult.query.all():
+    if books := SearchResult.query.filter_by(searcher_id=current_user.id).all():
         has_elems = True
-        books_result_pagination = SearchResult.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        books_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(books_result_pagination.iter_pages())
         if not books_result_pagination.items:
             page = page - 1

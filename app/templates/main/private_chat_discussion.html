@@ -117,13 +117,15 @@
           <div class="main__bottom forum-main-bottom">
             <a class="main__bottom-item" href="{{url_for('main.forum')}}">Главная страница форума</a>
             <a id="invite_participant" class="main__bottom-item">Пригласить участника</a>
+            {% if current_user.id != chat_creator_id %}
+              <a id="leave_chat" class="main__bottom-item">Покинуть чат</a>
+            {% endif %}
             <a id="write_msg" data-username="{{current_user.username}};{{user_is_admin}};{{chat_id}}" class="main__bottom-item" href="#1">Написать сообщение</a>
           </div>
   
           <span class="main__span-forum" id="posts_count">Сообщений: {{posts_count}}</span>
           <span class="main__span-forum" id="participants_count">Участников: {{participants_count}}</span>
           <!--Количество сообщений в этой теме-->
-  
         </div>
       </section>
   
@@ -169,7 +171,7 @@
                       </a>
                   </div>
   
-                  <div class="message__name-info">
+                  <div class="message__name-info" id="{{post.id}}user_info">
                     <p class="message__info">
                       <span class="message__span">
                         {{post["age"]}}
@@ -187,6 +189,11 @@
                     <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " +
                       months_dict[post["user_timestamp"].date().month] +
                       " " + str(post["user_timestamp"].date().year) }}</span>
+                    {% if post["edited"] %}
+                      <span class="message__span" id="{{post.id}}edited">
+                        изменено
+                      </span>
+                    {% endif %}
                   </div>
                 </div>
   

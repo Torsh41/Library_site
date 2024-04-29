@@ -29,11 +29,11 @@ function search_category_on_forum()
                         if (category.username_of_cur_user)
                         {
                             html += `<li class="fraction__list-item">
-                                          <div class="fraction__topic" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}">
-                                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}">
-                                              <g clip-path="url(#clip0_139_2)" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}">
-                                                <rect x="35" width="8" height="78" fill="#F5F5DC" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}" />
-                                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" data-user="${category.username_of_cur_user}" data-category="${category.name}" data-pagi="${category.cur_page}" />
+                                          <div class="fraction__topic" data-user="${category.username_of_cur_user}" data-category="${category.id}" data-pagi="${category.cur_page}">
+                                            <svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg" data-user="${category.username_of_cur_user}" data-category="${category.id}" data-pagi="${category.cur_page}">
+                                              <g clip-path="url(#clip0_139_2)" data-user="${category.username_of_cur_user}" data-category="${category.id}" data-pagi="${category.cur_page}">
+                                                <rect x="35" width="8" height="78" fill="#F5F5DC" data-user="${category.username_of_cur_user}" data-category="${category.id}" data-pagi="${category.cur_page}" />
+                                                <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" data-user="${category.username_of_cur_user}" data-category="${category.id}" data-pagi="${category.cur_page}" />
                                               </g>
                                             </svg>
                                           </div>
@@ -56,11 +56,17 @@ function search_category_on_forum()
           
                           html += `<li class="fraction__list-item" id="${category.id}topic_info">
                                     <a href="/forum/${topic.id}" class="fraction__topic-link" id="${category.id + 'topic_info'}">
-                                      <div class="fraction__topic">
-                                        <p class="fraction__text-error"> ${topic.name}</p>
+                                      <div class="fraction__topic" id="${category.id}${topic.id}topic_name_div">
+                                        <p class="fraction__text-error" id="${category.id}${topic.id}top_name">${topic.name}</p>
                                       </div>
-                                    </a>
-                                  </li>`;                    
+                                    </a>`;
+                                    if (category.cur_user_is_admin)
+                                    {
+                                      html += `<a class="comments__command" id="${category.id}${topic.id}admin_mark">Админ</a>
+                                              <a id="${category.id}${topic.id}change_topic_name" class="comments__command" data-url="/change-topic-name/${category.id}/${topic.id}" data-name="${topic.name}">Редактировать</a>
+                                              <a id='${category.id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category.id}/${topic.id}/${1}' data-catid='${category.id}'>Удалить</a>`;      
+                                    }
+                                 html+= `</li>`;                    
                         });
 
                     html += `</ul>`;
