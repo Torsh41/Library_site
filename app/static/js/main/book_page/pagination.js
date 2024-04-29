@@ -129,6 +129,7 @@ function edit_comment_ajax()
               html = `<a id="${response.id}edit_com_a" data-combody="${response.body}" data-username="${response.username}" data-bookname="${response.book_name}" data-comid="${response.id}" class="comments__command">Редактировать</a>`;
               div.insertAdjacentHTML('afterbegin', html)
               document.getElementById("edit_comment_field").value = "";
+              document.getElementById("edit_comment_form").setAttribute("action", "");
               document.getElementById("edit_comment_sec").style.display = "none";
             },
             error: function(jqXHR, exception) {
@@ -223,7 +224,7 @@ $(function() {
           let text = target.dataset?.combody;
           document.getElementById("edit_comment_sec").style.display = "block";
           document.getElementById("edit_comment_field").value = text;
-          form = document.getElementById("edit_comment_form");
+          let form = document.getElementById("edit_comment_form");
           form.setAttribute("action", `/${username}/${book_name}/edit-comment/${comment_id}`);
         }
     });

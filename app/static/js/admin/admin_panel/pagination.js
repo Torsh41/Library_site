@@ -50,21 +50,24 @@ function get_user_search_page(url_path, pagination_id)
             });
             document.getElementById("users_search_list").innerHTML = html;
 
-            // перестройка пагинации
-            users_pagination_update(users[0].pages_count);
+            if (users.length)
+            {
+              // перестройка пагинации
+              users_pagination_update(users[0].pages_count);
 
-            // выделение текущей страницы
-            pagi = document.getElementById('1pagination');
-            pagi_li = pagi.querySelector('.pagination__item_cur_page');
-            if (pagi_li)
-            {
-              pagi_li.className = 'pagination__item active';
-            }
-            for (const child of pagi.children)
-            {
-              if (users.length && users[0].cur_page == child.textContent)
+              // выделение текущей страницы
+              pagi = document.getElementById('1pagination');
+              pagi_li = pagi.querySelector('.pagination__item_cur_page');
+              if (pagi_li)
               {
-                child.className = 'pagination__item_cur_page';
+                pagi_li.className = 'pagination__item active';
+              }
+              for (const child of pagi.children)
+              {
+                if (users.length && users[0].cur_page == child.textContent)
+                {
+                  child.className = 'pagination__item_cur_page';
+                }
               }
             }
         },

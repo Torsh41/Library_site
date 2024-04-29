@@ -381,23 +381,26 @@ def search_category_on_forum():
             categories_topics[category.id] = copy.deepcopy(category_topics)
 
         if current_user.is_authenticated:
+            if current_user.role == Role.ADMIN:
+                is_admin = True
+            else:
+                is_admin = False
             username_of_cur_user = current_user.username
         else:
-            username_of_cur_user = False
-        return jsonify([dict(result=True, cur_page=page, username_of_cur_user=username_of_cur_user, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(cur_page_category.topics.all())) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
+            username_of_cur_user = False; is_admin = False
+        return jsonify([dict(result=True, cur_page=page, username_of_cur_user=username_of_cur_user, cur_user_is_admin=is_admin, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(cur_page_category.topics.all())) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
     else:
         return jsonify([dict(result=False)])
 
 
-@main.route('/<username>/<category_name>/add_topic', methods=['POST'])
+@main.route('/<username>/<category_id>/add_topic', methods=['POST'])
 @login_required
 @check_actual_password
-def add_topic(username, category_name):
+def add_topic(username, category_id):
     if current_user.username != username:
         return render_template('403.html')
-    page = request.args.get('page', 1, type=int)
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
-    cur_category = Category.query.filter_by(name=category_name).first()
+    cur_category = Category.query.filter_by(id=int(category_id)).first()
     result = True
     for topic in cur_category.topics.all():
         if topic.name == in_topic_name:
@@ -601,7 +604,7 @@ def create_private_chat():
     private_chat_name = request.form.get('private_chat_name').strip().lower()
     if current_user.private_chats.filter_by(name=private_chat_name).first():
         return jsonify(dict(result=1))
-    elif len(current_user.private_chats.all()) >= MAX_PRIVATE_CHATS:
+    elif len(current_user.private_chats.all()) >= MAX_PRIVATE_CHATS_PER_USER:
         return jsonify(dict(result=0))
     private_chat = PrivateChat(name=private_chat_name, creator=current_user._get_current_object())
     database.session.add(private_chat)
@@ -747,19 +750,14 @@ def private_chat(chat_id):
 @login_required
 @check_actual_password
 def get_posts_page_on_chat_disc(chat_id, page):
-    page = int(page)
+    page = int(page); posts = list()
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     posts_pagination = chat.posts.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
-    posts = list()
-    if current_user.is_authenticated:
-        username = current_user.username
-        if current_user.role == Role.ADMIN:
-            user_is_admin = True
-        else:
-            user_is_admin = False
+    username = current_user.username
+    if current_user.role == Role.ADMIN:
+        user_is_admin = True
     else:
-        username = None
         user_is_admin = False
 
     for post in posts_pagination.items:
@@ -810,4 +808,19 @@ def get_users_page_to_invite(chat_id, page):
         users = users_pagination.items
         return jsonify([dict(result=True, cur_page=page, id=user.id, username=user.username, pages_count=pages_count, chat_id=chat.id) for user in users])
     else:
+        return render_template('404.html')
+    
+
+@main.route('/change-topic-name/<category_id>/<topic_id>', methods=['POST'])
+@admin_required
+@check_actual_password 
+def change_topic_name(category_id, topic_id):
+    try:
+        category = Category.query.filter_by(id=category_id).first()
+        topic = category.topics.filter_by(id=topic_id).first()
+        topic.name = str(request.form.get('topic_changed_name')).strip().replace("'", "")
+        database.session.add(topic)
+        database.session.commit()
+        return jsonify(dict(category_id=category_id, topic_id=topic_id, name=topic.name, username=current_user.username))
+    except:
         return render_template('404.html')

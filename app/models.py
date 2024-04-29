@@ -233,15 +233,15 @@ class SearchResult(database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary, default=False)
     isbn = database.Column(database.String(64), unique=False)
-    name = database.Column(database.String(64), unique=True, index=True)
+    name = database.Column(database.String(64), unique=False, index=True)
     author = database.Column(database.String(64), unique=False)
     publishing_house = database.Column(database.String(64), unique=False)
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
     grade = database.Column(database.Integer, unique=False)
-    def __init__(self, book: Book):
-        self.id = book.id
+    searcher_id = database.Column(database.Integer, unique=False)
+    def __init__(self, book: Book, searcher_id=None):
         self.cover = book.cover
         self.isbn = book.isbn
         self.name = book.name
@@ -254,6 +254,7 @@ class SearchResult(database.Model, SerializerMixin):
             self.grade = round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)
         except:
             self.grade = 0
+        self.searcher_id = searcher_id
     
 
 class BooksMaintaining(database.Model, SerializerMixin):

@@ -148,6 +148,21 @@
           </div>
         </section>
       {% endif %}
+
+      {% if current_user.role == Role.ADMIN %}
+        <section class="loginPopup" id="change_topic_name_sec" style="display: none">
+          <div class="formPopup">
+            <form id="change_topic_name_form" class="formContainer-comments" action="" method="post">
+    
+                <textarea type="text" id="changed_topic_name_field" class="comments__textarea-popup" name="topic_changed_name" rows="5"
+                  placeholder="Введите название темы раздела.." required></textarea>
+    
+              <input class="popup__btn" type="button" id="change_topic_name_button" value="Изменить">
+              <button id="cl_change_topic_name_form" type="button" class="popup__btn-end">Отменить</button>
+            </form>
+          </div>
+        </section>
+      {% endif %}
   
       <section id="first_section" class="main">
         <div class="main__container container">
@@ -191,76 +206,77 @@
       <div id="categories_container">
         <!--Секция для одного раздела (все разделы идут друг за другом)-->
         {% for category, topics_pagination in zip(categories, pagination_for_topics_foreach_category) %}
-        <section id="{{category.id}}category_info" class="fraction">
-          <div class="fraction__container container" id="{{category.id}}category_main_cont">
-            <div class="fraction__wrap">
-              <h2 class="fraction__title title" id="{{ category.id }}category_title">{{ category.name }}</h2>
-              <!--The title of the category/section-->
-  
-              <span class="fraction__results" id="{{category.id}}topics_count"> Всего тем: {{ len(category.topics.all()) }}</span>
-              <ul class="fraction__topic-list list-reset" id="{{ category.id }}grid_container">
-                {% if current_user.is_authenticated %}
-                <li class="fraction__list-item">
-                    <!--Add the new topic (for users)-->
-                    <div class="fraction__topic" id="{{category.id}}open_form_bt" class="fraction__topic-link" data-user="{{ current_user.username }}" data-category="{{ category.name }}" data-pagi="{{ category_pagination.page }}">
-                      <svg class="list__svg2" width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg" data-user="{{ current_user.username }}" data-category="{{ category.name }}" data-pagi="{{ category_pagination.page }}">
-                        <g clip-path="url(#clip0_139_2)" data-user="{{ current_user.username }}" data-category="{{ category.name }}" data-pagi="{{ category_pagination.page }}">
-                          <rect x="35" width="8" height="78" fill="#F5F5DC" data-user="{{ current_user.username }}" data-category="{{ category.name }}" data-pagi="{{ category_pagination.page }}"/>
-                          <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" data-user="{{ current_user.username }}" data-category="{{ category.name }}" data-pagi="{{ category_pagination.page }}"/>
-                        </g>
-                      </svg>
-                    </div>
-                </li>
-                {% else %}
-                <li class="fraction__list-item">
-                  <a class="fraction__topic-link">
-                    <div class="fraction__topic">
-                      <p class="fraction__text-error">Создавать темы могут только авторизованные пользователи.</p>
-                    </div>
-                  </a>
-                </li>
-                {% endif %}
-  
-  
-                {% for topic in topics_pagination.items %}
-                <li class="fraction__list-item" id="{{ category.id }}topic_info">
-                  <a href="{{url_for('main.topic', topic_id=topic.id)}}" class="fraction__topic-link">
-                    <div class="fraction__topic">
-                      <p class="fraction__text-error"> {{ topic.name }}</p>
-                    </div>
-                  </a>
-                  {% if current_user.role == Role.ADMIN %}
-                    <a class="comments__command">Админ</a>
-                    <a id="{{category.id}}{{topic.id}}topic_d" class="comments__command" data-url="/delete-topic/{{category.id}}/{{topic.id}}/{{1}}" data-catid="{{category.id}}">Удалить</a>
+          <section id="{{category.id}}category_info" class="fraction">
+            <div class="fraction__container container" id="{{category.id}}category_main_cont">
+              <div class="fraction__wrap">
+                <h2 class="fraction__title title" id="{{ category.id }}category_title">{{ category.name }}</h2>
+                <!--The title of the category/section-->
+    
+                <span class="fraction__results" id="{{category.id}}topics_count"> Всего тем: {{ len(category.topics.all()) }}</span>
+                <ul class="fraction__topic-list list-reset" id="{{ category.id }}grid_container">
+                  {% if current_user.is_authenticated %}
+                  <li class="fraction__list-item">
+                      <!--Add the new topic (for users)-->
+                      <div class="fraction__topic" id="{{category.id}}open_form_bt" class="fraction__topic-link" data-user="{{ current_user.username }}" data-category="{{ category.id }}" data-pagi="{{ category_pagination.page }}">
+                        <svg class="list__svg2" width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg" data-user="{{ current_user.username }}" data-category="{{ category.id }}" data-pagi="{{ category_pagination.page }}">
+                          <g clip-path="url(#clip0_139_2)" data-user="{{ current_user.username }}" data-category="{{ category.id }}" data-pagi="{{ category_pagination.page }}">
+                            <rect x="35" width="8" height="78" fill="#F5F5DC" data-user="{{ current_user.username }}" data-category="{{ category.id }}" data-pagi="{{ category_pagination.page }}"/>
+                            <rect x="78" y="35" width="8" height="78" transform="rotate(90 78 35)" fill="#F5F5DC" data-user="{{ current_user.username }}" data-category="{{ category.id }}" data-pagi="{{ category_pagination.page }}"/>
+                          </g>
+                        </svg>
+                      </div>
+                  </li>
+                  {% else %}
+                  <li class="fraction__list-item">
+                    <a class="fraction__topic-link">
+                      <div class="fraction__topic">
+                        <p class="fraction__text-error">Создавать темы могут только авторизованные пользователи.</p>
+                      </div>
+                    </a>
+                  </li>
                   {% endif %}
-                </li>
-                {% endfor %}
-              </ul>
-  
-              {% if topics_pagination %}
-              <div class="list__pagination pagination" id="{{category.id}}topics_pagi_container">
-                <ul class="pagination__list list-reset" id="{{category.id}}topics_pagi">
-                  <li class="pagination__item disabled">
-                    &bull;
-                  </li>
-                  {% for p in topics_pagination.iter_pages() %}
-                    {% if p %}
-                      <li class="pagination__item active">
-                        <a id="{{p}}topics_p" data-url="/get_topics_page_on_forum/{{category.id}}/{{p}}" data-catid="{{category.id}}">{{p}}</a>
-                      </li>
-                    {% else %}
-                      <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
-                    {% endif %}
+    
+    
+                  {% for topic in topics_pagination.items %}
+                    <li class="fraction__list-item" id="{{ category.id }}topic_info">
+                      <a href="{{url_for('main.topic', topic_id=topic.id)}}" class="fraction__topic-link">
+                        <div class="fraction__topic" id="{{category.id}}{{topic.id}}topic_name_div">
+                          <p class="fraction__text-error" id="{{category.id}}{{topic.id}}top_name"> {{ topic.name }}</p>
+                        </div>
+                      </a>
+                      {% if current_user.role == Role.ADMIN %}
+                        <a class="comments__command" id="{{category.id}}{{topic.id}}admin_mark">Админ</a>
+                        <a id="{{category.id}}{{topic.id}}change_topic_name" class="comments__command" data-url="/change-topic-name/{{category.id}}/{{topic.id}}" data-name="{{topic.name}}">Редактировать</a>
+                        <a id="{{category.id}}{{topic.id}}topic_d" class="comments__command" data-url="/delete-topic/{{category.id}}/{{topic.id}}/{{1}}" data-catid="{{category.id}}">Удалить</a>
+                      {% endif %}
+                    </li>
                   {% endfor %}
-                  <li class="pagination__item disabled">
-                    &bull;
-                  </li>
                 </ul>
+    
+                {% if topics_pagination %}
+                  <div class="list__pagination pagination" id="{{category.id}}topics_pagi_container">
+                    <ul class="pagination__list list-reset" id="{{category.id}}topics_pagi">
+                      <li class="pagination__item disabled">
+                        &bull;
+                      </li>
+                      {% for p in topics_pagination.iter_pages() %}
+                        {% if p %}
+                          <li class="pagination__item active">
+                            <a id="{{p}}topics_p" data-url="/get_topics_page_on_forum/{{category.id}}/{{p}}" data-catid="{{category.id}}">{{p}}</a>
+                          </li>
+                        {% else %}
+                          <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                        {% endif %}
+                      {% endfor %}
+                      <li class="pagination__item disabled">
+                        &bull;
+                      </li>
+                    </ul>
+                  </div>
+                {% endif %}
               </div>
-              {% endif %}
             </div>
-          </div>
-        </section>
+          </section>
         {% endfor %}
       </div>
   

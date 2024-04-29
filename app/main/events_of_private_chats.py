@@ -1,6 +1,6 @@
 from flask_socketio import emit, join_room, leave_room
 from .. import socketio
-from app.main import ELEMS_COUNT, months_dict, MAX_INVITATIONS
+from app.main import ELEMS_COUNT, months_dict, MAX_INVITATIONS_PER_CHAT
 from app import database
 from app.models import User, PrivateChatPost, PrivateChat, ChatInvitation
 from flask_login import current_user, login_required
@@ -114,7 +114,7 @@ def edit_post(data):
 @check_actual_password
 def invite(data):
     chat_invitations_count = PrivateChat.query.filter_by(id=int(data['chat_id'])).first().invitations.count()
-    if chat_invitations_count >= MAX_INVITATIONS:
+    if chat_invitations_count >= MAX_INVITATIONS_PER_CHAT:
         return emit('invitation', {'result': False}, to=int(data['chat_id']))
     new_user = User.query.filter_by(id=int(data['user_id'])).first()
     invitation = ChatInvitation(user=new_user, private_chat=PrivateChat.query.filter_by(id=int(data['chat_id'])).first())
