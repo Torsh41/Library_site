@@ -260,7 +260,7 @@ def list_delete(username, list_id, page):
     if current_user.username != username:
         return render_template('403.html')
     page = int(page)
-    cataloge = Cataloge.query.filter_by(id=list_id).first()
+    cataloge = current_user.cataloges.filter_by(id=list_id).first()
     database.session.delete(cataloge)
     database.session.commit()
     if cataloges := current_user.cataloges.all():
