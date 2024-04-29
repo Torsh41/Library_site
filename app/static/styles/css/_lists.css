@@ -6,7 +6,7 @@
 .list__wrap {
   padding: 52px 52px;
   border-radius: 15px;
-  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
+  background: radial-gradient(circle, rgba(206, 200, 189, 1) 35%, rgba(255, 252, 237, 1) 100%);
 }
 
 .list-best__wrap {
@@ -25,7 +25,7 @@
   align-items: center;
   /* padding: 52px 52px; */
   border-radius: 15px;
-  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
+  background: radial-gradient(circle, rgba(206, 200, 189, 1) 35%, rgba(255, 252, 237, 1) 100%);
 }
 
 .lists__create {
@@ -86,14 +86,18 @@
   width: 600px;
   padding: 52px 52px;
   border-radius: 15px;
-  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
+  background: radial-gradient(circle, rgba(206, 200, 189, 1) 35%, rgba(255, 252, 237, 1) 100%);
 }
 
 .list__books {
-  display: flex;
+  /* display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
+  align-items: center; */
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .list__book {
@@ -171,6 +175,10 @@
   align-items: center;
   justify-content: center;
   margin-left: 0;
+  width: 222px;
+  height: 300px;
+  margin-bottom: 48px;
+  background-color: #fdfde9;
   transition: background-color 0.3s linear;
   cursor: pointer;
 }
@@ -411,6 +419,15 @@
 }
 
 .list__book:not(:nth-child(4n)) {
+  margin-right: 59px;
+}
+
+.list__book:last-child {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.elemleft {
   margin-right: 59px;
 }
 

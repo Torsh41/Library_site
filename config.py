@@ -22,7 +22,8 @@ class Config:
     MAIL_PASSWORD = 'qctetuaboxunlvkv' #os.environ.get('MAIL_PASSWORD')
     MBK_MAIL_SUBJECT_PREFIX = '[Magic Book Keeper]' 
     MBK_MAIL_SENDER = 'The MBK team <MBK@example.com>' 
-    MBK_ADMIN = ['leokazantsev19@mail.ru'] #will array from three elements
+    MBK_ADMIN = ['leokazantsev19@mail.ru', 'elaudina03714@gmail.com'] #will array from three elements
+
     
     @staticmethod
     def init_app(app):
