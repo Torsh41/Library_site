@@ -1,0 +1,7 @@
+__pycache__/
+venv/
+venv_new_version/
+.vscode/
+test.py
+data-dev.sqlite
+
