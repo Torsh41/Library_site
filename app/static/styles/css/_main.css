@@ -40,6 +40,7 @@
   line-height: 23px;
   background-color: transparent;
   outline: none;
+  cursor: pointer;
   transition: color .3s linear, background-color .3s linear;
 }
 

@@ -29,6 +29,7 @@
             <div class="admin__set">
               <img src="{{url_for('personal.avatar', username=current_user.username)}}" alt="" class="admin__img">
               <!--Фото админа из его личного кабинета-->
+              <span class="admin__count">3</span> <!--Уведомления - этот тег работает внутри этого div - admin-set -->
             </div>
             {{ current_user.username }} <!--Имя админа и ссылка обратно в личный кабинет-->
           </a>

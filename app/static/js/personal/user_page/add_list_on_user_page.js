@@ -1,12 +1,16 @@
 $(function() {
 
     $('#open_popup_form').on('click', function(event) {
+        
         document.getElementById("popupForm").style.display = "block";
     });
 
     $('#close_popup_form').on('click', function(event)
-    {
+    {   
+        
         document.getElementById("popupForm").style.display = "none";
+        
+        
     });
 
     $('#add_list').on('click', function(event) {
@@ -197,5 +201,6 @@ $(function() {
         alert('Заполните поле');
         document.getElementById('add_list_field').value = '';
         }
+        
     });
 })   

@@ -17,9 +17,12 @@
 @import url(forum.css);
 @import url(media.css);
 @import url(swiper.min.css);
+@import url(popupInvite.css);
+@import url(select.css);
 
 html {
   box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
 *,

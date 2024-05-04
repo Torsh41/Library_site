@@ -18,6 +18,9 @@
   <script src="{{ url_for('static', filename='js/personal/user_page/add_book_js.js')}}"></script>
   <script src="{{ url_for('static', filename='js/personal/user_page/add_list_on_user_page.js')}}"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/popup.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/choices.min.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/select.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/book.js')}}"></script>
   <script src="{{ url_for('static', filename='js/personal/change_read_state/change_read_state.js')}}"></script>
   {% if current_user.role == Role.ADMIN %}
@@ -37,11 +40,13 @@
       
             <div class="header__right">
               <span class="header__menu">Меню</span>
+              <span class="header__count">3</span>
               <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
                 <span class="hamburger__box">
                   <span class="hamburger__inner"></span>
                 </span>
               </button>
+              
             </div>
           </div>
           <nav class="nav header__nav">
@@ -54,7 +59,8 @@
                   <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
                   <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
                 {% endif %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
+                <li class="nav__item --count"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a>
+                  <span class="nav__count">3</span></li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               </ul>
             </div>
@@ -159,7 +165,7 @@
   
       <!-- Добавление списка -->
       {% if pagination %}
-      <section class="popup" id="popupForm" style="display: {{ display }}">
+      <section class="popup" id="popupForm">
         <div class="popup__formPopup">
           <form class="popup__formContainer"
             action="{{url_for('personal.add_list', username=current_user.username, page=pagination.page)}}"
@@ -176,7 +182,7 @@
         </div>
       </section>
       {% else %}
-      <section class="popup" id="popupForm" style="display: {{ display }}">
+      <section class="popup" id="popupForm" >
         <div class="popup__formPopup">
           <form class="popup__formContainer"
             action="{{url_for('personal.add_list', username=current_user.username, page=1)}}" id="add_list_form"
@@ -257,7 +263,7 @@
                         <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book"><u>Книга:</u> {{
                           item.book.name }}</a>
                         <!--<a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-plan"><u>Состояние чтения:</u> {{item.read_state }}</a>-->
-                        <select name="read_state" class="book__select" id="{{cataloge_value.id}}{{item.id}}state" data-itemid="{{item.id}}">
+                        <select name="read_state" class="book__select js-custom-select" id="{{cataloge_value.id}}{{item.id}}state" data-itemid="{{item.id}}">
                           <option class="book__state book__plan" value="Планирую" {%if item.read_state == "Планирую"%}selected{%endif%}>Планирую</option>
                           <option class="book__state book__read" value="Читаю" {%if item.read_state == "Читаю"%}selected{%endif%}>Читаю</option>
                           <option class="book__state book__fuck" value="Заброшено" {%if item.read_state == "Заброшено"%}selected{%endif%}>Заброшено</option>

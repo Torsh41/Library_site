@@ -9,6 +9,12 @@ if (count > 0) {
         value.classList.add("elemleft");
     }
 
+    let listBooks = document.getElementsByClassName("list__books");
+    console.log(listBooks)
+    for (let value of listBooks) {
+        value.classList.add("list__booksStart");
+    }
+
 }
 
 else {
@@ -18,3 +24,11 @@ else {
         value.classList.remove("elemleft");
     }
 }
+
+
+// let markOne = document.getElementById("firstMark");
+// let markTwo = document.getElementById("secondMark");
+
+// markTwo.addEventListener("click", function() {
+//     markOne.classList.add("bookChange");
+// });
