@@ -9,7 +9,7 @@ function categories_pagination_update(pages, username)
   pages.forEach(p => {
     if (p)
     {
-      html += `<a data-url="/user/${username}/get_categories_page_for_book_adding/${p}">${p}</a>`;
+      html += `<a class="pagination__item active" data-url="/user/${username}/get_categories_page_for_book_adding/${p}">${p}</a>`;
     }
     else
     {
@@ -24,6 +24,7 @@ function categories_pagination_update(pages, username)
 
 
 $(function() {
+  let callback = function() { 
     $('#pagination').on('click', function(event){
         let target = event.target;
         if (target.tagName === 'A') 
@@ -43,11 +44,11 @@ $(function() {
               {
                 if (i == 0)
                 {
-                  html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox" value="${categories[i].name}" checked>${categories[i].name}</a>`;
+                  html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox form-check-input" value="${categories[i].name}" checked><label class="form-check-label">${categories[i].name}</label></a>`;
                 }
                 else
                 {
-                  html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox" value="${categories[i].name}">${categories[i].name}</a>`;
+                  html += `<a class="form__genre" id="${categories[i].id}categories"><input type="radio" name="category" class="form__checkbox form-check-input" value="${categories[i].name}"><label class="form-check-label">${categories[i].name}</label></a>`;
                 }
               }
               div = document.getElementById('cat_container');
@@ -83,4 +84,14 @@ $(function() {
           });
         }
     });
+  };
+
+  let observer = new MutationObserver(callback);
+  // наблюдать за всем
+  observer.observe(document, {
+    childList: true, // наблюдать за непосредственными детьми
+    subtree: true, // и более глубокими потомками
+    attributes: true,
+    characterData: true
+  });
 });

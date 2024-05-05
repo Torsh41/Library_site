@@ -40,7 +40,9 @@
       
             <div class="header__right">
               <span class="header__menu">Меню</span>
-              <span class="header__count">3</span>
+              {% if invitations > 0 %} 
+                <span class="header__count">{{ invitations }}</span>
+              {% endif %}
               <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
                 <span class="hamburger__box">
                   <span class="hamburger__inner"></span>
@@ -60,7 +62,10 @@
                   <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
                 {% endif %}
                 <li class="nav__item --count"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a>
-                  <span class="nav__count">3</span></li>
+                  {% if invitations > 0 %} 
+                    <span class="nav__count">{{ invitations }}</span>  <!--Уведомления-->
+                  {% endif %}
+                </li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               </ul>
             </div>
@@ -165,41 +170,41 @@
   
       <!-- Добавление списка -->
       {% if pagination %}
-      <section class="popup" id="popupForm">
-        <div class="popup__formPopup">
-          <form class="popup__formContainer"
-            action="{{url_for('personal.add_list', username=current_user.username, page=pagination.page)}}"
-            id="add_list_form" method="post">
-  
-            <textarea type="text" class="popup__textarea" id="add_list_field" rows="2" name="newList"
-              placeholder="Введите название списка..."></textarea>
-  
-            <div class="popup__btns">
-              <input class="popup__btn" id="add_list" type="button" value="Добавить">
-              <button type="button" id="close_popup_form" class="popup__btn-end">Отменить</button>
-            </div>
-          </form>
-        </div>
-      </section>
+        <section class="popup" id="popupForm">
+          <div class="popup__formPopup">
+            <form class="popup__formContainer"
+              action="{{url_for('personal.add_list', username=current_user.username, page=pagination.page)}}"
+              id="add_list_form" method="post">
+    
+              <textarea type="text" class="popup__textarea" id="add_list_field" rows="2" name="newList"
+                placeholder="Введите название списка..."></textarea>
+    
+              <div class="popup__btns">
+                <input class="popup__btn" id="add_list" type="button" value="Добавить">
+                <button type="button" id="close_popup_form" class="popup__btn-end">Отменить</button>
+              </div>
+            </form>
+          </div>
+        </section>
       {% else %}
-      <section class="popup" id="popupForm" >
-        <div class="popup__formPopup">
-          <form class="popup__formContainer"
-            action="{{url_for('personal.add_list', username=current_user.username, page=1)}}" id="add_list_form"
-            method="post">
-            <label class="popup__label">
-              <span class="popup__span">Ваш список</span>
-              <textarea type="text" class="popup__textarea" id="add_list_field" rows="5" name="newList"
-                placeholder="введите название списка..."></textarea>
-            </label>
-  
-            <div class="popup__btns">
-              <input class="popup__btn" id="add_list" type="button" value="Добавить">
-              <button type="button" id="close_popup_form" class="popup__btn-end">Отменить</button>
-            </div>
-          </form>
-        </div>
-      </section>
+        <section class="popup" id="popupForm" >
+          <div class="popup__formPopup">
+            <form class="popup__formContainer"
+              action="{{url_for('personal.add_list', username=current_user.username, page=1)}}" id="add_list_form"
+              method="post">
+              <label class="popup__label">
+                <span class="popup__span">Ваш список</span>
+                <textarea type="text" class="popup__textarea" id="add_list_field" rows="5" name="newList"
+                  placeholder="введите название списка..."></textarea>
+              </label>
+    
+              <div class="popup__btns">
+                <input class="popup__btn" id="add_list" type="button" value="Добавить">
+                <button type="button" id="close_popup_form" class="popup__btn-end">Отменить</button>
+              </div>
+            </form>
+          </div>
+        </section>
       {% endif %}
   
       <!--Кнопка все время присутствует на странице пользователя-->

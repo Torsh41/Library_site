@@ -311,16 +311,11 @@
       </form>
       
       {% if current_user.is_authenticated %}
-        <section class="loginPopup" id="edit_comment_sec" style="display: {{ display }}">
-          <div class="formPopup">
-            <h2 class="comments__title title">Редактирование комментария</h2>
-            <form class="formContainer-comments" action="" id="edit_comment_form" method="post">
-    
-              <label class="comments__label-popup">
-                <textarea type="text" class="comments__textarea-popup" id="edit_comment_field" rows="5" name="newComment"
-                  placeholder="введите новый комментарий..."></textarea>
-              </label>
-    
+        <section class="popup" id="edit_comment_sec" style="display: {{ display }}">
+          <div class="popup__formPopup">
+            <h2 class="popup__title title">Редактирование комментария</h2>
+            <form class="popup__formContainer" action="" id="edit_comment_form" method="post">
+              <textarea type="text" class="popup__textarea" id="edit_comment_field" rows="5" name="newComment" placeholder="введите новый комментарий..."></textarea>
               <div class="popup__btns">
                 <input class="popup__btn" id="edit_comment" type="button" value="Изменить">
                 <button id="close_form" type="button" class="popup__btn-end">Отменить</button>

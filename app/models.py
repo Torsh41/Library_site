@@ -166,6 +166,7 @@ class PrivateChatPost(database.Model, SerializerMixin):
 class ChatInvitation(database.Model, SerializerMixin):
     __tablename__ = "chats_invitations"
     id = database.Column(database.Integer, primary_key=True)
+    viewed = database.Column(database.Boolean, default=False)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     private_chat_id = database.Column(database.Integer, database.ForeignKey('private_chats.id'))
     

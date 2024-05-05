@@ -637,6 +637,11 @@ def private_chats():
         chats_info = res[1]
     else:
         pages = None
+    invitations = current_user.chats_invitations.filter_by(viewed=False).all()
+    for invitation in invitations:
+        invitation.viewed = True
+        database.session.add(invitation)
+    database.session.commit()
     return render_template('main/private_chats.html', chats_info=chats_info, pages=pages, range=range)
     
 
