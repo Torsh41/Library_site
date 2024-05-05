@@ -97,13 +97,10 @@
       {% endif %}
 
       {% if current_user.role == Role.ADMIN %}
-      <section class="loginPopup" id="change_topic_name_sec" style="display: none">
-        <div class="formPopup">
-          <form id="change_topic_name_form" class="formContainer-comments" action="" method="post">
-
-            <textarea type="text" id="changed_topic_name_field" class="comments__textarea-popup"
-              name="topic_changed_name" rows="5" placeholder="Введите название темы раздела.." required></textarea>
-
+      <section class="popup" id="change_topic_name_sec" style="display: none">
+        <div class="popup__formPopup">
+          <form id="change_topic_name_form" class="popup__formContainer" action="" method="post">
+            <input type="text" id="changed_topic_name_field" class="popup__textarea" name="topic_changed_name" maxlength="120" placeholder="Введите название темы раздела..">
             <input class="popup__btn" type="button" id="change_topic_name_button" value="Изменить">
             <button id="cl_change_topic_name_form" type="button" class="popup__btn-end">Отменить</button>
           </form>
@@ -194,21 +191,21 @@
 
 
                 {% for topic in topics_pagination.items %}
-                <li class="fraction__list-item" id="{{ category.id }}topic_info">
-                  <a href="{{url_for('main.topic', topic_id=topic.id)}}" class="fraction__topic-link">
-                    <div class="fraction__topic" id="{{category.id}}{{topic.id}}topic_name_div">
-                      <p class="fraction__text-error" id="{{category.id}}{{topic.id}}top_name"> {{ topic.name }}</p>
-                    </div>
-                  </a>
-                  {% if current_user.role == Role.ADMIN %}
-                  <a class="comments__command" id="{{category.id}}{{topic.id}}admin_mark">Админ</a>
-                  <a id="{{category.id}}{{topic.id}}change_topic_name" class="comments__command"
-                    data-url="/change-topic-name/{{category.id}}/{{topic.id}}"
-                    data-name="{{topic.name}}">Редактировать</a>
-                  <a id="{{category.id}}{{topic.id}}topic_d" class="comments__command"
-                    data-url="/delete-topic/{{category.id}}/{{topic.id}}/{{1}}" data-catid="{{category.id}}">Удалить</a>
-                  {% endif %}
-                </li>
+                  <li class="fraction__list-item" id="{{ category.id }}topic_info">
+                    <a href="{{url_for('main.topic', topic_id=topic.id)}}" class="fraction__topic-link">
+                      <div class="fraction__topic" id="{{category.id}}{{topic.id}}topic_name_div">
+                        <p class="fraction__text-error" id="{{category.id}}{{topic.id}}top_name"> {{ topic.name }}</p>
+                      </div>
+                    </a>
+                    {% if current_user.role == Role.ADMIN %}
+                    <a class="comments__command" id="{{category.id}}{{topic.id}}admin_mark">Админ</a>
+                    <a id="{{category.id}}{{topic.id}}change_topic_name" class="comments__command"
+                      data-url="/change-topic-name/{{category.id}}/{{topic.id}}"
+                      data-name="{{topic.name}}">Редактировать</a>
+                    <a id="{{category.id}}{{topic.id}}topic_d" class="comments__command"
+                      data-url="/delete-topic/{{category.id}}/{{topic.id}}/{{1}}" data-catid="{{category.id}}">Удалить</a>
+                    {% endif %}
+                  </li>
                 {% endfor %}
               </ul>
 

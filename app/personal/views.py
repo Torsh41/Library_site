@@ -59,7 +59,8 @@ def person(username, flag=False):
             p = 1
         cur_books_page_for_cataloges.append(p)
         paginations_for_books_in_lists.append(books_pagination)
-    return render_template('personal/user_page.html', user=current_user, catalogues=catalogues, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, cur_books_page_for_cataloges=cur_books_page_for_cataloges, cataloges_page=page, len=len, flag=flag, zip=zip, display="none")
+    invitations = len(current_user.chats_invitations.filter_by(viewed=False).all())
+    return render_template('personal/user_page.html', user=current_user, catalogues=catalogues, invitations=invitations, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, cur_books_page_for_cataloges=cur_books_page_for_cataloges, cataloges_page=page, len=len, flag=flag, zip=zip, display="none")
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])

@@ -129,23 +129,6 @@ function del_user(url_path, pagination_id)
           
           });
         }
-          // for (let i = 1; i <= response.pages; i++)
-          // {
-          //   if (response.pages > 1 && i == response.cur_page)
-          //   {
-          //     html += ` <li class="pagination__item_cur_page">
-          //                 <a id="${i}users_p" data-url='/admin/get_user_search_page/${i}' data-pagid='${pagination_id}'>${i}</a>
-          //               </li>`;
-          //   }
-          //   else
-          //   {
-          //     html += ` <li class="pagination__item active">
-          //                 <a id="${i}users_p" data-url='/admin/get_user_search_page/${i}' data-pagid='${pagination_id}'>${i}</a>
-          //               </li>`;
-          //   }
-          // }
-        
-
         html += `<li class="pagination__item disabled">&bull;</li></ul>`;
         
         document.getElementById('user_pagination_container').innerHTML = html;

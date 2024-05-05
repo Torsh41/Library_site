@@ -214,7 +214,7 @@
             <label class="form__label">
               <span class="form__span-genre">Категории</span>
               <div class="form__genre-wrap" id="cat_container">
-                <!-- {% for index in range(len(categories)) %}
+                {% for index in range(len(categories)) %}
                 {% if index == 0 %}
                 <a class="form__genre" id="{{categories[index].id}}categories"><input type="radio" name="category"
                     class="form__checkbox form-check-input" value="{{ categories[index].name }}" checked>
@@ -223,24 +223,8 @@
                   </label></a>
                 {% else %}
                 <a class="form__genre" id="{{categories[index].id}}categories"><input type="radio" name="category"
-                    class="form__checkbox" value="{{ categories[index].name }}">
+                    class="form__checkbox form-check-input" value="{{ categories[index].name }}">
                     <label class="form-check-label">{{ categories[index].name }}</label></a>
-                {% endif %}
-                {% endfor %} -->
-
-                {% for index in range(len(categories)) %}
-                {% if index == 0 %}
-                <label class="form__genre" id="{{categories[index].id}}categories">
-                  <input class="form__private visually-hidden" type="radio" name="category"  value="{{ categories[index].name }}" checked>
-                  <span class="form__check-visual"></span>
-                  <span class="form__check-text">{{ categories[index].name }}</span>
-                </label>
-                {% else %}
-                <label class="form__genre" id="{{categories[index].id}}categories">
-                  <input class="form__private visually-hidden" type="radio" name="category"  value="{{ categories[index].name }}">
-                  <span class="form__check-visual"></span>
-                  <span class="form__check-text">{{ categories[index].name }}</span>
-                </label>
                 {% endif %}
                 {% endfor %}
               </div>

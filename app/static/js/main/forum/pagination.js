@@ -143,10 +143,10 @@ function change_topic_name()
             html = `<a id="${response.category_id}${response.topic_id}change_topic_name" class="comments__command" data-url="/change-topic-name/${response.category_id}/${response.topic_id}" data-name="${response.name}">Редактировать</a>`;
             let a = document.getElementById(response.category_id + response.topic_id + 'admin_mark');
             a.insertAdjacentHTML('afterend', html);
-
             document.getElementById("changed_topic_name_field").value = "";
             document.getElementById("change_topic_name_form").setAttribute("action", "");
             document.getElementById("change_topic_name_sec").style.display = "none";
+            document.getElementById(response.category_id + "topic_info").scrollIntoView(); // прокрутка до верхней границы
           },
           error: function(jqXHR, exception) {
               if (exception === 'parsererror')
