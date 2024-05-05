@@ -72,7 +72,7 @@ function get_users_page(chat_id, url_path=`/forum/private_chat/${chat_id}/get_us
             {
                 $('#pagination').remove();
                 html +=`<div class="form__book" id="not_found">
-                            <div class="form__info form__book-link">
+                            <div class="form__popupInvite-text form__book-link">
                                 <span class="form__span-title">Нет доступных пользователей для приглашения</span>
                             </div>
                         </div>`;

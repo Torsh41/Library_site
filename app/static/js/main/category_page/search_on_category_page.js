@@ -27,7 +27,7 @@ function search_books_on_category_page(category_name, list_id=undefined)
                                     <div class="list__wrap">
                                     <h2 class="list__title title">Вот, что нашлось</h2>
                                     <span class="list__results"> Всего результатов: ${books[1][0].results_count} </span>
-                                    <ul class="list__books list-reset" id="book_search_res_ul">`;
+                                    <ul class="list__books list-reset list__booksStart" id="book_search_res_ul">`;
                     books[1].forEach(book => {
                         html += `<li class="list__book" id="${book.id}search_books_info">
                                     <a href="/book-page/${book.name}?list_id=${list_id}" class="list__book-set">

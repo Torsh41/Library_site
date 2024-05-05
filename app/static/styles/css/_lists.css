@@ -95,9 +95,13 @@
   justify-content: flex-start;
   align-items: center; */
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.list__booksStart {
+  justify-content: flex-start;
 }
 
 .list__book {

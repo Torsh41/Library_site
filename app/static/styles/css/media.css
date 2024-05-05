@@ -55,10 +55,12 @@
 
   .list__book:not(:nth-child(4n)) {
     margin-right: 0;
+    margin-left: 0;
   }
 
   .list__book:not(:nth-child(3n)) {
     margin-right: 59px;
+    margin-left: 0;
   }
 
   .list__container {
@@ -131,10 +133,12 @@
 
   .list__book:not(:nth-child(3n)) {
     margin-right: 0;
+    margin-left: 0;
   }
 
   .list__book:not(:nth-child(2n)) {
     margin-right: 59px;
+    margin-left: 0;
   }
 }
 
@@ -183,6 +187,7 @@
 
   .list__book:not(:nth-child(2n)) {
     margin-right: 0;
+    margin-left: 0;
   }
 
   .list__books {
@@ -324,6 +329,14 @@
     align-items: center;
   }
 
+  .list__booksStart {
+    justify-content: center;
+  }
+
+  .elemleft {
+    margin-right: 0;
+  }
+
   /* .list__book,
   .list__add {
     width: 178px;
@@ -333,7 +346,9 @@
   .list__book-wrap {
     width: 178px;
   } */
-
+  .list__book {
+    margin-left: 0;
+  }
 
   .fraction__wrap,
   .category__wrap {
@@ -596,6 +611,21 @@
     height: 250px;
 
   }
+
+  /* .defselect__list--dropdown .defselect__item,
+  .defselect__list[aria-expanded] .defselect__item {
+    font-size: 10px;
+  }
+
+
+
+  .defselect__list {
+    font-size: 10px;
+  }
+
+  .defselect {
+    font-size: 11px;
+  } */
 
   .book__top {
     margin-bottom: 20px;

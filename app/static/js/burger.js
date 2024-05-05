@@ -20,12 +20,18 @@
         !menu.classList.contains(params.hiddenClass)
       ) {
         menu.classList.add(params.activeClass);
-        document.body.style.overflow = 'hidden';
+        // document.body.style.overflow = 'hidden';
+        // document.body.style.background = 'rgba(0, 0, 0, 0.8)';
         btn.setAttribute('aria-expanded', true);
+        btn.classList.add('opens');
+          
+        
+
       } else {
         menu.classList.add(params.hiddenClass);
         document.body.removeAttribute('style');
         btn.setAttribute('aria-expanded', false);
+        btn.classList.remove('opens');
       }
     });
   }
