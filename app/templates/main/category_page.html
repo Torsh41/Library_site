@@ -142,6 +142,11 @@
                       </li>
                     </div>
                   {% endfor %}
+                  {% if not new_books %}
+                    <div class="list__wrap">
+                      В данной категории пока нет книг
+                    </div>
+                  {% endif %}
                 </div>
                 <div class="hero__pagination swiper-pagination js-hero-pagination"></div>
               </div>
@@ -180,6 +185,11 @@
                       </li>
                     </div>
                   {% endfor %}
+                  {% if not new_books %}
+                    <div class="list__wrap">
+                      В данной категории пока нет книг
+                    </div>
+                  {% endif %}
                 </div>
                 <div class="hero__pagination swiper-pagination js-hero-pagination"></div>
               </div>
