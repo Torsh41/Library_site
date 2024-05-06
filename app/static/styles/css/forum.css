@@ -10,13 +10,18 @@
 }
 
 .fraction__list-item {
-  position: relative;
+  /* position: relative; */
   width: 300px;
   height: 200px;
   border-radius: 20px;
   background-color: #fdfde9;
   margin-bottom: 40px;
   transition: background-color 0.3s linear, color 0.3s linear;
+}
+
+.fraction__wrapper-command {
+  display: flex;
+  flex-direction: row;
 }
 
 .fraction__topic {

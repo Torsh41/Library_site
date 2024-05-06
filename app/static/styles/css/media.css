@@ -249,6 +249,15 @@
     align-items: center;
   }
 
+  /* .fraction__wrapper-command {
+    display: flex;
+    flex-wrap: wrap;
+  } */
+
+  .comments__command {
+    font-size: 12px;
+  }
+
   .nav__admin-item:not(:last-child) {
     margin-bottom: 20px;
     margin-right: 0;
@@ -320,6 +329,10 @@
 
   .list__wrap {
     width: 400px;
+  }
+
+  .comments__command {
+    font-size: 10px;
   }
 
   .list__books {
@@ -524,6 +537,10 @@
     border: none;
     padding: 0;
     width: 200px;
+  }
+
+  .comments__command {
+    font-size: 7px;
   }
 
   .comments__btn {
