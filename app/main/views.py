@@ -212,7 +212,7 @@ def search_by_category(name):
         return render_template('404.html')
     res = category.books.all()
     result = str(request.form.get('search_result')).strip().lower()
-    if result == 'все':
+    if result == '*':
         search_result = res
     else:
         search_result = list(); release_date = request.form.get('release_date').strip(); description = request.form.get('description').strip()
