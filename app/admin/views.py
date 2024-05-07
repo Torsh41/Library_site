@@ -33,7 +33,7 @@ def user_search(username):
     users = User.query.all()
     if users:
         search_username = str(request.form.get('users_search_result'))
-        if search_username == 'все':
+        if search_username == '*':
             last_page = (len(users) - 1) // RESULT_COUNT
             if len(users) % RESULT_COUNT > 0:
                 last_page += 1
@@ -151,7 +151,7 @@ def search_books_on_admin_panel(username, category_name):
     category = Category.query.filter_by(name=category_name).first()
     if request.method == "POST":
         result = str(request.form.get('search_result')).strip().lower()
-        if result == "все":
+        if result == '*':
             books = category.books.all()
         else:
             books = category.books.filter((Book.name.like("%{}%".format(result))) | (
