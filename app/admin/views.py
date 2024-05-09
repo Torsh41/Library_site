@@ -3,10 +3,10 @@ from flask_login import current_user
 from flask import render_template, redirect, url_for, request, jsonify
 from .. import database
 from app.models import User, Book, Category, SearchResult
-from .forms import AddCategoryForm
+from .forms import AddCategoryForm, ChangeBookInfoForm
 from app.decorators import admin_required, check_actual_password
 RESULT_COUNT = 8
-
+CATEGORIES_COUNT = 5
 
 @admin.route('/<username>/admin_panel', methods=['GET', 'POST'])
 @admin_required
@@ -226,3 +226,27 @@ def del_book(username, category_name, book_id, page):
         pages_count = 1
         has_elems = False
     return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, category=category_name))
+
+
+@admin.route('/<username>/change_book_info/<int:book_id>', methods=['GET', 'POST'])
+@admin_required
+@check_actual_password
+def change_book_info(username, book_id):
+    if current_user.username != username:
+        return render_template('403.html')
+    if book := Book.query.filter_by(id=book_id).first():
+        pagination = Category.query.paginate(1, per_page=CATEGORIES_COUNT, error_out=False)
+        categories = pagination.items
+        form = ChangeBookInfoForm(book=book)
+        if form.validate_on_submit():
+            category = Category.query.filter_by(name=request.form.get('category')).first()
+            if cover := bytes(request.files['cover'].read()):
+                book.cover=cover
+            book.isbn=form.isbn.data.strip(); book.name=form.name.data.strip().lower().replace("'", ""); book.author=form.author.data.strip().lower(); book.publishing_house=form.publishing_house.data.strip()
+            book.description=request.form.get('description').strip(); book.release_date=form.release_date.data; book.count_of_chapters=form.chapters_count.data
+            book.category=category; book.user=current_user._get_current_object()
+            database.session.add(book)
+            database.session.commit()
+            return redirect(url_for('main.book_page', name=book.name))
+        return render_template('admin/change_book_info.html', form=form, categories=categories, pagination=pagination, book=book, range=range, len=len)
+    return render_template('404.html')

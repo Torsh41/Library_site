@@ -171,8 +171,8 @@ def add_new_book(username):
     if form.validate_on_submit():
         category = Category.query.filter_by(
             name=str(request.form.get('category'))).first()
-        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower().replace("'", ""), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(),
-                    description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data,
+        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data.strip(), name=form.name.data.strip().lower().replace("'", ""), author=form.author.data.strip().lower(), publishing_house=form.publishing_house.data.strip(),
+                    description=form.description.data.strip(), release_date=form.release_date.data, count_of_chapters=form.chapters_count.data,
                     category=category, user=current_user._get_current_object())
 
         if not book.cover:

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Изменить данные о книге</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
+  <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/admin/admin_panel/book_changing_pagination.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+  
+</head>
+
+<body>
+  <div class="content">
+    <header class="header style-1">
+      <div class="header__container container">
+        <a class="header__logo" href="{{url_for('main.index')}}">
+          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+            alt="Логотип MAGIC BOOK KEEPER">
+        </a>
+
+        <div class="header__right">
+          <span class="header__menu">Меню</span>
+          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+            <span class="hamburger__box">
+              <span class="hamburger__inner"></span>
+            </span>
+          </button>
+        </div>
+
+        <nav class="nav header__nav">
+          <div class="nav__menu js-menu-wrap">
+            <ul class="nav__list list-reset">
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+              <li class="nav__item"><a class="nav__link"
+                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              {% if current_user.role == Role.ADMIN %}
+              <li class="nav__item"><a class="nav__link"
+                  href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a>
+              </li>
+              {% endif %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
+              {% if current_user.role == Role.ADMIN %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a>
+              </li>
+              <li class="nav__item"><a class="nav__link"
+                  href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a>
+              </li>
+              {% endif %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+      </div>
+    </header>
+
+    <main>
+      <section class="main style-1">
+        <div class="main__container container">
+          <div class="main__top">
+            <h1 class="main__title">Отредактируйте данные</h1>
+            <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="461" y2="0.5" stroke="#E9E6C3" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="form">
+        <div class="form__container container">
+          <form class="form__wrap" enctype="multipart/form-data" method="post">
+            {{form.hidden_tag()}}
+            <span class="form__span">Обложка книги</span>
+            <div class="profile__image profile__image-edit">
+              <!--Тут получаем обложку для книги-->
+              <input class="profile__foto" type="file" name="cover" multiple accept="image/*,image/jpeg">
+            </div>
+            <label class="form__label">
+              <span class="form__span">ISBN</span>
+              {% if form.isbn.errors %}
+              <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
+              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2", value=book.isbn)}}
+              <span>
+                {% for msg in form.isbn.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2", value=book.isbn)}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Название</span>
+              {% if form.name.errors %}
+              <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
+              {{form.name(class="form__input", placeholder="Введите название книги", value=book.name, id=book.id)}}
+              <span>
+                {% for msg in form.name.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.name(class="form__input", placeholder="Введите название книги", value=book.name)}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Автор</span>
+              {% if form.author.errors %}
+              <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
+              {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
+              <span>
+                {% for msg in form.author.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Издательство</span>
+              {% if form.publishing_house.errors %}
+              <!--<input type="text" class="form__input" placeholder="Введите издательство" required>-->
+              {{form.publishing_house(class="form__input", placeholder="Введите издательство", value=book.publishing_house)}}
+              <span>
+                {% for msg in form.publishing_house.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.publishing_house(class="form__input", placeholder="Введите издательство", value=book.publishing_house)}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Описание</span>
+              <textarea class="form__input" id="description" maxlength="512" minlength="1" name="description" placeholder="Описание книги.." required="" value="aasasasasa">{{book.description}}</textarea>
+              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Дата выхода</span>
+              {% if form.release_date.errors %}
+              {{form.release_date(class="form__input", value=book.release_date)}}
+              <span>
+                {% for msg in form.release_date.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.release_date(class="form__input", value=book.release_date)}}
+              {% endif %}
+              <!--<input type="date" class="form__input" required>-->
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Количество глав</span>
+              {% if form.chapters_count.errors %}
+              {{form.chapters_count(class="form__input", placeholder="Введите количество глав", value=book.count_of_chapters)}}
+              <span>
+                {% for msg in form.chapters_count.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.chapters_count(class="form__input", placeholder="Введите количество глав", value=book.count_of_chapters)}}
+              {% endif %}
+              <!--<input type="number" class="form__input" min="2" placeholder="Введите количество глав" required>-->
+            </label>
+
+            <label class="form__label">
+              <span class="form__span-genre">Категории</span>
+              <div class="form__genre-wrap" id="cat_container">
+                {% for index in range(len(categories)) %}
+                {% if book.category.id ==  categories[index].id %}
+                    <a class="form__genre" id="{{categories[index].id}}categories"><input type="radio" name="category"
+                        class="form__checkbox form-check-input" value="{{ categories[index].name }}" checked>
+                    <label class="form-check-label">
+                        {{ categories[index].name }}
+                    </label></a>
+                {% else %}
+                    <a class="form__genre" id="{{categories[index].id}}categories"><input type="radio" name="category"
+                        class="form__checkbox form-check-input" value="{{ categories[index].name }}">
+                        <label class="form-check-label">{{ categories[index].name }}</label></a>
+                {% endif %}
+                {% endfor %}
+              </div>
+              <div class="list__pagination pagination" id="categories_pagination">
+                <ul class="pagination__list list-reset" id="pagination">
+                  <li class="pagination__item disabled">
+                    &bull;
+                  </li>
+                  {% for p in pagination.iter_pages() %}
+                    {% if p %}
+                        <li class="pagination__item active">
+                            <a data-url="/user/{{current_user.username}}/get_categories_page_for_book_adding/{{p}}">{{ p }}</a>
+                        </li>
+                    {% else %}
+                        <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                    {% endif %}
+                  {% endfor %}
+                  <li class="pagination__item disabled">
+                    &bull;
+                  </li>
+                </ul>
+              </div>
+            </label>
+
+            <!--<button class="form__btn btn">Добавить книгу в базу</button>-->
+            {{form.submit(class="form__btn btn")}}
+
+            <a class="form__exit-btn" href="{{url_for('main.book_page', name=book.name)}}">Вернуться на страницу книги</a>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -164,11 +164,13 @@
             <a class="main__bottom-item"> Всего оценок: {{ grade_count }} </a>
             <!--Пример: Средняя оценка - 4.5 из 5-->
           </div>
-  
+
+          {% if current_user.role == Role.ADMIN %}
+            <a class="main__form-btn btn" href="{{url_for('admin.change_book_info', username=current_user.username, book_id=book.id)}}">Редактировать данные о книге</a>
+          {% endif %}
         </div>
       </section>
-  
-  
+
       <form action="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id)}}" method="post">
         <section class="book">
           <div class="book__container container">
