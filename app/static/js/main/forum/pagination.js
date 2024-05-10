@@ -76,9 +76,9 @@ function get_topics_page_on_forum(url_path, category_id)
                       </a>`;
                     if (topic.cur_user_is_admin)
                     {
-                      html += `<a class="comments__command" id="${category_id}${topic.id}admin_mark">Админ</a>
+                      html += `<div class="fraction__wrapper-command"><a class="comments__command" id="${category_id}${topic.id}admin_mark">Админ</a>
                               <a id="${category_id}${topic.id}change_topic_name" class="comments__command" data-url="/change-topic-name/${category_id}/${topic.id}" data-name="${topic.name}">Редактировать</a>
-                              <a id='${category_id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category_id}/${topic.id}/${topic.cur_page}' data-catid='${category_id}'>Удалить</a>`;
+                              <a id='${category_id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category_id}/${topic.id}/${topic.cur_page}' data-catid='${category_id}'>Удалить</a></div>`;
                     }
         html += `</li>`;
       });
@@ -237,9 +237,9 @@ $(function() {
                                         </a>`;
                             if (category.cur_user_is_admin)
                             {
-                              html += `<a class="comments__command" id="${category.id}${topic.id}admin_mark">Админ</a>
+                              html += `<div class="fraction__wrapper-command"><a class="comments__command" id="${category.id}${topic.id}admin_mark">Админ</a>
                                       <a id="${category.id}${topic.id}change_topic_name" class="comments__command" data-url="/change-topic-name/${category.id}/${topic.id}" data-name="${topic.name}">Редактировать</a>
-                                      <a id='${category.id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category.id}/${topic.id}/${1}' data-catid='${category.id}'>Удалить</a>`;      
+                                      <a id='${category.id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category.id}/${topic.id}/${1}' data-catid='${category.id}'>Удалить</a></div>`;      
                             }
                             html += `</li>`;
                         });
@@ -444,9 +444,9 @@ $(function() {
                                 </a>`;
                     if (topic.cur_user_is_admin)
                     {
-                      html += `<a class="comments__command" id="${topic.category_id}${topic.topic_id}admin_mark">Админ</a>
+                      html += `<div class="fraction__wrapper-command"><a class="comments__command" id="${topic.category_id}${topic.topic_id}admin_mark">Админ</a>
                               <a id="${topic.category_id}${topic.topic_id}change_topic_name" class="comments__command" data-url="/change-topic-name/${topic.category_id}/${topic.topic_id}" data-name="${topic.name}">Редактировать</a>
-                              <a id='${topic.category_id}${topic.topic_id}topic_d' class="comments__command" data-url='/delete-topic/${topic.category_id}/${topic.topic_id}/${topic.topic_pages}' data-catid='${topic.category_id}'>Удалить</a>`;      
+                              <a id='${topic.category_id}${topic.topic_id}topic_d' class="comments__command" data-url='/delete-topic/${topic.category_id}/${topic.topic_id}/${topic.topic_pages}' data-catid='${topic.category_id}'>Удалить</a></div>`;      
                     }
                     html += `</li>`;
                 });
