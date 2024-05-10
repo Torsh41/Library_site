@@ -62,9 +62,9 @@ function search_category_on_forum()
                                     </a>`;
                                     if (category.cur_user_is_admin)
                                     {
-                                      html += `<a class="comments__command" id="${category.id}${topic.id}admin_mark">Админ</a>
+                                      html += `<div class="fraction__wrapper-command"><a class="comments__command" id="${category.id}${topic.id}admin_mark">Админ</a>
                                               <a id="${category.id}${topic.id}change_topic_name" class="comments__command" data-url="/change-topic-name/${category.id}/${topic.id}" data-name="${topic.name}">Редактировать</a>
-                                              <a id='${category.id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category.id}/${topic.id}/${1}' data-catid='${category.id}'>Удалить</a>`;      
+                                              <a id='${category.id}${topic.id}topic_d' class="comments__command" data-url='/delete-topic/${category.id}/${topic.id}/${1}' data-catid='${category.id}'>Удалить</a></div>`;      
                                     }
                                  html+= `</li>`;                    
                         });
