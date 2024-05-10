@@ -50,6 +50,7 @@
                 <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
               {% endif %}
               {% if current_user.is_authenticated %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               {% endif %}
             </ul>
@@ -89,9 +90,11 @@
           <div class="category__wrap">
             <ul class="category__list list-reset" id="categories_block">
               {% for category in categories %}
-              <li class="category__elem" id="{{category.id}}category_info"><a href="{{url_for('main.category', name=category.name, list_id=list_id)}}" class="category__book-link">
-                  <div class="category__block">{{ category.name }}</div>
-                </a></li>
+                <li class="category__elem" id="{{category.id}}category_info">
+                  <a href="{{url_for('main.category', name=category.name, list_id=list_id)}}" class="about__book-link">
+                    <div class="category__block">{{ category.name }}</div>
+                  </a>
+                </li>
               {% endfor %}
             </ul>
             {% if category_pagination %}

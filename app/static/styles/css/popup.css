@@ -143,25 +143,73 @@
 
 
 .popup {
-  position: absolute;
+  /* position: absolute;
   text-align: center;
+  width: 100%; */
+  /* height: 100%;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, .7);
+  z-index: 100; */
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  opacity: 0;
+  animation: ani 1s forwards;
 }
 
 .popup__formPopup {
-  position: fixed;
+  position: absolute;
+  /* width: 400px; */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  /* position: fixed;
   left: 50%;
   top: 5%;
-  transform: translate(-50%, 5%);
-  border: 6px solid #fdfde9;
-  z-index: 9;
-  background-color: #a59494;
+  transform: translate(-50%, 5%); */
+  border: 6px solid #989185;
+  /* z-index: 9; */
+  border-radius: 15px;
+  background-color: #fdfde9;
+  opacity: 0;
+  animation: ani 1s forwards;
+}
+
+@keyframes ani {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+/* .popup__btn-end:active .popup, .popup__formPopup {
+  opacity: 1;
+  animation: fad 1s forwards;
+}
+
+.fadeout {
+  opacity: 1;
+  animation: fad 1s forwards;
+}
+
+@keyframes fad {
+  100% {opacity: 1;}
+  0% {opacity: 0;}
+} */
+
+.no-scroll {
+  overflow-y: hidden;
 }
 
 .popup__formContainer {
   width: 600px;
   padding: 20px;
-  background-color: #a59494;
+  border-radius: 15px;
+  background-color: #989185;
 }
 
 .popup__formContainer input[type=text],
@@ -170,16 +218,37 @@
   padding: 15px;
   margin: 5px 0 20px 0;
   border: none;
-  background: #eee;
+  background: #fdfde9;
 }
 
 .popup__formContainer input[type=text]:focus,
 .popup__formContainer input[type=password]:focus {
-  background-color: #ddd;
+  background-color: #332f2e;
+  color: #F5F5DC;
   outline: none;
 }
 
 
 .popup__formContainer .btn:hover {
   opacity: 1;
+}
+
+.popup__textarea {
+  padding: 20px 40px;
+  margin-bottom: 0;
+  width: 100%;
+  background-color: #fdfde9;
+  border-radius: 20px;
+  border: 2px solid #989185;
+  resize: none;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.3s linear, color .3s linear;
+}
+
+
+
+.popup__title {
+  text-align: center;
+  color: #2E3033;
 }

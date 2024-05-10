@@ -19,6 +19,7 @@
     <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
     <script defer src="{{url_for('static', filename='js/swiper.min.js')}}"></script>
     <script defer src="{{url_for('static', filename='js/swiper.js')}}"></script>
+    <script defer src="{{ url_for('static', filename='js/book.js')}}"></script>
   </head>
 <body>
   <div class="content">
@@ -58,6 +59,7 @@
                 <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
               {% endif %}
               {% if current_user.is_authenticated %}
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               {% endif %}
             </ul>
@@ -94,18 +96,16 @@
                     </clipPath>
                   </defs>
                 </svg>
-                <input id="books_find_field" type="text" class="main__form-input" name="search_result" placeholder="Введите название книги или автора.." required>
+                <input id="books_find_field" type="text" class="main__form-input" name="search_result" maxlength="120" placeholder="Введите название книги или автора..">
               </label>
               <div>
-                <span class="main__help">Для просмотра всех книг из данной категории введите слово все</span>
+                <input class="profile__text" id="books_data_field" name="release_date" type="date">
               </div>
-              <div class="main__form-wrap">
-                <select name="release_date" id="books_data_field" class="main__form-select">
-                  <option value="#">Дата издания</option>
-                  {% for date in date_list %}
-                  <option value="{{ date }}">{{ date }}</option>
-                  {% endfor %}
-                </select>
+              <div>
+                <textarea class="profile__text" id="description_field" maxlength="200" name="description" placeholder="Введите описание или его часть.." rows="2"></textarea>
+              </div>
+              <div>
+                <span class="main__help">Для просмотра всех книг из данной категории введите символ *</span>
               </div>
               <button class="main__form-btn btn" id="find_books_button">Найти</button>
             </form>
@@ -123,7 +123,7 @@
                   {% for book in top_books %}
                     <div class="swiper-slide hero__slide hero__slide--one">
                       <li class="list__book-best">
-                        <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__book-set">
+                        <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__book-set">
                           <img class="list__book-set" src="{{url_for('main.cover', name=book[0].name)}}" alt="">
                         </a>
                         <div class="list__book-wrap">
@@ -131,7 +131,7 @@
                           <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
                             class="list__book-delete-btn">Добавить в список</a>
                           {% endif %}
-                          <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__link">Книга:
+                          <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__link">Книга:
                             {{book[0].name.title()}}</a>
                           <span class="list__link">Автор: {{book[0].author.title()}}</span>
                           <div class="list__mark-star">
@@ -142,6 +142,11 @@
                       </li>
                     </div>
                   {% endfor %}
+                  {% if not top_books %}
+                    <div class="list__wrap">
+                      В данной категории пока нет книг
+                    </div>
+                  {% endif %}
                 </div>
                 <div class="hero__pagination swiper-pagination js-hero-pagination"></div>
               </div>
@@ -161,7 +166,7 @@
                   {% for book in new_books %}
                     <div class="swiper-slide hero__slide hero__slide--one">
                       <li class="list__book-best">
-                        <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__book-set">
+                        <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__book-set">
                           <img class="list__book-set" src="{{url_for('main.cover', name=book[0].name)}}" alt="">
                         </a>
                         <div class="list__book-wrap">
@@ -169,7 +174,7 @@
                           <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
                             class="list__book-delete-btn">Добавить в список</a>
                           {% endif %}
-                          <a href="{{url_for('main.book_page', name=book[0].name)}}" class="list__link">Книга:
+                          <a href="{{url_for('main.book_page', name=book[0].name, list_id=list_id)}}" class="list__link">Книга:
                             {{book[0].name.title()}}</a>
                           <span class="list__link">Автор: {{book[0].author.title()}}</span>
                           <div class="list__mark-star">
@@ -180,6 +185,11 @@
                       </li>
                     </div>
                   {% endfor %}
+                  {% if not new_books %}
+                    <div class="list__wrap">
+                      В данной категории пока нет книг
+                    </div>
+                  {% endif %}
                 </div>
                 <div class="hero__pagination swiper-pagination js-hero-pagination"></div>
               </div>

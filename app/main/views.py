@@ -1,31 +1,13 @@
 from . import main
 from .. import database
-from app.models import BookGrade, Book, Comment, SearchResult, Category, User, TopicPost, DiscussionTopic, Role, BooksMaintaining
+from app.main import *
+from app.models import BookGrade, Book, Comment, Category, User, TopicPost, DiscussionTopic, Role, BooksMaintaining, PrivateChat, PrivateChatPost
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from flask_login import current_user, login_required
 from app.decorators import admin_required, check_actual_password
 from app.parse_excel import *
 import copy
-from operator import itemgetter
-from sqlalchemy.exc import IntegrityError
 from datetime import datetime
-ELEMS_COUNT = 8
-TOP_BOOKS_COUNT = 3
-BOOKS_MAINTAINING_PER_PAGE = 20
-months_dict = {
-    1: 'января',
-    2: 'февраля',
-    3: 'марта',
-    4: 'апреля',
-    5: 'мая',
-    6: 'июня',
-    7: 'июля',
-    8: 'августа',
-    9: 'сентября',
-    10: 'октября',
-    11: 'ноября',
-    12: 'декабря'
-}
 
 
 @main.app_context_processor
@@ -45,9 +27,16 @@ def cover(name):
     return cover
 
 
-@main.route('/<post_id>/get-post_screenshot', methods=['GET'])
+@main.route('/<post_id>/get-post-screenshot', methods=['GET'])
 def post_screenshot(post_id):
     post = TopicPost.query.filter_by(id=post_id).first()
+    file = make_response(post.file)
+    return file
+
+
+@main.route('/<post_id>/get-post-screenshot-on-private-chat', methods=['GET'])
+def post_screenshot_on_private_chat(post_id):
+    post = PrivateChatPost.query.filter_by(id=post_id).first()
     file = make_response(post.file)
     return file
 
@@ -59,17 +48,17 @@ def index():
 
 @main.route('/book-page/<name>', methods=['GET'])
 def book_page(name):
+    list_id = request.args.get('list_id', None, type=int)
     book = Book.query.filter_by(name=name).first()
     pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(
         1, per_page=ELEMS_COUNT, error_out=False)
     comments = pagination.items
     grades = book.grades.all()
     try:
-        fin_grade = round(
-            sum([value.grade for value in grades]) / len(grades), 1)
+        fin_grade = round(sum([value.grade for value in grades]) / len(grades), 1)
     except:
         fin_grade = 0
-    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=len(grades), int=int, display="none")
+    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=len(grades), int=int, list_id=list_id, display="none")
 
 
 @main.route('/get_comments_page/<book_name>/<page>', methods=['GET'])
@@ -188,10 +177,10 @@ def get_categories_page(page):
 def category(name):
     list_id = request.args.get('list_id', None, type=int)
     category = Category.query.filter_by(name=name).first()
-    if category is None:
+    if not category:
         return render_template('404.html')
     res = category.books.all()
-    date_list = list(); top_books = list(); new_books = list()
+    top_books = list(); new_books = list()
     if res:
         for book in res:
             try:
@@ -200,17 +189,14 @@ def category(name):
             except:
                 top_books.append([book, 0])
                 new_books.append([book, 0])
-            if not book.release_date in date_list:
-                date_list.append(book.release_date)
-                
+           
         if len(top_books) > TOP_BOOKS_COUNT:
             top_books = sorted(top_books, key=lambda value: value[1], reverse=True)[:TOP_BOOKS_COUNT]
             new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)[:TOP_BOOKS_COUNT]
         else:
             top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
             new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
-        
-    return render_template('main/category_page.html', date_list=date_list, top_books=top_books, new_books=new_books, name=category.name, list_id=list_id)
+    return render_template('main/category_page.html', top_books=top_books, new_books=new_books, name=category.name, list_id=list_id)
         
         
 @main.route('/category/<name>/search', methods=['POST'])
@@ -225,18 +211,19 @@ def search_by_category(name):
         return render_template('404.html')
     res = category.books.all()
     result = str(request.form.get('search_result')).strip().lower()
-    if result == 'все':
+    if result == '*':
         search_result = res
     else:
-        search_result = list(); release_date = request.form.get('release_date')
-        if release_date != '#':
-            search_result = category.books.filter_by(release_date=release_date).all()
-        search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
-    
+        search_result = list(); release_date = request.form.get('release_date').strip(); description = request.form.get('description').strip()
+        if result:
+            search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
+        if release_date:
+            search_result += category.books.filter((Book.release_date.like("%{}%".format(release_date)))).all()
+        if description:
+            search_result += category.books.filter((Book.description.like("%{}%".format(description)))).all()
+            
     if search_result:
-        search_result_fin = []
-        [search_result_fin.append(value) for value in search_result if value and value not in search_result_fin]
-        search_result = search_result_fin
+        search_result = list(set(search_result))
         results_count = len(search_result)
         pages_count = len(search_result) // ELEMS_COUNT
         if len(search_result) % ELEMS_COUNT > 0:
@@ -285,14 +272,14 @@ def topic(topic_id):
             post_from = topic.posts.filter_by(id=post.answer_to_post).first()
             if post_from:
                 posts.append({"this_is_answer": True, "basic_post_exist": True, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
-                             "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
+                             "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
             else:
                 posts.append({"this_is_answer": True, "basic_post_exist": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
-                             "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
+                             "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
         else:
             posts.append({"this_is_answer": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
-                         "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender})
-    return render_template('main/forum_discussion.html', user_is_admin=user_is_admin, topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str, display="none")
+                         "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+    return render_template('main/forum_discussion.html', user_is_admin=user_is_admin, topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str)
 
 
 @main.route('/get_categories_page_on_forum/<page>', methods=['GET'])
@@ -347,26 +334,26 @@ def get_posts_page(topic_id, page):
                     id=post.answer_to_post).first()
                 if post_from:
                     posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
             else:
                 posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
         else:
             if post.answer_to_post:
                 post_from = topic.posts.filter_by(
                     id=post.answer_to_post).first()
                 if post_from:
                     posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
             else:
                 posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender))
+                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
     return jsonify(dict(posts=posts, pages_count=pages_count))
 
 
@@ -393,23 +380,26 @@ def search_category_on_forum():
             categories_topics[category.id] = copy.deepcopy(category_topics)
 
         if current_user.is_authenticated:
+            if current_user.role == Role.ADMIN:
+                is_admin = True
+            else:
+                is_admin = False
             username_of_cur_user = current_user.username
         else:
-            username_of_cur_user = False
-        return jsonify([dict(result=True, cur_page=page, username_of_cur_user=username_of_cur_user, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(cur_page_category.topics.all())) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
+            username_of_cur_user = False; is_admin = False
+        return jsonify([dict(result=True, cur_page=page, username_of_cur_user=username_of_cur_user, cur_user_is_admin=is_admin, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(cur_page_category.topics.all())) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
     else:
         return jsonify([dict(result=False)])
 
 
-@main.route('/<username>/<category_name>/add_topic', methods=['POST'])
+@main.route('/<username>/<category_id>/add_topic', methods=['POST'])
 @login_required
 @check_actual_password
-def add_topic(username, category_name):
+def add_topic(username, category_id):
     if current_user.username != username:
         return render_template('403.html')
-    page = request.args.get('page', 1, type=int)
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
-    cur_category = Category.query.filter_by(name=category_name).first()
+    cur_category = Category.query.filter_by(id=int(category_id)).first()
     result = True
     for topic in cur_category.topics.all():
         if topic.name == in_topic_name:
@@ -604,3 +594,237 @@ def book_del():
             return jsonify(dict(result=False))
     except:
         return jsonify(dict(result=False))
+    
+
+@main.route('/forum/create_private_chat', methods=['POST'])
+@login_required
+@check_actual_password
+def create_private_chat():
+    private_chat_name = request.form.get('private_chat_name').strip().lower()
+    if current_user.private_chats.filter_by(name=private_chat_name).first():
+        return jsonify(dict(result=1))
+    elif len(current_user.private_chats.all()) >= MAX_PRIVATE_CHATS_PER_USER:
+        return jsonify(dict(result=0))
+    private_chat = PrivateChat(name=private_chat_name, creator=current_user._get_current_object())
+    database.session.add(private_chat)
+    database.session.commit()
+    return jsonify(dict(result=2))
+
+
+@main.route('/forum/private_chats', methods=['GET'])
+@login_required
+@check_actual_password
+def private_chats():
+    private_chats = current_user.private_chats.all()
+    chats_invitations = current_user.chats_invitations.all()
+    chats_info = list()
+    for private_chat in private_chats:
+        chats_info.append([private_chat.id, private_chat.name, "created"])
+    for chat_invitation in chats_invitations:
+        chats_info.append([chat_invitation.private_chat.id, chat_invitation.private_chat.name, "invited"])
+        
+    if chats_info:   
+        # найдем количество страниц
+        info_count = len(chats_info)
+        pages = info_count // ELEMS_COUNT
+        if info_count % ELEMS_COUNT > 0:
+            pages += 1
+        
+        res = dict()
+        for page in range(1, pages + 1):
+            res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
+        chats_info = res[1]
+    else:
+        pages = None
+    invitations = current_user.chats_invitations.filter_by(viewed=False).all()
+    for invitation in invitations:
+        invitation.viewed = True
+        database.session.add(invitation)
+    database.session.commit()
+    return render_template('main/private_chats.html', chats_info=chats_info, pages=pages, range=range)
+    
+
+@main.route('/forum/delete_private_chat/<chat_id>/<page>', methods=['GET'])
+@login_required
+@check_actual_password
+def delete_private_chat(chat_id, page):
+    chat_id = int(chat_id); page_ = int(page)
+    private_chat = current_user.private_chats.filter_by(id=chat_id).first()
+    database.session.delete(private_chat)
+    database.session.commit()
+        
+    # получаем данные для перестройки пагинации
+    private_chats = current_user.private_chats.all()
+    chats_invitations = current_user.chats_invitations.all()
+    chats_info = list()
+    for private_chat in private_chats:
+        chats_info.append([private_chat.id, private_chat.name, "created"])
+    for chat_invitation in chats_invitations:
+        chats_info.append([chat_invitation.private_chat.id, chat_invitation.private_chat.name, "invited"])
+        
+    if chats_info:   
+        has_elems = True
+        # найдем количество страниц
+        info_count = len(chats_info)
+        pages_count = info_count // ELEMS_COUNT
+        if info_count % ELEMS_COUNT > 0:
+            pages_count += 1
+        
+        res = dict(); pages_count_list = list()
+        for page in range(1, pages_count + 1):
+            res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
+        if res.get(page_):
+            chats_info = res[page_]
+            cur_page = page_
+        else:
+            chats_info = res[page_ - 1]
+            cur_page = page_ - 1
+        for page in range(1, pages_count + 1):
+            if page % 4 != 0:
+                pages_count_list.append(page)
+            else:
+                pages_count_list.append(None)
+        return jsonify([dict(has_elems=has_elems, cur_page=cur_page, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
+    return jsonify([dict(has_elems=False)])
+ 
+ 
+@main.route('/forum/get_chats_page/<page>', methods=['GET'])
+@login_required
+@check_actual_password
+def get_chats_page(page):
+    page_ = int(page); chats_info = list()
+    private_chats = current_user.private_chats.all()
+    chats_invitations = current_user.chats_invitations.all()
+    for private_chat in private_chats:
+        chats_info.append([private_chat.id, private_chat.name, "created"])
+    for chat_invitation in chats_invitations:
+        chats_info.append([chat_invitation.private_chat.id, chat_invitation.private_chat.name, "invited"])
+        
+    # найдем количество страниц
+    info_count = len(chats_info)
+    pages_count = info_count // ELEMS_COUNT
+    if info_count % ELEMS_COUNT > 0:
+        pages_count += 1
+    
+    res = dict(); pages_count_list = list()
+    for page in range(1, pages_count + 1):
+        res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
+    chats_info = res[page_]
+    for page in range(1, pages_count + 1):
+        if page % 4 != 0:
+            pages_count_list.append(page)
+        else:
+            pages_count_list.append(None)
+    return jsonify([dict(cur_page=page_, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
+
+
+@main.route('/forum/private_chat/<chat_id>', methods=['GET'])
+@login_required
+@check_actual_password
+def private_chat(chat_id):
+    chat = PrivateChat.query.filter_by(id=chat_id).first()
+    if not chat or (chat not in current_user.private_chats and not current_user.chats_invitations.filter_by(private_chat=chat).first()):
+        return render_template('403.html')
+
+    participants_count = chat.invitations.count() + 1
+    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+        user_is_admin = 1
+    else:
+        user_is_admin = 0
+    posts_pagination = chat.posts.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
+   
+    posts = list()
+    for post in posts_pagination.items:
+        user = User.query.filter_by(id=post.user_id).first()
+        if post.answer_to_post:
+            post_from = chat.posts.filter_by(id=post.answer_to_post).first()
+            if post_from:
+                posts.append({"this_is_answer": True, "basic_post_exist": True, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
+                             "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+            else:
+                posts.append({"this_is_answer": True, "basic_post_exist": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
+                             "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+        else:
+            posts.append({"this_is_answer": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
+                         "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+    return render_template('main/private_chat_discussion.html', chat_creator_id=chat.creator.id, user_is_admin=user_is_admin, chat_id=chat.id, chat_name=chat.name, posts_count=len(chat.posts.all()), participants_count=participants_count, posts_pagination=posts_pagination, posts=posts, str=str)
+
+
+@main.route('/get_posts_page_on_chat_disc/<chat_id>/<page>', methods=['GET'])
+@login_required
+@check_actual_password
+def get_posts_page_on_chat_disc(chat_id, page):
+    page = int(page); posts = list()
+    chat = PrivateChat.query.filter_by(id=chat_id).first()
+    posts_pagination = chat.posts.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    pages_count = list(posts_pagination.iter_pages())
+    username = current_user.username
+    if current_user.role == Role.ADMIN:
+        user_is_admin = True
+    else:
+        user_is_admin = False
+
+    for post in posts_pagination.items:
+        user = User.query.filter_by(id=post.user_id).first()
+        if post.file:
+            if post.answer_to_post:
+                post_from = chat.posts.filter_by(id=post.answer_to_post).first()
+                if post_from:
+                    posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
+                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                else:
+                    posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
+                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+            else:
+                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
+                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+        else:
+            if post.answer_to_post:
+                post_from = chat.posts.filter_by(id=post.answer_to_post).first()
+                if post_from:
+                    posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
+                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                else:
+                    posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
+                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+            else:
+                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
+                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+    return jsonify(dict(posts=posts, pages_count=pages_count))
+
+
+@main.route('/forum/private_chat/<chat_id>/get_users_page_to_invite/<page>', methods=['GET'])
+@login_required
+@check_actual_password
+def get_users_page_to_invite(chat_id, page):
+    chat = PrivateChat.query.filter_by(id=chat_id).first()
+    if chat:
+        try:
+            page = int(page)
+        except:
+            return jsonify([dict(result=False)])
+        
+        invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
+        users_pagination = User.query.filter(User.id != current_user.id).filter(User.id != chat.creator.id).filter(~User.id.in_(invited_users_id_to_cur_chat)).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        if not users_pagination.items:
+            return jsonify([dict(result=False)])
+        pages_count = list(users_pagination.iter_pages())
+        users = users_pagination.items
+        return jsonify([dict(result=True, cur_page=page, id=user.id, username=user.username, pages_count=pages_count, chat_id=chat.id) for user in users])
+    else:
+        return render_template('404.html')
+    
+
+@main.route('/change-topic-name/<category_id>/<topic_id>', methods=['POST'])
+@admin_required
+@check_actual_password 
+def change_topic_name(category_id, topic_id):
+    try:
+        category = Category.query.filter_by(id=category_id).first()
+        topic = category.topics.filter_by(id=topic_id).first()
+        topic.name = str(request.form.get('topic_changed_name')).strip().replace("'", "")
+        database.session.add(topic)
+        database.session.commit()
+        return jsonify(dict(category_id=category_id, topic_id=topic_id, name=topic.name, username=current_user.username))
+    except:
+        return render_template('404.html')

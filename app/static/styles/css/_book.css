@@ -7,7 +7,7 @@
 .comments__wrap {
   padding: 52px 100px;
   border-radius: 15px;
-  background-color: #cec8bd;
+  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
 }
 
 .book__title {
@@ -128,6 +128,10 @@
   transition: fill 0.2s linear;
 }
 
+.bookChange {
+  fill: gold;
+}
+
 .book__link:hover {
   color: gold;
 }
@@ -142,6 +146,11 @@
 
 .book__star::active {
   fill: gold;
+}
+
+.secondMark:hover ~ .firstMark {
+  fill: gold;
+  color: gold;
 }
 
 .book__state {
@@ -189,7 +198,7 @@
 
 .book__count {
   background-color: #fdfde9;
-  width: 30px;
+  width: 50px;
 }
 
 .book__td {

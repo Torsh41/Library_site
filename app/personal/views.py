@@ -8,7 +8,6 @@ from app.decorators import admin_required, check_actual_password
 from app.parse_excel import add_many_books
 from datetime import datetime
 import copy
-import codecs
 LISTS_COUNT = 2
 BOOKS_COUNT = 5
 CATEGORIES_COUNT = 5
@@ -60,7 +59,8 @@ def person(username, flag=False):
             p = 1
         cur_books_page_for_cataloges.append(p)
         paginations_for_books_in_lists.append(books_pagination)
-    return render_template('personal/user_page.html', user=current_user, catalogues=catalogues, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, cur_books_page_for_cataloges=cur_books_page_for_cataloges, cataloges_page=page, len=len, flag=flag, zip=zip, display="none")
+    invitations = len(current_user.chats_invitations.filter_by(viewed=False).all())
+    return render_template('personal/user_page.html', user=current_user, catalogues=catalogues, invitations=invitations, pagination=pagination, paginations_for_books_in_lists=paginations_for_books_in_lists, cur_books_page_for_cataloges=cur_books_page_for_cataloges, cataloges_page=page, len=len, flag=flag, zip=zip, display="none")
 
 
 @personal.route('/<username>/edit-profile', methods=['GET', 'POST'])
@@ -171,8 +171,8 @@ def add_new_book(username):
     if form.validate_on_submit():
         category = Category.query.filter_by(
             name=str(request.form.get('category'))).first()
-        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data, name=str(form.name.data).strip().lower().replace("'", ""), author=str(form.author.data).strip().lower(), publishing_house=str(form.publishing_house.data).strip(),
-                    description=form.description.data, release_date=form.release_date.data, count_of_chapters=form.chapters_count.data,
+        book = Book(cover=bytes(request.files['cover'].read()), isbn=form.isbn.data.strip(), name=form.name.data.strip().lower().replace("'", ""), author=form.author.data.strip().lower(), publishing_house=form.publishing_house.data.strip(),
+                    description=form.description.data.strip(), release_date=form.release_date.data, count_of_chapters=form.chapters_count.data,
                     category=category, user=current_user._get_current_object())
 
         if not book.cover:
@@ -261,10 +261,10 @@ def list_delete(username, list_id, page):
     if current_user.username != username:
         return render_template('403.html')
     page = int(page)
-    cataloge = Cataloge.query.filter_by(id=list_id).first()
+    cataloge = current_user.cataloges.filter_by(id=list_id).first()
     database.session.delete(cataloge)
     database.session.commit()
-    if cataloges := current_user.cataloges.all():
+    if current_user.cataloges.all():
         has_elems = True
         cataloge_pagination = current_user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
         pages_count = list(cataloge_pagination.iter_pages())

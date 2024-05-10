@@ -12,9 +12,35 @@
 }
 
 .header__right {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.--count {
+  position: relative;
+}
+
+.nav__count {
+  position: absolute;
+  top: -10px;
+  display: inline-block;
+  padding: 1px 11px;
+  color: #fff;
+  background-color: crimson;
+  border-radius: 100%;
+}
+
+.header__count{
+  position: absolute;
+  right: -30px;
+  top: -10px;
+  display: inline-block;
+  padding: 1px 11px;
+  color: #fff;
+  background-color: crimson;
+  border-radius: 100%;
 }
 
 .header__menu {

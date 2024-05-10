@@ -40,6 +40,7 @@
   line-height: 23px;
   background-color: transparent;
   outline: none;
+  cursor: pointer;
   transition: color .3s linear, background-color .3s linear;
 }
 
@@ -119,7 +120,7 @@
   border-radius: 20px;
   background-color: var(--white);
   cursor: pointer;
-  background-color: #cec8bd;
+  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
   transition: background-color 0.3s linear;
 }
 
@@ -151,7 +152,7 @@
   border-radius: 20px;
   outline: none;
   cursor: pointer;
-  background-color: #cec8bd;
+  background: radial-gradient(circle, rgba(206,200,189,1) 35%, rgba(255,252,237,1) 100%);
 }
 
 .main__form-select:not(:last-child) {

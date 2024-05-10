@@ -44,6 +44,7 @@
                             <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
                             <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
                             <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
+                            <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
                         </ul>
                     </div>
                 </nav>
@@ -113,66 +114,68 @@
     
             <section class="form">
                 <div id="main_table" class="form__container container">
-                    <div id="table_head" class="form__maintaining">
-                        {% for book in info %}
-                            <div class="form__book" id="{{book.id}}book">
-                                <div class="form__info form__book-id">
-                                    <span class="form__span-title">ID</span>
-                                    <span class="form__span-info">{{ book.id }}</span>
+                    {% if info %}
+                        <div id="table_head" class="form__maintaining">
+                            {% for book in info %}
+                                <div class="form__book" id="{{book.id}}book">
+                                    <div class="form__info form__book-id">
+                                        <span class="form__span-title">ID</span>
+                                        <span class="form__span-info">{{ book.id }}</span>
+                                    </div>
+                                    <div class="form__info form__book-name">
+                                        <span class="form__span-title">Название</span>
+                                        <span class="form__span-info">{{ book.name }}</span>
+                                    </div>
+                                    <div class="form__info form__book-author">
+                                        <span class="form__span-title">Авторы</span>
+                                        <span class="form__span-info">{{ book.authors }}</span>
+                                    </div>
+                                    <div class="form__info form__book-part">
+                                        <span class="form__span-title">Серии</span> 
+                                        <span class="form__span-info">{{ book.series }}</span>
+                                    </div>
+                                    <div class="form__info form__book-category">
+                                        <span class="form__span-title">Категории</span>
+                                        <span class="form__span-info">{{ book.categories }}</span>
+                                    </div>
+                                    <div class="form__info form__book-date">
+                                        <span class="form__span-title">Дата публикации</span>
+                                        <span class="form__span-info">{{ book.publishing_date }}</span>
+                                    </div>
+                                    <div class="form__info form__book-countpages">
+                                        <span class="form__span-title">Количество страниц</span>
+                                        <span class="form__span-info">{{ book.pages_count }}</span>
+                                    </div>
+                                    <div class="form__info form__book-isbn">
+                                        <span class="form__span-title">ISBN</span>
+                                        <span class="form__span-info">{{ book.isbn }}</span>
+                                    </div>
+                                    <div class="form__info form__book-comments">
+                                        <span class="form__span-title">Комментарии</span>
+                                        <span class="form__span-info">{{ book.comments }}</span>
+                                    </div>
+                                    <div class="form__info form__book-info">
+                                        <span class="form__span-title">Краткое содержание</span>
+                                        <span class="form__span-info">{{ book.summary }}</span>
+                                    </div>
+                                    <div class="form__info form__book-link">
+                                        <span class="form__span-title">Ссылка</span>
+                                        <span class="form__span-info">{{ book.link }}</span>
+                                    </div>
+                                    <div class="form__info form__book-count">
+                                        <span class="form__span-title">Количество</span>
+                                        <span class="form__span-info"><input class="book__count" id="{{book.id}}books_count" min="0"
+                                                formmethod="post" placeholder="введите наличие" required type="number"
+                                                value="{{book.count}}"></span>
+                                    </div>
+                                    <div class="form__book-delete">
+                                        <input class="form__delete-btn" id="{{book.id}}del_book" data-page="{{1}}" formmethod="post" type="submit"
+                                            value="удалить из списка">
+                                    </div>
                                 </div>
-                                <div class="form__info form__book-name">
-                                    <span class="form__span-title">Название</span>
-                                    <span class="form__span-info">{{ book.name }}</span>
-                                </div>
-                                <div class="form__info form__book-author">
-                                    <span class="form__span-title">Авторы</span>
-                                    <span class="form__span-info">{{ book.authors }}</span>
-                                </div>
-                                <div class="form__info form__book-part">
-                                    <span class="form__span-title">Серии</span> 
-                                    <span class="form__span-info">{{ book.series }}</span>
-                                </div>
-                                <div class="form__info form__book-category">
-                                    <span class="form__span-title">Категории</span>
-                                    <span class="form__span-info">{{ book.categories }}</span>
-                                </div>
-                                <div class="form__info form__book-date">
-                                    <span class="form__span-title">Дата публикации</span>
-                                    <span class="form__span-info">{{ book.publishing_date }}</span>
-                                </div>
-                                <div class="form__info form__book-countpages">
-                                    <span class="form__span-title">Количество страниц</span>
-                                    <span class="form__span-info">{{ book.pages_count }}</span>
-                                </div>
-                                <div class="form__info form__book-isbn">
-                                    <span class="form__span-title">ISBN</span>
-                                    <span class="form__span-info">{{ book.isbn }}</span>
-                                </div>
-                                <div class="form__info form__book-comments">
-                                    <span class="form__span-title">Комментарии</span>
-                                    <span class="form__span-info">{{ book.comments }}</span>
-                                </div>
-                                <div class="form__info form__book-info">
-                                    <span class="form__span-title">Краткое содержание</span>
-                                    <span class="form__span-info">{{ book.summary }}</span>
-                                </div>
-                                <div class="form__info form__book-link">
-                                    <span class="form__span-title">Ссылка</span>
-                                    <span class="form__span-info">{{ book.link }}</span>
-                                </div>
-                                <div class="form__info form__book-count">
-                                    <span class="form__span-title">Количество</span>
-                                    <span class="form__span-info"><input class="book__count" id="{{book.id}}books_count" min="0"
-                                            formmethod="post" placeholder="введите наличие" required type="number"
-                                            value="{{book.count}}"></span>
-                                </div>
-                                <div class="form__book-delete">
-                                    <input class="form__delete-btn" id="{{book.id}}del_book" data-page="{{1}}" formmethod="post" type="submit"
-                                        value="удалить из списка">
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     <div class="list__pagination pagination" id="pagination_container">
                         <ul class="pagination__list list-reset" id="pagination">
                             <li class="pagination__item disabled">

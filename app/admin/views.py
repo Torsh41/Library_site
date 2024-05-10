@@ -3,11 +3,10 @@ from flask_login import current_user
 from flask import render_template, redirect, url_for, request, jsonify
 from .. import database
 from app.models import User, Book, Category, SearchResult
-from .forms import AddCategoryForm
+from .forms import AddCategoryForm, ChangeBookInfoForm
 from app.decorators import admin_required, check_actual_password
-import copy
 RESULT_COUNT = 8
-
+CATEGORIES_COUNT = 5
 
 @admin.route('/<username>/admin_panel', methods=['GET', 'POST'])
 @admin_required
@@ -34,7 +33,7 @@ def user_search(username):
     users = User.query.all()
     if users:
         search_username = str(request.form.get('users_search_result'))
-        if search_username == 'все':
+        if search_username == '*':
             last_page = (len(users) - 1) // RESULT_COUNT
             if len(users) % RESULT_COUNT > 0:
                 last_page += 1
@@ -111,7 +110,7 @@ def user_delete(user_id, page):
                              & (User.id == user_id)).first()
     database.session.delete(user)
     database.session.commit()
-    if users := User.query.filter(User.id != current_user.id).all():
+    if User.query.filter(User.id != current_user.id).all():
         has_elems = True
         user_pagination = User.query.filter(User.id != current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(user_pagination.iter_pages())
@@ -132,7 +131,7 @@ def category_delete(username, category_id, page):
     category = Category.query.filter_by(id=category_id).first()
     database.session.delete(category)
     database.session.commit()
-    if categories := Category.query.all():
+    if Category.query.all():
         has_elems = True
         category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(category_pagination.iter_pages())
@@ -152,7 +151,7 @@ def search_books_on_admin_panel(username, category_name):
     category = Category.query.filter_by(name=category_name).first()
     if request.method == "POST":
         result = str(request.form.get('search_result')).strip().lower()
-        if result == "все":
+        if result == '*':
             books = category.books.all()
         else:
             books = category.books.filter((Book.name.like("%{}%".format(result))) | (
@@ -177,16 +176,11 @@ def search_books_on_admin_panel(username, category_name):
                 pages_count = list(range(1, pages + 1))      
                              
             # удаление прошлых результатов поиска из бд
-            database.session.query(SearchResult).delete()
-            
-            # old_books_result = SearchResult.query.all()
-            # if old_books_result:
-            #     for elem in old_books_result:
-            #         database.session.delete(elem)
-            
+            database.session.query(SearchResult).filter_by(searcher_id=current_user.id).delete()
+                 
             books_grades = list()
             for book in books:
-                book_for_cur_result = SearchResult(book)
+                book_for_cur_result = SearchResult(book, searcher_id=current_user.id)
                 database.session.add(book_for_cur_result)
                 grades = book.grades.all()
                 try:
@@ -201,26 +195,10 @@ def search_books_on_admin_panel(username, category_name):
             return jsonify([dict(has_books=False)])
 
     elif page := request.args.get('page', None, type=int):
-        cur_result_pagination = SearchResult.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        cur_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(cur_result_pagination.iter_pages())
         cur_result = cur_result_pagination.items
-        #cur_result_for_pagi = SearchResult.query.all()
         if cur_result:
-        # if cur_result_for_pagi:
-        #     page_count = 1
-        #     temp_arr = list()
-        #     books = dict()
-        #     counter = 0
-        #     for book in cur_result_for_pagi:
-        #         counter += 1
-        #         temp_arr.append(book)
-        #         if counter % RESULT_COUNT == 0:
-        #             books[page_count] = copy.copy(temp_arr)
-        #             page_count += 1
-        #             temp_arr = list()
-
-        #     if counter % RESULT_COUNT > 0:
-        #         books[page_count] = temp_arr
             return jsonify([dict(has_books=True, cur_page=page, pages_count=pages_count, username=current_user.username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book.grade) for book in cur_result])#books[page]])
         else:
             return jsonify([dict(has_books=False)])
@@ -234,12 +212,12 @@ def del_book(username, category_name, book_id, page):
     page = int(page)
     book = Book.query.filter_by(id=book_id).first()
     database.session.delete(book)
-    book_for_search_result = SearchResult.query.filter_by(id=book_id).first()
+    book_for_search_result = SearchResult.query.filter_by(searcher_id=current_user.id).filter_by(id=book_id).first()
     database.session.delete(book_for_search_result)
     database.session.commit()
-    if books := SearchResult.query.all():
+    if SearchResult.query.filter_by(searcher_id=current_user.id).all():
         has_elems = True
-        books_result_pagination = SearchResult.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        books_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(books_result_pagination.iter_pages())
         if not books_result_pagination.items:
             page = page - 1
@@ -248,3 +226,27 @@ def del_book(username, category_name, book_id, page):
         pages_count = 1
         has_elems = False
     return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, category=category_name))
+
+
+@admin.route('/<username>/change_book_info/<int:book_id>', methods=['GET', 'POST'])
+@admin_required
+@check_actual_password
+def change_book_info(username, book_id):
+    if current_user.username != username:
+        return render_template('403.html')
+    if book := Book.query.filter_by(id=book_id).first():
+        pagination = Category.query.paginate(1, per_page=CATEGORIES_COUNT, error_out=False)
+        categories = pagination.items
+        form = ChangeBookInfoForm(book=book)
+        if form.validate_on_submit():
+            category = Category.query.filter_by(name=request.form.get('category')).first()
+            if cover := bytes(request.files['cover'].read()):
+                book.cover=cover
+            book.isbn=form.isbn.data.strip(); book.name=form.name.data.strip().lower().replace("'", ""); book.author=form.author.data.strip().lower(); book.publishing_house=form.publishing_house.data.strip()
+            book.description=request.form.get('description').strip(); book.release_date=form.release_date.data; book.count_of_chapters=form.chapters_count.data
+            book.category=category; book.user=current_user._get_current_object()
+            database.session.add(book)
+            database.session.commit()
+            return redirect(url_for('main.book_page', name=book.name))
+        return render_template('admin/change_book_info.html', form=form, categories=categories, pagination=pagination, book=book, range=range, len=len)
+    return render_template('404.html')

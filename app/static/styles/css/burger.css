@@ -32,7 +32,7 @@
   width: 400px;
   height: 100vh;
   padding: 170px 80px 40px 50px;
-  background-color: #cec8bd;
+  background: radial-gradient(circle, rgba(206, 200, 189, 1) 35%, rgba(255, 252, 237, 1) 100%);
   box-shadow: 0 0 20px rgba(0, 0, 0, .3);
   transform: translateY(-100%);
 }
@@ -69,8 +69,19 @@
   margin-right: 0;
 }
 
+/* .dark {
+  opacity: 0.4;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  width: 100%;
+  z-index: 1;
+} */
 
-
+.opens {
+  position: fixed;
+}
 
 .hamburger {
   display: inline-block;
@@ -178,7 +189,7 @@
 }
 
 .nav__link:hover {
-  color:  #F5F5DC;
+  color: #F5F5DC;
   background-color: rgba(95, 77, 77, 0.444);
 }
 

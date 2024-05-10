@@ -55,10 +55,12 @@
 
   .list__book:not(:nth-child(4n)) {
     margin-right: 0;
+    margin-left: 0;
   }
 
   .list__book:not(:nth-child(3n)) {
     margin-right: 59px;
+    margin-left: 0;
   }
 
   .list__container {
@@ -131,10 +133,12 @@
 
   .list__book:not(:nth-child(3n)) {
     margin-right: 0;
+    margin-left: 0;
   }
 
   .list__book:not(:nth-child(2n)) {
     margin-right: 59px;
+    margin-left: 0;
   }
 }
 
@@ -183,6 +187,7 @@
 
   .list__book:not(:nth-child(2n)) {
     margin-right: 0;
+    margin-left: 0;
   }
 
   .list__books {
@@ -242,6 +247,15 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  /* .fraction__wrapper-command {
+    display: flex;
+    flex-wrap: wrap;
+  } */
+
+  .comments__command {
+    font-size: 12px;
   }
 
   .nav__admin-item:not(:last-child) {
@@ -317,11 +331,23 @@
     width: 400px;
   }
 
+  .comments__command {
+    font-size: 10px;
+  }
+
   .list__books {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  .list__booksStart {
+    justify-content: center;
+  }
+
+  .elemleft {
+    margin-right: 0;
   }
 
   /* .list__book,
@@ -333,7 +359,9 @@
   .list__book-wrap {
     width: 178px;
   } */
-
+  .list__book {
+    margin-left: 0;
+  }
 
   .fraction__wrap,
   .category__wrap {
@@ -511,6 +539,10 @@
     width: 200px;
   }
 
+  .comments__command {
+    font-size: 7px;
+  }
+
   .comments__btn {
 
     margin-top: 15px;
@@ -596,6 +628,21 @@
     height: 250px;
 
   }
+
+  /* .defselect__list--dropdown .defselect__item,
+  .defselect__list[aria-expanded] .defselect__item {
+    font-size: 10px;
+  }
+
+
+
+  .defselect__list {
+    font-size: 10px;
+  }
+
+  .defselect {
+    font-size: 11px;
+  } */
 
   .book__top {
     margin-bottom: 20px;

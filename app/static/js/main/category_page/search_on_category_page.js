@@ -1,129 +1,130 @@
 function search_books_on_category_page(category_name, list_id=undefined) 
 {
-  if (document.getElementById('books_find_field').value.trim() && document.getElementById('books_find_field').value.trim().length <= 200)
-  {
-    $.ajax({
-        method: 'post',
-        url: `/category/${category_name}/search`,
-        dataType: 'json',
-        data: $('#search_form').serialize(),
-        success: function(response) {
-            let result = response.result;
-            let html = '';
-            if (result)
-            {
-                let books = response.data;
-                search_result = books;
-                $('section').filter(function() {
-                    return this.id.match("search_result");
-                }).remove();
-                $('section').filter(function() {
-                    return this.id.match("nothing_found");
-                }).remove();
-                $('#pagination_container').remove();
-                document.getElementById("books_find_field").value = "";
-                html += `<section id="search_result" class="list">
-                            <div class="container list__container">
-                                <div class="list__wrap">
-                                <h2 class="list__title title">Вот, что нашлось</h2>
-                                <span class="list__results"> Всего результатов: ${books[1][0].results_count} </span>
-                                <ul class="list__books list-reset" id="book_search_res_ul">`;
-                books[1].forEach(book => {
-                    html += `<li class="list__book" id="${book.id}search_books_info">
-                                <a href="/book-page/${book.name}" class="list__book-set">
-                                    <img class="list__book-set" src="/${book.name}/get-cover" alt="">
-                                </a>
-                            <div class="list__book-wrap">`;
-
-                    if (book.current_user_is_auth)
-                    {
-                        html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
-                    }
-                    html += `<a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
-                                <span class="list__link">Автор: ${book.author}</span>
-                                <div class="list__mark-star">
-                                    <span class="list__mark-visible">Оценка ${book.grade}</span>
-                                    <img src="/static/styles/img/star1.svg" alt="" class="list__star">
-                                </div>
-                                </div>
-                            </li>`;
-                });
-                html += ` </ul></div></div></section>`;
-                
-                // собираем пагинацию
-                html += `<div id="pagination_container" class="list__pagination pagination">
-                            <ul id="pagination" class="pagination__list list-reset">
-                                <li class="pagination__item disabled">
-                                    &bull;
-                                </li>`;
-                for (let page = 1; page <= books[1][0].pages_count; page++)
+    if (document.getElementById('books_find_field').value.trim() || document.getElementById('books_data_field').value.trim() || document.getElementById('description_field').value.trim())
+    {
+        $.ajax({
+            method: 'post',
+            url: `/category/${category_name}/search`,
+            dataType: 'json',
+            data: $('#search_form').serialize(),
+            success: function(response) {
+                let result = response.result;
+                let html = '';
+                if (result)
                 {
-                    if (page == 1)
-                    {
-                        html += `<li class="pagination__item_cur_page">
-                                <a id='${page}books_p'>${page}</a>
-                                </li>`;
-                    }
-                    else
-                    {
-                        html += `<li class="pagination__item active">
-                                    <a id='${page}books_p'>${page}</a>
-                                </li>`;
-                    }
-                }
-                html += `<li class="pagination__item disabled">
-                            &bull;
-                        </li></ul></div>`;
+                    let books = response.data;
+                    search_result = books;
+                    $('section').filter(function() {
+                        return this.id.match("search_result");
+                    }).remove();
+                    $('section').filter(function() {
+                        return this.id.match("nothing_found");
+                    }).remove();
+                    $('#pagination_container').remove();
+                    document.getElementById("books_find_field").value = "";
+                    html += `<section id="search_result" class="list">
+                                <div class="container list__container">
+                                    <div class="list__wrap">
+                                    <h2 class="list__title title">Вот, что нашлось</h2>
+                                    <span class="list__results"> Всего результатов: ${books[1][0].results_count} </span>
+                                    <ul class="list__books list-reset list__booksStart" id="book_search_res_ul">`;
+                    books[1].forEach(book => {
+                        html += `<li class="list__book" id="${book.id}search_books_info">
+                                    <a href="/book-page/${book.name}?list_id=${list_id}" class="list__book-set">
+                                        <img class="list__book-set" src="/${book.name}/get-cover" alt="">
+                                    </a>
+                                <div class="list__book-wrap">`;
 
-                let section = document.getElementById('first_section');
-                section.insertAdjacentHTML('afterend', html);
-                section = document.getElementById('search_result');
-                document.getElementById('books_data_field').value = "#";
-                section.scrollIntoView(); // Прокрутка до верхней границы
-          }
-          else
-          {
-            $('section').filter(function() {
-              return this.id.match("search_result");
-            }).remove();
-            $('section').filter(function() {
-              return this.id.match("nothing_found");
-            }).remove();
-            $('#pagination_container').remove();
-            document.getElementById("books_find_field").value = "";
-            html = `<section id="nothing_found" class="list">
-                        <div class="container list__container">
-                        <div class="list__wrap">
-                            <h2 class="list__title title">Ничего не найдено</h2>
-                        </div>
-                        </div>
-                    </section>`;
-            let section = document.getElementById('first_section');
-            section.insertAdjacentHTML('afterend', html);
-            document.getElementById('nothing_found').scrollIntoView(); // Прокрутка до верхней границы
-          }
-        },
-        error: function(jqXHR, exception) {
-            if (exception === 'parsererror')
-            {
-                window.location.href = '/auth/login';
+                        if (book.current_user_is_auth)
+                        {
+                            html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
+                        }
+                        html += `<a href="/book-page/${book.name}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
+                                    <span class="list__link">Автор: ${book.author}</span>
+                                    <div class="list__mark-star">
+                                        <span class="list__mark-visible">Оценка ${book.grade}</span>
+                                        <img src="/static/styles/img/star1.svg" alt="" class="list__star">
+                                    </div>
+                                    </div>
+                                </li>`;
+                    });
+                    html += ` </ul></div></div></section>`;
+                    
+                    // собираем пагинацию
+                    html += `<div id="pagination_container" class="list__pagination pagination">
+                                <ul id="pagination" class="pagination__list list-reset">
+                                    <li class="pagination__item disabled">
+                                        &bull;
+                                    </li>`;
+                    for (let page = 1; page <= books[1][0].pages_count; page++)
+                    {
+                        if (page == 1)
+                        {
+                            html += `<li class="pagination__item_cur_page">
+                                    <a id='${page}books_p'>${page}</a>
+                                    </li>`;
+                        }
+                        else
+                        {
+                            html += `<li class="pagination__item active">
+                                        <a id='${page}books_p'>${page}</a>
+                                    </li>`;
+                        }
+                    }
+                    html += `<li class="pagination__item disabled">
+                                &bull;
+                            </li></ul></div>`;
+
+                    let section = document.getElementById('first_section');
+                    section.insertAdjacentHTML('afterend', html);
+                    section = document.getElementById('search_result');
+                    document.getElementById('books_data_field').value = '';
+                    document.getElementById('description_field').value = '';
+                    section.scrollIntoView(); // Прокрутка до верхней границы
+                }
+                else
+                {
+                    $('section').filter(function() {
+                    return this.id.match("search_result");
+                    }).remove();
+                    $('section').filter(function() {
+                    return this.id.match("nothing_found");
+                    }).remove();
+                    $('#pagination_container').remove();
+                    document.getElementById("books_find_field").value = "";
+                    html = `<section id="nothing_found" class="list">
+                                <div class="container list__container">
+                                <div class="list__wrap">
+                                    <h2 class="list__title title">Ничего не найдено</h2>
+                                </div>
+                                </div>
+                            </section>`;
+                    let section = document.getElementById('first_section');
+                    section.insertAdjacentHTML('afterend', html);
+                    document.getElementById('books_data_field').value = '';
+                    document.getElementById('description_field').value = '';
+                    document.getElementById('nothing_found').scrollIntoView(); // Прокрутка до верхней границы
+                }
+            },
+            error: function(jqXHR, exception) {
+                if (exception === 'parsererror')
+                {
+                    window.location.href = '/auth/login';
+                }
+                else
+                {
+                    console.log(exception);
+                }
             }
-            else
-            {
-                console.log(exception);
-            }
-        }
-    });
-  }
-  else if (document.getElementById('books_find_field').value.trim().length > 200)
-  {
-    alert('Слишком длинное название категории');
-  }
-  else
-  {
-    alert('Заполните поле');
-    document.getElementById('books_find_field').value = '';
-  }
+        });
+    }
+    else if (!document.getElementById('books_find_field').value.trim() && !document.getElementById('books_data_field').value.trim() && !document.getElementById('description_field').value.trim())
+    {
+        document.getElementById('books_find_field').value = '';
+        document.getElementById('books_data_field').value = '';
+        document.getElementById('description_field').value = '';
+        alert('Заполните хотя бы одно поле поиска');
+    }
 }      
 
 
@@ -136,7 +137,7 @@ function get_books_page_on_category(page, list_id=undefined)
     let html = '';
     search_result[page].forEach(book => {
         html += `<li class="list__book" id="${book.id}search_books_info">
-                    <a href="/book-page/${book.name}" class="list__book-set">
+                    <a href="/book-page/${book.name}?list_id=${list_id}" class="list__book-set">
                         <img class="list__book-set" src="/${book.name}/get-cover" alt="">
                     </a>
                 <div class="list__book-wrap">`;
@@ -145,7 +146,7 @@ function get_books_page_on_category(page, list_id=undefined)
         {
                 html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
         }
-        html += `<a href="/book-page/${book.name}" class="list__link-book">Книга: ${book.name}</a>
+        html += `<a href="/book-page/${book.name}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
                     <span class="list__link">Автор: ${book.author}</span>
                     <div class="list__mark-star">
                         <span class="list__mark-visible">Оценка ${book.grade}</span>
