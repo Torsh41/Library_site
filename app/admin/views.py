@@ -110,7 +110,7 @@ def user_delete(user_id, page):
                              & (User.id == user_id)).first()
     database.session.delete(user)
     database.session.commit()
-    if users := User.query.filter(User.id != current_user.id).all():
+    if User.query.filter(User.id != current_user.id).all():
         has_elems = True
         user_pagination = User.query.filter(User.id != current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(user_pagination.iter_pages())
@@ -131,7 +131,7 @@ def category_delete(username, category_id, page):
     category = Category.query.filter_by(id=category_id).first()
     database.session.delete(category)
     database.session.commit()
-    if categories := Category.query.all():
+    if Category.query.all():
         has_elems = True
         category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(category_pagination.iter_pages())
@@ -215,7 +215,7 @@ def del_book(username, category_name, book_id, page):
     book_for_search_result = SearchResult.query.filter_by(searcher_id=current_user.id).filter_by(id=book_id).first()
     database.session.delete(book_for_search_result)
     database.session.commit()
-    if books := SearchResult.query.filter_by(searcher_id=current_user.id).all():
+    if SearchResult.query.filter_by(searcher_id=current_user.id).all():
         has_elems = True
         books_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(books_result_pagination.iter_pages())

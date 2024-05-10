@@ -264,7 +264,7 @@ def list_delete(username, list_id, page):
     cataloge = current_user.cataloges.filter_by(id=list_id).first()
     database.session.delete(cataloge)
     database.session.commit()
-    if cataloges := current_user.cataloges.all():
+    if current_user.cataloges.all():
         has_elems = True
         cataloge_pagination = current_user.cataloges.order_by().paginate(page, per_page=LISTS_COUNT, error_out=False)
         pages_count = list(cataloge_pagination.iter_pages())

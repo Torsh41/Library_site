@@ -55,8 +55,7 @@ def book_page(name):
     comments = pagination.items
     grades = book.grades.all()
     try:
-        fin_grade = round(
-            sum([value.grade for value in grades]) / len(grades), 1)
+        fin_grade = round(sum([value.grade for value in grades]) / len(grades), 1)
     except:
         fin_grade = 0
     return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=len(grades), int=int, list_id=list_id, display="none")
