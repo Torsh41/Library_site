@@ -260,7 +260,7 @@
                   {% for item in pagination_for_book_in_list.items %}
                     <li class="list__book" id="{{cataloge_value.id}}book_info">
                       <a href="{{url_for('main.book_page', book_id=item.book.id)}}" class="list__book-set">
-                        <img class="list__book-set" src="{{url_for('main.cover', name=item.book.name)}}" alt="">
+                        <img class="list__book-set" src="{{url_for('main.cover', book_id=item.book.id)}}" alt="">
                       </a>
   
                       <div class="list__book-wrap">
