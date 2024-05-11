@@ -643,7 +643,6 @@ def private_chats():
 @login_required
 @check_actual_password
 def delete_private_chat(chat_id, page):
-    page_ = copy.copy(page)
     private_chat = current_user.private_chats.filter_by(id=chat_id).first()
     database.session.delete(private_chat)
     database.session.commit()
@@ -668,12 +667,12 @@ def delete_private_chat(chat_id, page):
         res = dict(); pages_count_list = list()
         for page in range(1, pages_count + 1):
             res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
-        if res.get(page_):
-            chats_info = res[page_]
-            cur_page = page_
+        if res.get(page):
+            chats_info = res[page]
+            cur_page = page
         else:
-            chats_info = res[page_ - 1]
-            cur_page = page_ - 1
+            chats_info = res[page - 1]
+            cur_page = page - 1
         for page in range(1, pages_count + 1):
             if page % 4 != 0:
                 pages_count_list.append(page)
@@ -687,7 +686,7 @@ def delete_private_chat(chat_id, page):
 @login_required
 @check_actual_password
 def get_chats_page(page):
-    page_ = copy.copy(page); chats_info = list()
+    chats_info = list()
     private_chats = current_user.private_chats.all()
     chats_invitations = current_user.chats_invitations.all()
     for private_chat in private_chats:
@@ -704,13 +703,13 @@ def get_chats_page(page):
     res = dict(); pages_count_list = list()
     for page in range(1, pages_count + 1):
         res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
-    chats_info = res[page_]
+    chats_info = res[page]
     for page in range(1, pages_count + 1):
         if page % 4 != 0:
             pages_count_list.append(page)
         else:
             pages_count_list.append(None)
-    return jsonify([dict(cur_page=page_, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
+    return jsonify([dict(cur_page=page, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
 
 
 @main.route('/forum/private_chat/<int:chat_id>', methods=['GET'])

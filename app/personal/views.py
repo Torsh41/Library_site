@@ -135,7 +135,7 @@ def get_lists_page(username, page):
     cataloges_items = dict()
     for cataloge in cataloges:
         items_pagination = cataloge.items.order_by().paginate(1, per_page=BOOKS_COUNT, error_out=False)
-        cataloge_items = [dict(id=item.id, read_state=item.read_state, name=item.book.name,
+        cataloge_items = [dict(id=item.id, read_state=item.read_state, name=item.book.name, book_id=item.book.id,
                                cur_page=1, pages_count=list(items_pagination.iter_pages())) for item in items_pagination.items]
         cataloges_items[cataloge.id] = copy.deepcopy(cataloge_items)
     return jsonify([dict(cur_page=pagination.page, pages_count=pages_count, id=cataloge.id, name=cataloge.name, items=items, username=current_user.username) for cataloge, items in zip(cataloges, cataloges_items.values())])
@@ -152,7 +152,7 @@ def get_books_page(username, cataloge_id, page):
         items_pagination = cataloge.items.order_by().paginate(page, per_page=BOOKS_COUNT, error_out=False)
         pages_count = list(items_pagination.iter_pages())
         items = items_pagination.items
-        return jsonify([dict(cur_page=page, pages_count=pages_count, id=item.id, name=item.book.name, read_state=item.read_state, username_of_cur_user=current_user.username) for item in items])
+        return jsonify([dict(cur_page=page, pages_count=pages_count, id=item.id, book_id=item.book.id, name=item.book.name, read_state=item.read_state, username_of_cur_user=current_user.username) for item in items])
     return render_template("404.html")
 
 
