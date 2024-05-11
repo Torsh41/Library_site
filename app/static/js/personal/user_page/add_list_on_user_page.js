@@ -61,12 +61,12 @@ $(function() {
                             {
                                 items.forEach(item => {
                                 html += `<li class="list__book" id="${cataloge.id}book_info">
-                                            <a href="/book-page/${item.name}" class="list__book-set">
+                                            <a href="/book-page/${item.id}" class="list__book-set">
                                                 <img class="list__book-set" src="/${item.name}/get-cover" alt="">
                                             </a>
                                             
                                             <div class="list__book-wrap">
-                                                <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
+                                                <a href="/book-page/${item.id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
                                                 <select name="read_state" class="book__select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
                                                 if (item.read_state == "Планирую")
                                                     html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  

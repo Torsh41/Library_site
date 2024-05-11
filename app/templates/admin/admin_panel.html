@@ -141,7 +141,7 @@
                 </li>
               {% for category in categories %}
               <li class="category__elem" id="{{category.id}}category_info">
-                <a id="{{category.id}}show_books" class="category__book-link" data-username="{{current_user.username}}" data-catname="{{category.name}}">{{ category.name }}</a>
+                <a id="{{category.id}}show_books" class="category__book-link" data-username="{{current_user.username}}" data-catid="{{category.id}}">{{ category.name }}</a>
                 <a data-url="/admin/{{current_user.username}}/category_delete/{{category.id}}/{{1}}" data-pagi="2pagination" class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
               </li>
               {% endfor %}

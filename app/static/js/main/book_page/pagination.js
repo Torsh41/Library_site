@@ -1,5 +1,5 @@
 // функция перестройки пагинации комментариев для ее правильного отображения
-function comments_pagination_update(pages, bookname)
+function comments_pagination_update(pages, book_id)
 {
   $('#comments_pagination').remove();
   let html = `<ul class="pagination__list list-reset" id="comments_pagination">
@@ -10,7 +10,7 @@ function comments_pagination_update(pages, bookname)
     if (p)
     {
       html += `<li class="pagination__item active">
-                <a id="${p}comments_p" data-url="/get_comments_page/${bookname}/${p}">${p}</a>
+                <a id="${p}comments_p" data-url="/get_comments_page/${book_id}/${p}">${p}</a>
               </li>`;
     }
     else
@@ -57,21 +57,24 @@ function get_comments_page(url_path)
                 html += ` <div class="comments__commands" id="${comment.id}com_commands_cont">`;
                 if (comment.username == comment.name_of_current_user)
                 {
-                  html += `<a id="${comment.id}edit_com_a" data-combody="${comment.body}" data-username="${comment.username}" data-bookname="${comment.book_name}" data-comid="${comment.id}" class="comments__command">Редактировать</a>
-                            <a class="comments__command" data-url='/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}' id="${comment.id}del">Удалить</a>`;
+                  html += `<a id="${comment.id}edit_com_a" data-combody="${comment.body}" data-username="${comment.username}" data-bookid="${comment.book_id}" data-comid="${comment.id}" class="comments__command">Редактировать</a>
+                            <a class="comments__command" data-url='/${comment.name_of_current_user}/${comment.book_id}/delete-comment/${comment.id}/${url[url.length - 1]}' id="${comment.id}del">Удалить</a>`;
                 }
                 else if (comment.user_is_admin)
                 {
                   html += `<a class="comments__command">Админ</a>
-                           <a class="comments__command" data-url='/${comment.name_of_current_user}/${comment.book_name}/delete-comment/${comment.id}/${url[url.length - 1]}' id="${comment.id}del">Удалить</a>`;
+                           <a class="comments__command" data-url='/${comment.name_of_current_user}/${comment.book_id}/delete-comment/${comment.id}/${url[url.length - 1]}' id="${comment.id}del">Удалить</a>`;
                 }
                 html += `</div></li>`;
                 
             });
             document.getElementById("comments_info_container").innerHTML = html;
 
-            // перестройка пагинации
-            comments_pagination_update(comments[0].pages_count, comments[0].book_name);
+            if (comments.length)
+            {
+              // перестройка пагинации
+              comments_pagination_update(comments[0].pages_count, comments[0].book_id);
+            }
 
             // выделение текущей страницы
             pagi = document.getElementById('comments_pagination');
@@ -126,7 +129,7 @@ function edit_comment_ajax()
               p.insertAdjacentHTML('afterend', html);
               p.textContent = response.day + " " + response.month + " " + response.year;
 
-              html = `<a id="${response.id}edit_com_a" data-combody="${response.body}" data-username="${response.username}" data-bookname="${response.book_name}" data-comid="${response.id}" class="comments__command">Редактировать</a>`;
+              html = `<a id="${response.id}edit_com_a" data-combody="${response.body}" data-username="${response.username}" data-bookid="${response.book_id}" data-comid="${response.id}" class="comments__command">Редактировать</a>`;
               div.insertAdjacentHTML('afterbegin', html)
               document.getElementById("edit_comment_field").value = "";
               document.getElementById("edit_comment_form").setAttribute("action", "");
@@ -168,7 +171,7 @@ $(function() {
                 url: url_path,
                 dataType: 'json',
                 success: function(response) {
-                  get_comments_page(`/get_comments_page/${response.book_name}/${response.cur_page}`);
+                  get_comments_page(`/get_comments_page/${response.book_id}/${response.cur_page}`);
                   $('ul').filter(function() {
                     return this.id.match('comments_pagination');
                   }).remove();
@@ -182,13 +185,13 @@ $(function() {
                         if (page == response.cur_page)
                         {
                           html += `<li class="pagination__item_cur_page">
-                                    <a id="${page}comments_p" data-url='/get_comments_page/${response.book_name}/${page}'>${page}</a>
+                                    <a id="${page}comments_p" data-url='/get_comments_page/${response.book_id}/${page}'>${page}</a>
                                   </li>`;
                         }
                         else
                         {
                           html += `<li class="pagination__item active>
-                                    <a id="${page}comments_p" data-url='/get_comments_page/${response.book_name}/${page}'>${page}</a>
+                                    <a id="${page}comments_p" data-url='/get_comments_page/${response.book_id}/${page}'>${page}</a>
                                   </li>`;
                         }
                       }
@@ -220,12 +223,12 @@ $(function() {
         {
           let comment_id = target.dataset?.comid;
           let username = target.dataset?.username;
-          let book_name = target.dataset?.bookname;
+          let book_id = target.dataset?.bookid;
           let text = target.dataset?.combody;
           document.getElementById("edit_comment_sec").style.display = "block";
           document.getElementById("edit_comment_field").value = text;
           let form = document.getElementById("edit_comment_form");
-          form.setAttribute("action", `/${username}/${book_name}/edit-comment/${comment_id}`);
+          form.setAttribute("action", `/${username}/${book_id}/edit-comment/${comment_id}`);
         }
     });
     

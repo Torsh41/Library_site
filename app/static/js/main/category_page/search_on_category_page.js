@@ -1,10 +1,10 @@
-function search_books_on_category_page(category_name, list_id=undefined) 
+function search_books_on_category_page(category_id, list_id=undefined) 
 {
     if (document.getElementById('books_find_field').value.trim() || document.getElementById('books_data_field').value.trim() || document.getElementById('description_field').value.trim())
     {
         $.ajax({
             method: 'post',
-            url: `/category/${category_name}/search`,
+            url: `/category/${category_id}/search`,
             dataType: 'json',
             data: $('#search_form').serialize(),
             success: function(response) {
@@ -30,8 +30,8 @@ function search_books_on_category_page(category_name, list_id=undefined)
                                     <ul class="list__books list-reset list__booksStart" id="book_search_res_ul">`;
                     books[1].forEach(book => {
                         html += `<li class="list__book" id="${book.id}search_books_info">
-                                    <a href="/book-page/${book.name}?list_id=${list_id}" class="list__book-set">
-                                        <img class="list__book-set" src="/${book.name}/get-cover" alt="">
+                                    <a href="/book-page/${book.id}?list_id=${list_id}" class="list__book-set">
+                                        <img class="list__book-set" src="/${book.id}/get-cover" alt="">
                                     </a>
                                 <div class="list__book-wrap">`;
 
@@ -39,7 +39,7 @@ function search_books_on_category_page(category_name, list_id=undefined)
                         {
                             html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
                         }
-                        html += `<a href="/book-page/${book.name}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
+                        html += `<a href="/book-page/${book.id}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
                                     <span class="list__link">Автор: ${book.author}</span>
                                     <div class="list__mark-star">
                                         <span class="list__mark-visible">Оценка ${book.grade}</span>
@@ -94,9 +94,9 @@ function search_books_on_category_page(category_name, list_id=undefined)
                     document.getElementById("books_find_field").value = "";
                     html = `<section id="nothing_found" class="list">
                                 <div class="container list__container">
-                                <div class="list__wrap">
-                                    <h2 class="list__title title">Ничего не найдено</h2>
-                                </div>
+                                    <div class="list__wrap">
+                                        <h2 class="list__title title">Ничего не найдено</h2>
+                                    </div>
                                 </div>
                             </section>`;
                     let section = document.getElementById('first_section');
@@ -137,8 +137,8 @@ function get_books_page_on_category(page, list_id=undefined)
     let html = '';
     search_result[page].forEach(book => {
         html += `<li class="list__book" id="${book.id}search_books_info">
-                    <a href="/book-page/${book.name}?list_id=${list_id}" class="list__book-set">
-                        <img class="list__book-set" src="/${book.name}/get-cover" alt="">
+                    <a href="/book-page/${book.id}?list_id=${list_id}" class="list__book-set">
+                        <img class="list__book-set" src="/${book.id}/get-cover" alt="">
                     </a>
                 <div class="list__book-wrap">`;
 
@@ -146,7 +146,7 @@ function get_books_page_on_category(page, list_id=undefined)
         {
                 html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
         }
-        html += `<a href="/book-page/${book.name}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
+        html += `<a href="/book-page/${book.id}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
                     <span class="list__link">Автор: ${book.author}</span>
                     <div class="list__mark-star">
                         <span class="list__mark-visible">Оценка ${book.grade}</span>
@@ -176,7 +176,7 @@ function get_books_page_on_category(page, list_id=undefined)
 
 let search_result;
 $(function() {
-    let category_name = document.getElementById("cat_title").dataset?.name;
+    let category_id = document.getElementById("cat_title").dataset?.id;
     let list_id = document.getElementById("cat_title").dataset?.listid;
     let callback = function() {
         $('#pagination').off();
@@ -190,12 +190,12 @@ $(function() {
         });
     };
     $('#search_form').submit(function(event) {
-        search_books_on_category_page(category_name, list_id);
+        search_books_on_category_page(category_id, list_id);
         event.preventDefault();
     });
 
     $('#find_books_button').on('click', function(event) {
-        search_books_on_category_page(category_name, list_id);
+        search_books_on_category_page(category_id, list_id);
     });
 
     let observer = new MutationObserver(callback);
@@ -206,5 +206,5 @@ $(function() {
             subtree: true, // и более глубокими потомками
             attributes: true,
             characterData: true
-        });
+    });
 });

@@ -94,12 +94,12 @@ function get_lists_page(url_path)
                 let items = Array.from(cataloge.items);
                 items.forEach(item => {
                   html += `<li class="list__book" id="${cataloge.id}book_info">
-                            <a href="/book-page/${item.name}" class="list__book-set">
-                              <img class="list__book-set" src="/${item.name}/get-cover" alt="">
+                            <a href="/book-page/${item.id}" class="list__book-set">
+                              <img class="list__book-set" src="/${item.id}/get-cover" alt="">
                             </a>
                           
                             <div class="list__book-wrap">
-                              <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
+                              <a href="/book-page/${item.id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
                   html += `<select name="read_state" class="book__select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
                             if (item.read_state == "Планирую")
                               html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
@@ -213,12 +213,12 @@ function get_books_page(url_path, cataloge_id)
       let html = '';
       books.forEach(book => {
         html += `<li class="list__book" id="${cataloge_id}book_info">
-                    <a href="/book-page/${book.name}" class="list__book-set">
-                      <img class="list__book-set" src="/${book.name}/get-cover" alt="">
+                    <a href="/book-page/${book.id}" class="list__book-set">
+                      <img class="list__book-set" src="/${book.id}/get-cover" alt="">
                     </a>
                     
                     <div class="list__book-wrap">
-                      <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                      <a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
                       <select name="read_state" class="book__select" id="${cataloge_id}${book.id}state" data-itemid="${book.id}">`;
                         if (book.read_state == "Планирую")
                           html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  

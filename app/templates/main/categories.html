@@ -91,7 +91,7 @@
             <ul class="category__list list-reset" id="categories_block">
               {% for category in categories %}
                 <li class="category__elem" id="{{category.id}}category_info">
-                  <a href="{{url_for('main.category', name=category.name, list_id=list_id)}}" class="about__book-link">
+                  <a href="{{url_for('main.category', id=category.id, list_id=list_id)}}" class="about__book-link">
                     <div class="category__block">{{ category.name }}</div>
                   </a>
                 </li>
