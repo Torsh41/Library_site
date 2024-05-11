@@ -18,7 +18,6 @@
   <script src="{{ url_for('static', filename='js/personal/user_page/add_book_js.js')}}"></script>
   <script src="{{ url_for('static', filename='js/personal/user_page/add_list_on_user_page.js')}}"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
-  <script defer src="{{ url_for('static', filename='js/popup.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/choices.min.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/select.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/book.js')}}"></script>
@@ -69,7 +68,6 @@
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
               </ul>
             </div>
-    
           </nav>
 
         {% if current_user.role == Role.ADMIN %}
@@ -260,14 +258,12 @@
                   <!--Добавленные книги-->
                   {% for item in pagination_for_book_in_list.items %}
                     <li class="list__book" id="{{cataloge_value.id}}book_info">
-                      <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__book-set">
-                        <img class="list__book-set" src="{{url_for('main.cover', name=item.book.name)}}" alt="">
+                      <a href="{{url_for('main.book_page', book_id=item.book.id)}}" class="list__book-set">
+                        <img class="list__book-set" src="{{url_for('main.cover', book_id=item.book.id)}}" alt="">
                       </a>
   
                       <div class="list__book-wrap">
-                        <a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-book"><u>Книга:</u> {{
-                          item.book.name }}</a>
-                        <!--<a href="{{url_for('main.book_page', name=item.book.name)}}" class="list__link-plan"><u>Состояние чтения:</u> {{item.read_state }}</a>-->
+                        <a href="{{url_for('main.book_page', book_id=item.book.id)}}" class="list__link-book"><u>Книга:</u> {{ item.book.name }}</a>
                         <select name="read_state" class="book__select js-custom-select" id="{{cataloge_value.id}}{{item.id}}state" data-itemid="{{item.id}}">
                           <option class="book__state book__plan" value="Планирую" {%if item.read_state == "Планирую"%}selected{%endif%}>Планирую</option>
                           <option class="book__state book__read" value="Читаю" {%if item.read_state == "Читаю"%}selected{%endif%}>Читаю</option>
@@ -302,9 +298,9 @@
                 {% endif %}
   
                 {% if pagination %}
-                <div class="list__end">
-                  <a class="list__delete-btn" data-url="/user/{{current_user.username}}/delete-list/{{cataloge_value.id}}/{{cataloges_page}}" id="{{cataloge_value.id}}del_list">Удалить список</a>
-                </div>
+                  <div class="list__end">
+                    <a class="list__delete-btn" data-url="/user/{{current_user.username}}/delete-list/{{cataloge_value.id}}/{{cataloges_page}}" id="{{cataloge_value.id}}del_list">Удалить список</a>
+                  </div>
                 {% endif %}
               </div>
             </div>

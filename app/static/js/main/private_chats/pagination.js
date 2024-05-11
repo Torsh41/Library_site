@@ -41,28 +41,26 @@ $(function() {
                     success: function(response) {
                         if (response[0].has_elems)
                         {
-                            if (response[0].cur_page == page)
-                            {
-                                $(`#${chat_id}chat_block`).remove();
-                                chats_pagination_update(response[0].pages_count);
-                            }
-                            else
-                            {
-                                $(`#${chat_id}chat_block`).remove();
-                                chats = Array.from(response); let = html = '';
-                                chats.forEach(chat => {
-                                    html += `<li id="${chat.id}chat_block" class="category__elem"><a id="${chat.id}chat_name" href="/forum/private_chat/${chat.id}" class="category__book-link">
-                                                <div class="category__block">${chat.name}</div></a>`;
-                                                if (chat.type == "created")
-                                                {
-                                                    html += `<a class="category__btn" id="${chat.id}del_chat" data-page="${chat.cur_page}" data-chatid="${chat.id}">Удалить чат</a>`;
-                                                }
-                                            html += `</li>`;
-                                });
-                                let ul = document.getElementById("chats_block");
-                                ul.insertAdjacentHTML('afterbegin', html);
-                                chats_pagination_update(response[0].pages_count);
-                            }
+                            $('li').filter(function() {
+                                return this.id.match('chat_block');
+                            }).remove();
+                            chats = Array.from(response); let = html = '';
+                            chats.forEach(chat => {
+                                html += `<li id="${chat.id}chat_block" class="fraction__list-item">
+                                            <a id="${chat.id}chat_name" href="/forum/private_chat/${chat.id}" class="fraction__topic-link">
+                                                <div class="fraction__topic">
+                                                    <p class="fraction__text-error">${chat.name}</p>
+                                                </div>
+                                            </a>`;
+                                            if (chat.type == "created")
+                                            {
+                                                html += `<div class="fraction__wrapper-command"><a class="comments__command" id="${chat.id}del_chat" data-page="${chat.cur_page}" data-chatid="${chat.id}">Удалить чат</a></div>`;
+                                            }
+                                        html += `</li>`;
+                            });
+                            let ul = document.getElementById("chats_block");
+                            ul.insertAdjacentHTML('afterbegin', html);
+                            chats_pagination_update(response[0].pages_count);
     
                         }
                         else
@@ -103,11 +101,15 @@ $(function() {
                    
                     chats = Array.from(response); let = html = '';
                     chats.forEach(chat => {
-                        html += `<li id="${chat.id}chat_block" class="category__elem"><a id="${chat.id}chat_name" href="/forum/private_chat/${chat.id}" class="category__book-link">
-                                    <div class="category__block">${chat.name}</div></a>`;
+                        html += `<li id="${chat.id}chat_block" class="fraction__list-item">
+                                        <a id="${chat.id}chat_name" href="/forum/private_chat/${chat.id}" class="fraction__topic-link">
+                                            <div class="fraction__topic">
+                                                <p class="fraction__text-error">${chat.name}</p>
+                                            </div>
+                                        </a>`;
                                     if (chat.type == "created")
                                     {
-                                        html += `<a class="category__btn" id="${chat.id}del_chat" data-page="${chat.cur_page}" data-chatid="${chat.id}">Удалить чат</a>`;
+                                        html += `<div class="fraction__wrapper-command"><a class="comments__command" id="${chat.id}del_chat" data-page="${chat.cur_page}" data-chatid="${chat.id}">Удалить чат</a></div>`;
                                     }
                                 html += `</li>`;
                     });

@@ -90,9 +90,11 @@
           <div class="category__wrap">
             <ul class="category__list list-reset" id="categories_block">
               {% for category in categories %}
-              <li class="category__elem" id="{{category.id}}category_info"><a href="{{url_for('main.category', name=category.name, list_id=list_id)}}" class="category__book-link">
-                  <div class="category__block">{{ category.name }}</div>
-                </a></li>
+                <li class="category__elem" id="{{category.id}}category_info">
+                  <a href="{{url_for('main.category', id=category.id, list_id=list_id)}}" class="about__book-link">
+                    <div class="category__block">{{ category.name }}</div>
+                  </a>
+                </li>
               {% endfor %}
             </ul>
             {% if category_pagination %}

@@ -76,10 +76,16 @@
                             {% if chats_info %}
                                 <ul class="category__list list-reset" id="chats_block">
                                     {% for chat_info in chats_info %}
-                                        <li id="{{chat_info[0]}}chat_block" class="category__elem"><a id="{{chat_info[0]}}chat_name" href="{{url_for('main.private_chat', chat_id=chat_info[0])}}" class="category__book-link">
-                                            <div class="category__block">{{ chat_info[1] }}</div></a>
+                                        <li id="{{chat_info[0]}}chat_block" class="fraction__list-item">
+                                            <a id="{{chat_info[0]}}chat_name" href="{{url_for('main.private_chat', chat_id=chat_info[0])}}" class="fraction__topic-link">
+                                                <div class="fraction__topic">
+                                                    <p class="fraction__text-error">{{ chat_info[1] }}</p>
+                                                </div>
+                                            </a>
                                             {% if chat_info[2] == "created" %}
-                                                <a class="category__btn" id="{{chat_info[0]}}del_chat" data-page="1" data-chatid="{{chat_info[0]}}">Удалить чат</a>
+                                                <div class="fraction__wrapper-command">
+                                                    <a class="comments__command" id="{{chat_info[0]}}del_chat" data-page="1" data-chatid="{{chat_info[0]}}">Удалить чат</a>
+                                                </div>
                                             {% endif %}
                                         </li>
                                     {% endfor %}

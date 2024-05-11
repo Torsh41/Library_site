@@ -114,13 +114,14 @@ def edit_post(data):
 @check_actual_password
 def invite(data):
     chat_invitations_count = PrivateChat.query.filter_by(id=int(data['chat_id'])).first().invitations.count()
+    room = int(data['chat_id'])
     if chat_invitations_count >= MAX_INVITATIONS_PER_CHAT:
-        return emit('invitation', {'result': False}, to=int(data['chat_id']))
+        return emit('invitation', {'result': False}, to=room)
     new_user = User.query.filter_by(id=int(data['user_id'])).first()
     invitation = ChatInvitation(user=new_user, private_chat=PrivateChat.query.filter_by(id=int(data['chat_id'])).first())
     database.session.add(invitation)
     database.session.commit()
-    return emit('invitation', {'result': True, 'new_user_name': new_user.username}, to=int(data['chat_id']))
+    return emit('invitation', {'result': True, 'new_user_name': new_user.username}, to=room)
 
 
 @socketio.on('leave chat', namespace='/private_chat')
@@ -130,5 +131,6 @@ def leave_chat(data):
     invitation = ChatInvitation.query.filter_by(user_id=current_user.id).filter_by(private_chat_id=int(data['chat_id'])).first()
     database.session.delete(invitation)
     database.session.commit()
-    leave_room(int(data['chat_id']))
-    return emit('left', {'result': True, 'username': current_user.username}, to=int(data['chat_id']))
+    room = int(data['chat_id'])
+    leave_room(room)
+    return emit('left', {'result': True, 'username': current_user.username}, to=room)

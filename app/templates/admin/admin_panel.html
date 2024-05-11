@@ -90,7 +90,7 @@
                   </defs>
                 </svg>
                 <input type="text" name="users_search_result" class="list__form-input" id="username_field"
-                  placeholder="Введите имя пользователя..">
+                  placeholder="Введите имя пользователя или символ *..">
               </label>
               <input class="list__btn-search" type="button" value="Найти" id="get_users">
             </form>
@@ -141,7 +141,7 @@
                 </li>
               {% for category in categories %}
               <li class="category__elem" id="{{category.id}}category_info">
-                <a id="{{category.id}}show_books" class="category__book-link" data-username="{{current_user.username}}" data-catname="{{category.name}}">{{ category.name }}</a>
+                <a id="{{category.id}}show_books" class="category__book-link" data-username="{{current_user.username}}" data-catid="{{category.id}}">{{ category.name }}</a>
                 <a data-url="/admin/{{current_user.username}}/category_delete/{{category.id}}/{{1}}" data-pagi="2pagination" class="category__btn" id="{{category.id}}del_category">Удалить категорию</a>
               </li>
               {% endfor %}
@@ -194,7 +194,7 @@
                 </defs>
               </svg>
               <input type="text" id="search_res_id" name="search_result" class="list__form-input"
-                placeholder="Введите название книги или автора, либо слово все...">
+                placeholder="Введите название книги или автора, либо символ *..">
             </label>
             <input id="find_book" class="list__btn-search" type="button" value="Найти">
           </form>

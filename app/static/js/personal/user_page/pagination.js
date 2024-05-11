@@ -25,6 +25,43 @@ function lists_pagination_update(pages, username)
 }
 
 
+let beauty = () => {
+  const select = document.querySelector('.js-custom-select');
+  const choices = new Choices(select, {
+      searchEnabled: false,
+      itemSelectText: '',
+      classNames: {
+          containerOuter: 'defselect',
+          containerInner: 'defselect__inner',
+          input: 'defselect__input',
+          inputCloned: 'defselect__input--cloned',
+          list: 'defselect__list',
+          listItems: 'defselect__list--multiple',
+          listSingle: 'defselect__list--single',
+          listDropdown: 'defselect__list--dropdown',
+          item: 'defselect__item',
+          itemSelectable: 'defselect__item--selectable',
+          itemDisabled: 'defselect__item--disabled',
+          itemChoice: 'defselect__item--choice',
+          placeholder: 'defselect__placeholder',
+          group: 'defselect__group',
+          groupHeading: 'defselect__heading',
+          button: 'defselect__button',
+          activeState: 'is-active',
+          focusState: 'is-focused',
+          openState: 'is-open',
+          disabledState: 'is-disabled',
+          highlightedState: 'is-highlighted',
+          selectedState: 'is-selected',
+          flippedState: 'is-flipped',
+          loadingState: 'is-loading',
+          noResults: 'has-no-results',
+          noChoices: 'has-no-defselect'
+        }
+  });
+};
+
+
 // функция перестройки пагинации элементов списка пользователя для ее правильного отображения
 function items_pagination_update(pages, username, cataloge_id)
 {
@@ -94,13 +131,13 @@ function get_lists_page(url_path)
                 let items = Array.from(cataloge.items);
                 items.forEach(item => {
                   html += `<li class="list__book" id="${cataloge.id}book_info">
-                            <a href="/book-page/${item.name}" class="list__book-set">
-                              <img class="list__book-set" src="/${item.name}/get-cover" alt="">
+                            <a href="/book-page/${item.book_id}" class="list__book-set">
+                              <img class="list__book-set" src="/${item.book_id}/get-cover" alt="">
                             </a>
                           
                             <div class="list__book-wrap">
-                              <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
-                  html += `<select name="read_state" class="book__select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
+                              <a href="/book-page/${item.book_id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
+                  html += `<select name="read_state" class="book__select js-custom-select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
                             if (item.read_state == "Планирую")
                               html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
                                         <option class="book__state book__read" value="Читаю">Читаю</option>
@@ -184,6 +221,7 @@ function get_lists_page(url_path)
             }
           }
         }
+        beauty();
       },
       error: function(jqXHR, exception) {
           if (exception === 'parsererror')
@@ -213,13 +251,13 @@ function get_books_page(url_path, cataloge_id)
       let html = '';
       books.forEach(book => {
         html += `<li class="list__book" id="${cataloge_id}book_info">
-                    <a href="/book-page/${book.name}" class="list__book-set">
-                      <img class="list__book-set" src="/${book.name}/get-cover" alt="">
+                    <a href="/book-page/${book.book_id}" class="list__book-set">
+                      <img class="list__book-set" src="/${book.book_id}/get-cover" alt="">
                     </a>
                     
                     <div class="list__book-wrap">
-                      <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
-                      <select name="read_state" class="book__select" id="${cataloge_id}${book.id}state" data-itemid="${book.id}">`;
+                      <a href="/book-page/${book.book_id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                      <select name="read_state" class="book__select js-custom-select" id="${cataloge_id}${book.id}state" data-itemid="${book.id}">`;
                         if (book.read_state == "Планирую")
                           html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
                                     <option class="book__state book__read" value="Читаю">Читаю</option>
@@ -264,6 +302,7 @@ function get_books_page(url_path, cataloge_id)
             child.className = 'pagination__item_cur_page';
         }
       }
+      beauty();
     },
     error: function(jqXHR, exception) {
         if (exception === 'parsererror')
@@ -354,7 +393,6 @@ $(function() {
       let url_path = target.dataset?.url;
       let cataloge_id = url_path.split('/')[4];
       get_books_page(url_path, cataloge_id);
-      
     }
     else if (target.tagName === 'A' && target.id.includes('del_book'))
     {
@@ -403,14 +441,14 @@ $(function() {
             document.getElementById(cataloge_id + 'books_pagination_container').innerHTML = html;
           },
           error: function(jqXHR, exception) {
-              if (exception === 'parsererror')
-              {
-                  window.location.href = '/auth/login';
-              }
-              else
-              {
-                  console.log(exception);
-              }
+            if (exception === 'parsererror')
+            {
+                window.location.href = '/auth/login';
+            }
+            else
+            {
+                console.log(exception);
+            }
           }
         });
       }

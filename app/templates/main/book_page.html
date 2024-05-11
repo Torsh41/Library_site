@@ -134,7 +134,7 @@
                 <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
               {% endif %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.category', name=book.category.name, list_id=list_id)}}">Поиск книг в категории</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.category', id=book.category.id, list_id=list_id)}}">Поиск книг в категории</a></li>
               {% if current_user.is_authenticated %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
@@ -164,11 +164,13 @@
             <a class="main__bottom-item"> Всего оценок: {{ grade_count }} </a>
             <!--Пример: Средняя оценка - 4.5 из 5-->
           </div>
-  
+
+          {% if current_user.role == Role.ADMIN %}
+            <a class="main__form-btn btn" href="{{url_for('admin.change_book_info', username=current_user.username, book_id=book.id)}}">Редактировать данные о книге</a>
+          {% endif %}
         </div>
       </section>
-  
-  
+
       <form action="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book.id)}}" method="post">
         <section class="book">
           <div class="book__container container">
@@ -177,7 +179,7 @@
                 <div class="book__image">
   
                   <!--Тут обложка книги-->
-                  <img class="book__image-set" src="{{url_for('main.cover', name=book.name)}}">
+                  <img class="book__image-set" src="{{url_for('main.cover', book_id=book.id)}}">
   
                   <div class="book__set">
                     <!--Выборка доступна только авторизированным пользователям-->
@@ -339,7 +341,7 @@
                     placeholder="Введите свой комментарий.."></textarea>
                 </label>
       
-                <input class="comments__btn btn" type="button" value="Отправить" id="send_comment" data-user="{{current_user.username}}" data-book="{{book.name}}">
+                <input class="comments__btn btn" type="button" value="Отправить" id="send_comment" data-user="{{current_user.username}}" data-book="{{book.id}}">
               </form>
             {% else %}
               <div class="book__footer">
@@ -375,11 +377,11 @@
     
                 <div class="comments__commands" id="{{comment.id}}com_commands_cont">
                   {% if comment.user.username == current_user.username %}
-                    <a id="{{comment.id}}edit_com_a" data-combody="{{ comment.body }}" data-username="{{current_user.username}}" data-bookname="{{book.name}}" data-comid="{{comment.id}}" class="comments__command">Редактировать</a>
-                    <a class="comments__command" data-url="/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
+                    <a id="{{comment.id}}edit_com_a" data-combody="{{ comment.body }}" data-username="{{current_user.username}}" data-bookid="{{book.id}}" data-comid="{{comment.id}}" class="comments__command">Редактировать</a>
+                    <a class="comments__command" data-url="/{{current_user.username}}/{{book.id}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
                   {% elif current_user.role == Role.ADMIN %}
                     <a class="comments__command">Админ</a>
-                    <a class="comments__command" data-url="/{{current_user.username}}/{{book.name}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
+                    <a class="comments__command" data-url="/{{current_user.username}}/{{book.id}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
                   {% endif %}
                 </div>
               </li>
@@ -394,7 +396,7 @@
                   {% for p in pagination.iter_pages() %}
                     {% if p %}
                       <li class="pagination__item active">
-                        <a id="{{p}}comments_p" data-url="/get_comments_page/{{book.name}}/{{p}}">{{ p }}</a>
+                        <a id="{{p}}comments_p" data-url="/get_comments_page/{{book.id}}/{{p}}">{{ p }}</a>
                       </li>
                     {% else %}
                       <li class="pagination__item disabled"><a href="#">&hellip;</a></li>

@@ -1,3 +1,40 @@
+let beauty = () => {
+    const select = document.querySelector('.js-custom-select');
+    const choices = new Choices(select, {
+        searchEnabled: false,
+        itemSelectText: '',
+        classNames: {
+            containerOuter: 'defselect',
+            containerInner: 'defselect__inner',
+            input: 'defselect__input',
+            inputCloned: 'defselect__input--cloned',
+            list: 'defselect__list',
+            listItems: 'defselect__list--multiple',
+            listSingle: 'defselect__list--single',
+            listDropdown: 'defselect__list--dropdown',
+            item: 'defselect__item',
+            itemSelectable: 'defselect__item--selectable',
+            itemDisabled: 'defselect__item--disabled',
+            itemChoice: 'defselect__item--choice',
+            placeholder: 'defselect__placeholder',
+            group: 'defselect__group',
+            groupHeading: 'defselect__heading',
+            button: 'defselect__button',
+            activeState: 'is-active',
+            focusState: 'is-focused',
+            openState: 'is-open',
+            disabledState: 'is-disabled',
+            highlightedState: 'is-highlighted',
+            selectedState: 'is-selected',
+            flippedState: 'is-flipped',
+            loadingState: 'is-loading',
+            noResults: 'has-no-results',
+            noChoices: 'has-no-defselect'
+          }
+    });
+};
+
+
 $(function() {
 
     $('#open_popup_form').on('click', function(event) {
@@ -61,13 +98,13 @@ $(function() {
                             {
                                 items.forEach(item => {
                                 html += `<li class="list__book" id="${cataloge.id}book_info">
-                                            <a href="/book-page/${item.name}" class="list__book-set">
-                                                <img class="list__book-set" src="/${item.name}/get-cover" alt="">
+                                            <a href="/book-page/${item.id}" class="list__book-set">
+                                                <img class="list__book-set" src="/${item.id}/get-cover" alt="">
                                             </a>
                                             
                                             <div class="list__book-wrap">
-                                                <a href="/book-page/${item.name}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
-                                                <select name="read_state" class="book__select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
+                                                <a href="/book-page/${item.id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
+                                                <select name="read_state" class="book__select js-custom-select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
                                                 if (item.read_state == "Планирую")
                                                     html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
                                                             <option class="book__state book__read" value="Читаю">Читаю</option>
@@ -169,6 +206,7 @@ $(function() {
                 section.scrollIntoView(); // Прокрутка до верхней границы
                 document.getElementById('add_list_field').value = '';
                 document.getElementById('popupForm').style.display = "none";
+                beauty();
             }
             else if (cataloges[0].result == 1)
             {
