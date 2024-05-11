@@ -326,7 +326,7 @@ function del_category(url_path, pagination_id)
   }
 }
 
-function open_book_panel(username, category)
+function open_book_panel(username, category_id)
 {
     section = document.getElementById("book_search_in_a_category");
     section.style.display = "block";
@@ -347,7 +347,7 @@ function open_book_panel(username, category)
     div = document.getElementById("2cont");
     div.insertAdjacentHTML("afterbegin", html);
     form = document.getElementById("category_book_search");
-    form.setAttribute("action", `/admin/${username}/search_books_on_admin_panel/${category}`);
+    form.setAttribute("action", `/admin/${username}/search_books_on_admin_panel/${category_id}`);
     section.scrollIntoView(); // Прокрутка до верхней границы
 }
 
@@ -668,8 +668,8 @@ let callback = function() {
       else if (target.tagName === 'A' && target.id.includes('show_books'))
       {
         let username = target.dataset?.username;
-        let category = target.dataset?.catname;
-        open_book_panel(username, category);
+        let category_id = target.dataset?.catid;
+        open_book_panel(username, category_id);
       }
       else if (target.tagName === 'A' && target.id.includes('del_category'))
       {

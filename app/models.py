@@ -19,11 +19,11 @@ class User(UserMixin, database.Model, SerializerMixin):
     email = database.Column(database.String(64), unique=True, index=True)
     username = database.Column(database.String(64), unique=True, index=True)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
-    avatar = database.Column(database.LargeBinary, default=False)
-    city = database.Column(database.String(64), default=False)
-    gender = database.Column(database.String(4), default=False)
-    age = database.Column(database.Integer, default=False)
-    about_me = database.Column(database.Text(), default=False)
+    avatar = database.Column(database.LargeBinary)
+    city = database.Column(database.String(64))
+    gender = database.Column(database.String(4))
+    age = database.Column(database.Integer)
+    about_me = database.Column(database.Text())
     password_hash = database.Column(database.String(128))
     books = database.relationship('Book', backref='user')
     private_chats = database.relationship('PrivateChat', backref='creator', lazy='dynamic')
@@ -133,8 +133,8 @@ class TopicPost(database.Model, SerializerMixin):
     __tablename__ = "posts"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.String(1024), index=True)
-    file = database.Column(database.LargeBinary, default=False)
-    answer_to_post = database.Column(database.Integer, default=False)
+    file = database.Column(database.LargeBinary)
+    answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -154,9 +154,9 @@ class PrivateChat(database.Model, SerializerMixin):
 class PrivateChatPost(database.Model, SerializerMixin):
     __tablename__ = "private_chat_posts"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.Text(1024), index=True)
-    file = database.Column(database.LargeBinary, default=False)
-    answer_to_post = database.Column(database.Integer, default=False)
+    body = database.Column(database.Text(), index=True)
+    file = database.Column(database.LargeBinary)
+    answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -174,7 +174,7 @@ class ChatInvitation(database.Model, SerializerMixin):
 class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
-    cover = database.Column(database.LargeBinary, default=False)
+    cover = database.Column(database.LargeBinary)
     isbn = database.Column(database.String(64), unique=False)
     name = database.Column(database.String(128), unique=True, index=True)
     author = database.Column(database.String(128), unique=False)
@@ -232,7 +232,7 @@ class Item(database.Model, SerializerMixin):
 class SearchResult(database.Model, SerializerMixin):
     __tablename__ = "search_results"
     id = database.Column(database.Integer, primary_key=True)
-    cover = database.Column(database.LargeBinary, default=False)
+    cover = database.Column(database.LargeBinary)
     isbn = database.Column(database.String(64), unique=False)
     name = database.Column(database.String(64), unique=False, index=True)
     author = database.Column(database.String(64), unique=False)
@@ -262,17 +262,17 @@ class BooksMaintaining(database.Model, SerializerMixin):
     __tablename__ = "books_maintaining"     
     id = database.Column(database.Integer, primary_key=True)  
     name = database.Column(database.String(128), unique=True, index=True)
-    authors = database.Column(database.String(128), unique=False, default=None)
-    series = database.Column(database.String(128), unique=False, default=None)
-    categories = database.Column(database.String(128), unique=False, default=False)
-    publishing_date = database.Column(database.Integer, unique=False, default=False)
-    publishing_house = database.Column(database.String(128), unique=False, default=False)
-    pages_count = database.Column(database.Integer, unique=False, default=False)
-    isbn = database.Column(database.String(64), unique=False, default=False)
-    comments = database.Column(database.String(64), unique=False, default=False)
-    summary = database.Column(database.Text(), unique=False, default=False)
-    link = database.Column(database.String(256), unique=False, default=False)
-    count = database.Column(database.Integer, unique=False, default=False)
+    authors = database.Column(database.String(128), unique=False)
+    series = database.Column(database.String(128), unique=False)
+    categories = database.Column(database.String(128), unique=False)
+    publishing_date = database.Column(database.Integer, unique=False)
+    publishing_house = database.Column(database.String(128), unique=False)
+    pages_count = database.Column(database.Integer, unique=False)
+    isbn = database.Column(database.String(64), unique=False)
+    comments = database.Column(database.String(64), unique=False)
+    summary = database.Column(database.Text(), unique=False)
+    link = database.Column(database.String(256), unique=False)
+    count = database.Column(database.Integer, unique=False)
     
     
 @login_manager.user_loader

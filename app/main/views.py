@@ -20,9 +20,9 @@ def inject_months_dict():
     return dict(months_dict=months_dict)
 
 
-@main.route('/<name>/get-cover', methods=['GET'])
-def cover(name):
-    book = Book.query.filter_by(name=name).first()
+@main.route('/<int:book_id>/get-cover', methods=['GET'])
+def cover(book_id):
+    book = Book.query.filter_by(id=book_id).first()
     cover = make_response(book.cover)
     return cover
 
@@ -46,10 +46,10 @@ def index():
     return render_template('main/index.html')
 
 
-@main.route('/book-page/<name>', methods=['GET'])
-def book_page(name):
+@main.route('/book-page/<int:book_id>', methods=['GET'])
+def book_page(book_id):
     list_id = request.args.get('list_id', None, type=int)
-    book = Book.query.filter_by(name=name).first()
+    book = Book.query.filter_by(id=book_id).first()
     pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(
         1, per_page=ELEMS_COUNT, error_out=False)
     comments = pagination.items
@@ -61,10 +61,9 @@ def book_page(name):
     return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=len(grades), int=int, list_id=list_id, display="none")
 
 
-@main.route('/get_comments_page/<book_name>/<page>', methods=['GET'])
-def get_comments_page(book_name, page):
-    page = int(page)
-    book = Book.query.filter_by(name=book_name).first()
+@main.route('/get_comments_page/<int:book_id>/<int:page>', methods=['GET'])
+def get_comments_page(book_id, page):
+    book = Book.query.filter_by(id=book_id).first()
     comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
@@ -73,16 +72,16 @@ def get_comments_page(book_name, page):
     name_of_current_user = current_user.username if (current_user.is_authenticated) else None
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(cur_page=page, pages_count=pages_count, user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=name_of_current_user, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(cur_page=page, pages_count=pages_count, user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_id=book_id, username=user.username, name_of_current_user=name_of_current_user, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
 
 
-@main.route('/<username>/<book_name>/add_comment', methods=['POST'])
+@main.route('/<username>/<int:book_id>/add_comment', methods=['POST'])
 @login_required
 @check_actual_password
-def add_comment(username, book_name):
+def add_comment(username, book_id):
     if current_user.username != username:
         return render_template('403.html')
-    book = Book.query.filter_by(name=book_name).first()
+    book = Book.query.filter_by(id=book_id).first()
     comment = Comment(body=str(request.form.get('comment')).strip().replace("'", ""), book=book, user=current_user._get_current_object())
     database.session.add(comment)
     database.session.commit()
@@ -98,13 +97,13 @@ def add_comment(username, book_name):
     users = list()
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(pages=last_page, user_is_admin=user_is_admin, pages_count=pages_count, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_name=book_name, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([dict(pages=last_page, user_is_admin=user_is_admin, pages_count=pages_count, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_id=book_id, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
 
 
-@main.route('/<username>/<book_name>/edit-comment/<comment_id>', methods=['POST'])
+@main.route('/<username>/<int:book_id>/edit-comment/<int:comment_id>', methods=['POST'])
 @login_required
 @check_actual_password
-def edit_comment(username, comment_id, book_name):
+def edit_comment(username, comment_id, book_id):
     if current_user.username != username:
         return render_template('403.html')
     comment = Comment.query.filter_by(id=comment_id).first()
@@ -112,10 +111,10 @@ def edit_comment(username, comment_id, book_name):
     comment.timestamp = datetime.now()
     database.session.add(comment)
     database.session.commit()
-    return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_name=book_name, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year)))
+    return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_id=book_id, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year)))
 
 
-@main.route('/<username>/give-grade/<book_id>/<grade>')
+@main.route('/<username>/give-grade/<int:book_id>/<int:grade>')
 @login_required
 @check_actual_password
 def give_grade(username, book_id, grade):
@@ -130,17 +129,17 @@ def give_grade(username, book_id, grade):
     grade = BookGrade(grade=grade, user=current_user, book=book)
     database.session.add(grade)
     database.session.commit()
-    return redirect(url_for('main.book_page', name=book.name))
+    return redirect(url_for('main.book_page', book_id=book.id))
 
 
-@main.route('/<username>/<book_name>/delete-comment/<comment_id>/<page>', methods=['GET'])
+@main.route('/<username>/<int:book_id>/delete-comment/<int:comment_id>/<int:page>', methods=['GET'])
 @login_required
 @check_actual_password
-def comment_delete(username, book_name, comment_id, page):
+def comment_delete(username, book_id, comment_id, page):
     if current_user.username != username:
         return render_template('403.html')
     page = int(page)
-    book = Book.query.filter_by(name=book_name).first()
+    book = Book.query.filter_by(id=book_id).first()
     comment = book.comments.filter_by(id=comment_id).first()
     database.session.delete(comment)
     database.session.commit()
@@ -152,7 +151,7 @@ def comment_delete(username, book_name, comment_id, page):
             page -= 1
     else:
         page = 1; pages_count = [1]; has_elems = False
-    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, book_name=book_name))
+    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, book_id=book_id))
 
 
 @main.route('/categories', methods=['GET'])
@@ -164,19 +163,18 @@ def categories():
     return render_template('main/categories.html', categories=categories, category_pagination=category_pagination, list_id=list_id)
 
 
-@main.route('/get_categories_page/<page>', methods=['GET'])
+@main.route('/get_categories_page/<int:page>', methods=['GET'])
 def get_categories_page(page):
-    page = int(page)
     categories_pagination = Category.query.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
     return jsonify([dict(cur_page=page, id=category.id, pages_count=pages_count, name=category.name) for category in categories])
 
 
-@main.route('/category/<name>', methods=['GET'])
-def category(name):
+@main.route('/category/<int:id>', methods=['GET'])
+def category(id):
     list_id = request.args.get('list_id', None, type=int)
-    category = Category.query.filter_by(name=name).first()
+    category = Category.query.filter_by(id=id).first()
     if not category:
         return render_template('404.html')
     res = category.books.all()
@@ -196,17 +194,17 @@ def category(name):
         else:
             top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
             new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
-    return render_template('main/category_page.html', top_books=top_books, new_books=new_books, name=category.name, list_id=list_id)
+    return render_template('main/category_page.html', top_books=top_books, new_books=new_books, name=category.name, id=category.id, list_id=list_id)
         
         
-@main.route('/category/<name>/search', methods=['POST'])
-def search_by_category(name):
+@main.route('/category/<int:id>/search', methods=['POST'])
+def search_by_category(id):
     if current_user.is_authenticated:
         current_user_is_auth = True; username = current_user.username
     else:
         current_user_is_auth = False; username = None
  
-    category = Category.query.filter_by(name=name).first()
+    category = Category.query.filter_by(id=id).first()
     if category is None:
         return render_template('404.html')
     res = category.books.all()
@@ -255,7 +253,7 @@ def forum():
     return render_template('main/forum.html', pagination_for_topics_foreach_category=pagination_for_topics_foreach_category, category_pagination=category_pagination, categories=categories, len=len, zip=zip, display="none")
 
 
-@main.route('/forum/<topic_id>')
+@main.route('/forum/<int:topic_id>')
 def topic(topic_id):
     posts_page = request.args.get('posts_page', 1, type=int)
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
@@ -282,9 +280,8 @@ def topic(topic_id):
     return render_template('main/forum_discussion.html', user_is_admin=user_is_admin, topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str)
 
 
-@main.route('/get_categories_page_on_forum/<page>', methods=['GET'])
+@main.route('/get_categories_page_on_forum/<int:page>', methods=['GET'])
 def get_categories_page_on_forum(page):
-    page = int(page)
     categories_pagination = Category.query.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
@@ -309,9 +306,8 @@ def get_categories_page_on_forum(page):
     return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, pages_count=pages_count, username_of_cur_user=username_of_cur_user, id=category.id, name=category.name, topics=topics, topics_count=len(category.topics.all())) for category, topics in zip(categories, categories_topics.values())])
 
 
-@main.route('/get_posts_page/<topic_id>/<page>', methods=['GET'])
+@main.route('/get_posts_page/<int:topic_id>/<int:page>', methods=['GET'])
 def get_posts_page(topic_id, page):
-    page = int(page)
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
     posts_pagination = topic.posts.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
@@ -392,14 +388,14 @@ def search_category_on_forum():
         return jsonify([dict(result=False)])
 
 
-@main.route('/<username>/<category_id>/add_topic', methods=['POST'])
+@main.route('/<username>/<int:category_id>/add_topic', methods=['POST'])
 @login_required
 @check_actual_password
 def add_topic(username, category_id):
     if current_user.username != username:
         return render_template('403.html')
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
-    cur_category = Category.query.filter_by(id=int(category_id)).first()
+    cur_category = Category.query.filter_by(id=category_id).first()
     result = True
     for topic in cur_category.topics.all():
         if topic.name == in_topic_name:
@@ -425,9 +421,8 @@ def add_topic(username, category_id):
     return jsonify([dict(result=result)])
 
 
-@main.route('/get_topics_page_on_forum/<category_id>/<page>', methods=['GET'])
+@main.route('/get_topics_page_on_forum/<int:category_id>/<int:page>', methods=['GET'])
 def get_topics_page_on_forum(category_id, page):
-    page = int(page)
     if current_user.is_authenticated and current_user.role == Role.ADMIN:
         is_admin = True
     else:
@@ -439,16 +434,17 @@ def get_topics_page_on_forum(category_id, page):
     return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, id=topic.id, name=topic.name, pages_count=pages_count) for topic in topics])
 
 
-@main.route('/delete-topic/<category_id>/<topic_id>/<page>', methods=['GET'])
+@main.route('/delete-topic/<int:category_id>/<int:topic_id>/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
 def topic_delete(category_id, topic_id, page):
-    page = int(page)
     category = Category.query.filter_by(id=category_id).first()
     if category:
         topic = category.topics.filter_by(id=topic_id).first()
         database.session.delete(topic)
         database.session.commit()
+    else:
+        return render_template('404.html')
 
     if topics := category.topics.all():
         has_elems = True
@@ -548,11 +544,10 @@ def search_book():
                                 link=book_info.link, count=book_info.count) for book_info in items])
             
 
-@main.route('/books-maintaining/get-page/<page>', methods=['GET'])
+@main.route('/books-maintaining/get-page/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
 def get_books_info_page(page):
-    page = int(page)
     data_pagination = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     pages_count_arr = list(data_pagination.iter_pages())
     data = data_pagination.items
@@ -644,11 +639,10 @@ def private_chats():
     return render_template('main/private_chats.html', chats_info=chats_info, pages=pages, range=range)
     
 
-@main.route('/forum/delete_private_chat/<chat_id>/<page>', methods=['GET'])
+@main.route('/forum/delete_private_chat/<int:chat_id>/<int:page>', methods=['GET'])
 @login_required
 @check_actual_password
 def delete_private_chat(chat_id, page):
-    chat_id = int(chat_id); page_ = int(page)
     private_chat = current_user.private_chats.filter_by(id=chat_id).first()
     database.session.delete(private_chat)
     database.session.commit()
@@ -673,12 +667,12 @@ def delete_private_chat(chat_id, page):
         res = dict(); pages_count_list = list()
         for page in range(1, pages_count + 1):
             res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
-        if res.get(page_):
-            chats_info = res[page_]
-            cur_page = page_
+        if res.get(page):
+            chats_info = res[page]
+            cur_page = page
         else:
-            chats_info = res[page_ - 1]
-            cur_page = page_ - 1
+            chats_info = res[page - 1]
+            cur_page = page - 1
         for page in range(1, pages_count + 1):
             if page % 4 != 0:
                 pages_count_list.append(page)
@@ -688,11 +682,11 @@ def delete_private_chat(chat_id, page):
     return jsonify([dict(has_elems=False)])
  
  
-@main.route('/forum/get_chats_page/<page>', methods=['GET'])
+@main.route('/forum/get_chats_page/<int:page>', methods=['GET'])
 @login_required
 @check_actual_password
 def get_chats_page(page):
-    page_ = int(page); chats_info = list()
+    chats_info = list()
     private_chats = current_user.private_chats.all()
     chats_invitations = current_user.chats_invitations.all()
     for private_chat in private_chats:
@@ -709,16 +703,16 @@ def get_chats_page(page):
     res = dict(); pages_count_list = list()
     for page in range(1, pages_count + 1):
         res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
-    chats_info = res[page_]
+    chats_info = res[page]
     for page in range(1, pages_count + 1):
         if page % 4 != 0:
             pages_count_list.append(page)
         else:
             pages_count_list.append(None)
-    return jsonify([dict(cur_page=page_, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
+    return jsonify([dict(cur_page=page, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
 
 
-@main.route('/forum/private_chat/<chat_id>', methods=['GET'])
+@main.route('/forum/private_chat/<int:chat_id>', methods=['GET'])
 @login_required
 @check_actual_password
 def private_chat(chat_id):
@@ -750,11 +744,11 @@ def private_chat(chat_id):
     return render_template('main/private_chat_discussion.html', chat_creator_id=chat.creator.id, user_is_admin=user_is_admin, chat_id=chat.id, chat_name=chat.name, posts_count=len(chat.posts.all()), participants_count=participants_count, posts_pagination=posts_pagination, posts=posts, str=str)
 
 
-@main.route('/get_posts_page_on_chat_disc/<chat_id>/<page>', methods=['GET'])
+@main.route('/get_posts_page_on_chat_disc/<int:chat_id>/<int:page>', methods=['GET'])
 @login_required
 @check_actual_password
 def get_posts_page_on_chat_disc(chat_id, page):
-    page = int(page); posts = list()
+    posts = list()
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     posts_pagination = chat.posts.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
@@ -793,19 +787,14 @@ def get_posts_page_on_chat_disc(chat_id, page):
     return jsonify(dict(posts=posts, pages_count=pages_count))
 
 
-@main.route('/forum/private_chat/<chat_id>/get_users_page_to_invite/<page>', methods=['GET'])
+@main.route('/forum/private_chat/<int:chat_id>/get_users_page_to_invite/<int:page>', methods=['GET'])
 @login_required
 @check_actual_password
 def get_users_page_to_invite(chat_id, page):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     if chat:
-        try:
-            page = int(page)
-        except:
-            return jsonify([dict(result=False)])
-        
         invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
-        users_pagination = User.query.filter(User.id != current_user.id).filter(User.id != chat.creator.id).filter(~User.id.in_(invited_users_id_to_cur_chat)).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        users_pagination = User.query.filter(User.id != current_user.id).filter(User.id != chat.creator.id).filter(~User.id.in_(invited_users_id_to_cur_chat)).paginate(page, per_page=USERS_COUNT, error_out=False)
         if not users_pagination.items:
             return jsonify([dict(result=False)])
         pages_count = list(users_pagination.iter_pages())
@@ -815,16 +804,17 @@ def get_users_page_to_invite(chat_id, page):
         return render_template('404.html')
     
 
-@main.route('/change-topic-name/<category_id>/<topic_id>', methods=['POST'])
+@main.route('/change-topic-name/<int:category_id>/<int:topic_id>', methods=['POST'])
 @admin_required
 @check_actual_password 
 def change_topic_name(category_id, topic_id):
-    try:
-        category = Category.query.filter_by(id=category_id).first()
-        topic = category.topics.filter_by(id=topic_id).first()
-        topic.name = str(request.form.get('topic_changed_name')).strip().replace("'", "")
-        database.session.add(topic)
-        database.session.commit()
-        return jsonify(dict(category_id=category_id, topic_id=topic_id, name=topic.name, username=current_user.username))
-    except:
+    category = Category.query.filter_by(id=category_id).first()
+    if not category:
         return render_template('404.html')
+    topic = category.topics.filter_by(id=topic_id).first()
+    topic.name = str(request.form.get('topic_changed_name')).strip().replace("'", "")
+    database.session.add(topic)
+    database.session.commit()
+    return jsonify(dict(category_id=category_id, topic_id=topic_id, name=topic.name, username=current_user.username))
+ 
+       

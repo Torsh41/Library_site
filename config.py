@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
-
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 class Config:
     REMEMBER_COOKIE_DURATION = timedelta(days=10)
@@ -10,21 +10,18 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY') or 'I am Mister Max'
     JWT_ALGORITHM = 'HS256'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    #SQLALCHEMY_RECORD_QUERIES = True
     MAX_CONTENT_LENGTH = 1024 * 1024
-    #SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     JWT_EXPIRATION = 1800
     MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 465#587
-    MAIL_USE_SSL = True#False
-    MAIL_USE_TLS = False#True
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USE_TLS = False
     MAIL_USERNAME = 'leokazantsev19@gmail.com' #(os.environ.get('MAIL_USERNAME'))
     MAIL_PASSWORD = 'qctetuaboxunlvkv' #os.environ.get('MAIL_PASSWORD')
     MBK_MAIL_SUBJECT_PREFIX = '[Magic Book Keeper]' 
     MBK_MAIL_SENDER = 'The MBK team <MBK@example.com>' 
     MBK_ADMIN = ['leokazantsev19@mail.ru', 'elaudina03714@gmail.com'] #will array from three elements
 
-    
     @staticmethod
     def init_app(app):
         pass
@@ -41,7 +38,7 @@ class TestingConfig(Config):
         
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-    "postgresql://postgres:rootroot@localhost/" + "prod_db"
+    "postgresql://main_user:mainchoppa666@localhost/" + "prod_db"
         
 config = {
     'development': DevelopmentConfig,

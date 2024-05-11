@@ -41,12 +41,10 @@ function get_users_page(chat_id, url_path=`/forum/private_chat/${chat_id}/get_us
                 users.forEach(user => {
                     html +=`<div class="form__book" id="${user.id}user">
                                 <div class="form__info form__book-link">
-                                    <span class="form__span-title">Имя пользователя</span>
+                                    <span class="form__span-info">Имя пользователя</span>
                                     <span class="form__span-info">${user.username}</span>
                                 </div>
-                                <div class="form__book-delete">
-                                    <input class="form__delete-btn" id="${user.id}send_invite" formmethod="post" type="submit" value="Отправить приглашение">
-                                </div>
+                                <input class="comments__command" id="${user.id}send_invite" formmethod="post" type="submit" value="Отправить приглашение">
                             </div>`;
                 });
                 let title = document.getElementById('invite_title');
@@ -71,9 +69,9 @@ function get_users_page(chat_id, url_path=`/forum/private_chat/${chat_id}/get_us
             else
             {
                 $('#pagination').remove();
-                html +=`<div class="form__book" id="not_found">
-                            <div class="form__popupInvite-text form__book-link">
-                                <span class="form__span-title">Нет доступных пользователей для приглашения</span>
+                html +=`<div class="container list__container" id="not_found">
+                            <div class="list__wrap">
+                                <h2 class="list__title title">Нет доступных пользователей для приглашения</h2>
                             </div>
                         </div>`;
                 let title = document.getElementById('invite_title');

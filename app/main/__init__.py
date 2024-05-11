@@ -5,6 +5,7 @@ BOOKS_MAINTAINING_PER_PAGE = 20
 MAX_PRIVATE_CHATS_PER_USER = 10
 MAX_INVITATIONS_PER_CHAT = 30
 ELEMS_COUNT = 8
+USERS_COUNT = 4
 months_dict = {
     1: 'января',
     2: 'февраля',

@@ -57,22 +57,20 @@ def user_search(username):
         return jsonify([dict(result=False)])
 
 
-@admin.route('/get_user_search_page/<page>', methods=['GET'])
+@admin.route('/get_user_search_page/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
 def get_user_search_page(page):
-    page = int(page)
     user_pagination = User.query.filter(User.username != current_user.username).paginate(page, per_page=RESULT_COUNT, error_out=False)
     pages_count = list(user_pagination.iter_pages())
     users = user_pagination.items
     return jsonify([dict(cur_page=page, id=user.id, email=user.email, username=user.username, pages_count=pages_count, city=user.city, gender=user.gender, age=user.age, about_me=user.about_me) for user in users])
 
 
-@admin.route('/<username>/get_category_search_page/<page>', methods=['GET'])
+@admin.route('/<username>/get_category_search_page/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
 def get_category_search_page(username, page):
-    page = int(page)
     category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
     pages_count = list(category_pagination.iter_pages())
     categories = category_pagination.items
@@ -101,13 +99,11 @@ def add_category(username):
     return render_template('admin/admin_panel.html', categories=categories, form=form, category_pagination=category_pagination, displays={"users_search_result_disp": "none", "book_categories_disp": "block", "add_category_disp": "block", "books_in_a_category_disp": "none"})
 
 
-@admin.route('/admin_panel/user_delete/<user_id>/<page>', methods=['GET'])
+@admin.route('/admin_panel/user_delete/<int:user_id>/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
 def user_delete(user_id, page):
-    page = int(page)
-    user = User.query.filter((User.id != current_user.id)
-                             & (User.id == user_id)).first()
+    user = User.query.filter((User.id != current_user.id) & (User.id == user_id)).first()
     database.session.delete(user)
     database.session.commit()
     if User.query.filter(User.id != current_user.id).all():
@@ -123,11 +119,10 @@ def user_delete(user_id, page):
     return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems))
 
 
-@admin.route('/<username>/category_delete/<category_id>/<page>', methods=['GET'])
+@admin.route('/<username>/category_delete/<int:category_id>/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
 def category_delete(username, category_id, page):
-    page = int(page)
     category = Category.query.filter_by(id=category_id).first()
     database.session.delete(category)
     database.session.commit()
@@ -144,11 +139,11 @@ def category_delete(username, category_id, page):
     return jsonify(dict(username=current_user.username, cur_page=page, pages_count=pages_count, has_elems=has_elems))
 
 
-@admin.route('/<username>/search_books_on_admin_panel/<category_name>', methods=['GET', 'POST'])
+@admin.route('/<username>/search_books_on_admin_panel/<int:category_id>', methods=['GET', 'POST'])
 @admin_required
 @check_actual_password
-def search_books_on_admin_panel(username, category_name):
-    category = Category.query.filter_by(name=category_name).first()
+def search_books_on_admin_panel(username, category_id):
+    category = Category.query.filter_by(id=category_id).first()
     if request.method == "POST":
         result = str(request.form.get('search_result')).strip().lower()
         if result == '*':
@@ -190,7 +185,7 @@ def search_books_on_admin_panel(username, category_name):
             database.session.commit()
             if len(books) > RESULT_COUNT:
                 books = books[:RESULT_COUNT]
-            return jsonify([dict(has_books=True, pages=pages, cur_page=1, pages_count=pages_count, username=current_user.username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books, books_grades)])
+            return jsonify([dict(has_books=True, pages=pages, cur_page=1, pages_count=pages_count, username=current_user.username, category=category.id, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book_grade) for book, book_grade in zip(books, books_grades)])
         else:
             return jsonify([dict(has_books=False)])
 
@@ -199,17 +194,16 @@ def search_books_on_admin_panel(username, category_name):
         pages_count = list(cur_result_pagination.iter_pages())
         cur_result = cur_result_pagination.items
         if cur_result:
-            return jsonify([dict(has_books=True, cur_page=page, pages_count=pages_count, username=current_user.username, category=category.name, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book.grade) for book in cur_result])#books[page]])
+            return jsonify([dict(has_books=True, cur_page=page, pages_count=pages_count, username=current_user.username, category=category.id, id=book.id, name=book.name, author=book.author, release_date=book.release_date, grade=book.grade) for book in cur_result])
         else:
             return jsonify([dict(has_books=False)])
     return render_template('500.html')
 
 
-@admin.route('/<username>/del_book/<category_name>/<book_id>/<page>', methods=['GET'])
+@admin.route('/<username>/del_book/<int:category_id>/<int:book_id>/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
-def del_book(username, category_name, book_id, page):
-    page = int(page)
+def del_book(username, category_id, book_id, page):
     book = Book.query.filter_by(id=book_id).first()
     database.session.delete(book)
     book_for_search_result = SearchResult.query.filter_by(searcher_id=current_user.id).filter_by(id=book_id).first()
@@ -225,7 +219,7 @@ def del_book(username, category_name, book_id, page):
         page = 1
         pages_count = 1
         has_elems = False
-    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, category=category_name))
+    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, category=category_id))
 
 
 @admin.route('/<username>/change_book_info/<int:book_id>', methods=['GET', 'POST'])
