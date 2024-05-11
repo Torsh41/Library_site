@@ -1,4 +1,4 @@
-let beauty = () => {
+let beauty_add_list = () => {
     const select = document.querySelector('.js-custom-select');
     const choices = new Choices(select, {
         searchEnabled: false,
@@ -206,7 +206,7 @@ $(function() {
                 section.scrollIntoView(); // Прокрутка до верхней границы
                 document.getElementById('add_list_field').value = '';
                 document.getElementById('popupForm').style.display = "none";
-                beauty();
+                beauty_add_list();
             }
             else if (cataloges[0].result == 1)
             {
