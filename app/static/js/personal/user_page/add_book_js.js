@@ -229,7 +229,9 @@ function book_added()
 {
     var url = document.location.search;
     var searchParams = new URLSearchParams(url);
-    if (searchParams.get("flag"))
+    if (searchParams.get("flag")) 
         smoke.alert(`<p class="list__text">Книга успешно добавлена!</p>`);
+    
+
 }
 
