@@ -20,8 +20,6 @@
         !menu.classList.contains(params.hiddenClass)
       ) {
         menu.classList.add(params.activeClass);
-        // document.body.style.overflow = 'hidden';
-        // document.body.style.background = 'rgba(0, 0, 0, 0.8)';
         btn.setAttribute('aria-expanded', true);
         btn.classList.add('opens');
           

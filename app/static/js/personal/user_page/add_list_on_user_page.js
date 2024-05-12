@@ -232,13 +232,12 @@ $(function() {
         }
         else if (document.getElementById('add_list_field').value.trim().length > 200)
         {
-        alert('Слишком длинное название списка');
+          alert('Слишком длинное название списка');
         }
         else
         {
-        alert('Заполните поле');
-        document.getElementById('add_list_field').value = '';
+          alert('Заполните поле');
+          document.getElementById('add_list_field').value = '';
         }
-        
     });
 })   
