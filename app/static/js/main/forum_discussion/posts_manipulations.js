@@ -11,10 +11,6 @@ function write_post_socket(topic_id, post_id_to_answer = false)
       topic_id: topic_id,
       post_id_to_answer: post_id_to_answer,
     });
-
-    // $('#add_post_button').on('click', function(event) {
-    //   write_post_socket(topic_id);
-    // });
     document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
   } 
   else if (document.getElementById("post_body_id").value.trim().length > 200) 

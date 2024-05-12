@@ -9,7 +9,7 @@ function users_pagination_update(pages)
   pages.forEach(p => {
     if (p)
     {
-      html += `<li class="pagination__item_cur_page">
+      html += `<li class="pagination__item active">
                   <a id='${p}users_p' data-url='/admin/get_user_search_page/${p}' data-pagid='1pagination'>${p}</a>
               </li>`;
     }
@@ -56,8 +56,8 @@ function get_user_search_page(url_path, pagination_id)
               users_pagination_update(users[0].pages_count);
 
               // выделение текущей страницы
-              pagi = document.getElementById('1pagination');
-              pagi_li = pagi.querySelector('.pagination__item_cur_page');
+              let pagi = document.getElementById('1pagination');
+              let pagi_li = pagi.querySelector('.pagination__item_cur_page');
               if (pagi_li)
               {
                 pagi_li.className = 'pagination__item active';
