@@ -188,7 +188,7 @@ function get_category_page(url_path, pagination_id)
           html = '';
           categories.forEach(category => {
               html += `<li class="category__elem" id="${category.id}category_info">
-                        <a id='${category.id}show_books' data-username='${category.username}' data-catname='${category.name}' class="category__book-link">${category.name}</a>
+                        <a id='${category.id}show_books' data-username='${category.username}' data-catid='${category.id}' class="category__book-link">${category.name}</a>
                         <a data-url='/admin/${category.username}/category_delete/${category.id}/${url[url.length - 1]}' data-pagi='${pagination_id}' class="category__btn" id="${category.id}del_category">Удалить категорию</a>
                       </li>`;
           });
@@ -326,7 +326,7 @@ function del_category(url_path, pagination_id)
   }
 }
 
-function open_book_panel(username, category_id)
+function open_book_panel(username, category_id, category_name)
 {
     section = document.getElementById("book_search_in_a_category");
     section.style.display = "block";
@@ -343,7 +343,7 @@ function open_book_panel(username, category_id)
     $('h2').filter(function() {
         return this.id.match("category_title");
       }).remove();
-    html = `<h2 class="list__title title" id="category_title">Книги в категории "${category}"</h2>`;
+    html = `<h2 class="list__title title" id="category_title">Книги в категории "${category_name}"</h2>`;
     div = document.getElementById("2cont");
     div.insertAdjacentHTML("afterbegin", html);
     form = document.getElementById("category_book_search");
@@ -378,13 +378,13 @@ function search_books_on_category()
                 books.forEach(book => {
                     html += `<li class="list__book" id="${book.id}book_info">
                                 
-                                <a href="/book-page/${book.name}" class="list__book-set">
-                                   <img class="list__book-set" src="/${book.name}/get-cover" alt=""> 
+                                <a href="/book-page/${book.id}" class="list__book-set">
+                                   <img class="list__book-set" src="/${book.id}/get-cover" alt=""> 
                                 </a>
                                     
                                 
                                 <div class="list__book-wrap">
-                                        <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                                        <a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
                                         <span class="list__link"><b>Автор:</b> ${book.author}</span>
                                         <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
                                         <a id='${book.id}book_d' class="list__book-delete-btn" data-url='/admin/${book.username}/del_book/${book.category}/${book.id}/${1}'>Удалить книгу</a>
@@ -440,14 +440,14 @@ function search_books_on_category()
             }
           },
           error: function(jqXHR, exception) {
-              if (exception === 'parsererror')
-              {
-                  window.location.href = '/auth/login';
-              }
-              else
-              {
-                  console.log(exception);
-              }
+              // if (exception === 'parsererror')
+              // {
+              //     window.location.href = '/auth/login';
+              // }
+              // else
+              // {
+              //     console.log(exception);
+              // }
         }
       });
     }
@@ -505,13 +505,13 @@ function get_books_page_on_admin_panel(url_path)
                 html = '';
                 books.forEach(book => {
                         html += `<li class="list__book" id="${book.id}book_info">
-                                     <a href="/book-page/${book.name}" class="list__book-set">
-                                        <img class="list__book-set" src="/${book.name}/get-cover" alt=""> 
+                                     <a href="/book-page/${book.id}" class="list__book-set">
+                                        <img class="list__book-set" src="/${book.id}/get-cover" alt=""> 
                                     </a>
                          
                      
                                     <div class="list__book-wrap">
-                                            <a href="/book-page/${book.name}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                                            <a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
                                             <span class="list__link"><b>Автор:</b> ${book.author}</span>
                                             <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
                                             <a id='${book.id}book_d' class="list__book-delete-btn" data-url='/admin/${book.username}/del_book/${book.category}/${book.id}/${book.cur_page}'>Удалить книгу</a>
@@ -669,7 +669,8 @@ let callback = function() {
       {
         let username = target.dataset?.username;
         let category_id = target.dataset?.catid;
-        open_book_panel(username, category_id);
+        let category_name = target.textContent;
+        open_book_panel(username, category_id, category_name);
       }
       else if (target.tagName === 'A' && target.id.includes('del_category'))
       {
