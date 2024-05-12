@@ -114,15 +114,15 @@ def edit_comment(username, comment_id, book_id):
     return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_id=book_id, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year)))
 
 
-@main.route('/<username>/give-grade/<int:book_id>/<int:grade>')
+@main.route('/<username>/give-grade/<int:book_id>', methods=['GET'])
 @login_required
 @check_actual_password
-def give_grade(username, book_id, grade):
+def give_grade(username, book_id):
     if current_user.username != username:
         return render_template('403.html')
     book = Book.query.filter_by(id=book_id).first()
-    previous_grade = BookGrade.query.filter_by(
-        user=current_user, book=book).first()
+    grade = int(request.args.get('grade'))
+    previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
     if previous_grade:
         database.session.delete(previous_grade)
 
