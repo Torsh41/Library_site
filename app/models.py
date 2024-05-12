@@ -154,7 +154,7 @@ class PrivateChat(database.Model, SerializerMixin):
 class PrivateChatPost(database.Model, SerializerMixin):
     __tablename__ = "private_chat_posts"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.Text(1024), index=True)
+    body = database.Column(database.Text(), index=True)
     file = database.Column(database.LargeBinary)
     answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
