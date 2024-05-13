@@ -141,6 +141,20 @@
   word-break: break-all;
 }
 
+.message__wrappermain {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.message__dataform {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  right: 20px;
+  top: 20px;
+}
+
 .message__admin {
   display: flex;
   flex-direction: row;
