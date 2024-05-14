@@ -102,7 +102,11 @@ function add_post_on_forum(posts) {
                                 html += `<span class="message__span" id="${post.id}edited">изменено</span>`;
                               }
                         html += `</div></div>`;
-                        html += `<div class="message__right" id="${post.id}msg_write_id">`;
+                        html += `<div class="message__right" id="${post.id}msg_write_id">
+                                  <div class="message__wrappermain">
+                                    <div class="message__dataform" id="${post.id}post_date">
+                                      <span class="message__span">${post.post_day + " " + post.post_month + " " + post.post_year}</span>
+                                    </div>`;
     if (post.this_is_answer) 
     {
       if (post.basic_post_exist) 
@@ -130,7 +134,7 @@ function add_post_on_forum(posts) {
                   <img class="modal-content" id="${post.id}modal_img">
                 </div>`;
     }
-
+    html += `</div>`;
     if (post.username == cur_username) 
     {
       html += `<div class="message__admin" id="${post.id}personal_cont">
@@ -316,7 +320,11 @@ function get_posts_page(url_path, post_id=undefined)
                             html += `<span class="message__span" id="${post.id}edited">изменено</span>`;
                           }
                       html += `</div></div>`;
-                      html += `<div class="message__right" id="${post.id}msg_write_id">`;
+                      html += `<div class="message__right" id="${post.id}msg_write_id">
+                                <div class="message__wrappermain">
+                                  <div class="message__dataform" id="${post.id}post_date">
+                                    <span class="message__span">${post.post_day + " " + post.post_month + " " + post.post_year}</span>
+                                  </div>`;
                       if (post.this_is_answer)
                       {
                         if (post.basic_post_exist)
@@ -344,7 +352,7 @@ function get_posts_page(url_path, post_id=undefined)
                                     <img class="modal-content" id="${post.id}modal_img">
                                   </div>`;
                       }
-
+                      html += `</div>`;
                   if (post.username == post.current_username)
                   {
                     html += `<div class="message__admin" id="${post.id}personal_cont">
@@ -406,11 +414,8 @@ function get_posts_page(url_path, post_id=undefined)
 }
 
 
-function edit_post_on_forum_discussion(topic_id, post_id, post_body, username)
+function edit_post_on_forum_discussion(topic_id, post_id, post_body, post_date, username)
 {
-  $('p').filter(function() {
-      return this.id.match(post_id + "post_body");
-    }).remove();
   $('a').filter(function() {
       return this.id.match(post_id + "edit_post_a");
     }).remove();
@@ -419,20 +424,8 @@ function edit_post_on_forum_discussion(topic_id, post_id, post_body, username)
   {
     document.getElementById(post_id + 'user_info').insertAdjacentHTML('beforeend', `<span class="message__span" id="${post_id}edited">изменено</span>`);
   }
-
-  let html = `<p class="message__text" id="${post_id}post_body">
-                ${post_body} <!--Сообщение пользователя-->
-              </p>`;
-  let div = document.getElementById(post_id + 'base_to_answer');
-  if (div)
-  {
-    div.insertAdjacentHTML('afterend', html);
-  }
-  else
-  {
-    div = document.getElementById(post_id + 'msg_write_id');
-    div.insertAdjacentHTML('afterbegin', html);
-  }
+  document.getElementById(post_id + 'post_date').children.textContent = post_date;
+  document.getElementById(post_id + 'post_body').textContent = post_body;
   if (username == cur_username)
   {
     let div_ = document.getElementById(post_id + 'answer_on');
@@ -505,7 +498,7 @@ $(function() {
   });
 
   socket.on("edit post response", function (data) {
-    edit_post_on_forum_discussion(data.topic_id, data.post_id, data.post_body, data.username);
+    edit_post_on_forum_discussion(data.topic_id, data.post_id, data.post_body, data.post_date, data.username);
   });
 
   $('#disc_posts_container').on('click', function(event) {
@@ -551,10 +544,3 @@ $(function() {
     document.getElementById("edit_post_sec").style.display = "none";
   });
 });
-
-
-
-
-
-
-

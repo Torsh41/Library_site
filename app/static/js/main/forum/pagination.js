@@ -130,18 +130,14 @@ function change_topic_name()
           dataType: 'json',
           data: $('#change_topic_name_form').serialize(),
           success: function(response) {
-            $('p').filter(function() {
-              return this.id.match(response.category_id + response.topic_id + "top_name");
-            }).remove();
-            $('a').filter(function() {
-              return this.id.match(response.category_id + response.topic_id + "change_topic_name");
-            }).remove();
+            $('#' + response.category_id + response.topic_id + "top_name").remove();
+            $('#' + response.category_id + response.topic_id + "change_topic_name").remove();
           
             let html = `<p class="fraction__text-error" id="${response.category_id}${response.topic_id}top_name"> ${response.name}</p>`;
-            let div = document.getElementById(response.category_id + response.topic_id + 'topic_name_div');
-            div.insertAdjacentHTML('afterbegin', html)
+            let div = document.getElementById(String(response.category_id) + String(response.topic_id) + 'topic_name_div');
+            div.insertAdjacentHTML('afterbegin', html);
             html = `<a id="${response.category_id}${response.topic_id}change_topic_name" class="comments__command" data-url="/change-topic-name/${response.category_id}/${response.topic_id}" data-name="${response.name}">Редактировать</a>`;
-            let a = document.getElementById(response.category_id + response.topic_id + 'admin_mark');
+            let a = document.getElementById(String(response.category_id) + String(response.topic_id) + 'admin_mark');
             a.insertAdjacentHTML('afterend', html);
             document.getElementById("changed_topic_name_field").value = "";
             document.getElementById("change_topic_name_form").setAttribute("action", "");

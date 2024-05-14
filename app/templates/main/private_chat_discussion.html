@@ -200,48 +200,52 @@
                 </div>
   
                 <div class="message__right" id="{{post["id"]}}msg_write_id">
-                  {% if post["this_is_answer"] %}
-                    {% if post["basic_post_exist"] %}
-                      <div class="message__answer" id="{{post["id"]}}base_to_answer">
-                        <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
-                        <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
-                      </div>
-                    {% else %}
-                      <div class="message__answer" id="{{post["id"]}}base_to_answer">
-                        <span class="message__span-answer">Сообщение удалено</span>
+                  <div class="message__wrappermain">
+                    <div class="message__dataform" id="{{post["id"]}}post_date">
+                      <span class="message__span">{{ str(post["post_timestamp"].date().day) + " " + months_dict[post["post_timestamp"].date().month] + " " + str(post["post_timestamp"].date().year) }}</span>
+                    </div>
+                    {% if post["this_is_answer"] %}
+                      {% if post["basic_post_exist"] %}
+                        <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                          <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
+                          <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
+                        </div>
+                      {% else %}
+                        <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                          <span class="message__span-answer">Сообщение удалено</span>
+                        </div>
+                      {% endif %}
+                    {% endif %}
+                    <p class="message__text" id="{{post["id"]}}post_body">
+                      {{post["body"]}} <!--Сообщение пользователя-->
+                    </p>
+                    {% if post["file"] %}
+                      <img id="{{post.id}}img" style="width: 80px; height: 80px" src="{{url_for('main.post_screenshot_on_private_chat', post_id=post["id"])}}" data-postid="{{post.id}}"/>
+                      <div id="{{post.id}}modal" class="modal">
+                        <span class="close" onclick="document.getElementById('{{post.id}}modal').style.display='none'">&times;</span>
+                        <img class="modal-content" id="{{post.id}}modal_img">
                       </div>
                     {% endif %}
-                  {% endif %}
-                  <p class="message__text" id="{{post["id"]}}post_body">
-                    {{post["body"]}} <!--Сообщение пользователя-->
-                  </p>
-                  {% if post["file"] %}
-                    <img id="{{post.id}}img" style="width: 80px; height: 80px" src="{{url_for('main.post_screenshot_on_private_chat', post_id=post["id"])}}" data-postid="{{post.id}}"/>
-                    <div id="{{post.id}}modal" class="modal">
-                      <span class="close" onclick="document.getElementById('{{post.id}}modal').style.display='none'">&times;</span>
-                      <img class="modal-content" id="{{post.id}}modal_img">
-                    </div>
-                  {% endif %}
-  
+                  </div>
                   <!--This block for user (only for his messages)-->
-                  {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
-                  <div class="message__admin" id="{{post["id"]}}personal_cont">
-                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
-                    <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-body="{{post["body"]}}">Редактировать</a>
-                    <a id="{{post.id}}post_d" class="message__admin-btn" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
+                    {% if (post["username"] == current_user.username) and current_user.is_authenticated %}
+                    <div class="message__admin" id="{{post["id"]}}personal_cont">
+                      <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                      <a class="message__admin-btn" id="{{post["id"]}}edit_post_a" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-body="{{post["body"]}}">Редактировать</a>
+                      <a id="{{post.id}}post_d" class="message__admin-btn" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
+                    </div>
+                    {% elif current_user.role == Role.ADMIN %}
+                    <div class="message__admin" id="{{post["id"]}}personal_cont">
+                      <a class="comments__command">Админ</a>
+                      <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                      <a id="{{post.id}}post_d" class="message__admin-btn" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
+                    </div>
+                    {% elif current_user.is_authenticated %}
+                    <div class="message__admin" id="{{post["id"]}}personal_cont">
+                      <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
+                    </div>
+                    {% endif %}
                   </div>
-                  {% elif current_user.role == Role.ADMIN %}
-                  <div class="message__admin" id="{{post["id"]}}personal_cont">
-                    <a class="comments__command">Админ</a>
-                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
-                    <a id="{{post.id}}post_d" class="message__admin-btn" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}" data-page="{{1}}">Удалить</a>
-                  </div>
-                  {% elif current_user.is_authenticated %}
-                  <div class="message__admin" id="{{post["id"]}}personal_cont">
-                    <a class="message__admin-btn" id="{{post["id"]}}answer_on" data-chatid="{{chat_id}}" data-postid="{{post["id"]}}">Ответить</a>
-                  </div>
-                  {% endif %}
-                </div>
               </div>
             {% endfor %}
   

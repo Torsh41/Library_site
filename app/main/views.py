@@ -417,7 +417,7 @@ def add_topic(username, category_id):
             is_admin = True
         else:
             is_admin = False
-        return jsonify([dict(result=result, cur_user_is_admin=is_admin, pages_count=pages_count, topic_pages=last_page, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category_by_page)) for topic in topics_for_cur_category_by_page])
+        return jsonify([dict(result=result, cur_user_is_admin=is_admin, pages_count=pages_count, topic_pages=last_page, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category)) for topic in topics_for_cur_category_by_page])
     return jsonify([dict(result=result)])
 
 
