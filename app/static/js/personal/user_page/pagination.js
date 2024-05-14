@@ -24,10 +24,6 @@ function lists_pagination_update(pages, username) {
 
 let beauty = () => {
   const select = document.querySelector('.js-custom-select');
-  // const selectArray = document.getElementsByClassName('.js-custom-select');
-  // console.log(selectArray);
-  // let countSelects = selectArray.length;
-
   const choices = new Choices(selectArray[i], {
     searchEnabled: false,
     itemSelectText: '',
