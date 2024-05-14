@@ -18,7 +18,7 @@ class Config:
     MAIL_PORT = 465#587
     MAIL_USE_SSL = True#False
     MAIL_USE_TLS = False#True
-    MAIL_USERNAME = 'leokazantsev19@gmail.com' #(os.environ.get('MAIL_USERNAME'))
+    MAIL_USERNAME = 'leokazantsev19@gmail.com' #os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = 'qctetuaboxunlvkv' #os.environ.get('MAIL_PASSWORD')
     MBK_MAIL_SUBJECT_PREFIX = '[Magic Book Keeper]' 
     MBK_MAIL_SENDER = 'The MBK team <MBK@example.com>' 
