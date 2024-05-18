@@ -11,10 +11,6 @@ function write_post_socket(topic_id, post_id_to_answer = false)
       topic_id: topic_id,
       post_id_to_answer: post_id_to_answer,
     });
-
-    // $('#add_post_button').on('click', function(event) {
-    //   write_post_socket(topic_id);
-    // });
     document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
   } 
   else if (document.getElementById("post_body_id").value.trim().length > 200) 
@@ -38,10 +34,6 @@ function del_post_socket(topic_id, post_id, page)
       post_id: post_id,
       page: page,
     });
-
-    // $('#add_post_button').on('click', function(event) {
-    //   write_post_socket(topic_id);
-    // });
     document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
   }
 }
@@ -258,9 +250,6 @@ function del_post(response, topic_id, post_id)
 function answer_on_post(topic_id, post_id) 
 {
   document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}', '${post_id}')`);
-  // $('#add_post_button').on('click', function(event) {
-  //   write_post_socket(topic_id, post_id);
-  // });
   document.getElementById("add_post_form").scrollIntoView();
   $("#post_body_id").css("opacity", ".4").animate({ opacity: "1" }, "slow");
 }
