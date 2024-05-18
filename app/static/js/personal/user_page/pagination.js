@@ -22,45 +22,6 @@ function lists_pagination_update(pages, username) {
 }
 
 
-let beauty = () => {
-  const select = document.querySelector('.js-custom-select');
-  const choices = new Choices(selectArray[i], {
-    searchEnabled: false,
-    itemSelectText: '',
-    classNames: {
-      containerOuter: 'defselect',
-      containerInner: 'defselect__inner',
-      input: 'defselect__input',
-      inputCloned: 'defselect__input--cloned',
-      list: 'defselect__list',
-      listItems: 'defselect__list--multiple',
-      listSingle: 'defselect__list--single',
-      listDropdown: 'defselect__list--dropdown',
-      item: 'defselect__item',
-      itemSelectable: 'defselect__item--selectable',
-      itemDisabled: 'defselect__item--disabled',
-      itemChoice: 'defselect__item--choice',
-      placeholder: 'defselect__placeholder',
-      group: 'defselect__group',
-      groupHeading: 'defselect__heading',
-      button: 'defselect__button',
-      activeState: 'is-active',
-      focusState: 'is-focused',
-      openState: 'is-open',
-      disabledState: 'is-disabled',
-      highlightedState: 'is-highlighted',
-      selectedState: 'is-selected',
-      flippedState: 'is-flipped',
-      loadingState: 'is-loading',
-      noResults: 'has-no-results',
-      noChoices: 'has-no-defselect'
-    }
-  });
-
-
-};
-
-
 // функция перестройки пагинации элементов списка пользователя для ее правильного отображения
 function items_pagination_update(pages, username, cataloge_id) {
   $("#" + cataloge_id + "books_pagination").remove();
@@ -191,7 +152,8 @@ function get_lists_page(url_path) {
       });
       let div = document.getElementById('lists_container');
       div.insertAdjacentHTML('afterbegin', html);
-      if (cataloges.length) {
+      if (cataloges.length) 
+      {
         // перестройка пагинации
         lists_pagination_update(cataloges[0].pages_count, cataloges[0].username);
 
@@ -207,7 +169,6 @@ function get_lists_page(url_path) {
           }
         }
       }
-      beauty();
     },
     error: function (jqXHR, exception) {
       if (exception === 'parsererror') {
@@ -282,7 +243,6 @@ function get_books_page(url_path, cataloge_id) {
           child.className = 'pagination__item_cur_page';
         }
       }
-      beauty();
     },
     error: function (jqXHR, exception) {
       if (exception === 'parsererror') {

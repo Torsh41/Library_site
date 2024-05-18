@@ -130,12 +130,8 @@ function change_topic_name()
           dataType: 'json',
           data: $('#change_topic_name_form').serialize(),
           success: function(response) {
-            $('#' + response.category_id + response.topic_id + "top_name").remove();
             $('#' + response.category_id + response.topic_id + "change_topic_name").remove();
-          
-            let html = `<p class="fraction__text-error" id="${response.category_id}${response.topic_id}top_name"> ${response.name}</p>`;
-            let div = document.getElementById(String(response.category_id) + String(response.topic_id) + 'topic_name_div');
-            div.insertAdjacentHTML('afterbegin', html);
+            document.getElementById(String(response.category_id) + String(response.topic_id) + 'top_name').textContent = response.name;
             html = `<a id="${response.category_id}${response.topic_id}change_topic_name" class="comments__command" data-url="/change-topic-name/${response.category_id}/${response.topic_id}" data-name="${response.name}">Редактировать</a>`;
             let a = document.getElementById(String(response.category_id) + String(response.topic_id) + 'admin_mark');
             a.insertAdjacentHTML('afterend', html);
