@@ -152,7 +152,8 @@ function get_lists_page(url_path) {
       });
       let div = document.getElementById('lists_container');
       div.insertAdjacentHTML('afterbegin', html);
-      if (cataloges.length) {
+      if (cataloges.length) 
+      {
         // перестройка пагинации
         lists_pagination_update(cataloges[0].pages_count, cataloges[0].username);
 

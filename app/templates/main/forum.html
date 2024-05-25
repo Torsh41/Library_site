@@ -201,7 +201,7 @@
                 <li class="fraction__list-item" id="{{ category.id }}topic_info">
                   <a href="{{url_for('main.topic', topic_id=topic.id)}}" class="fraction__topic-link">
                     <div class="fraction__topic" id="{{category.id}}{{topic.id}}topic_name_div">
-                      <p class="fraction__text-error" id="{{category.id}}{{topic.id}}top_name"> {{ topic.name }}</p>
+                      <p class="fraction__text-error" id="{{category.id}}{{topic.id}}top_name">{{ topic.name }}</p>
                     </div>
                   </a>
                   {% if current_user.role == Role.ADMIN %}

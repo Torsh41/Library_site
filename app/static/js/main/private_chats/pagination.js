@@ -44,7 +44,7 @@ $(function() {
                             $('li').filter(function() {
                                 return this.id.match('chat_block');
                             }).remove();
-                            chats = Array.from(response); let = html = '';
+                            chats = Array.from(response); let html = '';
                             chats.forEach(chat => {
                                 html += `<li id="${chat.id}chat_block" class="fraction__list-item">
                                             <a id="${chat.id}chat_name" href="/forum/private_chat/${chat.id}" class="fraction__topic-link">

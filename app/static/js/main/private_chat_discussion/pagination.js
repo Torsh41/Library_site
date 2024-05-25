@@ -83,7 +83,11 @@ $(function() {
                                     html += `<span class="message__span" id="${post.id}edited">изменено</span>`;
                                   }
                               html += `</div></div>`;
-                              html += `<div class="message__right" id="${post.id}msg_write_id">`;
+                              html += `<div class="message__right" id="${post.id}msg_write_id">
+                                        <div class="message__wrappermain">
+                                          <div class="message__dataform" id="${post.id}post_date">
+                                            <span class="message__span">${post.post_day + " " + post.post_month + " " + post.post_year}</span>
+                                          </div>`;
                               if (post.this_is_answer)
                               {
                                 html += `<div class="message__answer" id="${post.id}base_to_answer">
@@ -102,7 +106,7 @@ $(function() {
                                             <img class="modal-content" id="${post.id}modal_img">
                                           </div>`;
                               }
-        
+                              html += `</div>`;
                           if (post.username == post.current_username)
                           {
                             html += `<div class="message__admin" id="${post.id}personal_cont">

@@ -501,6 +501,20 @@
     margin-bottom: 10px;
   }
 
+  .message__admin-btn,
+  .message__span {
+    font-size: 9px;
+  }
+
+  .form__input {
+    font-size: 9px;
+  }
+
+  .form__span {
+    /* line-height: 19px; */
+    text-align: center;
+  }
+
 }
 
 @media (max-width: 575px) {
@@ -862,7 +876,8 @@
 
   .form__span {
     margin-bottom: 2px;
-    line-height: 15px;
+    font-size: 10px;
+    line-height: 11px;
   }
 
   .button__write {
