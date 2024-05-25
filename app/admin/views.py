@@ -240,6 +240,6 @@ def change_book_info(username, book_id):
             book.category=category; book.user=current_user._get_current_object()
             database.session.add(book)
             database.session.commit()
-            return redirect(url_for('main.book_page', name=book.name))
+            return redirect(url_for('main.book_page', book_id=book.id))
         return render_template('admin/change_book_info.html', form=form, categories=categories, pagination=pagination, book=book, range=range, len=len)
     return render_template('404.html')

@@ -220,10 +220,9 @@
               </div>
             </label>
 
-            <!--<button class="form__btn btn">Добавить книгу в базу</button>-->
             {{form.submit(class="form__btn btn")}}
 
-            <a class="form__exit-btn" href="{{url_for('main.book_page', name=book.name)}}">Вернуться на страницу книги</a>
+            <a class="form__exit-btn" href="{{url_for('main.book_page', book_id=book.id)}}">Вернуться на страницу книги</a>
           </form>
         </div>
       </section>
