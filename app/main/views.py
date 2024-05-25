@@ -216,7 +216,7 @@ def search_by_category(id):
         if result:
             search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
         if release_date:
-            search_result += category.books.filter((Book.release_date.like("%{}%".format(release_date)))).all()
+            search_result += category.books.filter_by(release_date=release_date).all()
         if description:
             search_result += category.books.filter((Book.description.like("%{}%".format(description)))).all()
             
