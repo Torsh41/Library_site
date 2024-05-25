@@ -90,10 +90,19 @@ $(function() {
                                           </div>`;
                               if (post.this_is_answer)
                               {
-                                html += `<div class="message__answer" id="${post.id}base_to_answer">
-                                          <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
-                                          <p class="message__text-answer">${post.body_of_post_from}</p>
-                                        </div>`;
+                                if (post.basic_post_exist)
+                                {
+                                  html += `<div class="message__answer" id="${post.base_id}base_to_answer">
+                                            <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
+                                            <p class="message__text-answer">${post.body_of_post_from}</p>
+                                          </div>`;
+                                }
+                                else
+                                {
+                                  html += `<div class="message__answer" id="${post.id}base_to_answer">
+                                            <span class="message__span-answer">Сообщение удалено</span>
+                                          </div>`;
+                                }
                               }
                               html += `<p class="message__text" id="${post.id}post_body">
                               ${post.body} <!--Сообщение пользователя-->

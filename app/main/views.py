@@ -269,7 +269,7 @@ def topic(topic_id):
         if post.answer_to_post:
             post_from = topic.posts.filter_by(id=post.answer_to_post).first()
             if post_from:
-                posts.append({"this_is_answer": True, "basic_post_exist": True, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
+                posts.append({"this_is_answer": True, "basic_post_exist": True, "base_id": post_from.id, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
                              "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
             else:
                 posts.append({"this_is_answer": True, "basic_post_exist": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
@@ -329,7 +329,7 @@ def get_posts_page(topic_id, page):
                 post_from = topic.posts.filter_by(
                     id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
+                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
                         post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
@@ -342,7 +342,7 @@ def get_posts_page(topic_id, page):
                 post_from = topic.posts.filter_by(
                     id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
+                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
                         post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
@@ -733,7 +733,7 @@ def private_chat(chat_id):
         if post.answer_to_post:
             post_from = chat.posts.filter_by(id=post.answer_to_post).first()
             if post_from:
-                posts.append({"this_is_answer": True, "basic_post_exist": True, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
+                posts.append({"this_is_answer": True, "basic_post_exist": True, "base_id": post_from.id, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
                              "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
             else:
                 posts.append({"this_is_answer": True, "basic_post_exist": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
@@ -764,7 +764,7 @@ def get_posts_page_on_chat_disc(chat_id, page):
             if post.answer_to_post:
                 post_from = chat.posts.filter_by(id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
+                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
                         post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
@@ -776,7 +776,7 @@ def get_posts_page_on_chat_disc(chat_id, page):
             if post.answer_to_post:
                 post_from = chat.posts.filter_by(id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
+                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
                         post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
                 else:
                     posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(

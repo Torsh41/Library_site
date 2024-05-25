@@ -104,7 +104,7 @@ function add_post_on_forum(posts) {
     {
       if (post.basic_post_exist) 
       {
-        html += `<div class="message__answer" id="${post.id}base_to_answer">
+        html += `<div class="message__answer" id="${post.base_id}base_to_answer">
                                         <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
                                         <p class="message__text-answer">${post.body_of_post_from}</p>
                                       </div>`;
@@ -315,7 +315,7 @@ function get_posts_page(url_path, post_id=undefined)
                       {
                         if (post.basic_post_exist)
                         {
-                          html += `<div class="message__answer" id="${post.id}base_to_answer">
+                          html += `<div class="message__answer" id="${post.base_id}base_to_answer">
                                     <span class="message__span-answer">Сообщение от ${post.username_of_post_from}</span>
                                     <p class="message__text-answer">${post.body_of_post_from}</p>
                                   </div>`;
@@ -405,22 +405,26 @@ function edit_post_on_forum_discussion(chat_id, post_id, post_body, post_date, u
   $('a').filter(function() {
       return this.id.match(post_id + "edit_post_a");
     }).remove();
+  let elem = document.getElementById(post_id + 'user_info');
   let edited_span = document.getElementById(post_id + 'edited');
-  if (!edited_span)
+  if (elem)
   {
-    document.getElementById(post_id + 'user_info').insertAdjacentHTML('beforeend', `<span class="message__span" id="${post_id}edited">изменено</span>`);
+    if (!edited_span)
+    {
+      elem.insertAdjacentHTML('beforeend', `<span class="message__span" id="${post_id}edited">изменено</span>`);
+    }
+    document.getElementById(post_id + 'post_date').children.textContent = post_date;
+    document.getElementById(post_id + 'post_body').textContent = post_body;
+    if (username == cur_username)
+    {
+      let div_ = document.getElementById(post_id + 'answer_on');
+      html = `<a class="message__admin-btn" id="${post_id}edit_post_a" data-chatid="${chat_id}" data-postid="${post_id}" data-body="${post_body}">Редактировать</a>`;
+      div_.insertAdjacentHTML('afterend', html)
+    }
+    document.getElementById("edit_post_field").value = "";
+    document.getElementById("edit_post_sec").style.display = "none";
   }
-
-  document.getElementById(post_id + 'post_date').children.textContent = post_date;
-  document.getElementById(post_id + 'post_body').textContent = post_body;
-  if (username == cur_username)
-  {
-    let div_ = document.getElementById(post_id + 'answer_on');
-    html = `<a class="message__admin-btn" id="${post_id}edit_post_a" data-chatid="${chat_id}" data-postid="${post_id}" data-body="${post_body}">Редактировать</a>`;
-    div_.insertAdjacentHTML('afterend', html)
-  }
-  document.getElementById("edit_post_field").value = "";
-  document.getElementById("edit_post_sec").style.display = "none";
+  $(`#${post_id}base_to_answer .message__text-answer`).text(post_body);
 }
 
 

@@ -206,7 +206,7 @@
                     </div>
                     {% if post["this_is_answer"] %}
                       {% if post["basic_post_exist"] %}
-                        <div class="message__answer" id="{{post["id"]}}base_to_answer">
+                        <div class="message__answer" id="{{post["base_id"]}}base_to_answer">
                           <span class="message__span-answer">Сообщение от {{post["username_of_post_from"]}}</span>
                           <p class="message__text-answer">{{post["body_of_post_from"]}}</p>
                         </div>
