@@ -1,6 +1,6 @@
 function write_post_socket(topic_id, post_id_to_answer = false) 
 {
-  if (document.getElementById("post_body_id").value.trim() && document.getElementById("post_body_id").value.trim().length <= 200) 
+  if (document.getElementById("post_body_id").value.trim() && document.getElementById("post_body_id").value.trim().length <= 200 && document.getElementById("file_input_id").files[0].size <= 1024 * 1024) 
   {
     form = document.getElementById("add_post_form");
     var formData = new FormData(form);
@@ -13,6 +13,10 @@ function write_post_socket(topic_id, post_id_to_answer = false)
     });
     document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${topic_id}')`);
   } 
+  else if (document.getElementById("file_input_id").files[0].size > 1024 * 1024)
+  {
+    alert("Слишком тяжелый файл во вложении");
+  }
   else if (document.getElementById("post_body_id").value.trim().length > 200) 
   {
     alert("Слишком длинный пост");
@@ -416,7 +420,7 @@ function edit_post_on_forum_discussion(topic_id, post_id, post_body, post_date, 
     {
       elem.insertAdjacentHTML('beforeend', `<span class="message__span" id="${post_id}edited">изменено</span>`);
     }
-    document.getElementById(post_id + 'post_date').children.textContent = post_date;
+    $(`#${post_id}post_date > span`).text(post_date);
     document.getElementById(post_id + 'post_body').textContent = post_body;
     if (username == cur_username)
     {

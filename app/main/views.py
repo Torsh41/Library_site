@@ -261,7 +261,7 @@ def topic(topic_id):
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = topic.posts.order_by().paginate(
+    posts_pagination = topic.posts.order_by(TopicPost.id).paginate(
         posts_page, per_page=ELEMS_COUNT, error_out=False)
     posts = list()
     for post in posts_pagination.items:
@@ -309,7 +309,7 @@ def get_categories_page_on_forum(page):
 @main.route('/get_posts_page/<int:topic_id>/<int:page>', methods=['GET'])
 def get_posts_page(topic_id, page):
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
-    posts_pagination = topic.posts.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    posts_pagination = topic.posts.order_by(TopicPost.id).paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     posts = list()
     if current_user.is_authenticated:
@@ -725,7 +725,7 @@ def private_chat(chat_id):
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = chat.posts.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
+    posts_pagination = chat.posts.order_by(PrivateChatPost.id).paginate(1, per_page=ELEMS_COUNT, error_out=False)
    
     posts = list()
     for post in posts_pagination.items:
@@ -750,7 +750,7 @@ def private_chat(chat_id):
 def get_posts_page_on_chat_disc(chat_id, page):
     posts = list()
     chat = PrivateChat.query.filter_by(id=chat_id).first()
-    posts_pagination = chat.posts.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    posts_pagination = chat.posts.order_by(PrivateChatPost.id).paginate(page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     username = current_user.username
     if current_user.role == Role.ADMIN:
