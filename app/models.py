@@ -175,7 +175,7 @@ class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary)
-    isbn = database.Column(database.String(128), unique=False)
+    isbn = database.Column(database.String(512), unique=False)
     name = database.Column(database.String(512), unique=True, index=True)
     author = database.Column(database.String(512), unique=False)
     publishing_house = database.Column(database.String(512), unique=False)
