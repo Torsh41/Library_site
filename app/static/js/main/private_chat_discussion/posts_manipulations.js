@@ -1,23 +1,25 @@
 function write_post_socket(chat_id, post_id_to_answer = false) 
 {
-  if (document.getElementById("post_body_id").value.trim() && document.getElementById("post_body_id").value.trim().length <= 200 && document.getElementById("file_input_id").files[0].size <= 1024 * 1024) 
+  if (document.getElementById("post_body_id").value.trim() && document.getElementById("post_body_id").value.trim().length <= 200)
   {
     form = document.getElementById("add_post_form");
     var formData = new FormData(form);
+    let file = formData.get("screenshot");
+    if (file.size > 1024 * 1024)
+    {
+      alert("Слишком тяжелый файл во вложении");
+      return;
+    }
     socket.emit("send post", {
       post_body: formData.get("post_body"),
-      filename: formData.get("screenshot").name,
-      screenshot: formData.get("screenshot"),
+      filename: file.name,
+      screenshot: file,
       chat_id: chat_id,
       post_id_to_answer: post_id_to_answer,
     });
 
     document.getElementById("add_post_button").setAttribute("onclick", `write_post_socket('${chat_id}')`);
   } 
-  else if (document.getElementById("file_input_id").files[0].size > 1024 * 1024)
-  {
-    alert("Слишком тяжелый файл во вложении");
-  }
   else if (document.getElementById("post_body_id").value.trim().length > 200) 
   {
     alert("Слишком длинный пост");
