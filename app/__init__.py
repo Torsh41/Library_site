@@ -40,7 +40,6 @@ def create_app(config_name):
   database.init_app(app)
   with app.app_context():
     database.create_all()
-    # database.drop_all()
       
   # здесь выполняется подключение маршрутов и
   # нестандартных страниц с сообщениями об ошибках
