@@ -93,12 +93,7 @@ function del_user(url_path, pagination_id)
       url: url_path,
       dataType: 'json',
       success: function(response) {
-        //let url = url_path.split('/'); user_id_for_del = url[url.length - 2];
-        // $('li').filter(function() {
-        //   return this.id.match(user_id_for_del + "user_info");
-        // }).remove();
         get_user_search_page(`/admin/get_user_search_page/${response.cur_page}`);
-
         $('ul').filter(function() {
           return this.id.match(pagination_id);
         }).remove();
@@ -383,8 +378,16 @@ function search_books_on_category()
                                 </a>
                                     
                                 
-                                <div class="list__book-wrap">
-                                        <a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                                <div class="list__book-wrap">`;
+                                if (book.name.length > 10)
+                                {
+                                  book.name = book.name.slice(0, 10) + "...";
+                                }
+                                if (book.author.length > 10)
+                                {
+                                  book.author = book.author.slice(0, 10) + "...";
+                                }
+                                html += `<a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
                                         <span class="list__link"><b>Автор:</b> ${book.author}</span>
                                         <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
                                         <a id='${book.id}book_d' class="list__book-delete-btn" data-url='/admin/${book.username}/del_book/${book.category}/${book.id}/${1}'>Удалить книгу</a>
@@ -440,14 +443,14 @@ function search_books_on_category()
             }
           },
           error: function(jqXHR, exception) {
-              // if (exception === 'parsererror')
-              // {
-              //     window.location.href = '/auth/login';
-              // }
-              // else
-              // {
-              //     console.log(exception);
-              // }
+            if (exception === 'parsererror')
+            {
+                window.location.href = '/auth/login';
+            }
+            else
+            {
+                console.log(exception);
+            }
         }
       });
     }
@@ -474,7 +477,7 @@ function books_pagination_update(pages, username, category)
   pages.forEach(p => {
     if (p)
     {
-      html += `<li class="pagination__item_cur_page">
+      html += `<li class="pagination__item active">
                   <a id="${p}get_books_p" data-url='/admin/${username}/search_books_on_admin_panel/${category}?page=${p}'>${p}</a>
               </li>`;
     }
@@ -482,7 +485,6 @@ function books_pagination_update(pages, username, category)
     {
       html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
     }
-   
   });
   html += `<li class="pagination__item disabled">&bull;</li></ul>`;
   div = document.getElementById("3pagination_container");
@@ -510,8 +512,16 @@ function get_books_page_on_admin_panel(url_path)
                                     </a>
                          
                      
-                                    <div class="list__book-wrap">
-                                            <a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                                    <div class="list__book-wrap">`;
+                                    if (book.name.length > 10)
+                                    {
+                                      book.name = book.name.slice(0, 10) + "...";
+                                    }
+                                    if (book.author.length > 10)
+                                    {
+                                      book.author = book.author.slice(0, 10) + "...";
+                                    }
+                                    html += `<a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
                                             <span class="list__link"><b>Автор:</b> ${book.author}</span>
                                             <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
                                             <a id='${book.id}book_d' class="list__book-delete-btn" data-url='/admin/${book.username}/del_book/${book.category}/${book.id}/${book.cur_page}'>Удалить книгу</a>
@@ -532,10 +542,10 @@ function get_books_page_on_admin_panel(url_path)
                     }
                     for (const child of pagi.children)
                     {
-                        if (books.length && books[0].cur_page == child.textContent)
-                        {
-                            child.className = 'pagination__item_cur_page';
-                        }
+                      if (books.length && books[0].cur_page == child.textContent)
+                      {
+                          child.className = 'pagination__item_cur_page';
+                      }
                     }
           }
         },

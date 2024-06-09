@@ -189,7 +189,7 @@ def search_books_on_admin_panel(username, category_id):
             return jsonify([dict(has_books=False)])
 
     elif page := request.args.get('page', None, type=int):
-        cur_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
+        cur_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).order_by(SearchResult.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(cur_result_pagination.iter_pages())
         cur_result = cur_result_pagination.items
         if cur_result:

@@ -39,6 +39,14 @@ function search_books_on_category_page(category_id, list_id=undefined)
                         {
                             html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
                         }
+                        if (book.name.length > 10)
+                        {
+                            book.name = book.name.slice(0, 10) + "...";
+                        }
+                        if (book.author.length > 10)
+                        {
+                            book.author = book.author.slice(0, 10) + "...";
+                        }
                         html += `<a href="/book-page/${book.id}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
                                     <span class="list__link">Автор: ${book.author}</span>
                                     <div class="list__mark-star">
@@ -145,6 +153,14 @@ function get_books_page_on_category(page, list_id=undefined)
         if (book.current_user_is_auth)
         {
                 html += `<a href="/user/${book.username}/add-book-in-list-tmp/${book.id}?list_id=${list_id}" class="list__book-delete-btn">Добавить в список</a>`;
+        }
+        if (book.name.length > 10)
+        {
+            book.name = book.name.slice(0, 10) + "...";
+        }
+        if (book.author.length > 10)
+        {
+            book.author = book.author.slice(0, 10) + "...";
         }
         html += `<a href="/book-page/${book.id}?list_id=${list_id}" class="list__link-book">Книга: ${book.name}</a>
                     <span class="list__link">Автор: ${book.author}</span>

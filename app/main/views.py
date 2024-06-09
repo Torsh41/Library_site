@@ -194,7 +194,7 @@ def category(id):
         else:
             top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
             new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
-    return render_template('main/category_page.html', top_books=top_books, new_books=new_books, name=category.name, id=category.id, list_id=list_id)
+    return render_template('main/category_page.html', top_books=top_books, new_books=new_books, name=category.name, id=category.id, list_id=list_id, len=len)
         
         
 @main.route('/category/<int:id>/search', methods=['POST'])

@@ -16,15 +16,15 @@ class Role:
 class User(UserMixin, database.Model, SerializerMixin):
     __tablename__ = "users"
     id = database.Column(database.Integer, primary_key=True)
-    email = database.Column(database.String(64), unique=True, index=True)
-    username = database.Column(database.String(64), unique=True, index=True)
+    email = database.Column(database.Text(), unique=True, index=True)
+    username = database.Column(database.Text(), unique=True, index=True)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     avatar = database.Column(database.LargeBinary)
-    city = database.Column(database.String(64))
+    city = database.Column(database.Text())
     gender = database.Column(database.String(4))
     age = database.Column(database.Integer)
     about_me = database.Column(database.Text())
-    password_hash = database.Column(database.String(128))
+    password_hash = database.Column(database.Text())
     books = database.relationship('Book', backref='user')
     private_chats = database.relationship('PrivateChat', backref='creator', lazy='dynamic')
     chats_invitations = database.relationship('ChatInvitation', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")
@@ -32,7 +32,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     comments = database.relationship('Comment', backref='user', cascade="all, delete, delete-orphan")
     posts_from_all_topics = database.relationship('TopicPost', backref='user', cascade="all, delete, delete-orphan")
     posts_from_all_private_chats = database.relationship('PrivateChatPost', backref='user', cascade="all, delete, delete-orphan")
-    cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")#, uselist=False)
+    cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")
     confirmed = database.Column(database.Boolean, default=False)
     role = database.Column(database.Boolean, default=False)
     
@@ -116,7 +116,7 @@ class User(UserMixin, database.Model, SerializerMixin):
 class Category(database.Model, SerializerMixin):
     __tablename__ = "categories"    
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(256), unique=True, index=True)
+    name = database.Column(database.Text(), unique=True, index=True)
     books = database.relationship('Book', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
     topics = database.relationship('DiscussionTopic', backref='category', lazy='dynamic', cascade="all, delete, delete-orphan")
 
@@ -124,7 +124,7 @@ class Category(database.Model, SerializerMixin):
 class DiscussionTopic(database.Model, SerializerMixin):
     __tablename__ = "topics"
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(1024), unique=False, index=True)
+    name = database.Column(database.Text(), unique=False, index=True)
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
     posts = database.relationship('TopicPost', backref='topic', lazy='dynamic', cascade="all, delete, delete-orphan")
 
@@ -132,7 +132,7 @@ class DiscussionTopic(database.Model, SerializerMixin):
 class TopicPost(database.Model, SerializerMixin):
     __tablename__ = "posts"
     id = database.Column(database.Integer, primary_key=True)
-    body = database.Column(database.String(1024), index=True)
+    body = database.Column(database.Text(), index=True)
     file = database.Column(database.LargeBinary)
     answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
@@ -144,7 +144,7 @@ class TopicPost(database.Model, SerializerMixin):
 class PrivateChat(database.Model, SerializerMixin):
     __tablename__ = "private_chats"
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(1024), unique=False, index=True)
+    name = database.Column(database.Text(), unique=False, index=True)
     activity = database.Column(database.DateTime, index=True, default=datetime.now)
     posts = database.relationship('PrivateChatPost', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
     invitations = database.relationship('ChatInvitation', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
@@ -175,10 +175,10 @@ class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary)
-    isbn = database.Column(database.String(512), unique=False)
-    name = database.Column(database.String(512), unique=True, index=True)
-    author = database.Column(database.String(512), unique=False)
-    publishing_house = database.Column(database.String(512), unique=False)
+    isbn = database.Column(database.Text(), unique=False)
+    name = database.Column(database.Text(), unique=True, index=True)
+    author = database.Column(database.Text(), unique=False)
+    publishing_house = database.Column(database.Text(), unique=False)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
@@ -216,7 +216,7 @@ class Comment(database.Model, SerializerMixin):
 class Cataloge(database.Model, SerializerMixin):
     __tablename__ = "catalogues"
     id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(64), unique=False, index=True)
+    name = database.Column(database.Text(), unique=False, index=True)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     items = database.relationship('Item', backref='cataloge', lazy='dynamic', cascade="all, delete, delete-orphan")
 
@@ -233,16 +233,17 @@ class SearchResult(database.Model, SerializerMixin):
     __tablename__ = "search_results"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary)
-    isbn = database.Column(database.String(64), unique=False)
-    name = database.Column(database.String(64), unique=False, index=True)
-    author = database.Column(database.String(64), unique=False)
-    publishing_house = database.Column(database.String(64), unique=False)
+    isbn = database.Column(database.Text(), unique=False)
+    name = database.Column(database.Text(), unique=False, index=True)
+    author = database.Column(database.Text(), unique=False)
+    publishing_house = database.Column(database.Text(), unique=False)
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
     grade = database.Column(database.Integer, unique=False)
     searcher_id = database.Column(database.Integer, unique=False)
     def __init__(self, book: Book, searcher_id=None):
+        self.id = book.id
         self.cover = book.cover
         self.isbn = book.isbn
         self.name = book.name
@@ -261,17 +262,17 @@ class SearchResult(database.Model, SerializerMixin):
 class BooksMaintaining(database.Model, SerializerMixin):
     __tablename__ = "books_maintaining"     
     id = database.Column(database.Integer, primary_key=True)  
-    name = database.Column(database.String(128), unique=True, index=True)
-    authors = database.Column(database.String(128), unique=False)
-    series = database.Column(database.String(128), unique=False)
-    categories = database.Column(database.String(128), unique=False)
+    name = database.Column(database.Text(), unique=True, index=True)
+    authors = database.Column(database.Text(), unique=False)
+    series = database.Column(database.Text(), unique=False)
+    categories = database.Column(database.Text(), unique=False)
     publishing_date = database.Column(database.Integer, unique=False)
-    publishing_house = database.Column(database.String(128), unique=False)
+    publishing_house = database.Column(database.Text(), unique=False)
     pages_count = database.Column(database.Integer, unique=False)
-    isbn = database.Column(database.String(64), unique=False)
-    comments = database.Column(database.String(64), unique=False)
+    isbn = database.Column(database.Text(), unique=False)
+    comments = database.Column(database.Text(), unique=False)
     summary = database.Column(database.Text(), unique=False)
-    link = database.Column(database.String(256), unique=False)
+    link = database.Column(database.Text(), unique=False)
     count = database.Column(database.Integer, unique=False)
     
     

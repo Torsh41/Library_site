@@ -131,9 +131,8 @@
                           <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
                             class="list__book-delete-btn">Добавить в список</a>
                           {% endif %}
-                          <a href="{{url_for('main.book_page', book_id=book[0].id, list_id=list_id)}}" class="list__link">Книга:
-                            {{book[0].name.title()}}</a>
-                          <span class="list__link">Автор: {{book[0].author.title()}}</span>
+                          <a href="{{url_for('main.book_page', book_id=book[0].id, list_id=list_id)}}" class="list__link">Книга: {% if len(book[0].name) > 10 %} {{book[0].name.title()[:10] + "..."}} {% else %} {{book[0].name.title()}} {% endif %}</a>
+                          <span class="list__link">Автор: {% if len(book[0].author) > 10 %} {{book[0].author.title()[:10] + "..."}} {% else %} {{book[0].author.title()}} {% endif %}</span>
                           <div class="list__mark-star">
                             <span class="list__mark-visible">Оценка {{book[1]}}</span>
                             <img src="{{url_for('static', filename='styles/img/star1.svg')}}" alt="" class="list__star">
@@ -174,9 +173,8 @@
                           <a href="{{url_for('personal.add_book_in_list_tmp', username=current_user.username, book_id=book[0].id, list_id=list_id)}}"
                             class="list__book-delete-btn">Добавить в список</a>
                           {% endif %}
-                          <a href="{{url_for('main.book_page', book_id=book[0].id, list_id=list_id)}}" class="list__link">Книга:
-                            {{book[0].name.title()}}</a>
-                          <span class="list__link">Автор: {{book[0].author.title()}}</span>
+                          <a href="{{url_for('main.book_page', book_id=book[0].id, list_id=list_id)}}" class="list__link">Книга: {% if len(book[0].name) > 10 %} {{book[0].name.title()[:10] + "..."}} {% else %} {{book[0].name.title()}} {% endif %}</a>
+                          <span class="list__link">Автор: {% if len(book[0].author) > 10 %} {{book[0].author.title()[:10] + "..."}} {% else %} {{book[0].author.title()}} {% endif %}</span>
                           <div class="list__mark-star">
                             <span class="list__mark-visible">Оценка {{book[1]}}</span>
                             <img src="{{url_for('static', filename='styles/img/star1.svg')}}" alt="" class="list__star">
