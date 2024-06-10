@@ -65,8 +65,12 @@ $(function() {
                                                 <img class="list__book-set" src="/${item.id}/get-cover" alt="">
                                             </a>
                                             
-                                            <div class="list__book-wrap">
-                                                <a href="/book-page/${item.id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
+                                            <div class="list__book-wrap">`;
+                                            if (item.name.length > 10)
+                                            {
+                                                item.name = item.name.slice(0, 10) + "...";
+                                            }
+                                            html += `<a href="/book-page/${item.id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>
                                                 <select name="read_state" class="book__select js-custom-select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
                                                 if (item.read_state == "Планирую")
                                                     html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  

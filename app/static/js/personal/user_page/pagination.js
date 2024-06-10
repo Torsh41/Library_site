@@ -91,8 +91,12 @@ function get_lists_page(url_path) {
                               <img class="list__book-set" src="/${item.book_id}/get-cover" alt="">
                             </a>
                           
-                            <div class="list__book-wrap">
-                              <a href="/book-page/${item.book_id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
+                            <div class="list__book-wrap">`;
+                            if (item.name.length > 10)
+                            {
+                                item.name = item.name.slice(0, 10) + "...";
+                            }
+                            html +=  `<a href="/book-page/${item.book_id}" class="list__link-book"><u>Книга:</u> ${item.name}</a>`;
           html += `<select name="read_state" class="book__select js-custom-select" id="${cataloge.id}${item.id}state" data-itemid="${item.id}">`;
           if (item.read_state == "Планирую")
             html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  
@@ -202,8 +206,12 @@ function get_books_page(url_path, cataloge_id) {
                       <img class="list__book-set" src="/${book.book_id}/get-cover" alt="">
                     </a>
                     
-                    <div class="list__book-wrap">
-                      <a href="/book-page/${book.book_id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                    <div class="list__book-wrap">`;
+                    if (book.name.length > 10)
+                    {
+                        book.name = book.name.slice(0, 10) + "...";
+                    }
+                    html +=  `<a href="/book-page/${book.book_id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
                       <select name="read_state" class="book__select js-custom-select" id="${cataloge_id}${book.id}state" data-itemid="${book.id}">`;
         if (book.read_state == "Планирую")
           html += `<option class="book__state book__plan" value="Планирую" selected>Планирую</option>  

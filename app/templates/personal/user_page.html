@@ -19,7 +19,7 @@
   <script src="{{ url_for('static', filename='js/personal/user_page/add_list_on_user_page.js')}}"></script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/choices.min.js')}}"></script>
-  <script defer src="{{ url_for('static', filename='js/select.js')}}"></script>
+  <!--<script defer src="{{ url_for('static', filename='js/select.js')}}"></script>-->
   <script defer src="{{ url_for('static', filename='js/book.js')}}"></script>
   <script src="{{ url_for('static', filename='js/personal/change_read_state/change_read_state.js')}}"></script>
   {% if current_user.role == Role.ADMIN %}
@@ -236,8 +236,7 @@
   
                 <ul class="list__books list-reset" id="{{cataloge_value.id}}books_info_container">
                   <!--Добавление книги в список - перебрасывает в рааздел категорий книг-->
-                  <li class="list__add"><a href="{{url_for('main.categories', list_id=cataloge_value.id)}}"
-                      class="list__link">
+                  <li class="list__add"><a href="{{url_for('main.categories', list_id=cataloge_value.id)}}" class="list__link">
                       <div class="list__block-add">
                         <svg class="list__svg2" width="78" height="78" viewBox="0 0 78 78" fill="none"
                           xmlns="http://www.w3.org/2000/svg">
@@ -263,7 +262,7 @@
                       </a>
   
                       <div class="list__book-wrap">
-                        <a href="{{url_for('main.book_page', book_id=item.book.id)}}" class="list__link-book"><u>Книга:</u> {{ item.book.name }}</a>
+                        <a href="{{url_for('main.book_page', book_id=item.book.id)}}" class="list__link-book"><u>Книга:</u> {% if len(item.book.name) > 10 %} {{item.book.name[:10] + "..."}} {% else %} {{item.book.name}} {% endif %}</a>
                         <select name="read_state" class="book__select js-custom-select" id="{{cataloge_value.id}}{{item.id}}state" data-itemid="{{item.id}}">
                           <option class="book__state book__plan" value="Планирую" {%if item.read_state == "Планирую"%}selected{%endif%}>Планирую</option>
                           <option class="book__state book__read" value="Читаю" {%if item.read_state == "Читаю"%}selected{%endif%}>Читаю</option>
