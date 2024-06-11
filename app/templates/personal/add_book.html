@@ -110,14 +110,14 @@
               <span class="form__span">ISBN</span>
               {% if form.isbn.errors %}
               <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
-              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
+              {{form.isbn(class="form__input", placeholder="Пример 5-9367-2651-2")}}
               <span>
                 {% for msg in form.isbn.errors %}
                 {{ msg }}
                 {% endfor %}
               </span>
               {% else %}
-              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2")}}
+              {{form.isbn(class="form__input", placeholder="Пример 5-9367-2651-2")}}
               {% endif %}
             </label>
 
@@ -268,7 +268,7 @@
 
   <footer class="footer">
     <div class="footer__container container">
-      <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+      <a href="#" class="footer__wrap">© MBK | Community Magic Book Keeper</a>
     </div>
   </footer>
 

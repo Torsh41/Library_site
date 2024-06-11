@@ -3,6 +3,7 @@ from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaF
 from wtforms.validators import DataRequired, Length, Regexp, NumberRange
 from wtforms import ValidationError
 from ..models import Book
+from isbnlib import is_isbn10, is_isbn13
 
 
 class EditProfileForm(FlaskForm):
@@ -17,11 +18,20 @@ class EditProfileForm(FlaskForm):
 def validate_bookname(form, field):
     if Book.query.filter_by(name=str(field.data).strip().lower()).first():
         raise ValidationError('Данное название книги уже находится в общей базе.')
+    
 
+def validate_isbn(form, field):
+    if Book.query.filter_by(isbn=field.data).first():
+        raise ValidationError('Книга с таким ISBN уже находится в общей базе.')
+
+
+def validate_isbn_10_or_13(form, field):
+    if not is_isbn10(field.data) and not is_isbn13(field.data):
+        raise ValidationError('ISBN должен соответствовать стандарту ISBN 10 или ISBN 13.')
+    
     
 class AddNewBookForm(FlaskForm):
-    isbn = StringField('BookISBN', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 64), Regexp('[0-9-]', 0,
-    'Название ISBN должно содержать только цифры и тире.')])
+    isbn = StringField('BookISBN', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), validate_isbn, validate_isbn_10_or_13])
     name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название книги должно содержать только буквы и пробелы.'), validate_bookname])
     author = StringField('AuthorName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,

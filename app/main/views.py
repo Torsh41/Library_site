@@ -207,7 +207,7 @@ def search_by_category(id):
     category = Category.query.filter_by(id=id).first()
     if category is None:
         return render_template('404.html')
-    res = category.books.all()
+    res = category.books.order_by(Book.id).all()
     result = str(request.form.get('search_result')).strip().lower()
     if result == '*':
         search_result = res
@@ -219,6 +219,8 @@ def search_by_category(id):
             search_result += category.books.filter_by(release_date=release_date).all()
         if description:
             search_result += category.books.filter((Book.description.like("%{}%".format(description)))).all()
+        
+        search_result = sorted(search_result, key=lambda value: value.id)
             
     if search_result:
         search_result = list(set(search_result))

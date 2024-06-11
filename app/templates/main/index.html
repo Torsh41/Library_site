@@ -77,57 +77,6 @@
           </div>
   
           <div class="main__bottom">
-            <!-- {% if current_user.is_anonymous %}
-            <a class="main__bottom-item" href="{{url_for('auth.register')}}">Регистрация</a>
-            {% else %}
-            <a class="main__bottom-item" href="#">Регистрация</a>
-            {% endif %}
-  
-            {% if current_user.is_authenticated %}
-            <a class="main__bottom-item" href="{{url_for('personal.person', username=current_user.username)}}">Личный
-              кабинет</a>
-            {% else %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
-            {% endif %}
-            <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-            <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
-            {% if current_user.role == Role.ADMIN %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
-            {% endif %}
-          </ul>
-        </div>
-
-      </nav>
-    </div>
-  </header>
-
-  <main>
-
-    <section class="main">
-      <div class="main__container container">
-
-        <div class="main__top">
-          <span class="main__span">Цифровая кафедра РХТУ</span>
-          <h1 class="main__title ">Библиотека</h1>
-          <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="0.5" x2="461" y2="0.5" stroke="#e6e2de" />
-          </svg>
-        </div>
-
-        <div class="main__bottom">
-          <!-- {% if current_user.is_anonymous %}
-          <a class="main__bottom-item" href="{{url_for('auth.register')}}">Регистрация</a>
-          {% else %}
-          <a class="main__bottom-item" href="#">Регистрация</a>
-          {% endif %}
-
-          {% if current_user.is_authenticated %}
-          <a class="main__bottom-item" href="{{url_for('personal.person', username=current_user.username)}}">Личный
-            кабинет</a>
-          {% else %}
-          <a class="main__bottom-item" href="{{url_for('auth.login')}}">Личный кабинет</a>
-          {% endif %} -->
-
           <a class="main__bottom-item" href="#1">О нас</a>
           <a class="main__bottom-item" href="#2">Контакты</a>
         </div>
@@ -139,13 +88,12 @@
             <h2 class="about__title title">О нас</h2>
   
             <p class="about__text">
-              Mы удобный поисковик, в котором переплетаются такие возможности, как добаление разнообразных книг в
+              Mы удобный поисковик и общественная платформа по обсуждению тем, связанных с книгами, где переплетаются такие возможности, как добаление разнообразных книг в
               общую библиотеку, так и поиск уже существующих.
-              На нашем сайте Вы можете вести собственную библиотеку в своём профиле.
-              наша библиотека позволит Вам не только прочитать всю доступную информацию о книге, но и ознакомиться с отзывами к
-              ней
-              от других читателей, а также оставить свой.
-              Если Вы обнаружите ошибку в работе сайта, или недостоверную информацию по книге, или у Вас будут
+              На нашем сайте вы можете вести собственную библиотеку в своём профиле и обсуждать с другими пользователями различные темы.
+              Наша библиотека позволит вам не только прочитать всю доступную информацию о книге, но и ознакомиться с отзывами к
+              ней от других читателей, а также оставить свой.
+              Если вы обнаружите ошибку в работе сайта, или недостоверную информацию о книге, или у вас будут
               предложения по улучшению данного проекта, то свяжитесь с нами в следующих соцсетях:
             </p>
   
@@ -155,9 +103,6 @@
                     class="about__icon-photo"></a></li>
               <li class="about__icon"><a href="t.me/headhuntersweb (https://t.me/headhuntersweb)" class="about__icon-link"
                   target="_blank"><img src="{{url_for('static', filename='styles/img/telegram.svg')}}" alt="Telegram"
-                    class="about__icon-photo"></a></li>
-              <li class="about__icon"><a href="https://github.com/SimpleMaking/Library_site" class="about__icon-link"
-                  target="_blank"><img src="{{url_for('static', filename='styles/img/github.svg')}}" alt="Github"
                     class="about__icon-photo"></a></li>
             </ul>
   
@@ -172,7 +117,7 @@
             <h2 class="contacts__title title">Контакты</h2>
   
             <p class="contacts__email">
-              headhunters@gmail.com
+              MBK@gmail.com
             </p>
   
             <p class="contacts__phone">
@@ -191,7 +136,7 @@
   
   <footer class="footer">
     <div class="footer__container container">
-      <a href="#" class="footer__wrap">© CLUB | Community Head Hunters</a>
+      <a href="#" class="footer__wrap">© MBK | Community Magic Book Keeper</a>
     </div>
   </footer>
 </body>
