@@ -1,7 +1,9 @@
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+load_dotenv()
 
 class Config:
     REMEMBER_COOKIE_DURATION = timedelta(days=10)
@@ -20,7 +22,7 @@ class Config:
     MAIL_PASSWORD = 'qctetuaboxunlvkv' #os.environ.get('MAIL_PASSWORD')
     MBK_MAIL_SUBJECT_PREFIX = '[Magic Book Keeper]' 
     MBK_MAIL_SENDER = 'The MBK team <MBK@example.com>' 
-    MBK_ADMIN = ['leokazantsev19@mail.ru', 'elaudina03714@gmail.com'] #will array from three elements
+    MBK_ADMIN = ['leokazantsev19@mail.ru', 'elaudina03714@gmail.com', 'kola9876543210@mail.ru'] #will array from three elements
 
     @staticmethod
     def init_app(app):
@@ -38,7 +40,8 @@ class TestingConfig(Config):
         
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-    "postgresql://main_user:mainchoppa666@localhost/" + "prod_db"
+    "postgresql://" + os.getenv("POSTGRES_USER") + ":" + os.getenv("POSTGRES_PASSWORD") + "@lib-db" + "/" + os.getenv("POSTGRES_DB")
+    #NOTE: `lib-db` is the docker container name AND ip address
         
 config = {
     'development': DevelopmentConfig,

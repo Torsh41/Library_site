@@ -1,0 +1,52 @@
+services:
+  web:
+    container_name: lib-web
+    build: .
+    restart: always
+    links:
+      - "db:5432"
+    ports:
+      - "5000:5000"
+  db:
+    image: postgres
+    container_name: lib-db
+    restart: always
+    # secrets:
+    #   - example_secret
+    env_file: ".env"
+    environment:
+      # POSTGRES_INITDB_ARGS:
+      # - POSTGRES_PASSWORD=${DB_ADMIN_PASSWORD}
+      # - POSTGRES_USER=${DB_ADMIN_USER}
+      # - POSTGRES_DB=${DB_NAME}
+      - PGDATA=/var/lib/postgresql/data
+      # EXAMPLE_VAR: /run/secrets/example_secret
+    volumes:
+      - library-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    # expose:
+    #   - 5432
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: lib-pgadmin
+    restart: always
+    env_file: ".env"
+    # environment:
+      # - PGADMIN_DEFAULT_EMAIL=${DB_ADMIN_USER}
+      # - PGADMIN_DEFAULT_PASSWORD=${DB_ADMIN_PASSWORD}
+    # links:
+    #   - "db:5432"
+    ports:
+      - "5001:80"
+volumes:
+  library-db:
+# secrets:
+  # example_secret:
+  #   file: ./path/to/secret.txt
+# lib-pgadmin  | postfix/postlog: starting the Postfix mail system
+# lib-pgadmin  | [2024-09-16 09:00:56 +0000] [1] [INFO] Starting gunicorn 22.0.0
+# lib-pgadmin  | [2024-09-16 09:00:56 +0000] [1] [ERROR] Invalid address: ('lib-db', 80)
+# lib-pgadmin  | [2024-09-16 09:00:56 +0000] [1] [ERROR] Retrying in 1 second.
+# lib-pgadmin  | [2024-09-16 09:00:57 +0000] [1] [ERROR] Invalid address: ('lib-db', 80)
+
