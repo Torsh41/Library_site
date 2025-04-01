@@ -4,8 +4,7 @@ from app import create_app
 from app import database as db
 
 
-# Create the application with testing enviroment
-app = create_app('testing')
+app = None
 # Define a test user
 test_user_username = "AlexanderTheGreat"
 test_user_email = "tsar@moskov.mvmvmvmvm"
@@ -18,7 +17,9 @@ test_user = User(
 )
 
 
-def main_():
+def main_(app_):
+    global app
+    app = app_
     suite = unittest.defaultTestLoader.discover(".", pattern="webapi_test_*.py")
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)

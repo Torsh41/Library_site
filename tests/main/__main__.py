@@ -1,4 +1,6 @@
 from . import main_
+from .. import get_application
 
 if __name__ == "__main__":
-    main_()
+    app = get_application()
+    main_(app)
