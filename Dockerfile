@@ -21,6 +21,7 @@ COPY . .
 EXPOSE 5000
 
 RUN pip install gunicorn python-dotenv # TODO: add these to requirements.txt
+RUN apt-get install sqlite3
 
 # RUN apt install procps
 
