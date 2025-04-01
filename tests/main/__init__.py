@@ -7,13 +7,9 @@ from app import create_app
 # app = create_app('testing')
 
 def main_():
-    suite = get_test_suite()
+    suite = unittest.defaultTestLoader.discover(".", pattern="main_test_*.py")
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
-def get_test_suite():
-    suite = unittest.defaultTestLoader.discover(".", pattern="main_test_*.py")
-    return suite
 
 def with_app_context(func):
     """Helper decorator, to run a function within the app_context().
