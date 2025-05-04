@@ -1,6 +1,5 @@
 import unittest
 from app.models import User, Role
-from app import create_app
 from app import database as db
 
 
@@ -15,6 +14,7 @@ test_user = User(
     password=test_user_password,
     role=Role.ADMIN
 )
+# test_user.role = Role.USER
 
 
 def main_(app_):
@@ -40,19 +40,14 @@ def require_user_registration() -> User:
     if existing_user is not None:
         return existing_user
     print(f"Registration - Test User:\n\tname='{test_user.username}', " +
-          f"email='{test_user.email}', pwd={test_user.password}'.")
-    database.session.add(test_user)
-    database.session.commit()
+          f"email='{test_user.email}', pwd={get_test_user_password()}'.")
+    db.session.add(test_user)
+    db.session.commit()
     return test_user
-
-@with_app_context
-def require_user_login():
-    """Get a logged in user."""
-    pass
 
 def get_app_test_client():
     """Get application client something to make http requests."""
-    return app.test_client()
+    return app.test_client(use_cookies=True)
 
 def get_test_user_password():
     return test_user_password
