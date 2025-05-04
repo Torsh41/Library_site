@@ -22,7 +22,7 @@
 
 ```
 python3 -m tests
-docker exec -t python3 -m tests
+docker exec -t lib-web python3 -m tests
 ```
 
 Для запуска отдельно тестов `main` или `webapi`, можно указать вот такие
@@ -30,5 +30,5 @@ docker exec -t python3 -m tests
 
 ```
 python3 -m tests.webapi
-docker exec -t python3 -m tests.webapi
+docker exec -t lib-web python3 -m tests.webapi
 ```
