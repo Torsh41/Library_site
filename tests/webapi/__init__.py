@@ -36,7 +36,7 @@ def with_app_context(func):
 @with_app_context
 def require_user_registration() -> User:
     """Get a registered user."""
-    existing_user = db.session.execute(db.select(User).filter_by(username=test_user.username)).scalar_one_or_none()
+    existing_user = db.session.execute(db.select(User).filter_by(username=test_user_username)).scalar_one_or_none()
     if existing_user is not None:
         return existing_user
     print(f"Registration - Test User:\n\tname='{test_user.username}', " +
