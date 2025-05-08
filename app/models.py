@@ -109,7 +109,8 @@ class User(UserMixin, database.Model, SerializerMixin):
             self.role = False
             
     def default_ava(self):
-        with app.open_resource(app.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
+        # with app.open_resource(app.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
+        with app.open_resource(app.root_path + '/static/styles/img/default_avatar.jpg', 'rb') as f:
             self.avatar = f.read()
             
             
