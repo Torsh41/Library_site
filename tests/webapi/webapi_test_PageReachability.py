@@ -147,3 +147,194 @@ class AuthPagesTest(unittest.TestCase):
         self.assertNotEqual(response.status_code, 404, msg=errmsg)
 
 
+class MainPagesTest(unittest.TestCase):
+    """Check if pages defined inside main module are reachable."""
+    @classmethod
+    def setUpClass(cls):
+        """This method runs only during initialization of the test case"""
+        print("\nLog : Running Main Page Reachability Tests...")
+        cls.client = get_app_test_client()
+        cls.test_user = test_admin.copy()
+        _ = cls.test_user.login(cls.client)
+
+    def test_get_cover(self):
+        response = self.client.get("/1/get-cover")
+        errmsg = "Error: unable to reach /<int:book_id>/get-cover page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_post_screenshot(self):
+        response = self.client.get("/1/get-post-screenshot")
+        errmsg = "Error: unable to reach /<post_id>/get-post-screenshot page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_post_screenshot_on_private_chat(self):
+        response = self.client.get("/1/get-post-screenshot-on-private-chat")
+        errmsg = "Error: unable to reach /<post_id>/get-post-screenshot-on-private-chat page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_index(self):
+        response = self.client.get("/")
+        errmsg = "Error: unable to reach index page (route='/')."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_book_page(self):
+        response = self.client.get("/book-page/1")
+        errmsg = "Error: unable to reach /book-page/<int:book_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_comments_page(self):
+        response = self.client.get("/get_comments_page/1/1")
+        errmsg = "Error: unable to reach /get_comments_page/<int:book_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_add_comment(self):
+        response = self.client.get("/1/1/add_comment")
+        errmsg = "Error: unable to reach /<username>/<int:book_id>/add_comment page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_edit_comment(self):
+        response = self.client.get("/1/1/edit-comment/1")
+        errmsg = "Error: unable to reach /<username>/<int:book_id>/edit-comment/<int:comment_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_give_grade(self):
+        response = self.client.get("/1/give-grade/1")
+        errmsg = "Error: unable to reach /<username>/give-grade/<int:book_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_delete_comment(self):
+        response = self.client.get("/1/1/delete-comment/1/1")
+        errmsg = "Error: unable to reach /<username>/<int:book_id>/delete-comment/<int:comment_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_categories(self):
+        response = self.client.get("/categories")
+        errmsg = "Error: unable to reach /categories page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_categories_page(self):
+        response = self.client.get("/get_categories_page/1")
+        errmsg = "Error: unable to reach /get_categories_page/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_category(self):
+        response = self.client.get("/category/1")
+        errmsg = "Error: unable to reach /category/<int:id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_category_search(self):
+        response = self.client.get("/category/1/search")
+        errmsg = "Error: unable to reach /category/<int:id>/search page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum(self):
+        response = self.client.get("/forum")
+        errmsg = "Error: unable to reach /forum page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum_with_id(self):
+        response = self.client.get("/forum/1")
+        errmsg = "Error: unable to reach /forum/<int:topic_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_categories_page_on_forum(self):
+        response = self.client.get("/get_categories_page_on_forum/1")
+        errmsg = "Error: unable to reach /get_categories_page_on_forum/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_posts_page(self):
+        response = self.client.get("/get_posts_page/1/1")
+        errmsg = "Error: unable to reach /get_posts_page/<int:topic_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_search_category_on_forum(self):
+        response = self.client.get("/search_category_on_forum")
+        errmsg = "Error: unable to reach /search_category_on_forum page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_add_topic(self):
+        response = self.client.get("/1/1/add_topic")
+        errmsg = "Error: unable to reach /<username>/<int:category_id>/add_topic page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_topics_page_on_forum(self):
+        response = self.client.get("/get_topics_page_on_forum/1/1")
+        errmsg = "Error: unable to reach /get_topics_page_on_forum/<int:category_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_delete_topic(self):
+        response = self.client.get("/delete-topic/1/1/1")
+        errmsg = "Error: unable to reach /delete-topic/<int:category_id>/<int:topic_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_books_maintaining(self):
+        response = self.client.get("/books-maintaining")
+        errmsg = "Error: unable to reach /books-maintaining page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_books_maintaining_add_file(self):
+        response = self.client.get("/books-maintaining/add-file")
+        errmsg = "Error: unable to reach /books-maintaining/add-file page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_books_maintaining_search(self):
+        response = self.client.get("/books-maintaining/search")
+        errmsg = "Error: unable to reach /books-maintaining/search page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_books_maintaining_get_page(self):
+        response = self.client.get("/books-maintaining/get-page/1")
+        errmsg = "Error: unable to reach /books-maintaining/get-page/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_books_maintaining_change_count(self):
+        response = self.client.get("/books-maintaining/change-count")
+        errmsg = "Error: unable to reach /books-maintaining/change-count page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_books_maintaining_del_book(self):
+        response = self.client.get("/books-maintaining/del-book")
+        errmsg = "Error: unable to reach /books-maintaining/del-book page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum_create_private_chat(self):
+        response = self.client.get("/forum/create_private_chat")
+        errmsg = "Error: unable to reach /forum/create_private_chat page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum_private_chats(self):
+        response = self.client.get("/forum/private_chats")
+        errmsg = "Error: unable to reach /forum/private_chats page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum_delete_private_chat(self):
+        response = self.client.get("/forum/delete_private_chat/1/1")
+        errmsg = "Error: unable to reach /forum/delete_private_chat/<int:chat_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum_get_chats_page(self):
+        response = self.client.get("/forum/get_chats_page/1")
+        errmsg = "Error: unable to reach /forum/get_chats_page/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum_private_chat_with_id(self):
+        response = self.client.get("/forum/private_chat/1")
+        errmsg = "Error: unable to reach /forum/private_chat/<int:chat_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_posts_page_on_chat_disc(self):
+        response = self.client.get("/get_posts_page_on_chat_disc/1/1")
+        errmsg = "Error: unable to reach /get_posts_page_on_chat_disc/<int:chat_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_forum_get_users_page_to_invite(self):
+        response = self.client.get("/forum/private_chat/1/get_users_page_to_invite/1")
+        errmsg = "Error: unable to reach /forum/private_chat/<int:chat_id>/get_users_page_to_invite/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_change_topic_name(self):
+        response = self.client.get("/change-topic-name/1/1")
+        errmsg = "Error: unable to reach /change-topic-name/<int:category_id>/<int:topic_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+
