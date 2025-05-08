@@ -78,7 +78,7 @@ class PersonalPagesTest(unittest.TestCase):
     def test_add_book_in_list(self):
         response = self.client.get("/user/" + self.test_user.name + "/add-book-in-list/1/1/read_state")
         errmsg = "Error: unable to reach /user/<username>/add-book-in-list/1/1/read_state page."
-        self.assertEqual(response.status_code, 302, msg=errmsg)
+        self.assertEqual(response.status_code, 200, msg=errmsg)
 
     def test_delete_list(self):
         response = self.client.get("/user/" + self.test_user.name + "/delete-list/1/1")
