@@ -23,6 +23,8 @@ def inject_months_dict():
 @main.route('/<int:book_id>/get-cover', methods=['GET'])
 def cover(book_id):
     book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return render_template('400.html')
     cover = make_response(book.cover)
     return cover
 
@@ -30,6 +32,8 @@ def cover(book_id):
 @main.route('/<post_id>/get-post-screenshot', methods=['GET'])
 def post_screenshot(post_id):
     post = TopicPost.query.filter_by(id=post_id).first()
+    if post is None:
+        return render_template('400.html')
     file = make_response(post.file)
     return file
 
@@ -37,6 +41,8 @@ def post_screenshot(post_id):
 @main.route('/<post_id>/get-post-screenshot-on-private-chat', methods=['GET'])
 def post_screenshot_on_private_chat(post_id):
     post = PrivateChatPost.query.filter_by(id=post_id).first()
+    if post is None:
+        return render_template('400.html')
     file = make_response(post.file)
     return file
 
@@ -50,21 +56,40 @@ def index():
 def book_page(book_id):
     list_id = request.args.get('list_id', None, type=int)
     book = Book.query.filter_by(id=book_id).first()
-    pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(
-        1, per_page=ELEMS_COUNT, error_out=False)
+    if book is None:
+        return render_template('400.html')
+    pagination = (book.comments
+                        .order_by(Comment.timestamp.asc())
+                        .paginate(1, per_page=ELEMS_COUNT, error_out=False))
     comments = pagination.items
     grades = book.grades.all()
     try:
         fin_grade = round(sum([value.grade for value in grades]) / len(grades), 1)
     except:
         fin_grade = 0
-    return render_template('main/book_page.html', book=book, fin_grade=fin_grade, comments=comments, pagination=pagination, len=len, str=str, grade_count=len(grades), int=int, list_id=list_id, display="none")
+    return render_template(
+        'main/book_page.html',
+        book=book,
+        fin_grade=fin_grade,
+        comments=comments,
+        pagination=pagination,
+        len=len,
+        str=str,
+        grade_count=len(grades),
+        int=int,
+        list_id=list_id,
+        display="none"
+    )
 
 
 @main.route('/get_comments_page/<int:book_id>/<int:page>', methods=['GET'])
 def get_comments_page(book_id, page):
     book = Book.query.filter_by(id=book_id).first()
-    comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    if book is None:
+        return render_template('400.html')
+    comments_pagination = (book.comments
+                           .order_by(Comment.timestamp.asc())
+                           .paginate(page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
     users = list()
@@ -72,7 +97,22 @@ def get_comments_page(book_id, page):
     name_of_current_user = current_user.username if (current_user.is_authenticated) else None
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(cur_page=page, pages_count=pages_count, user_is_admin=user_is_admin, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_id=book_id, username=user.username, name_of_current_user=name_of_current_user, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([
+        dict(
+            cur_page=page,
+            pages_count=pages_count,
+            user_is_admin=user_is_admin,
+            id=comment.id,
+            body=comment.body,
+            day=str(comment.timestamp.date().day),
+            month=months_dict[comment.timestamp.date().month],
+            year=str(comment.timestamp.date().year),
+            book_id=book_id,
+            username=user.username,
+            name_of_current_user=name_of_current_user,
+            current_user_is_authenticated=current_user.is_authenticated
+        ) for comment, user in zip(comments, users)
+    ])
 
 
 @main.route('/<username>/<int:book_id>/add_comment', methods=['POST'])
@@ -82,7 +122,13 @@ def add_comment(username, book_id):
     if current_user.username != username:
         return render_template('403.html')
     book = Book.query.filter_by(id=book_id).first()
-    comment = Comment(body=str(request.form.get('comment')).strip().replace("'", ""), book=book, user=current_user._get_current_object())
+    if book is None:
+        return render_template('400.html')
+    comment = Comment(
+        body=str(request.form.get('comment')).strip().replace("'", ""),
+        book=book,
+        user=current_user._get_current_object()
+    )
     database.session.add(comment)
     database.session.commit()
     comments = book.comments.all()
@@ -90,14 +136,30 @@ def add_comment(username, book_id):
     id_of_added_comment = comments[-1].id
     if len(comments) % ELEMS_COUNT > 0:
         last_page += 1
-    comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(last_page, per_page=ELEMS_COUNT, error_out=False)
+    comments_pagination = (book.comments
+                           .order_by(Comment.timestamp.asc())
+                           .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
     user_is_admin = True if current_user.role == Role.ADMIN else False
     users = list()
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
-    return jsonify([dict(pages=last_page, user_is_admin=user_is_admin, pages_count=pages_count, id_of_added_comment=id_of_added_comment, id=comment.id, body=comment.body, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year), book_id=book_id, username=user.username, name_of_current_user=current_user.username, current_user_is_authenticated=current_user.is_authenticated) for comment, user in zip(comments, users)])
+    return jsonify([
+        dict(
+            pages=last_page,
+            user_is_admin=user_is_admin,
+            pages_count=pages_count,
+            id_of_added_comment=id_of_added_comment,
+            id=comment.id, body=comment.body,
+            day=str(comment.timestamp.date().day),
+            month=months_dict[comment.timestamp.date().month],
+            year=str(comment.timestamp.date().year),
+            book_id=book_id, username=user.username,
+            name_of_current_user=current_user.username,
+            current_user_is_authenticated=current_user.is_authenticated
+        ) for comment, user in zip(comments, users)
+    ])
 
 
 @main.route('/<username>/<int:book_id>/edit-comment/<int:comment_id>', methods=['POST'])
@@ -107,11 +169,21 @@ def edit_comment(username, comment_id, book_id):
     if current_user.username != username:
         return render_template('403.html')
     comment = Comment.query.filter_by(id=comment_id).first()
+    if comment is None:
+        return render_template('400.html')
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
     comment.timestamp = datetime.now()
     database.session.add(comment)
     database.session.commit()
-    return jsonify(dict(id=comment_id, body=comment.body, username=current_user.username, book_id=book_id, day=str(comment.timestamp.date().day), month=months_dict[comment.timestamp.date().month], year=str(comment.timestamp.date().year)))
+    return jsonify(dict(
+        id=comment_id,
+        body=comment.body,
+        username=current_user.username,
+        book_id=book_id,
+        day=str(comment.timestamp.date().day),
+        month=months_dict[comment.timestamp.date().month],
+        year=str(comment.timestamp.date().year)
+    ))
 
 
 @main.route('/<username>/give-grade/<int:book_id>', methods=['GET'])
@@ -121,6 +193,8 @@ def give_grade(username, book_id):
     if current_user.username != username:
         return render_template('403.html')
     book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return render_template('400.html')
     grade = int(request.args.get('grade'))
     previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
     if previous_grade:
@@ -145,38 +219,60 @@ def comment_delete(username, book_id, comment_id, page):
     database.session.commit()
     if book.comments.all():
         has_elems = True
-        comments_pagination = book.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        comments_pagination = (book.comments
+                               .order_by(Comment.timestamp.asc())
+                               .paginate(page, per_page=ELEMS_COUNT, error_out=False))
         pages_count = list(comments_pagination.iter_pages())
         if not comments_pagination.items:
             page -= 1
     else:
         page = 1; pages_count = [1]; has_elems = False
-    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, username=current_user.username, book_id=book_id))
+    return jsonify(dict(
+        cur_page=page,
+        pages_count=pages_count,
+        has_elems=has_elems,
+        username=current_user.username, book_id=book_id
+    ))
 
 
 @main.route('/categories', methods=['GET'])
 def categories():
     list_id = request.args.get('list_id', None, type=int)
-    category_pagination = Category.query.order_by().paginate(
-        1, per_page=ELEMS_COUNT, error_out=False)
+    category_pagination = (Category.query
+                           .order_by()
+                           .paginate(1, per_page=ELEMS_COUNT, error_out=False))
     categories = category_pagination.items
-    return render_template('main/categories.html', categories=categories, category_pagination=category_pagination, list_id=list_id)
+    return render_template(
+        'main/categories.html',
+        categories=categories,
+        category_pagination=category_pagination,
+        list_id=list_id
+    )
 
 
 @main.route('/get_categories_page/<int:page>', methods=['GET'])
 def get_categories_page(page):
-    categories_pagination = Category.query.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    categories_pagination = (Category.query
+                             .order_by()
+                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
-    return jsonify([dict(cur_page=page, id=category.id, pages_count=pages_count, name=category.name) for category in categories])
+    return jsonify([
+        dict(
+            cur_page=page,
+            id=category.id,
+            pages_count=pages_count,
+            name=category.name
+        ) for category in categories
+    ])
 
 
 @main.route('/category/<int:id>', methods=['GET'])
 def category(id):
-    list_id = request.args.get('list_id', None, type=int)
     category = Category.query.filter_by(id=id).first()
-    if not category:
-        return render_template('404.html')
+    if category is None:
+        return render_template('400.html')
+    list_id = request.args.get('list_id', None, type=int)
     res = category.books.all()
     top_books = list(); new_books = list()
     if res:
@@ -194,7 +290,15 @@ def category(id):
         else:
             top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
             new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
-    return render_template('main/category_page.html', top_books=top_books, new_books=new_books, name=category.name, id=category.id, list_id=list_id, len=len)
+    return render_template(
+        'main/category_page.html',
+        top_books=top_books,
+        new_books=new_books,
+        name=category.name,
+        id=category.id,
+        list_id=list_id,
+        len=len
+    )
         
         
 @main.route('/category/<int:id>/search', methods=['POST'])
@@ -203,22 +307,28 @@ def search_by_category(id):
         current_user_is_auth = True; username = current_user.username
     else:
         current_user_is_auth = False; username = None
- 
     category = Category.query.filter_by(id=id).first()
     if category is None:
-        return render_template('404.html')
+        return render_template('400.html')
     res = category.books.order_by(Book.id).all()
     result = str(request.form.get('search_result')).strip().lower()
     if result == '*':
         search_result = res
     else:
-        search_result = list(); release_date = request.form.get('release_date').strip(); description = request.form.get('description').strip()
+        search_result = list()
+        release_date = request.form.get('release_date').strip()
+        description = request.form.get('description').strip()
         if result:
-            search_result += category.books.filter((Book.name.like("%{}%".format(result))) | (Book.author.like("%{}%".format(result)))).all()
+            search_result += category.books.filter(
+                (Book.name.like("%{}%".format(result))) |
+                (Book.author.like("%{}%".format(result)))
+            ).all()
         if release_date:
             search_result += category.books.filter_by(release_date=release_date).all()
         if description:
-            search_result += category.books.filter((Book.description.like("%{}%".format(description)))).all()
+            search_result += category.books.filter(
+                (Book.description.like("%{}%".format(description)))
+            ).all()
         
         search_result = sorted(search_result, key=lambda value: value.id)
             
@@ -235,7 +345,18 @@ def search_by_category(id):
                 book_grade = round(sum([value.grade for value in book_grades]) / len(book_grades), 1)
             else:
                 book_grade = 0
-            books.append(dict(result=True, id=book.id, name=book.name, grade=book_grade, category_id=category.id, current_user_is_auth=current_user_is_auth, username=username, author=book.author, pages_count=pages_count, results_count=results_count))
+            books.append(dict(
+                result=True,
+                id=book.id,
+                name=book.name,
+                grade=book_grade,
+                category_id=category.id,
+                current_user_is_auth=current_user_is_auth,
+                username=username,
+                author=book.author,
+                pages_count=pages_count,
+                results_count=results_count
+            ))
         for page in range(1, pages_count + 1):
             res[page] = books[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
             
@@ -245,54 +366,123 @@ def search_by_category(id):
 
 @main.route('/forum')
 def forum():
-    category_pagination = Category.query.order_by().paginate(
-        1, per_page=ELEMS_COUNT, error_out=False)
+    category_pagination = (Category.query
+                           .order_by()
+                           .paginate(1, per_page=ELEMS_COUNT, error_out=False))
     categories = category_pagination.items
     pagination_for_topics_foreach_category = list()
     for category in categories:
-        pagination_for_topics_foreach_category.append(
-            category.topics.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False))
-    return render_template('main/forum.html', pagination_for_topics_foreach_category=pagination_for_topics_foreach_category, category_pagination=category_pagination, categories=categories, len=len, zip=zip, display="none")
+        pagination_for_topics_foreach_category.append(category.topics
+                            .order_by()
+                            .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    return render_template(
+        'main/forum.html',
+        pagination_for_topics_foreach_category=pagination_for_topics_foreach_category,
+        category_pagination=category_pagination,
+        categories=categories,
+        len=len,
+        zip=zip,
+        display="none"
+    )
 
 
 @main.route('/forum/<int:topic_id>')
 def topic(topic_id):
-    posts_page = request.args.get('posts_page', 1, type=int)
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
+    if topic is None:
+        return render_template('400.html')
+    posts_page = request.args.get('posts_page', 1, type=int)
     if current_user.is_authenticated and current_user.role == Role.ADMIN:
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = topic.posts.order_by(TopicPost.id).paginate(
-        posts_page, per_page=ELEMS_COUNT, error_out=False)
+    posts_pagination = (topic.posts
+                        .order_by(TopicPost.id)
+                        .paginate(posts_page, per_page=ELEMS_COUNT, error_out=False))
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
         if post.answer_to_post:
             post_from = topic.posts.filter_by(id=post.answer_to_post).first()
             if post_from:
-                posts.append({"this_is_answer": True, "basic_post_exist": True, "base_id": post_from.id, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
-                             "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+                posts.append({
+                    "this_is_answer": True,
+                    "basic_post_exist": True,
+                    "base_id": post_from.id,
+                    "username_of_post_from": post_from.user.username,
+                    "body_of_post_from": post_from.body,
+                    "id": post.id,
+                    "file": post.file,
+                    "body": post.body,
+                    "post_timestamp": post.timestamp,
+                    "username": user.username,
+                    "user_timestamp": user.timestamp,
+                    "city": user.city,
+                    "age": user.age,
+                    "about_me": user.about_me,
+                    "gender": user.gender,
+                    "edited": post.edited
+                })
             else:
-                posts.append({"this_is_answer": True, "basic_post_exist": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
-                             "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+                posts.append({
+                    "this_is_answer": True,
+                    "basic_post_exist": False,
+                    "id": post.id,
+                    "file": post.file,
+                    "body": post.body,
+                    "post_timestamp": post.timestamp,
+                    "username": user.username,
+                    "user_timestamp": user.timestamp,
+                    "city": user.city,
+                    "age": user.age,
+                    "about_me": user.about_me,
+                    "gender": user.gender,
+                    "edited": post.edited
+                })
         else:
-            posts.append({"this_is_answer": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
-                         "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
-    return render_template('main/forum_discussion.html', user_is_admin=user_is_admin, topic_id=topic_id, topic_name=topic.name, posts_count=len(topic.posts.all()), posts_pagination=posts_pagination, posts=posts, str=str)
+            posts.append({
+                "this_is_answer": False,
+                "id": post.id,
+                "file": post.file,
+                "body": post.body,
+                "post_timestamp": post.timestamp,
+                "username": user.username,
+                "user_timestamp": user.timestamp,
+                "city": user.city,
+                "age": user.age,
+                "about_me": user.about_me,
+                "gender": user.gender,
+                "edited": post.edited
+            })
+    return render_template(
+        'main/forum_discussion.html',
+        user_is_admin=user_is_admin,
+        topic_id=topic_id,
+        topic_name=topic.name,
+        posts_count=len(topic.posts.all()),
+        posts_pagination=posts_pagination, posts=posts,
+        str=str
+    )
 
 
 @main.route('/get_categories_page_on_forum/<int:page>', methods=['GET'])
 def get_categories_page_on_forum(page):
-    categories_pagination = Category.query.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    categories_pagination = (Category.query
+                             .order_by()
+                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
     categories_topics = dict()
     for category in categories:
-        topics_pagination = category.topics.order_by().paginate(
-            1, per_page=ELEMS_COUNT, error_out=False)
-        category_topics = [dict(id=topic.id, name=topic.name, cur_page=1,
-                                topic_pages=list(topics_pagination.iter_pages())) for topic in topics_pagination.items]
+        topics_pagination = (category.topics
+                             .order_by()
+                             .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+        category_topics = [dict(
+            id=topic.id,
+            name=topic.name,
+            cur_page=1,
+            topic_pages=list(topics_pagination.iter_pages())
+        ) for topic in topics_pagination.items]
         categories_topics[category.id] = copy.deepcopy(category_topics)
 
     if current_user.is_authenticated:
@@ -305,13 +495,28 @@ def get_categories_page_on_forum(page):
         username_of_cur_user = False
         is_admin = False
 
-    return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, pages_count=pages_count, username_of_cur_user=username_of_cur_user, id=category.id, name=category.name, topics=topics, topics_count=len(category.topics.all())) for category, topics in zip(categories, categories_topics.values())])
+    return jsonify([
+        dict(
+            cur_user_is_admin=is_admin,
+            cur_page=page,
+            pages_count=pages_count,
+            username_of_cur_user=username_of_cur_user,
+            id=category.id,
+            name=category.name,
+            topics=topics,
+            topics_count=len(category.topics.all())
+        ) for category, topics in zip(categories, categories_topics.values())
+    ])
 
 
 @main.route('/get_posts_page/<int:topic_id>/<int:page>', methods=['GET'])
 def get_posts_page(topic_id, page):
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
-    posts_pagination = topic.posts.order_by(TopicPost.id).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    if topic is None:
+        return render_template('400.html')
+    posts_pagination = (topic.posts
+                        .order_by(TopicPost.id)
+                        .paginate(page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(posts_pagination.iter_pages())
     posts = list()
     if current_user.is_authenticated:
@@ -331,27 +536,159 @@ def get_posts_page(topic_id, page):
                 post_from = topic.posts.filter_by(
                     id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=True,
+                        base_id=post_from.id,
+                        username_of_post_from=post_from.user.username,
+                        body_of_post_from=post_from.body,
+                        cur_page=posts_pagination.page,
+                        topic_id=topic_id,
+                        pages=posts_pagination.pages,
+                        id=post.id,
+                        body=post.body,
+                        file=True,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str(post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city, age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
                 else:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=False,
+                        cur_page=posts_pagination.page,
+                        topic_id=topic_id,
+                        pages=posts_pagination.pages,
+                        id=post.id,
+                        body=post.body,
+                        file=True,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str(post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city, age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
             else:
-                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                posts.append(dict(
+                    this_is_answer=False,
+                    cur_page=posts_pagination.page,
+                    topic_id=topic_id,
+                    pages=posts_pagination.pages,
+                    id=post.id,
+                    body=post.body,
+                    file=True,
+                    post_day=str(post.timestamp.date().day),
+                    post_month=months_dict[post.timestamp.date().month],
+                    post_year=str(post.timestamp.date().year),
+                    user_is_admin=user_is_admin,
+                    current_username=username,
+                    username=user.username,
+                    user_day=str(user.timestamp.date().day),
+                    user_month=months_dict[user.timestamp.date().month],
+                    user_year=str(user.timestamp.date().year),
+                    city=user.city,
+                    age=user.age,
+                    about_me=user.about_me,
+                    gender=user.gender,
+                    edited=post.edited
+                ))
         else:
             if post.answer_to_post:
                 post_from = topic.posts.filter_by(
                     id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=True,
+                        base_id=post_from.id,
+                        username_of_post_from=post_from.user.username,
+                        body_of_post_from=post_from.body,
+                        cur_page=posts_pagination.page,
+                        topic_id=topic_id,
+                        pages=posts_pagination.pages,
+                        id=post.id,
+                        body=post.body,
+                        file=False,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str(post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city,
+                        age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
                 else:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=False,
+                        cur_page=posts_pagination.page,
+                        topic_id=topic_id,
+                        pages=posts_pagination.pages, id=post.id,
+                        body=post.body,
+                        file=False,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str(post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city,
+                        age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
             else:
-                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, topic_id=topic_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                posts.append(dict(
+                    this_is_answer=False,
+                    cur_page=posts_pagination.page,
+                    topic_id=topic_id,
+                    pages=posts_pagination.pages, id=post.id,
+                    body=post.body,
+                    file=False,
+                    post_day=str(post.timestamp.date().day),
+                    post_month=months_dict[post.timestamp.date().month],
+                    post_year=str(post.timestamp.date().year),
+                    user_is_admin=user_is_admin,
+                    current_username=username,
+                    username=user.username,
+                    user_day=str(user.timestamp.date().day),
+                    user_month=months_dict[user.timestamp.date().month],
+                    user_year=str(user.timestamp.date().year),
+                    city=user.city,
+                    age=user.age,
+                    about_me=user.about_me,
+                    gender=user.gender,
+                    edited=post.edited
+                ))
     return jsonify(dict(posts=posts, pages_count=pages_count))
 
 
@@ -359,13 +696,15 @@ def get_posts_page(topic_id, page):
 def search_category_on_forum():
     category_name = str(request.form.get('category_name')).strip().lower()
     found_category = Category.query.filter(
-        Category.name.like("%{}%".format(category_name))).first()
+            Category.name.like("%{}%".format(category_name))
+    ).first()
     if found_category:
         page = 1
         cur_page_items = list()
         while True:
-            cur_page_items = Category.query.order_by().paginate(
-                page, per_page=ELEMS_COUNT, error_out=False).items
+            cur_page_items = (Category.query
+                              .order_by()
+                              .paginate(page, per_page=ELEMS_COUNT, error_out=False)).items
             if found_category in cur_page_items:
                 break
             page += 1
@@ -373,8 +712,12 @@ def search_category_on_forum():
         categories_topics = dict()
         for category in cur_page_items:
             topics_pagination = category.topics.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
-            category_topics = [dict(id=topic.id, name=topic.name, cur_page=1,
-                                    pages_count=list(topics_pagination.iter_pages())) for topic in topics_pagination.items]
+            category_topics = [dict(
+                id=topic.id,
+                name=topic.name,
+                cur_page=1,
+                pages_count=list(topics_pagination.iter_pages())
+            ) for topic in topics_pagination.items]
             categories_topics[category.id] = copy.deepcopy(category_topics)
 
         if current_user.is_authenticated:
@@ -385,7 +728,18 @@ def search_category_on_forum():
             username_of_cur_user = current_user.username
         else:
             username_of_cur_user = False; is_admin = False
-        return jsonify([dict(result=True, cur_page=page, username_of_cur_user=username_of_cur_user, cur_user_is_admin=is_admin, id_of_found_elem=found_category.id, id=cur_page_category.id, name=cur_page_category.name, topics=topics, topics_count=len(cur_page_category.topics.all())) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())])
+        return jsonify([
+            dict(
+                result=True,
+                cur_page=page,
+                username_of_cur_user=username_of_cur_user,
+                cur_user_is_admin=is_admin,
+                id_of_found_elem=found_category.id,
+                id=cur_page_category.id,
+                name=cur_page_category.name, topics=topics,
+                topics_count=len(cur_page_category.topics.all())
+            ) for cur_page_category, topics in zip(cur_page_items, categories_topics.values())
+        ])
     else:
         return jsonify([dict(result=False)])
 
@@ -396,8 +750,10 @@ def search_category_on_forum():
 def add_topic(username, category_id):
     if current_user.username != username:
         return render_template('403.html')
-    in_topic_name = str(request.form.get('topic_name')).strip().lower()
     cur_category = Category.query.filter_by(id=category_id).first()
+    if cur_category is None:
+        return render_template('400.html')
+    in_topic_name = str(request.form.get('topic_name')).strip().lower()
     result = True
     for topic in cur_category.topics.all():
         if topic.name == in_topic_name:
@@ -412,14 +768,27 @@ def add_topic(username, category_id):
         if len(topics_for_cur_category) % ELEMS_COUNT > 0:
             last_page += 1
             
-        topics_pagination = cur_category.topics.order_by().paginate(last_page, per_page=ELEMS_COUNT, error_out=False)
+        topics_pagination = (cur_category.topics
+                             .order_by()
+                             .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
         pages_count = list(topics_pagination.iter_pages())
         topics_for_cur_category_by_page = topics_pagination.items
         if current_user.role == Role.ADMIN:
             is_admin = True
         else:
             is_admin = False
-        return jsonify([dict(result=result, cur_user_is_admin=is_admin, pages_count=pages_count, topic_pages=last_page, category_id=cur_category.id, topic_id=topic.id, name=topic.name, topics_count=len(topics_for_cur_category)) for topic in topics_for_cur_category_by_page])
+        return jsonify([
+            dict(
+                result=result,
+                cur_user_is_admin=is_admin,
+                pages_count=pages_count,
+                topic_pages=last_page,
+                category_id=cur_category.id,
+                topic_id=topic.id,
+                name=topic.name,
+                topics_count=len(topics_for_cur_category)
+            ) for topic in topics_for_cur_category_by_page
+        ])
     return jsonify([dict(result=result)])
 
 
@@ -430,10 +799,22 @@ def get_topics_page_on_forum(category_id, page):
     else:
         is_admin = False
     category = Category.query.filter_by(id=category_id).first()
-    topics_pagination = category.topics.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    if category is None:
+        return render_template('400.html')
+    topics_pagination = (category.topics
+                         .order_by()
+                         .paginate(page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(topics_pagination.iter_pages())
     topics = topics_pagination.items
-    return jsonify([dict(cur_user_is_admin=is_admin, cur_page=page, id=topic.id, name=topic.name, pages_count=pages_count) for topic in topics])
+    return jsonify([
+        dict(
+            cur_user_is_admin=is_admin,
+            cur_page=page,
+            id=topic.id,
+            name=topic.name,
+            pages_count=pages_count
+        ) for topic in topics
+    ])
 
 
 @main.route('/delete-topic/<int:category_id>/<int:topic_id>/<int:page>', methods=['GET'])
@@ -450,7 +831,9 @@ def topic_delete(category_id, topic_id, page):
 
     if topics := category.topics.all():
         has_elems = True
-        topics_pagination = category.topics.order_by().paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        topics_pagination = (category.topics
+                             .order_by()
+                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
         pages_count = list(topics_pagination.iter_pages())
         if not topics_pagination.items:
             page -= 1
@@ -458,15 +841,26 @@ def topic_delete(category_id, topic_id, page):
         page = 1
         pages_count = 1
         has_elems = False
-    return jsonify(dict(cur_page=page, pages_count=pages_count, has_elems=has_elems, topics_count=len(topics)))
+    return jsonify(dict(
+        cur_page=page,
+        pages_count=pages_count,
+        has_elems=has_elems,
+        topics_count=len(topics)
+    ))
 
 
 @main.route('/books-maintaining', methods=['GET'])
 @admin_required
 @check_actual_password
 def books_relevance():
-    pagination = BooksMaintaining.query.order_by().paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
-    return render_template('main/books_maintaining.html', info=pagination.items, pagination=pagination)
+    pagination = (BooksMaintaining.query
+                  .order_by()
+                  .paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    return render_template(
+        'main/books_maintaining.html',
+        info=pagination.items,
+        pagination=pagination
+    )
 
 
 @main.route('/books-maintaining/add-file', methods=['POST'])
@@ -484,28 +878,54 @@ def add_new_books_info():
     for book_info in data:
         if BooksMaintaining.query.filter_by(name=book_info[0]).first():
             continue
-        book_obj = BooksMaintaining(name=book_info[0], authors=book_info[1], series=book_info[2], 
-                        categories=book_info[3], publishing_date=book_info[4], publishing_house=book_info[5],
-                        pages_count=book_info[6], isbn=book_info[7], comments=book_info[8], summary=book_info[9], 
-                        link=book_info[10], count=book_info[11])
-        
+        book_obj = BooksMaintaining(
+            name=book_info[0],
+            authors=book_info[1],
+            series=book_info[2],
+            categories=book_info[3],
+            publishing_date=book_info[4],
+            publishing_house=book_info[5],
+            pages_count=book_info[6],
+            isbn=book_info[7],
+            comments=book_info[8],
+            summary=book_info[9],
+            link=book_info[10],
+            count=book_info[11]
+        )
         database.session.add(book_obj)
-    database.session.commit()
-    
+        database.session.commit()
     data_len = BooksMaintaining.query.count()
     # найдем количество страниц
     pages = data_len // BOOKS_MAINTAINING_PER_PAGE
     if data_len % BOOKS_MAINTAINING_PER_PAGE > 0:
         pages += 1
     # pages - она же последняя страница
-    data_pagination = BooksMaintaining.query.order_by().paginate(pages, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    data_pagination = (BooksMaintaining.query
+                       .order_by()
+                       .paginate(pages, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
     pages_count_arr = list(data_pagination.iter_pages())
     data = data_pagination.items
     
-    return jsonify([dict(result=True, pages_count_arr=pages_count_arr, cur_page=pages, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
-                        categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
-                        pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
-                        link=book_info.link, count=book_info.count) for book_info in data])
+    return jsonify([
+        dict(
+            result=True,
+            pages_count_arr=pages_count_arr,
+            cur_page=pages,
+            id=book_info.id,
+            name=book_info.name,
+            authors=book_info.authors,
+            series=book_info.series,
+            categories=book_info.categories,
+            publishing_date=book_info.publishing_date,
+            publishing_house=book_info.publishing_house,
+            pages_count=book_info.pages_count,
+            isbn=book_info.isbn,
+            comments=book_info.comments,
+            summary=book_info.summary,
+            link=book_info.link,
+            count=book_info.count
+        ) for book_info in data
+    ])
     # Название - 0
     # Авторы - 1
     # серия - 2
@@ -524,39 +944,94 @@ def add_new_books_info():
 @check_actual_password
 def search_book():
     book_name = str(request.form.get('search_result')).strip().lower()
-    book = BooksMaintaining.query.filter(BooksMaintaining.name.like("%{}%".format(book_name))).first()
+    book = BooksMaintaining.query.filter(
+            BooksMaintaining.name.like("%{}%".format(book_name))
+    ).first()
     if not book:
         return jsonify([dict(result=False)])
     
-    pagination = BooksMaintaining.query.paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    pagination = (BooksMaintaining.query
+                  .paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
     if book in pagination.items:
         pages_count_arr = list(pagination.iter_pages())
-        return jsonify([dict(result=True, cur_page=1, pages_count_arr=pages_count_arr, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
-                            categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
-                            pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
-                            link=book_info.link, count=book_info.count) for book_info in pagination.items])
+        return jsonify([
+            dict(
+                result=True,
+                cur_page=1,
+                pages_count_arr=pages_count_arr,
+                id_of_found_elem=book.id,
+                id=book_info.id,
+                name=book_info.name,
+                authors=book_info.authors,
+                series=book_info.series,
+                categories=book_info.categories,
+                publishing_date=book_info.publishing_date,
+                publishing_house=book_info.publishing_house,
+                pages_count=book_info.pages_count,
+                isbn=book_info.isbn,
+                comments=book_info.comments,
+                summary=book_info.summary,
+                link=book_info.link,
+                count=book_info.count
+            ) for book_info in pagination.items
+        ])
     for page in range(2, pagination.pages + 1):  
-        items_pagination = BooksMaintaining.query.paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+        items_pagination = (BooksMaintaining.query
+                            .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
         items = items_pagination.items
         if book in items:
             pages_count_arr = list(items_pagination.iter_pages())
-            return jsonify([dict(result=True, cur_page=page, pages_count_arr=pages_count_arr, id_of_found_elem=book.id, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
-                                categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
-                                pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
-                                link=book_info.link, count=book_info.count) for book_info in items])
+            return jsonify([
+                dict(
+                    result=True,
+                    cur_page=page,
+                    pages_count_arr=pages_count_arr,
+                    id_of_found_elem=book.id,
+                    id=book_info.id,
+                    name=book_info.name,
+                    authors=book_info.authors,
+                    series=book_info.series,
+                    categories=book_info.categories,
+                    publishing_date=book_info.publishing_date,
+                    publishing_house=book_info.publishing_house,
+                    pages_count=book_info.pages_count,
+                    isbn=book_info.isbn,
+                    comments=book_info.comments,
+                    summary=book_info.summary,
+                    link=book_info.link,
+                    count=book_info.count
+                ) for book_info in items
+            ])
             
 
 @main.route('/books-maintaining/get-page/<int:page>', methods=['GET'])
 @admin_required
 @check_actual_password
 def get_books_info_page(page):
-    data_pagination = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+    data_pagination = (BooksMaintaining.query
+                       .order_by()
+                       .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
     pages_count_arr = list(data_pagination.iter_pages())
     data = data_pagination.items
-    return jsonify([dict(cur_page=page, pages_count_arr=pages_count_arr, id=book_info.id, name=book_info.name, authors=book_info.authors, series=book_info.series, 
-                        categories=book_info.categories, publishing_date=book_info.publishing_date, publishing_house=book_info.publishing_house,
-                        pages_count=book_info.pages_count, isbn=book_info.isbn, comments=book_info.comments, summary=book_info.summary, 
-                        link=book_info.link, count=book_info.count) for book_info in data])
+    return jsonify([
+        dict(
+            cur_page=page,
+            pages_count_arr=pages_count_arr,
+            id=book_info.id,
+            name=book_info.name,
+            authors=book_info.authors,
+            series=book_info.series,
+            categories=book_info.categories,
+            publishing_date=book_info.publishing_date,
+            publishing_house=book_info.publishing_house,
+            pages_count=book_info.pages_count,
+            isbn=book_info.isbn,
+            comments=book_info.comments,
+            summary=book_info.summary,
+            link=book_info.link,
+            count=book_info.count
+        ) for book_info in data
+    ])
     
 
 @main.route('/books-maintaining/change-count', methods=['POST'])
@@ -582,7 +1057,9 @@ def book_del():
         
         # получаем данные для перестройки пагинации
         if BooksMaintaining.query.all():
-            data_pagination = BooksMaintaining.query.order_by().paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
+            data_pagination = (BooksMaintaining.query
+                               .order_by()
+                               .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
             pages_count_arr = list(data_pagination.iter_pages())
             if not data_pagination.items:
                 page -= 1
@@ -602,7 +1079,10 @@ def create_private_chat():
         return jsonify(dict(result=1))
     elif len(current_user.private_chats.all()) >= MAX_PRIVATE_CHATS_PER_USER:
         return jsonify(dict(result=0))
-    private_chat = PrivateChat(name=private_chat_name, creator=current_user._get_current_object())
+    private_chat = PrivateChat(
+        name=private_chat_name,
+        creator=current_user._get_current_object()
+    )
     database.session.add(private_chat)
     database.session.commit()
     return jsonify(dict(result=2))
@@ -618,8 +1098,8 @@ def private_chats():
     for private_chat in private_chats:
         chats_info.append([private_chat.id, private_chat.name, "created"])
     for chat_invitation in chats_invitations:
-        chats_info.append([chat_invitation.private_chat.id, chat_invitation.private_chat.name, "invited"])
-        
+        chats_info.append([chat_invitation.private_chat.id,
+                           chat_invitation.private_chat.name, "invited"])
     if chats_info:   
         # найдем количество страниц
         info_count = len(chats_info)
@@ -638,7 +1118,12 @@ def private_chats():
         invitation.viewed = True
         database.session.add(invitation)
     database.session.commit()
-    return render_template('main/private_chats.html', chats_info=chats_info, pages=pages, range=range)
+    return render_template(
+            'main/private_chats.html',
+            chats_info=chats_info,
+            pages=pages,
+            range=range
+    )
     
 
 @main.route('/forum/delete_private_chat/<int:chat_id>/<int:page>', methods=['GET'])
@@ -646,6 +1131,8 @@ def private_chats():
 @check_actual_password
 def delete_private_chat(chat_id, page):
     private_chat = current_user.private_chats.filter_by(id=chat_id).first()
+    if private_chat is None:
+        return render_template('400.html')
     database.session.delete(private_chat)
     database.session.commit()
         
@@ -656,7 +1143,8 @@ def delete_private_chat(chat_id, page):
     for private_chat in private_chats:
         chats_info.append([private_chat.id, private_chat.name, "created"])
     for chat_invitation in chats_invitations:
-        chats_info.append([chat_invitation.private_chat.id, chat_invitation.private_chat.name, "invited"])
+        chats_info.append([chat_invitation.private_chat.id,
+                           chat_invitation.private_chat.name, "invited"])
         
     if chats_info:   
         has_elems = True
@@ -680,7 +1168,16 @@ def delete_private_chat(chat_id, page):
                 pages_count_list.append(page)
             else:
                 pages_count_list.append(None)
-        return jsonify([dict(has_elems=has_elems, cur_page=cur_page, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
+        return jsonify([
+            dict(
+                has_elems=has_elems,
+                cur_page=cur_page,
+                pages_count=pages_count_list,
+                id=chat[0],
+                name=chat[1],
+                type=chat[2]
+            ) for chat in chats_info
+        ])
     return jsonify([dict(has_elems=False)])
  
  
@@ -694,14 +1191,16 @@ def get_chats_page(page):
     for private_chat in private_chats:
         chats_info.append([private_chat.id, private_chat.name, "created"])
     for chat_invitation in chats_invitations:
-        chats_info.append([chat_invitation.private_chat.id, chat_invitation.private_chat.name, "invited"])
+        chats_info.append([chat_invitation.private_chat.id,
+                           chat_invitation.private_chat.name, "invited"])
         
     # найдем количество страниц
     info_count = len(chats_info)
     pages_count = info_count // ELEMS_COUNT
     if info_count % ELEMS_COUNT > 0:
         pages_count += 1
-    
+    if pages_count == 0:
+        return jsonify([{}])
     res = dict(); pages_count_list = list()
     for page in range(1, pages_count + 1):
         res[page] = chats_info[(page - 1) * ELEMS_COUNT: page * ELEMS_COUNT]
@@ -711,7 +1210,15 @@ def get_chats_page(page):
             pages_count_list.append(page)
         else:
             pages_count_list.append(None)
-    return jsonify([dict(cur_page=page, pages_count=pages_count_list, id=chat[0], name=chat[1], type=chat[2]) for chat in chats_info])
+    return jsonify([
+        dict(
+            cur_page=page,
+            pages_count=pages_count_list,
+            id=chat[0],
+            name=chat[1],
+            type=chat[2]
+        ) for chat in chats_info
+    ])
 
 
 @main.route('/forum/private_chat/<int:chat_id>', methods=['GET'])
@@ -719,7 +1226,10 @@ def get_chats_page(page):
 @check_actual_password
 def private_chat(chat_id):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
-    if not chat or (chat not in current_user.private_chats and not current_user.chats_invitations.filter_by(private_chat=chat).first()):
+    if private_chat is None:
+        return render_template('400.html')
+    if (chat not in current_user.private_chats and
+        not current_user.chats_invitations.filter_by(private_chat=chat).first()):
         return render_template('403.html')
 
     participants_count = chat.invitations.count() + 1
@@ -727,32 +1237,89 @@ def private_chat(chat_id):
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = chat.posts.order_by(PrivateChatPost.id).paginate(1, per_page=ELEMS_COUNT, error_out=False)
-   
+    posts_pagination = (chat.posts
+                        .order_by(PrivateChatPost.id)
+                        .paginate(1, per_page=ELEMS_COUNT, error_out=False))
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
         if post.answer_to_post:
             post_from = chat.posts.filter_by(id=post.answer_to_post).first()
             if post_from:
-                posts.append({"this_is_answer": True, "basic_post_exist": True, "base_id": post_from.id, "username_of_post_from": post_from.user.username, "body_of_post_from": post_from.body, "id": post.id, "file": post.file, "body": post.body,
-                             "post_timestamp": post.timestamp, "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+                posts.append({
+                    "this_is_answer": True,
+                    "basic_post_exist": True,
+                    "base_id": post_from.id,
+                    "username_of_post_from": post_from.user.username,
+                    "body_of_post_from": post_from.body,
+                    "id": post.id,
+                    "file": post.file,
+                    "body": post.body,
+                    "post_timestamp": post.timestamp,
+                    "username": user.username,
+                    "user_timestamp": user.timestamp,
+                    "city": user.city,
+                    "age": user.age,
+                    "about_me": user.about_me,
+                    "gender": user.gender,
+                    "edited": post.edited
+                })
             else:
-                posts.append({"this_is_answer": True, "basic_post_exist": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
-                             "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
+                posts.append({
+                    "this_is_answer": True,
+                    "basic_post_exist": False,
+                    "id": post.id,
+                    "file": post.file,
+                    "body": post.body,
+                    "post_timestamp": post.timestamp,
+                    "username": user.username,
+                    "user_timestamp": user.timestamp,
+                    "city": user.city,
+                    "age": user.age,
+                    "about_me": user.about_me,
+                    "gender": user.gender,
+                    "edited": post.edited
+                })
         else:
-            posts.append({"this_is_answer": False, "id": post.id, "file": post.file, "body": post.body, "post_timestamp": post.timestamp,
-                         "username": user.username, "user_timestamp": user.timestamp, "city": user.city, "age": user.age, "about_me": user.about_me, "gender": user.gender, "edited": post.edited})
-    return render_template('main/private_chat_discussion.html', chat_creator_id=chat.creator.id, user_is_admin=user_is_admin, chat_id=chat.id, chat_name=chat.name, posts_count=len(chat.posts.all()), participants_count=participants_count, posts_pagination=posts_pagination, posts=posts, str=str)
+            posts.append({
+                "this_is_answer": False,
+                "id": post.id,
+                "file": post.file,
+                "body": post.body,
+                "post_timestamp": post.timestamp,
+                "username": user.username,
+                "user_timestamp": user.timestamp,
+                "city": user.city,
+                "age": user.age,
+                "about_me": user.about_me,
+                "gender": user.gender,
+                "edited": post.edited
+            })
+    return render_template(
+        'main/private_chat_discussion.html',
+        chat_creator_id=chat.creator.id,
+        user_is_admin=user_is_admin,
+        chat_id=chat.id,
+        chat_name=chat.name,
+        posts_count=len(chat.posts.all()),
+        participants_count=participants_count,
+        posts_pagination=posts_pagination,
+        posts=posts,
+        str=str
+    )
 
 
 @main.route('/get_posts_page_on_chat_disc/<int:chat_id>/<int:page>', methods=['GET'])
 @login_required
 @check_actual_password
 def get_posts_page_on_chat_disc(chat_id, page):
-    posts = list()
     chat = PrivateChat.query.filter_by(id=chat_id).first()
-    posts_pagination = chat.posts.order_by(PrivateChatPost.id).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+    if chat is None:
+        return render_template('400.html')
+    posts = list()
+    posts_pagination = (chat.posts
+                        .order_by(PrivateChatPost.id).
+                        paginate(page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(posts_pagination.iter_pages())
     username = current_user.username
     if current_user.role == Role.ADMIN:
@@ -766,26 +1333,162 @@ def get_posts_page_on_chat_disc(chat_id, page):
             if post.answer_to_post:
                 post_from = chat.posts.filter_by(id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=True,
+                        base_id=post_from.id,
+                        username_of_post_from=post_from.user.username,
+                        body_of_post_from=post_from.body,
+                        cur_page=posts_pagination.page,
+                        chat_id=chat_id,
+                        pages=posts_pagination.pages,
+                        id=post.id,
+                        body=post.body,
+                        file=True,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str( post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city,
+                        age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
                 else:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=False,
+                        cur_page=posts_pagination.page,
+                        chat_id=chat_id,
+                        pages=posts_pagination.pages,
+                        id=post.id,
+                        body=post.body,
+                        file=True,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str(post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city,
+                        age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
             else:
-                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=True, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                posts.append(dict(
+                    this_is_answer=False,
+                    cur_page=posts_pagination.page,
+                    chat_id=chat_id,
+                    pages=posts_pagination.pages,
+                    id=post.id,
+                    body=post.body,
+                    file=True,
+                    post_day=str(post.timestamp.date().day),
+                    post_month=months_dict[post.timestamp.date().month],
+                    post_year=str(post.timestamp.date().year),
+                    user_is_admin=user_is_admin,
+                    current_username=username,
+                    username=user.username,
+                    user_day=str(user.timestamp.date().day),
+                    user_month=months_dict[user.timestamp.date().month],
+                    user_year=str(user.timestamp.date().year),
+                    city=user.city,
+                    age=user.age,
+                    about_me=user.about_me,
+                    gender=user.gender,
+                    edited=post.edited
+                ))
         else:
             if post.answer_to_post:
                 post_from = chat.posts.filter_by(id=post.answer_to_post).first()
                 if post_from:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=True, base_id=post_from.id, username_of_post_from=post_from.user.username, body_of_post_from=post_from.body, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(
-                        post.timestamp.date().year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=True,
+                        base_id=post_from.id,
+                        username_of_post_from=post_from.user.username,
+                        body_of_post_from=post_from.body,
+                        cur_page=posts_pagination.page,
+                        chat_id=chat_id,
+                        pages=posts_pagination.pages,
+                        id=post.id,
+                        body=post.body,
+                        file=False,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str( post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city,
+                        age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
                 else:
-                    posts.append(dict(this_is_answer=True, basic_post_exist=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                    ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                    posts.append(dict(
+                        this_is_answer=True,
+                        basic_post_exist=False,
+                        cur_page=posts_pagination.page,
+                        chat_id=chat_id,
+                        pages=posts_pagination.pages,
+                        id=post.id,
+                        body=post.body,
+                        file=False,
+                        post_day=str(post.timestamp.date().day),
+                        post_month=months_dict[post.timestamp.date().month],
+                        post_year=str(post.timestamp.date().year),
+                        user_is_admin=user_is_admin,
+                        current_username=username,
+                        username=user.username,
+                        user_day=str(user.timestamp.date().day),
+                        user_month=months_dict[user.timestamp.date().month],
+                        user_year=str(user.timestamp.date().year),
+                        city=user.city,
+                        age=user.age,
+                        about_me=user.about_me,
+                        gender=user.gender,
+                        edited=post.edited
+                    ))
             else:
-                posts.append(dict(this_is_answer=False, cur_page=posts_pagination.page, chat_id=chat_id, pages=posts_pagination.pages, id=post.id, body=post.body, file=False, post_day=str(post.timestamp.date().day), post_month=months_dict[post.timestamp.date().month], post_year=str(post.timestamp.date(
-                ).year), user_is_admin=user_is_admin, current_username=username, username=user.username, user_day=str(user.timestamp.date().day), user_month=months_dict[user.timestamp.date().month], user_year=str(user.timestamp.date().year), city=user.city, age=user.age, about_me=user.about_me, gender=user.gender, edited=post.edited))
+                posts.append(dict(
+                    this_is_answer=False,
+                    cur_page=posts_pagination.page,
+                    chat_id=chat_id,
+                    pages=posts_pagination.pages,
+                    id=post.id,
+                    body=post.body,
+                    file=False,
+                    post_day=str(post.timestamp.date().day),
+                    post_month=months_dict[post.timestamp.date().month],
+                    post_year=str(post.timestamp.date().year),
+                    user_is_admin=user_is_admin,
+                    current_username=username,
+                    username=user.username,
+                    user_day=str(user.timestamp.date().day),
+                    user_month=months_dict[user.timestamp.date().month],
+                    user_year=str(user.timestamp.date().year),
+                    city=user.city,
+                    age=user.age,
+                    about_me=user.about_me,
+                    gender=user.gender,
+                    edited=post.edited
+                ))
     return jsonify(dict(posts=posts, pages_count=pages_count))
 
 
@@ -794,16 +1497,28 @@ def get_posts_page_on_chat_disc(chat_id, page):
 @check_actual_password
 def get_users_page_to_invite(chat_id, page):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
-    if chat:
-        invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
-        users_pagination = User.query.filter(User.id != current_user.id).filter(User.id != chat.creator.id).filter(~User.id.in_(invited_users_id_to_cur_chat)).paginate(page, per_page=USERS_COUNT, error_out=False)
-        if not users_pagination.items:
-            return jsonify([dict(result=False)])
-        pages_count = list(users_pagination.iter_pages())
-        users = users_pagination.items
-        return jsonify([dict(result=True, cur_page=page, id=user.id, username=user.username, pages_count=pages_count, chat_id=chat.id) for user in users])
-    else:
-        return render_template('404.html')
+    if chat is None:
+        return render_template('400.html')
+    invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
+    users_pagination = (User.query
+                        .filter(User.id != current_user.id)
+                        .filter(User.id != chat.creator.id)
+                        .filter(~User.id.in_(invited_users_id_to_cur_chat))
+                        .paginate(page, per_page=USERS_COUNT, error_out=False))
+    if not users_pagination.items:
+        return jsonify([dict(result=False)])
+    pages_count = list(users_pagination.iter_pages())
+    users = users_pagination.items
+    return jsonify([
+        dict(
+            result=True,
+            cur_page=page,
+            id=user.id,
+            username=user.username,
+            pages_count=pages_count,
+            chat_id=chat.id
+        ) for user in users
+    ])
     
 
 @main.route('/change-topic-name/<int:category_id>/<int:topic_id>', methods=['POST'])
@@ -811,12 +1526,17 @@ def get_users_page_to_invite(chat_id, page):
 @check_actual_password 
 def change_topic_name(category_id, topic_id):
     category = Category.query.filter_by(id=category_id).first()
-    if not category:
-        return render_template('404.html')
     topic = category.topics.filter_by(id=topic_id).first()
+    if chat is None or topic is None:
+        return render_template('400.html')
     topic.name = str(request.form.get('topic_changed_name')).strip().replace("'", "")
     database.session.add(topic)
     database.session.commit()
-    return jsonify(dict(category_id=category_id, topic_id=topic_id, name=topic.name, username=current_user.username))
+    return jsonify(dict(
+        category_id=category_id,
+        topic_id=topic_id,
+        name=topic.name,
+        username=current_user.username
+    ))
  
        
