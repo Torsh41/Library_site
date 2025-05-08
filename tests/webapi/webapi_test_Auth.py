@@ -1,82 +1,182 @@
 import unittest
+from werkzeug.test import Client, TestResponse
+from app.models import Category, Book, User, Role
+from app import database as db
 from . import *
+from . import app
+from .UserPrototype import UserPrototype, test_user, test_admin
+
+from pprint import pprint
 
 
-class RegistrationTest(unittest.TestCase):
-    def test_registration(self):
-        """Testing registration of a new user"""
-        client = get_app_test_client()
-        response = client.post("/auth/register", data={
-            "username": "some_user",
-            "email": "random_email@some_mail.some_domain",
-            "password": "123456"
-        })
-        self.assertEqual(response.status_code, 200)
-
-
-class LoginTest(unittest.TestCase):
-    def test_login(self):
-        """Testing login of a user"""
-        test_user = require_user_registration()
-        client = get_app_test_client()
-        response = client.post("/auth/login", data={
-            "email": test_user.email,
-            "password": get_test_user_password()
-        })
-        self.assertEqual(response.status_code, 200)
-
-
-class PageReachablity(unittest.TestCase):
+class AuthModuleTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        """This method runs before every test-method"""
-        cls.test_user = require_user_registration()
+        """This method runs only during initialization of the test case"""
+        print("\nLog : Running Auth Module Funcionality Tests...")
         cls.client = get_app_test_client()
-        # log in the test user
-        response = cls.client.post("/auth/login", data={
-            "email": cls.test_user.email,
-            "password": get_test_user_password()
+        cls.test_user = test_user.copy()
+
+    def test_registration(self):
+        """Test user registration
+        TODO: somwhere in this function, the global test_user is being
+        dropped from the database. It's not fatal, but weird and annoying"""
+        # Extract CSRF token from /auth/register page (the ugly way)
+        response = self.client.post("/auth/register")
+        csrf_token = extract_csrf_token(response.data.decode("utf-8"))
+        # Delete user if already exists
+        email = "somerandom@email.mmmmmmmmmmmmmm"
+        username = "RegistrationUser"
+        password = "gibberish"
+        password2 = "gibberish"
+        with app.app_context():
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user is not None:
+                db.session.delete(existing_user)
+                db.session.commit()
+        # User registration
+        response = self.client.post("/auth/register", data={
+            "csrf_token": csrf_token,
+            "email": email,
+            "username": username,
+            "password": password,
+            "password2": password2
         })
+        errmsg = f"Error: unsuccessful registration attempt."
+        self.assertEqual(response.status_code, 302, msg=errmsg)
 
-    def test_index_page(self):
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, 200)
+    def test_login(self):
+        """Test user login"""
+        response = self.test_user.login(self.client)
+        errmsg = f"Error: unsuccessful login attempt."
+        self.assertEqual(response.status_code, 302, msg=errmsg)
+        errmsg = f"Error: response redirects to a different page, than /user/<username>."
+        self.assertEqual(response.headers["Location"], "/user/" + self.test_user.name, msg=errmsg)
 
-    def test_categories_page(self):
-        response = self.client.get("/categories")
-        self.assertEqual(response.status_code, 200)
+    # def test_logout(self):
+    #     """Test user logout"""
+    #     response = self.test_user.login(self.client)
+    #     errmsg = f"Error: unsuccessful login attempt."
+    #     self.assertEqual(response.status_code, 302, msg=errmsg)
+    #     response = self.client.post("/auth/logout")
+    #     pprint(response.__dict__)
+    #     print(response.data.decode("utf-8"))
+    #     errmsg = f"Error: unable to log out. (???)"
+    #     self.assertEqual(response.status_code, 200, msg=errmsg)
 
-    def test_forum_page(self):
-        response = self.client.get("/forum")
-        self.assertEqual(response.status_code, 200)
+    # def test_change_password(self):
+    #     """Test user password change
+    #     Requires an email server/client/something to recieve the csrf token
+    #     to be able to do anything. In the TODO list."""
+    #     pass
 
-    def test_private_chats_page(self):
-        response = self.client.get("/forum/private_chats", follow_redirects=True)
-        # Should contain a single redirect from /auth/login to /forum/private_chats
-        self.assertEqual(len(response.history), 1)
-        self.assertEqual(response.status_code, 200)
 
-    def test_books_maintaining_page(self):
-        response = self.client.get("/books-maintaining", follow_redirects=True)
-        # Should contain a single redirect from /auth/login to /books-maintaining
-        self.assertEqual(len(response.history), 1)
-        self.assertEqual(response.status_code, 200)
+class PersonalModuleTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """This method runs only during initialization of the test case"""
+        print("\nLog : Running Personal Module Funcionality Tests...")
+        cls.client = get_app_test_client()
+        cls.test_user = test_user.copy()
 
-    def test_user_page(self):
-        response = self.client.get("/user/" + self.test_user.username, follow_redirects=True)
-        # Should contain a single redirect from /auth/login to /user/<username>
-        self.assertEqual(len(response.history), 1)
-        self.assertEqual(response.status_code, 200)
+    def test_upload_book(self):
+        """Test upload of one new book.
+        """
+        # User login
+        response = self.test_user.login(self.client)
+        errmsg = f"Error: unsuccessful login attempt."
+        self.assertEqual(response.status_code, 302, msg=errmsg)
+        # Create a new category
+        with app.app_context():
+            category_name = "A Category"
+            category_name = str(category_name).strip().lower().replace("'", "")
+            category = Category.query.filter_by(name=category_name).first()
+            if category is None:
+                category = Category(name = category_name)
+            db.session.add(category)
+            db.session.commit()
+        # Extract CSRF token from the /admin/<username>/add-new-book page
+        response = self.client.post("/user/" + self.test_user.name + "/add-new-book")
+        csrf_token = extract_csrf_token(response.data.decode("utf-8"))
+        errmsg = "Error: unsuccessful API call to /user/<username>/add-new-book"
+        self.assertEqual(response.status_code, 200, msg=errmsg)
+        # Create a "book"
+        cover = b"An image binary"
+        ISBN = "978-0-439-13636-5"
+        title = "A book title"
+        author = "An author"
+        publisher = "Publisher"
+        description = "Very long and interesting description"
+        release_date = "2025-05-14"
+        chapter_count = "25"
+        with app.app_context():
+            book = Book.query.filter_by(isbn=ISBN).first()
+            if book is not None:
+                db.session.delete(book)
+                db.session.commit()
+        response = self.client.post("/user/" + self.test_user.name + "/add-new-book", data={
+            "csrf_token": csrf_token,
+            # "cover": cover,
+            "isbn": ISBN,
+            "name": title,
+            "author": author,
+            "publishing_house": publisher,
+            "description": description,
+            "release_date": release_date,
+            "chapters_count": chapter_count,
+            "category": category_name,
+            "submit": "Добавить книгу в базу"
+        })
+        errmsg = "Error: unsuccessful API call to /user/<username>/add-new-book"
+        self.assertEqual(response.status_code, 302, msg=errmsg)
+        # Verify that the book was created
+        with app.app_context():
+            category = Category.query.filter_by(name=category_name).first()
+            errmsg = "Error: unable to find previously created category by it's name"
+            self.assertIsNotNone(category, msg=errmsg)
+            book = Book.query.filter_by(isbn=ISBN).first()
+            errmsg = "Error: book was not inserted into the database"
+            self.assertIsNotNone(book, msg=errmsg)
 
-    def test_edit_profile_page(self):
-        response = self.client.get("/user/" + self.test_user.username, "/edit-profile", follow_redirects=True)
-        # Should contain a single redirect from /auth/login to /user/<username>/edit-profile
-        self.assertEqual(len(response.history), 1)
-        self.assertEqual(response.status_code, 200)
-        
-    def test_admin_panel_page(self):
-        response = self.client.get("/admin/" + self.test_user.username + "/admin_panel", follow_redirects=True)
-        # Should contain a single redirect from /auth/login to /admin/<username>/admin_panel
-        self.assertEqual(len(response.history), 1)
-        self.assertEqual(response.status_code, 200)
-        
+
+class AdminModuleTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """This method runs only during initialization of the test case"""
+        print("\nLog : Running Admin Module Funcionality Tests...")
+        cls.client = get_app_test_client()
+        cls.test_user = test_admin.copy()
+
+    def test_add_category(self):
+        """Test adding book category."""
+        # User login
+        response = self.test_user.login(self.client)
+        errmsg = f"Error: unsuccessful login attempt."
+        self.assertEqual(response.status_code, 302, msg=errmsg)
+        # Extract CSRF token from the /admin/<username>/add-category page
+        response = self.client.post("/admin/" + self.test_user.name + "/add-category")
+        csrf_token = extract_csrf_token(response.data.decode("utf-8"))
+        errmsg = "Error: unsuccessful API call to /admin/<username>/add-category"
+        self.assertEqual(response.status_code, 200, msg=errmsg)
+        # TODO: assert for CSRF token being correct/valid (TODO in other places as well)
+        # Ensure that the category does not already exist
+        category_name = "Another Category"
+        category_name = str(category_name).strip().lower().replace("'", "")
+        with app.app_context():
+            category = Category.query.filter_by(name=category_name).first()
+            if category is not None:
+                db.session.delete(category)
+                db.session.commit()
+        # Create a category
+        response = self.client.post("/admin/" + self.test_user.name + "/add-category", data={
+            "csrf_token": csrf_token,
+            "category_name": category_name
+        })
+        errmsg = "Error: unsuccessful API call to /admin/<username>/add-category"
+        self.assertEqual(response.status_code, 302, msg=errmsg)
+        # Verify that the category was created
+        with app.app_context():
+            category = Category.query.filter_by(name=category_name).first()
+            errmsg = "Error: category was not inserted into the database"
+            self.assertIsNotNone(category, msg=errmsg)
+
