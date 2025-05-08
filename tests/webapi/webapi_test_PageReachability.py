@@ -338,3 +338,64 @@ class MainPagesTest(unittest.TestCase):
         self.assertNotEqual(response.status_code, 404, msg=errmsg)
 
 
+class AdminPagesTest(unittest.TestCase):
+    """Check if pages defined inside admin module are reachable."""
+    @classmethod
+    def setUpClass(cls):
+        """This method runs only during initialization of the test case"""
+        print("\nLog : Running Admin Page Reachability Tests...")
+        cls.client = get_app_test_client()
+        cls.test_user = test_admin.copy()
+        _ = cls.test_user.login(cls.client)
+
+    def test_admin_panel(self):
+        response = self.client.get("/admin/<username>/admin_panel")
+        errmsg = "Error: unable to reach /admin/<username>/admin_panel page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_admin_panel_user_search(self):
+        response = self.client.get("/admin/<username>/admin_panel/user_search")
+        errmsg = "Error: unable to reach /admin/<username>/admin_panel/user_search page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_user_search_page(self):
+        response = self.client.get("/admin/get_user_search_page/1")
+        errmsg = "Error: unable to reach /admin/get_user_search_page/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_get_category_search_page(self):
+        response = self.client.get("/admin/<username>/get_category_search_page/1")
+        errmsg = "Error: unable to reach /admin/<username>/get_category_search_page/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_add_category(self):
+        response = self.client.get("/admin/<username>/add-category")
+        errmsg = "Error: unable to reach /admin/<username>/add-category page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_admin_paneluser_delete(self):
+        response = self.client.get("/admin/admin_panel/user_delete/1/1")
+        errmsg = "Error: unable to reach /admin/admin_panel/user_delete/<int:user_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_category_delete(self):
+        response = self.client.get("/admin/<username>/category_delete/1/1")
+        errmsg = "Error: unable to reach /admin/<username>/category_delete/<int:category_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_search_books_on_admin_panel(self):
+        response = self.client.get("/admin/<username>/search_books_on_admin_panel/1")
+        errmsg = "Error: unable to reach /admin/<username>/search_books_on_admin_panel/<int:category_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_del_book(self):
+        response = self.client.get("/admin/<username>/del_book/1/1/1")
+        errmsg = "Error: unable to reach /admin/<username>/del_book/<int:category_id>/<int:book_id>/<int:page> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_change_book_info(self):
+        response = self.client.get("/admin/<username>/change_book_info/1")
+        errmsg = "Error: unable to reach /admin/<username>/change_book_info/<int:book_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+
