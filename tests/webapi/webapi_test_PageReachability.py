@@ -116,8 +116,34 @@ class AuthPagesTest(unittest.TestCase):
         cls.test_user = test_admin.copy()
         _ = cls.test_user.login(cls.client)
 
-    # def test_user_page(self):
-    #     response = self.client.get("/user/" + self.test_user.name)
-    #     errmsg = "Error: unable to reach /user/<username> page."
-    #     self.assertEqual(response.status_code, 200, msg=errmsg)
+    def test_login(self):
+        response = self.client.get("/auth/login")
+        errmsg = "Error: unable to reach /auth/login page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_logout(self):
+        response = self.client.get("/auth/logout")
+        errmsg = "Error: unable to reach /auth/logout page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_register(self):
+        response = self.client.get("/auth/register")
+        errmsg = "Error: unable to reach /auth/register page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_confirm_token(self):
+        response = self.client.get("/auth/confirm/insert_a_csrf_token_here")
+        errmsg = "Error: unable to reach /auth/confirm/<token> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_unconfirmed(self):
+        response = self.client.get("/auth/unconfirmed")
+        errmsg = "Error: unable to reach /auth/unconfirmed page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
+    def test_confirm(self):
+        response = self.client.get("/auth/confirm")
+        errmsg = "Error: unable to reach /auth/confirm page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
 
