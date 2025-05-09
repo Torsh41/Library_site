@@ -349,6 +349,8 @@ def del_book(username, category_id, book_id, page):
         return render_template("400.html")
     database.session.delete(book)
     book_for_search_result = SearchResult.query.filter_by(searcher_id=current_user.id).filter_by(id=book_id).first()
+    if book_for_search_result is None:
+        return render_template("400.html")
     database.session.delete(book_for_search_result)
     database.session.commit()
     if SearchResult.query.filter_by(searcher_id=current_user.id).all():
