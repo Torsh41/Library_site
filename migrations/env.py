@@ -16,14 +16,23 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = database.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+def get_database_url() -> str:
+    """Get database URL from `config.py`. Retrieves
+    different URLs, depending on FLASK_CONFIG env variable.
+    """
+    import os
+    from config import config
+    url = config[os.getenv("FLASK_CONFIG") or "production"].SQLALCHEMY_DATABASE_URI
+    return url
+config.set_main_option("sqlalchemy.url", get_database_url())
+
 
 
 def run_migrations_offline() -> None:
