@@ -125,14 +125,17 @@ class User(UserMixin, database.Model, SerializerMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
     
-    def check_admin(self):
-        try:
-            if self.email in current_app.config['MBK_ADMIN']:
-                self.role = True
-            else:
-                self.role = False
-        except:
-            self.role = False
+    def default_role(self):
+        default_admins = current_app.config['MBK_ADMIN']
+        if len(default_admins) == 0:
+            print("WARNING: No Admin email is defined. " +
+                  "You will be unable to manage the website.\n" +
+                  "WARNING: To create Admin user, " +
+                  "define an envirounment variable `MBK_ADMIN=['admin@email.com']`.")
+        elif self.email in default_admins:
+            self.role = Role.ADMIN
+        else:
+            self.role = Role.USER
             
     def default_ava(self):
         # with app.open_resource(app.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:

@@ -48,7 +48,7 @@ def register():
         user = User(username=form.username.data.strip().replace("'", ""), email=form.email.data.strip().lower(),
                     password=form.password.data)
         user.default_ava()
-        user.check_admin()
+        user.default_role()
         database.session.add(user)
         database.session.commit()
         login_user(user)
