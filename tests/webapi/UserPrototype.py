@@ -71,9 +71,10 @@ class UserPrototype:
         # print(self.password)
         return response
 
-
 # Create User Prototypes with different user roles
 test_user = UserPrototype("User1", "user1@user.user", "123456", Role.USER)
 test_admin = UserPrototype("Admin1", "admin1@admin.admin", "123456", Role.ADMIN)
+test_moderator = UserPrototype("Moderator1", "moderator1@moderator.moderator", "123456", Role.MODERATOR)
+test_teacher = UserPrototype("Teacher1", "teacher1@teacher.teacher", "123456", Role.TEACHER)
 
 

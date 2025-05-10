@@ -7,10 +7,36 @@ from jose import jwt
 from sqlalchemy_serializer import SerializerMixin
 
 
-class Role:
+class Role(database.Model, SerializerMixin):
     USER = 0
     ADMIN = 1
+    MODERATOR = 2
+    TEACHER = 3
+    __tablename__ = "roles"
+    id = database.Column(database.Integer, primary_key=True)
+    name = database.Column(database.String(16), unique=True)
+
+    def __repr__(self):
+        return self.name
     
+    @staticmethod
+    def by_id(role_id):
+        """Get existing Role object from database.
+        Example: Role.by_id(Role.ADMIN)
+        """
+        role = db.session.execute(
+            database.select(Role).filter_by(id=role_id)
+        ).scalar_one_or_none()
+        return role
+
+    @staticmethod
+    def get_defined_roles():
+        """Get a list of Role objects, to populate the Role table after creating it."""
+        return [Role(id=Role.USER, name="User"),
+                Role(id=Role.ADMIN, name="Admin"),
+                Role(id=Role.MODERATOR, name="Moderator"),
+                Role(id=Role.TEACHER, name="Teacher")]
+
 
 #отношение один ко многим
 class User(UserMixin, database.Model, SerializerMixin):
@@ -34,7 +60,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     posts_from_all_private_chats = database.relationship('PrivateChatPost', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")
     confirmed = database.Column(database.Boolean, default=False)
-    role = database.Column(database.Boolean, default=False)
+    role = database.Column(database.Integer, database.ForeignKey('roles.id'))
     
     def generate_confirmation_token(self): #30 минут время действия токена
         now = datetime.now()
