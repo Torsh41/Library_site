@@ -38,17 +38,11 @@ class UserPrototype:
             username = self.name,
             email = self.email,
             password = self.password,
-            role = self.role
+            role = self.role,
+            confirmed = True
         )
         new_user.default_ava()
         db.session.add(new_user)
-        db.session.commit()
-        # Verify the user
-        token = new_user.generate_confirmation_token()
-        ret = new_user.confirm(token)
-        if ret == False:
-            print("Error: Unable to verify (confirm) the user during registration.")
-            return None
         db.session.commit()
         return new_user
 
@@ -57,18 +51,12 @@ class UserPrototype:
         # Extract CSRF token from the /auth/login page (the ugly way)
         response = client.post("/auth/login")
         csrf_token = extract_csrf_token(response.data.decode("utf-8"))
-        # print(response.data.decode("utf-8"))
         # Log in
         response = client.post("/auth/login", data={
             "csrf_token": csrf_token,
             "email": self.email,
             "password": self.password
         })
-        # pprint(response.__dict__)
-        # print(response.data.decode("utf-8"))
-        # print(csrf_token)
-        # print(self.email)
-        # print(self.password)
         return response
 
 # Create User Prototypes with different user roles
