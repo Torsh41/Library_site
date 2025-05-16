@@ -53,51 +53,59 @@ def admin_panel(username):
 @admin_required
 @check_actual_password
 def user_search(username):
+    ret = [{"result": False}]
     users = User.query.all()
-    if users:
-        search_username = str(request.form.get('users_search_result'))
-        if search_username == '*':
-            last_page = (len(users) - 1) // USERS_COUNT
-            if len(users) % USERS_COUNT > 0:
-                last_page += 1
-            user_pagination = (User.query
-                               .filter(User.username != current_user.username)
-                               .paginate(1, per_page=USERS_COUNT, error_out=False))
-            if user_pagination.items:
-                users = user_pagination.items
-                pages_count = list(user_pagination.iter_pages())
-                return jsonify([
-                    dict(
-                        result=True,
-                        cur_page=1,
-                        pages_count=pages_count,
-                        page=last_page,
-                        id=user.id,
-                        username=user.username
-                    ) for user in users
-                ])
-            else:
-                return jsonify([dict(result=False)])
-        else:
-            user = User.query.filter((User.username != current_user.username) & (
-                User.username.like("%{}%".format(search_username)))).first()
-            if user:
-                last_page = 1
-                pages_count = [1]
-                return jsonify([
-                    dict(
-                        result=True,
-                        cur_page=1,
-                        pages_count=pages_count,
-                        page=last_page,
-                        id=user.id,
-                        username=user.username
-                    )
-                ])
-            else:
-                return jsonify([dict(result=False)])
+    search_string = str(request.form.get('users_search_result'))
+    if users is None or search_string == "":
+        return ret
+    result = False
+    pages_count = None
+    last_page = None
+    if '*' in search_string:
+        last_page = (len(users) - 1) // USERS_COUNT
+        if len(users) % USERS_COUNT > 0:
+            last_page += 1
+        user_pagination = (User.query
+                            .filter(User.username != current_user.username)
+                            .paginate(1, per_page=USERS_COUNT, error_out=False))
+        if user_pagination.items:
+            users = user_pagination.items
+            result = True
+            pages_count = list(user_pagination.iter_pages())
+            last_page = last_page
+    elif '@' in search_string:
+        at_symbol = search_string.find('@')
+        users = User.query.filter(
+                (User.username != current_user.username) &
+                (User.email.like("%{}%@%{}%".format(search_string[:at_symbol], search_string[at_symbol + 1:])))
+        ).first()
+        if users:
+            users = [users]
+            result = True
+            last_page = 1
+            pages_count = [1]
     else:
-        return jsonify([dict(result=False)])
+        users = User.query.filter(
+                (User.username != current_user.username) &
+                (User.username.like("%{}%".format(search_string)))
+        ).first()
+        if users:
+            users = [users]
+            result = True
+            last_page = 1
+            pages_count = [1]
+    if result:
+        ret = [{
+            "result": result,
+            "cur_page": 1,
+            "pages_count": pages_count,
+            "page": last_page,
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role
+        } for user in users]
+    return jsonify(ret)
 
 
 @admin.route('/get_user_search_page/<int:page>', methods=['GET'])

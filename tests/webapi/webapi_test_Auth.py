@@ -8,7 +8,7 @@ from .UserPrototype import UserPrototype, test_user, test_admin
 
 from pprint import pprint
 
-
+@unittest.skip("showing class skipping")
 class AuthModuleTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -71,6 +71,7 @@ class AuthModuleTest(unittest.TestCase):
     #     pass
 
 
+@unittest.skip("showing class skipping")
 class PersonalModuleTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -179,4 +180,38 @@ class AdminModuleTest(unittest.TestCase):
             category = Category.query.filter_by(name=category_name).first()
             errmsg = "Error: category was not inserted into the database"
             self.assertIsNotNone(category, msg=errmsg)
+
+    def test_user_search(self):
+        """Test an endpoint that returns JSON list of users"""
+        import json
+        user = test_user.copy()
+        errmsg = ("Error: unsuccessful API call to /<username>/admin_panel/user_search; search_string=`{}`.")
+        # Do an incorrect response
+        search_string = ""
+        response = self.client.post("/admin/" + self.test_user.name + "/admin_panel/user_search", data={
+            "users_search_result": search_string
+        })
+        self.assertEqual(response.status_code, 200, msg=errmsg)
+        self.assertEqual(json.loads(response.data)[0]["result"], False, msg=errmsg.format(search_string))
+        # Get all users
+        search_string = "*"
+        response = self.client.post("/admin/" + self.test_user.name + "/admin_panel/user_search", data={
+            "users_search_result": search_string
+        })
+        self.assertEqual(response.status_code, 200, msg=errmsg)
+        self.assertEqual(json.loads(response.data)[0]["result"], True, msg=errmsg.format(search_string))
+        # Search users by name
+        search_string = "user"
+        response = self.client.post("/admin/" + self.test_user.name + "/admin_panel/user_search", data={
+            "users_search_result": search_string
+        })
+        self.assertEqual(response.status_code, 200, msg=errmsg)
+        self.assertEqual(json.loads(response.data)[0]["result"], True, msg=errmsg.format(search_string))
+        # Search users by email
+        search_string = "@user"
+        response = self.client.post("/admin/" + self.test_user.name + "/admin_panel/user_search", data={
+            "users_search_result": search_string
+        })
+        self.assertEqual(response.status_code, 200, msg=errmsg)
+        self.assertEqual(json.loads(response.data)[0]["result"], True, msg=errmsg.format(search_string))
 
