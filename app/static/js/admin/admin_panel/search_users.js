@@ -20,15 +20,26 @@ function search_users_on_forum()
                 }).remove();
                 html = `<ul class="users__list list-reset" id="users_search_list">`;
                 users.forEach(user => {
-                    html += `<li class="users__item" id="${user.id}user_info">
-                    <span class="users__link">
-                    <div class="users__set">
-                        <img src="/user/${user.username}/edit-profile/edit-avatar" alt="" class="users__img"> 
-                    </div>
-                    ${user.username} 
-                    </span>
-                    <a class="users__btn" id="${user.id}del_user" data-url='/admin/admin_panel/user_delete/${user.id}/${user.page}' data-pagid='1pagination'>Удалить пользователя</a>
-                </li>`;
+                    html += `
+                    <li class="users__item" id="${user.id}user_info">
+                        <a class="users__item__header users__btn" href="" style="width: 100%;">
+                            <div class="users__set">
+                                <img src="/user/${user.username}/edit-profile/edit-avatar" alt="" class="users__img"> 
+                            </div>
+                                <span>${user.username}</span>
+                            <span>${user.email}</span>
+                        </a>
+                        <div class="users__item__detail">
+                            <div><span>Имя: ${user.username}</span></div>
+                            <div><span>Почта: ${user.email}</span></div>
+                            <div><span>Роль: ${user.role}</span></div>
+                            <!--
+                            <a class="users__btn" id="${user.id}del_user" data-url='/admin/admin_panel/user_delete/${user.id}/${user.page}' data-pagid='1pagination'>
+                                Удалить пользователя
+                            </a>
+                            -->
+                        </div>
+                    </li>`;
                 });
                 html += `</ul>`;
                 div.insertAdjacentHTML("beforeend", html);
