@@ -93,6 +93,11 @@
   padding: 10px 20px;
   flex-basis: 100%;
   background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.users__item__detail span:last-child {
+    float: right;
 }
 
 .users__btn {
@@ -155,10 +160,6 @@
   margin-left: auto;
   overflow: hidden;
 
-}
-
-.users__item__detail {
-    border-radius: 10px;
 }
 
 .list__btn {

@@ -30,9 +30,9 @@ function search_users_on_forum()
                             <span>${user.email}</span>
                         </a>
                         <div class="users__item__detail" id="user_detail_${user.id}" style="display: none;">
-                            <div><span>Имя: ${user.username}</span></div>
-                            <div><span>Почта: ${user.email}</span></div>
-                            <div><span>Роль: ${user.role}</span></div>
+                            <div><span>Имя:</span><span>${user.username}</span></div>
+                            <div><span>Почта:</span><span>${user.email}</span></div>
+                            <div><span>Роль:</span><span>${user.role}</span></div>
                             <!--
                             <a class="users__btn" id="${user.id}del_user" data-url='/admin/admin_panel/user_delete/${user.id}/${user.page}' data-pagid='1pagination'>
                                 Удалить пользователя
