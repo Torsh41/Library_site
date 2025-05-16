@@ -22,14 +22,14 @@ function search_users_on_forum()
                 users.forEach(user => {
                     html += `
                     <li class="users__item" id="${user.id}user_info">
-                        <a class="users__item__header users__btn" href="" style="width: 100%;">
+                        <a class="users__item__header users__btn" id="user_header_${user.id}" href="javascript:usersItemDetailOpen('${user.id}');" style="width: 100%;">
                             <div class="users__set">
                                 <img src="/user/${user.username}/edit-profile/edit-avatar" alt="" class="users__img"> 
                             </div>
                                 <span>${user.username}</span>
                             <span>${user.email}</span>
                         </a>
-                        <div class="users__item__detail">
+                        <div class="users__item__detail" id="user_detail_${user.id}" style="display: none;">
                             <div><span>Имя: ${user.username}</span></div>
                             <div><span>Почта: ${user.email}</span></div>
                             <div><span>Роль: ${user.role}</span></div>
@@ -115,6 +115,16 @@ function search_users_on_forum()
         alert('Заполните поле');
         document.getElementById('username_field').value = '';
     }
+}
+
+function usersItemDetailOpen(itemId) {
+    document.getElementById("user_header_" + itemId).href = "javascript:usersItemDetailClose('" + itemId + "');";
+    document.getElementById("user_detail_" + itemId).style.display = "block";
+}
+
+function usersItemDetailClose(itemId) {
+    document.getElementById("user_header_" + itemId).href = "javascript:usersItemDetailOpen('" + itemId + "');";
+    document.getElementById("user_detail_" + itemId).style.display = "none";
 }
 
 $(function() {
