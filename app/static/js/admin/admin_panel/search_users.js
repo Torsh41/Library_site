@@ -1,3 +1,6 @@
+// Global variable, defined later
+roles = {};
+
 function search_users_on_forum()
 {
     if (document.getElementById('username_field').value.trim() && document.getElementById('username_field').value.trim().length <= 62)
@@ -32,7 +35,7 @@ function search_users_on_forum()
                         <div class="users__item__detail" id="user_detail_${user.id}" style="display: none;">
                             <div><span>Имя:</span><span>${user.username}</span></div>
                             <div><span>Почта:</span><span>${user.email}</span></div>
-                            <div><span>Роль:</span><span>${user.role}</span></div>
+                            <div><span>Роль:</span><span>${roles[user.role]}</span></div>
                             <!--
                             <a class="users__btn" id="${user.id}del_user" data-url='/admin/admin_panel/user_delete/${user.id}/${user.page}' data-pagid='1pagination'>
                                 Удалить пользователя
@@ -127,14 +130,25 @@ function usersItemDetailClose(itemId) {
     document.getElementById("user_detail_" + itemId).style.display = "none";
 }
 
-$(function() {
-    $('#search_users_form').submit(function(event) {
-        search_users_on_forum();
-        event.preventDefault();
-    });
 
-    $('#get_users').click(function(event) {
-        search_users_on_forum();
-    });
+// Кусок говна. Лучше бы его здесь не было.
+const promise = fetch( "/get_role_name_list")
+    .then(response => response.json())
+    .catch(error => console.error('Error:', error));
+
+$(function() {
+    Promise.all([promise])
+        .then(results => {
+            roles = results[0];
+            $('#search_users_form').submit(function(event) {
+                search_users_on_forum();
+                event.preventDefault();
+            });
+
+            $('#get_users').click(function(event) {
+                search_users_on_forum();
+            });
+        })
+        .catch(err => console.log(err))
 });
 

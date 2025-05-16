@@ -1492,6 +1492,23 @@ def get_posts_page_on_chat_disc(chat_id, page):
     return jsonify(dict(posts=posts, pages_count=pages_count))
 
 
+@main.route('/get_role_name/<int:role_id>', methods=['GET'])
+def get_role_name():
+    role = Role.by_id(role_id)
+    if role is None:
+        return render_template('500.html')
+    return role.name
+
+
+@main.route('/get_role_name_list', methods=['GET'])
+def get_role_name_list():
+    role_list = database.session.scalars(database.select(Role)).all()
+    ret = {}
+    for role in role_list:
+        ret[role.id] = role.name
+    return jsonify(ret)
+
+
 @main.route('/forum/private_chat/<int:chat_id>/get_users_page_to_invite/<int:page>', methods=['GET'])
 @login_required
 @check_actual_password
