@@ -21,7 +21,7 @@ function search_users_on_forum()
                 html = `<ul class="users__list list-reset" id="users_search_list">`;
                 users.forEach(user => {
                     html += `
-                    <li class="users__item" id="${user.id}user_info">
+                    <li id="${user.id}user_info">
                         <a class="users__item__header users__btn" id="user_header_${user.id}" href="javascript:usersItemDetailOpen('${user.id}');" style="width: 100%;">
                             <div class="users__set">
                                 <img src="/user/${user.username}/edit-profile/edit-avatar" alt="" class="users__img"> 
