@@ -2,7 +2,7 @@ from . import admin
 from flask_login import current_user
 from flask import render_template, redirect, url_for, request, jsonify
 from .. import database
-from app.models import User, Book, Category, SearchResult
+from app.models import User, Role, Book, Category, SearchResult
 from .forms import AddCategoryForm, ChangeBookInfoForm
 from app.decorators import admin_required, check_actual_password
 RESULT_COUNT = 8
@@ -218,6 +218,24 @@ def user_delete(user_id, page):
         pages_count=pages_count,
         has_elems=has_elems
     ))
+
+
+@admin.route('/admin_panel/set_user_role/<int:user_id>/<int:role_id>', methods=['GET'])
+@admin_required
+@check_actual_password
+def set_user_role(user_id, role_id):
+    user = database.session.execute(
+            database.select(User).filter_by(id=user_id)
+    ).scalar_one_or_none()
+    role = database.session.execute(
+            database.select(Role).filter_by(id=role_id)
+    ).scalar_one_or_none()
+    if user is None or role is None:
+        return render_template("400.html")
+    user.role = role.id
+    database.session.add(user)
+    database.session.commit()
+    return "{}"
 
 
 @admin.route('/<username>/category_delete/<int:category_id>/<int:page>', methods=['GET'])

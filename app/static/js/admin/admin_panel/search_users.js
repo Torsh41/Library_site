@@ -25,7 +25,7 @@ function search_users_on_forum()
                 users.forEach(user => {
                     html += `
                     <li id="${user.id}user_info">
-                        <a class="users__item__header users__btn" id="user_header_${user.id}" href="javascript:usersItemDetailOpen('${user.id}');" style="width: 100%;">
+                        <a class="users__item__header users__btn" id="user_header_${user.id}" href="javascript:usersItemDetailOpen('${user.id}');">
                             <div class="users__set">
                                 <img src="/user/${user.username}/edit-profile/edit-avatar" alt="" class="users__img"> 
                             </div>
@@ -35,12 +35,24 @@ function search_users_on_forum()
                         <div class="users__item__detail" id="user_detail_${user.id}" style="display: none;">
                             <div><span>Имя:</span><span>${user.username}</span></div>
                             <div><span>Почта:</span><span>${user.email}</span></div>
-                            <div><span>Роль:</span><span>${roles[user.role]}</span></div>
-                            <!--
-                            <a class="users__btn" id="${user.id}del_user" data-url='/admin/admin_panel/user_delete/${user.id}/${user.page}' data-pagid='1pagination'>
-                                Удалить пользователя
-                            </a>
-                            -->
+                            <div><span>Роль:</span><span id="user_role_${user.id}">${roles[user.role]}</span></div>
+                            <div>
+                                <select name="user_role" id="role_select_${user.id}">
+                                    <option value="">-- Выберите роль --</option>`;
+                    for (const [role_id, role_name] of Object.entries(roles)) {
+                        html += `   <option value="${role_id}">${role_name}</option>`;
+                    }
+                    html += `   </select>
+                                <a class="users__btn" id="set_user_role_${user.id}" href="javascript:setUserRole('${user.id}');" data-pagid="1pagination">
+                                    Изменить роль
+                                </a>
+                            </div>
+                            <div>
+                                <div></div>
+                                <a class="users__btn" id="${user.id}del_user" data-url='/admin/admin_panel/user_delete/${user.id}/${user.page}' data-pagid='1pagination'>
+                                    Удалить пользователя
+                                </a>
+                            </div>
                         </div>
                     </li>`;
                 });
@@ -128,6 +140,23 @@ function usersItemDetailOpen(itemId) {
 function usersItemDetailClose(itemId) {
     document.getElementById("user_header_" + itemId).href = "javascript:usersItemDetailOpen('" + itemId + "');";
     document.getElementById("user_detail_" + itemId).style.display = "none";
+}
+
+function setUserRole(userId) {
+    roleId = document.getElementById("role_select_" + userId).value;
+    if (roleId === "") {
+        alert("Выберите роль")
+    } else {
+        fetch("/admin/admin_panel/set_user_role/" + userId + "/" + roleId)
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("user_role_" + userId).textContent = roles[roleId];
+                } else {
+                    alert("Что-то пошло не так...");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
 }
 
 
