@@ -373,7 +373,7 @@ class AdminPagesTest(unittest.TestCase):
         errmsg = "Error: unable to reach /admin/<username>/add-category page."
         self.assertNotEqual(response.status_code, 404, msg=errmsg)
 
-    def test_admin_paneluser_delete(self):
+    def test_user_delete(self):
         response = self.client.get("/admin/admin_panel/user_delete/1/1")
         errmsg = "Error: unable to reach /admin/admin_panel/user_delete/<int:user_id>/<int:page> page."
         self.assertNotEqual(response.status_code, 404, msg=errmsg)
