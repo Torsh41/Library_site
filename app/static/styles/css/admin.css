@@ -96,8 +96,9 @@
   border-radius: 10px;
 }
 
-.users__item__detail span:last-child {
-    float: right;
+.users__item__detail > div {
+  display: flex;
+  justify-content: space-between;
 }
 
 .users__btn {
