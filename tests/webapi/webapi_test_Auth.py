@@ -8,7 +8,6 @@ from .UserPrototype import UserPrototype, test_user, test_admin
 
 from pprint import pprint
 
-@unittest.skip("showing class skipping")
 class AuthModuleTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -71,7 +70,6 @@ class AuthModuleTest(unittest.TestCase):
     #     pass
 
 
-@unittest.skip("showing class skipping")
 class PersonalModuleTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -214,4 +212,20 @@ class AdminModuleTest(unittest.TestCase):
         })
         self.assertEqual(response.status_code, 200, msg=errmsg)
         self.assertEqual(json.loads(response.data)[0]["result"], True, msg=errmsg.format(search_string))
+
+        def test_set_user_role(self):
+            user = UserPrototype("SetRoleTestUser", "Someemail@testuser.user", "123456", Role.ADMIN)
+            # Ensure the user has ADMIN role
+            with app.app_context():
+                user.role = Role.by_id(Role.ADMIN)
+                db.session.add(user)
+                db.session.commit()
+            # Set user role to USER
+            response = self.client.get("/admin/admin_panel/set_user_role/" + user.id + "/" + Role.by_id(Role.USER).id)
+            errmsg = "Error: unsuccessful API call to /admin/admin_panel/set_user_role/<user_id>/<role_id>"
+            self.assertEqual(response.status_code, 200, msg=errmsg)
+            # Sync user with database
+            user = user.copy()
+            errmsg = "Error: failed to set user role"
+            self.assertEqual(user.role, Role.by_id(Role.USER).id, msg=errmsg)
 

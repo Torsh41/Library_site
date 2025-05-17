@@ -378,6 +378,11 @@ class AdminPagesTest(unittest.TestCase):
         errmsg = "Error: unable to reach /admin/admin_panel/user_delete/<int:user_id>/<int:page> page."
         self.assertNotEqual(response.status_code, 404, msg=errmsg)
 
+    def test_set_user_role(self):
+        response = self.client.get("/admin/admin_panel/set_user_role/1/1")
+        errmsg = "Error: unable to reach /admin/admin_panel/set_user_role/<int:user_id>/<int:role_id> page."
+        self.assertNotEqual(response.status_code, 404, msg=errmsg)
+
     def test_category_delete(self):
         response = self.client.get("/admin/<username>/category_delete/1/1")
         errmsg = "Error: unable to reach /admin/<username>/category_delete/<int:category_id>/<int:page> page."
