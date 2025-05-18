@@ -230,6 +230,9 @@
                     {% if book.category.name %}
                     <li class="book__list-element"><b>Категория:</b> {{ book.category.name }}</li>
                     {% endif %}
+                    {% if book.reference_url %}
+                    <li class="book__list-element"><a href={{ book.reference_url }}>ссылка:</b> {{ book.reference_url }}</li>
+                    {% endif %}
                   </ul>
                 </div>
               </div>

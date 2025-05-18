@@ -205,9 +205,11 @@ class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary)
-    isbn = database.Column(database.Text(), unique=True)
+    # Make isbn non-unique to allow multiple null values. Please, find a better solution.
+    isbn = database.Column(database.Text(), unique=False)
     name = database.Column(database.Text(), unique=True, index=True)
     author = database.Column(database.Text(), unique=False)
+    reference_url = database.Column(database.Text(), unique=False)
     publishing_house = database.Column(database.Text(), unique=False)
     timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
     description = database.Column(database.Text(), unique=False)

@@ -247,6 +247,7 @@ def add_new_book(username):
             isbn = form.isbn.data.strip(),
             name = form.name.data.strip().lower().replace("'", ""),
             author = form.author.data.strip().lower(),
+            reference_url = form.reference_url.data.strip(),
             publishing_house = form.publishing_house.data.strip(),
             description = form.description.data.strip(),
             release_date = form.release_date.data,

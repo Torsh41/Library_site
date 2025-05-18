@@ -104,6 +104,7 @@ class PersonalModuleTest(unittest.TestCase):
         ISBN = "978-0-439-13636-5"
         title = "A book title"
         author = "An author"
+        reference_url = "http://abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;%="
         publisher = "Publisher"
         description = "Very long and interesting description"
         release_date = "2025-05-14"

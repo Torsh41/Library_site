@@ -412,11 +412,14 @@ def change_book_info(username, book_id):
     form = ChangeBookInfoForm(book=book)
     if form.validate_on_submit():
         category = Category.query.filter_by(name=request.form.get('category')).first()
+        if category is None:
+            return render_template("400.html")
         if cover := bytes(request.files['cover'].read()):
             book.cover = cover
         book.isbn = form.isbn.data.strip()
         book.name = form.name.data.strip().lower().replace("'", "")
         book.author = form.author.data.strip().lower()
+        book.reference_url = form.reference_url.data.strip()
         book.publishing_house = form.publishing_house.data.strip()
         book.description = request.form.get('description').strip()
         book.release_date = form.release_date.data

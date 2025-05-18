@@ -132,6 +132,20 @@
             </label>
 
             <label class="form__label">
+              <span class="form__span">Ссылка на источник</span>
+              {% if form.reference_url.errors %}
+              {{form.reference_url(class="form__input", placeholder="https://flibusta.su/book/122769-malenkiy-prints/read/")}}
+              <span>
+                {% for msg in form.reference_url.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.reference_url(class="form__input", placeholder="https://flibusta.su/book/122769-malenkiy-prints/read/")}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
               <span class="form__span">Издательство</span>
               {% if form.publishing_house.errors %}
               <!--<input type="text" class="form__input" placeholder="Введите издательство" required>-->
