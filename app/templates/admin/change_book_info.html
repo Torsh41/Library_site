@@ -81,28 +81,19 @@
         <div class="form__container container">
           <form class="form__wrap" enctype="multipart/form-data" method="post">
             {{form.hidden_tag()}}
+            <label class="form__label">
+                <span style="color: #0006">
+                    Обязательные поля отмечены *
+                </span>
+            </label>
             <span class="form__span">Обложка книги</span>
             <div class="profile__image profile__image-edit">
               <!--Тут получаем обложку для книги-->
               <input class="profile__foto" type="file" name="cover" multiple accept="image/*,image/jpeg">
             </div>
             <label class="form__label">
-              <span class="form__span">ISBN</span>
-              {% if form.isbn.errors %}
-              <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
-              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2", value=book.isbn)}}
-              <span>
-                {% for msg in form.isbn.errors %}
-                {{ msg }}
-                {% endfor %}
-              </span>
-              {% else %}
-              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2", value=book.isbn)}}
-              {% endif %}
-            </label>
-
             <label class="form__label">
-              <span class="form__span">Название</span>
+              <span class="form__span">Название*</span>
               {% if form.name.errors %}
               <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
               {{form.name(class="form__input", placeholder="Введите название книги", value=book.name, id=book.id)}}
@@ -117,7 +108,7 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Автор</span>
+              <span class="form__span">Автор*</span>
               {% if form.author.errors %}
               <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
               {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
@@ -128,6 +119,35 @@
               </span>
               {% else %}
               {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Описание*</span>
+              {% if form.description.errors %}
+              {{form.description(class="form__input", placeholder="Описание книги..")}}
+              <span>
+                {% for msg in form.description.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.description(class="form__input", placeholder="Описание книги..")}}
+              {% endif %}
+              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
+            </label>
+
+              <span class="form__span">ISBN</span>
+              {% if form.isbn.errors %}
+              <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
+              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2", value=book.isbn)}}
+              <span>
+                {% for msg in form.isbn.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.isbn(class="form__input", placeholder="Пример 978-5-93673-265-2", value=book.isbn)}}
               {% endif %}
             </label>
 
@@ -158,12 +178,6 @@
               {% else %}
               {{form.publishing_house(class="form__input", placeholder="Введите издательство", value=book.publishing_house)}}
               {% endif %}
-            </label>
-
-            <label class="form__label">
-              <span class="form__span">Описание</span>
-              <textarea class="form__input" id="description" maxlength="512" minlength="1" name="description" placeholder="Описание книги.." required="" value="aasasasasa">{{book.description}}</textarea>
-              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
             </label>
 
             <label class="form__label">

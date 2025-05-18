@@ -212,11 +212,14 @@
                 <div class="book__info">
                   <ul class="book__list list-reset">
                     <!--характеристики книги текстом (с учетем опциональных)-->
-                    {% if book.isbn %}
-                    <li class="book__list-element"><b>ISBN:</b> {{ book.isbn }}</li>
-                    {% endif %}
                     {% if book.author %}
                     <li class="book__list-element"><b>Автор:</b> {{ book.author }}</li>
+                    {% endif %}
+                    {% if book.reference_url %}
+                    <li class="book__list-element"><b>Ссылка: </b><a href={{ book.reference_url }}>{{ book.reference_url }}</a></li>
+                    {% endif %}
+                    {% if book.isbn %}
+                    <li class="book__list-element"><b>ISBN:</b> {{ book.isbn }}</li>
                     {% endif %}
                     {% if book.publishing_house %}
                     <li class="book__list-element"><b>Издательство:</b> {{ book.publishing_house }}</li>
@@ -229,9 +232,6 @@
                     {% endif %}
                     {% if book.category.name %}
                     <li class="book__list-element"><b>Категория:</b> {{ book.category.name }}</li>
-                    {% endif %}
-                    {% if book.reference_url %}
-                    <li class="book__list-element"><a href={{ book.reference_url }}>ссылка:</b> {{ book.reference_url }}</li>
                     {% endif %}
                   </ul>
                 </div>

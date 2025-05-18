@@ -112,21 +112,6 @@
               <input class="profile__foto" type="file" name="cover" multiple accept="image/*,image/jpeg">
             </div>
             <label class="form__label">
-              <span class="form__span">ISBN</span>
-              {% if form.isbn.errors %}
-              <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
-              {{form.isbn(class="form__input", placeholder="Пример 5-9367-2651-2")}}
-              <span>
-                {% for msg in form.isbn.errors %}
-                {{ msg }}
-                {% endfor %}
-              </span>
-              {% else %}
-              {{form.isbn(class="form__input", placeholder="Пример 5-9367-2651-2")}}
-              {% endif %}
-            </label>
-
-            <label class="form__label">
               <span class="form__span">Название*</span>
               {% if form.name.errors %}
               <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
@@ -157,6 +142,36 @@
             </label>
 
             <label class="form__label">
+              <span class="form__span">Описание*</span>
+              {% if form.description.errors %}
+              {{form.description(class="form__input", placeholder="Описание книги..")}}
+              <span>
+                {% for msg in form.description.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.description(class="form__input", placeholder="Описание книги..")}}
+              {% endif %}
+              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">ISBN</span>
+              {% if form.isbn.errors %}
+              <!--<input type="number" class="form__input" placeholder="Пример 978-5-93673-265-2" required>-->
+              {{form.isbn(class="form__input", placeholder="Пример 5-9367-2651-2")}}
+              <span>
+                {% for msg in form.isbn.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.isbn(class="form__input", placeholder="Пример 5-9367-2651-2")}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
               <span class="form__span">Ссылка на источник</span>
               {% if form.reference_url.errors %}
               {{form.reference_url(class="form__input", placeholder="https://flibusta.su/book/122769-malenkiy-prints/read/")}}
@@ -183,21 +198,6 @@
               {% else %}
               {{form.publishing_house(class="form__input", placeholder="Введите издательство")}}
               {% endif %}
-            </label>
-
-            <label class="form__label">
-              <span class="form__span">Описание*</span>
-              {% if form.description.errors %}
-              {{form.description(class="form__input", placeholder="Описание книги..")}}
-              <span>
-                {% for msg in form.description.errors %}
-                {{ msg }}
-                {% endfor %}
-              </span>
-              {% else %}
-              {{form.description(class="form__input", placeholder="Описание книги..")}}
-              {% endif %}
-              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
             </label>
 
             <label class="form__label">
