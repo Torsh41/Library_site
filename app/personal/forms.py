@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaField, DateField
-from wtforms.validators import DataRequired, Length, Regexp, NumberRange
+from wtforms.validators import DataRequired, Length, Regexp, NumberRange, Optional
 from wtforms import ValidationError
 from ..models import Book
 from isbnlib import is_isbn10, is_isbn13
@@ -31,15 +31,15 @@ def validate_isbn_10_or_13(form, field):
     
     
 class AddNewBookForm(FlaskForm):
-    isbn = StringField('BookISBN', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), validate_isbn, validate_isbn_10_or_13])
+    isbn = StringField('BookISBN', validators=[Optional(), Length(1, 128), validate_isbn, validate_isbn_10_or_13])
     name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название книги должно содержать только буквы и пробелы.'), validate_bookname])
     author = StringField('AuthorName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Имя автора должно содержать только буквы и пробелы.')])
-    publishing_house = StringField('HouseName', validators=[DataRequired('Поле не должно быть пустым.'), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
+    publishing_house = StringField('HouseName', validators=[Optional(), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название издательсва должно содержать только буквы и пробелы.'), Length(1, 64)])
     description = TextAreaField('Description', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 1024)])
-    release_date = DateField('ReleaseDate', validators=[DataRequired('Поле не должно быть пустым.')])
-    chapters_count = IntegerField('ChaptersCount', validators=[DataRequired('Поле не должно быть пустым.'), NumberRange(2, 100, message='Здесь невозможно ошибиться:)')])
+    release_date = DateField('ReleaseDate', validators=[Optional()])
+    chapters_count = IntegerField('ChaptersCount', validators=[Optional(), NumberRange(2, 100, message='Здесь невозможно ошибиться:)')]) # Верим...
     submit = SubmitField('Добавить книгу в базу')
     

@@ -101,6 +101,11 @@
           {% if len(categories) > 0 %}
           <form class="form__wrap" enctype="multipart/form-data" method="post">
             {{form.hidden_tag()}}
+            <label class="form__label">
+                <span style="color: #0006">
+                    Обязательные поля отмечены *
+                </span>
+            </label>
             <span class="form__span">Обложка книги</span>
             <div class="profile__image profile__image-edit">
               <!--Тут получаем обложку для книги-->
@@ -122,7 +127,7 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Название</span>
+              <span class="form__span">Название*</span>
               {% if form.name.errors %}
               <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
               {{form.name(class="form__input", placeholder="Введите название книги")}}
@@ -137,7 +142,7 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Автор</span>
+              <span class="form__span">Автор*</span>
               {% if form.author.errors %}
               <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
               {{form.author(class="form__input", placeholder="Иванов Иван Иванович")}}
@@ -167,7 +172,7 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Описание</span>
+              <span class="form__span">Описание*</span>
               {% if form.description.errors %}
               {{form.description(class="form__input", placeholder="Описание книги..")}}
               <span>
