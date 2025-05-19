@@ -45,5 +45,7 @@ class ChangeBookInfoForm(AddNewBookForm):
     def __init__(self, book, *args, **kwargs):
         super(ChangeBookInfoForm, self).__init__(*args, **kwargs)
         self.book = book
+        # Set default value for the description field
+        self.description.process_data(self.book.description)
 
   
