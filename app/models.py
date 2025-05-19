@@ -215,6 +215,7 @@ class Book(database.Model, SerializerMixin):
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
+    moderation_request_id = database.Column(database.Integer, database.ForeignKey('moderation_requests.id'))
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
     cataloge_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
@@ -259,6 +260,19 @@ class Item(database.Model, SerializerMixin):
     read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено  
     cataloge_id = database.Column(database.Integer, database.ForeignKey('catalogues.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
+
+
+class ModerationRequest(database.Model, SerializerMixin):
+    # enum of possible status values
+    STATUS_OPEN = 0
+    STATUS_ACCEPTED = 1
+    STATUS_REJECTED = 2
+
+    __tablename__ = "moderation_requests"
+    id = database.Column(database.Integer, primary_key=True)
+    book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
+    status = database.Column(database.String(32), default = STATUS_OPEN)
+    comment = database.Column(database.String(128))
 
 
 class SearchResult(database.Model, SerializerMixin):
