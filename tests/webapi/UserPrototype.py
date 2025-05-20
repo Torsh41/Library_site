@@ -17,8 +17,11 @@ class UserPrototype:
         Can be used to make sure the user is registered in the given testcase."""
         return UserPrototype(self.name, self.email, self.password, self.role)
 
+    @with_app_context
     def get(self):
-        return self.user
+        return db.session.execute(
+            db.select(User).filter_by(username=self.name)
+        ).scalar_one_or_none()
 
     @with_app_context
     def register(self) -> User | None:
