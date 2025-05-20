@@ -21,7 +21,7 @@ class BookPrototype:
         # self.timestamp = datetime.datetime.now()
         self.release_date = release_date
         self.count_of_chapters = count_of_chapters
-        self.moderation_request = ModerationRequest(status=moderation_request_status)
+        self.moderation_request = ModerationRequest(_status=moderation_request_status)
         self.book = self.create()
 
     @with_app_context
