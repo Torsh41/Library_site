@@ -3,8 +3,8 @@ from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, request, make_response, jsonify
 from .forms import EditProfileForm, AddNewBookForm
 from .. import database
-from app.models import User, Cataloge, Book, Item, Category, Role
-from app.decorators import admin_required, check_actual_password
+from app.models import User, Cataloge, Book, ModerationRequest, Item, Category, Role
+from app.decorators import *
 from app.parse_excel import add_many_books
 from datetime import datetime
 import copy
@@ -242,6 +242,7 @@ def add_new_book(username):
     form = AddNewBookForm()
     if form.validate_on_submit():
         category = Category.query.filter_by(name=str(request.form.get('category'))).first()
+        moderation_request = ModerationRequest()
         book = Book(
             # cover = bytes(request.files['cover'].read()),
             isbn = form.isbn.data.strip(),
@@ -253,7 +254,8 @@ def add_new_book(username):
             release_date = form.release_date.data,
             count_of_chapters = form.chapters_count.data,
             category = category,
-            user = current_user._get_current_object()
+            user = current_user._get_current_object(),
+            moderation_request = moderation_request
         )
         if not book.cover:
             book.default_cover()

@@ -292,23 +292,27 @@ def category(id):
     if category is None:
         return render_template('400.html')
     list_id = request.args.get('list_id', None, type=int)
-    res = category.books.all()
+    books = database.session.execute(
+            database.select(Book)
+                    .join(Book.category)
+                    .filter_by(id=category.id)
+                    .join(Book.moderation_request)
+                    .filter_by(status=ModerationRequest.STATUS_ACCEPTED)
+    ).scalars().all()
     top_books = list(); new_books = list()
-    if res:
-        for book in res:
-            try:
-                top_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
-                new_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
-            except:
-                top_books.append([book, 0])
-                new_books.append([book, 0])
-           
-        if len(top_books) > TOP_BOOKS_COUNT:
-            top_books = sorted(top_books, key=lambda value: value[1], reverse=True)[:TOP_BOOKS_COUNT]
-            new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)[:TOP_BOOKS_COUNT]
-        else:
-            top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
-            new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
+    for book in books:
+        try:
+            top_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
+            new_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
+        except:
+            top_books.append([book, 0])
+            new_books.append([book, 0])
+    if len(top_books) > TOP_BOOKS_COUNT:
+        top_books = sorted(top_books, key=lambda value: value[1], reverse=True)[:TOP_BOOKS_COUNT]
+        new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)[:TOP_BOOKS_COUNT]
+    else:
+        top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
+        new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
     return render_template(
         'main/category_page.html',
         top_books=top_books,
