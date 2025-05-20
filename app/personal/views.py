@@ -276,6 +276,11 @@ def add_new_book(username):
 def add_book_in_list_tmp(username, book_id):
     if current_user.username != username:
         return render_template('403.html')
+    book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     list_id = request.args.get('list_id', None, type=int)
     if request.form:
         read_state = request.form.get('read_state')
@@ -328,6 +333,10 @@ def add_book_in_list(username, list_id, book_id, read_state):
         return render_template('403.html')
     cataloge_for_adding = current_user.cataloges.filter_by(id=list_id).first()
     book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     flag = False; page = 1
     if cataloge_for_adding is None or book is None:
         return render_template("400.html")
