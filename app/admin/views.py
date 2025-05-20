@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, request, jsonify
 from .. import database
 from app.models import User, Role, Book, Category, SearchResult
 from .forms import AddCategoryForm, ChangeBookInfoForm
-from app.decorators import admin_required, check_actual_password
+from app.decorators import *
 RESULT_COUNT = 8
 CATEGORIES_COUNT = 5
 USERS_COUNT = CATEGORIES_COUNT
