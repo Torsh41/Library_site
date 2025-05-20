@@ -1,10 +1,10 @@
 from . import main
 from .. import database
 from app.main import *
-from app.models import BookGrade, Book, Comment, Category, User, TopicPost, DiscussionTopic, Role, BooksMaintaining, PrivateChat, PrivateChatPost
+from app.models import *
 from flask import render_template, request, redirect, url_for, make_response, jsonify
 from flask_login import current_user, login_required
-from app.decorators import admin_required, check_actual_password
+from app.decorators import *
 from app.parse_excel import *
 import copy
 from datetime import datetime
@@ -25,6 +25,8 @@ def cover(book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
         return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     cover = make_response(book.cover)
     return cover
 
@@ -58,6 +60,8 @@ def book_page(book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
         return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     pagination = (book.comments
                         .order_by(Comment.timestamp.asc())
                         .paginate(1, per_page=ELEMS_COUNT, error_out=False))
@@ -87,6 +91,8 @@ def get_comments_page(book_id, page):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
         return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     comments_pagination = (book.comments
                            .order_by(Comment.timestamp.asc())
                            .paginate(page, per_page=ELEMS_COUNT, error_out=False))
@@ -124,6 +130,8 @@ def add_comment(username, book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
         return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     comment = Comment(
         body=str(request.form.get('comment')).strip().replace("'", ""),
         book=book,
@@ -171,6 +179,11 @@ def edit_comment(username, comment_id, book_id):
     comment = Comment.query.filter_by(id=comment_id).first()
     if comment is None:
         return render_template('400.html')
+    book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
     comment.timestamp = datetime.now()
     database.session.add(comment)
@@ -195,6 +208,8 @@ def give_grade(username, book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
         return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     grade = int(request.args.get('grade'))
     previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
     if previous_grade:
@@ -214,6 +229,10 @@ def comment_delete(username, book_id, comment_id, page):
         return render_template('403.html')
     page = int(page)
     book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return render_template('400.html')
+    if not book_passed_moderation(book):
+        return render_template('403.html')
     comment = book.comments.filter_by(id=comment_id).first()
     database.session.delete(comment)
     database.session.commit()
@@ -301,6 +320,7 @@ def category(id):
     )
         
         
+# TODO: unused method
 @main.route('/category/<int:id>/search', methods=['POST'])
 def search_by_category(id):
     if current_user.is_authenticated:
@@ -310,7 +330,14 @@ def search_by_category(id):
     category = Category.query.filter_by(id=id).first()
     if category is None:
         return render_template('400.html')
-    res = category.books.order_by(Book.id).all()
+    res = database.session.execute(
+            database.select(Book)
+                    .join(Book.category)
+                    .filter_by(id=category.id)
+                    .join(Book.moderation_request)
+                    .filter_by(status=ModerationRequest.STATUS_ACCEPTED)
+           .order_by(Book.id)
+    ).scalars().all()
     result = str(request.form.get('search_result')).strip().lower()
     if result == '*':
         search_result = res
