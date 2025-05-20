@@ -226,7 +226,7 @@ class Book(database.Model, SerializerMixin):
         # with app.open_resource(app.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
         with app.open_resource(app.root_path + '/static/styles/img/book.jpg', 'rb') as f:
             self.cover = f.read()
-    
+
 
 class BookGrade(database.Model, SerializerMixin):
     __tablename__ = "grades"
@@ -269,11 +269,28 @@ class ModerationRequest(database.Model, SerializerMixin):
     STATUS_ACCEPTED = 1
     STATUS_REJECTED = 2
 
+    status_dict = {
+        STATUS_OPEN: "Обрабатывается",
+        STATUS_ACCEPTED: "Одобрено",
+        STATUS_REJECTED: "Отклонено",
+    }
+
     __tablename__ = "moderation_requests"
     id = database.Column(database.Integer, primary_key=True)
-    book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
-    status = database.Column(database.String(32), default = STATUS_OPEN)
-    comment = database.Column(database.String(128))
+    book = database.relationship('Book', backref='moderation_request', uselist=False, cascade="all, delete, delete-orphan")
+    _status = database.Column(database.Integer, default=STATUS_OPEN)
+    comment = database.Column(database.String(128), default="")
+
+    @property
+    def status(self):
+        return status_dict[self._status]
+
+    @status.setter
+    def status(self, status) -> bool:
+        if status not in ModerationRequest.status_dict.keys():
+            raise ValueError(f"ModerationRequest status={status} is not defined in app/models.py")
+        self._status = status
+        database.session.add(self)
 
 
 class SearchResult(database.Model, SerializerMixin):
