@@ -1,7 +1,8 @@
 from flask import abort, session, redirect, url_for
 from flask_login import login_required, current_user, logout_user
-from app.models import Role, User
+from app.models import Role, User, Book, ModerationRequest
 from functools import wraps
+from . import database
 
 
 def admin_required(func):
@@ -29,5 +30,19 @@ def check_actual_password(func):
     return decorated_func
 
 
+def book_passed_moderation(book: Book) -> bool:
+    """Check if a user has permission to access to the book.
+    Specifically, check if the book has not passed moderation, or if
+    current_user is not a Moderator or an Admin.
+    """
+    if book is None:
+        return False
+    if book.moderation_request.status == ModerationRequest.STATUS_ACCEPTED:
+        return True
+    if (current_user.is_authenticated and
+        (current_user.role == Role.MODERATOR or
+         current_user.role == Role.ADMIN)):
+        return True
+    return False
 
-        
+
