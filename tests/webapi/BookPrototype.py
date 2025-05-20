@@ -21,8 +21,8 @@ class BookPrototype:
         # self.timestamp = datetime.datetime.now()
         self.release_date = release_date
         self.count_of_chapters = count_of_chapters
-        self.moderation_request = ModerationRequest(_status=moderation_request_status)
-        self.book = self.create()
+        self.moderation_request_status = moderation_request_status
+        self.create()
 
     @with_app_context
     def get(self) -> Book | None:
@@ -49,6 +49,7 @@ class BookPrototype:
             return existing_book
         # Create a new user
         print(f"Creating a book :\tname='{self.name}', author='{self.author}'.")
+        moderation_request = ModerationRequest(_status=self.moderation_request_status)
         new_book = Book(
             name = self.name,
             author = self.author,
@@ -61,10 +62,10 @@ class BookPrototype:
             count_of_chapters = self.count_of_chapters,
             category_id = self.category_id,
             user_id = self.user_id,
-            moderation_request = self.moderation_request
+            moderation_request = moderation_request
         )
         new_book.default_cover()
-        db.session.add(self.moderation_request)
+        db.session.add(moderation_request)
         db.session.add(new_book)
         db.session.commit()
         return new_book

@@ -5,8 +5,8 @@ from . import with_app_context
 
 class CategoryPrototype:
     def __init__(self, name: str):
-        self.name=name.strip().lower().replace("'", "")
-        self.category = self.create()
+        self.name = name.strip().lower().replace("'", "")
+        self.create()
 
     @with_app_context
     def get(self) -> Category | None:

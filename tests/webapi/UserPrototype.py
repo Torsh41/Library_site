@@ -10,7 +10,7 @@ class UserPrototype:
         self.email = email.strip().lower()
         self.password = password
         self.role = role
-        self.user = self.register()
+        self.register()
 
     def copy(self):
         """Get a deep copy of the object <self>.
