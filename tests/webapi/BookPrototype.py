@@ -33,7 +33,7 @@ class BookPrototype:
     @with_app_context
     def get_moderation(self) -> ModerationRequest | None:
         return db.session.execute(
-            db.select(ModerationRequest).filter_by(book=self.book)
+            db.select(ModerationRequest).filter_by(book=self.get())
         ).scalar_one_or_none()
 
     @with_app_context
