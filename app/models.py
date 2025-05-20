@@ -283,7 +283,7 @@ class ModerationRequest(database.Model, SerializerMixin):
 
     @property
     def status(self):
-        return status_dict[self._status]
+        return ModerationRequest.status_dict[self._status]
 
     @status.setter
     def status(self, status) -> bool:
