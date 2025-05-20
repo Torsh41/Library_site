@@ -223,7 +223,8 @@ class Book(database.Model, SerializerMixin):
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
     def default_cover(self):
-        with app.open_resource(app.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
+        # with app.open_resource(app.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
+        with app.open_resource(app.root_path + '/static/styles/img/book.jpg', 'rb') as f:
             self.cover = f.read()
     
 
