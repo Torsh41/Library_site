@@ -1,6 +1,6 @@
 from . import personal
 from flask_login import login_required, current_user
-from flask import render_template, redirect, url_for, request, make_response, jsonify
+from flask import render_template, redirect, abort, url_for, request, make_response, jsonify
 from .forms import EditProfileForm, AddNewBookForm
 from .. import database
 from app.models import User, Cataloge, Book, ModerationRequest, Item, Category, Role
@@ -22,9 +22,9 @@ def inject_roles():
 def avatar(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        return render_template('400.html')
+        return abort(400)
     if user.avatar is None:
-        return render_template('400.html')
+        return abort(400)
     avatar = make_response(user.avatar)
     return avatar
 
@@ -34,7 +34,7 @@ def avatar(username):
 @check_actual_password
 def person(username, flag=False):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     page = request.args.get('page', 1, type=int)
     items_page = request.args.get('items_page', 1, type=int)
     cataloge_id = request.args.get('cataloge_id', None, type=int)
@@ -87,7 +87,7 @@ def person(username, flag=False):
 @check_actual_password
 def edit(username):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     form = EditProfileForm()
     if form.validate_on_submit():
         if request.files['avatar']:
@@ -115,7 +115,7 @@ def edit(username):
 @check_actual_password
 def add_list(username):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     new_cataloge_name = str(request.form.get('newList')).strip().lower()
     user_cataloges = current_user.cataloges.all()
     result = 2
@@ -172,7 +172,7 @@ def add_list(username):
 @check_actual_password
 def get_lists_page(username, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     pagination = (current_user.cataloges
                 .order_by()
                 .paginate(page, per_page=LISTS_COUNT, error_out=False))
@@ -209,10 +209,10 @@ def get_lists_page(username, page):
 @check_actual_password
 def get_books_page(username, cataloge_id, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     cataloge = Cataloge.query.filter_by(id=cataloge_id).first()
     if cataloge is None:
-        return render_template('400.html')
+        return abort(400)
     items_pagination = (cataloge.items
                 .order_by()
                 .paginate(page, per_page=BOOKS_COUNT, error_out=False))
@@ -236,7 +236,7 @@ def get_books_page(username, cataloge_id, page):
 @check_actual_password
 def add_new_book(username):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     pagination = Category.query.paginate(1, per_page=CATEGORIES_COUNT, error_out=False)
     categories = pagination.items
     form = AddNewBookForm()
@@ -277,12 +277,12 @@ def add_new_book(username):
 @check_actual_password
 def add_book_in_list_tmp(username, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     list_id = request.args.get('list_id', None, type=int)
     if request.form:
         read_state = request.form.get('read_state')
@@ -313,7 +313,7 @@ def add_book_in_list_tmp(username, book_id):
 @check_actual_password
 def get_lists_page_to_add_book(username, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     cataloges_pagination = (current_user.cataloges
                 .paginate(page, per_page=LISTS_COUNT, error_out=False))
     return jsonify([
@@ -332,16 +332,16 @@ def get_lists_page_to_add_book(username, page):
 @check_actual_password
 def add_book_in_list(username, list_id, book_id, read_state):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     cataloge_for_adding = current_user.cataloges.filter_by(id=list_id).first()
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     flag = False; page = 1
     if cataloge_for_adding is None or book is None:
-        return render_template("400.html")
+        return abort(400)
 
     all_pages = (current_user.cataloges
                 .order_by()
@@ -382,10 +382,10 @@ def add_book_in_list(username, list_id, book_id, read_state):
 @check_actual_password
 def list_delete(username, list_id, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     cataloge = current_user.cataloges.filter_by(id=list_id).first()
     if cataloge is None:
-        return render_template('400.html')
+        return abort(400)
     database.session.delete(cataloge)
     database.session.commit()
     if current_user.cataloges.all():
@@ -411,11 +411,11 @@ def list_delete(username, list_id, page):
 @check_actual_password
 def item_delete(username, cataloge_id, item_id, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     cataloge = current_user.cataloges.filter_by(id=cataloge_id).first()
     item = cataloge.items.filter_by(id=item_id).first()
     if cataloge is None or item is None:
-        return render_template('400.html')
+        return abort(400)
     database.session.delete(item)
     database.session.commit()
     if cataloge.items.all():
@@ -443,7 +443,7 @@ def item_delete(username, cataloge_id, item_id, page):
 @check_actual_password
 def get_categories_page_for_book_adding(username, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     categories_pagination = (Category.query
                 .paginate(page, per_page=CATEGORIES_COUNT, error_out=False))
     categories = categories_pagination.items

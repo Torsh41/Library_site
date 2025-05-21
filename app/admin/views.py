@@ -1,6 +1,6 @@
 from . import admin
 from flask_login import current_user
-from flask import render_template, redirect, url_for, request, jsonify
+from flask import render_template, redirect, abort, url_for, request, jsonify
 from .. import database
 from app.models import User, Role, Book, Category, SearchResult
 from .forms import AddCategoryForm, ChangeBookInfoForm
@@ -198,7 +198,7 @@ def user_delete(user_id, page):
         (User.id == user_id)
     ).first()
     if user is None:
-        return render_template("400.html")
+        return abort(400)
     database.session.delete(user)
     database.session.commit()
     if User.query.filter(User.id != current_user.id).all():
@@ -231,7 +231,7 @@ def set_user_role(user_id, role_id):
             database.select(Role).filter_by(id=role_id)
     ).scalar_one_or_none()
     if user is None or role is None:
-        return render_template("400.html")
+        return abort(400)
     user.role = role.id
     database.session.add(user)
     database.session.commit()
@@ -244,7 +244,7 @@ def set_user_role(user_id, role_id):
 def category_delete(username, category_id, page):
     category = Category.query.filter_by(id=category_id).first()
     if category is None:
-        return render_template("400.html")
+        return abort(400)
     database.session.delete(category)
     database.session.commit()
     if Category.query.all():
@@ -271,7 +271,7 @@ def category_delete(username, category_id, page):
 def search_books_on_admin_panel(username, category_id):
     category = Category.query.filter_by(id=category_id).first()
     if category is None:
-        return render_template("400.html")
+        return abort(400)
     if request.method == "POST":
         result = str(request.form.get('search_result')).strip().lower()
         if result == '*':
@@ -363,7 +363,7 @@ def search_books_on_admin_panel(username, category_id):
             ])
         else:
             return jsonify([dict(has_books=False)])
-    return render_template('500.html')
+    return abort(500)
 
 
 @admin.route('/<username>/del_book/<int:category_id>/<int:book_id>/<int:page>', methods=['GET'])
@@ -372,11 +372,11 @@ def search_books_on_admin_panel(username, category_id):
 def del_book(username, category_id, book_id, page):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template("400.html")
+        return abort(400)
     database.session.delete(book)
     book_for_search_result = SearchResult.query.filter_by(searcher_id=current_user.id).filter_by(id=book_id).first()
     if book_for_search_result is None:
-        return render_template("400.html")
+        return abort(400)
     database.session.delete(book_for_search_result)
     database.session.commit()
     if SearchResult.query.filter_by(searcher_id=current_user.id).all():
@@ -403,17 +403,17 @@ def del_book(username, category_id, book_id, page):
 @check_actual_password
 def change_book_info(username, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template("400.html")
+        return abort(400)
     pagination = Category.query.paginate(1, per_page=CATEGORIES_COUNT, error_out=False)
     categories = pagination.items
     form = ChangeBookInfoForm(book=book)
     if form.validate_on_submit():
         category = Category.query.filter_by(name=request.form.get('category')).first()
         if category is None:
-            return render_template("400.html")
+            return abort(400)
         if cover := bytes(request.files['cover'].read()):
             book.cover = cover
         book.isbn = form.isbn.data.strip()

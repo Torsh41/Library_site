@@ -2,7 +2,7 @@ from . import main
 from .. import database
 from app.main import *
 from app.models import *
-from flask import render_template, request, redirect, url_for, make_response, jsonify
+from flask import render_template, request, redirect, abort, url_for, make_response, jsonify
 from flask_login import current_user, login_required
 from app.decorators import *
 from app.parse_excel import *
@@ -24,9 +24,9 @@ def inject_months_dict():
 def cover(book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     cover = make_response(book.cover)
     return cover
 
@@ -35,7 +35,7 @@ def cover(book_id):
 def post_screenshot(post_id):
     post = TopicPost.query.filter_by(id=post_id).first()
     if post is None:
-        return render_template('400.html')
+        return abort(400)
     file = make_response(post.file)
     return file
 
@@ -44,7 +44,7 @@ def post_screenshot(post_id):
 def post_screenshot_on_private_chat(post_id):
     post = PrivateChatPost.query.filter_by(id=post_id).first()
     if post is None:
-        return render_template('400.html')
+        return abort(400)
     file = make_response(post.file)
     return file
 
@@ -58,10 +58,11 @@ def index():
 def book_page(book_id):
     list_id = request.args.get('list_id', None, type=int)
     book = Book.query.filter_by(id=book_id).first()
+    from flask import abort
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     pagination = (book.comments
                         .order_by(Comment.timestamp.asc())
                         .paginate(1, per_page=ELEMS_COUNT, error_out=False))
@@ -90,9 +91,9 @@ def book_page(book_id):
 def get_comments_page(book_id, page):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     comments_pagination = (book.comments
                            .order_by(Comment.timestamp.asc())
                            .paginate(page, per_page=ELEMS_COUNT, error_out=False))
@@ -126,12 +127,12 @@ def get_comments_page(book_id, page):
 @check_actual_password
 def add_comment(username, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     comment = Comment(
         body=str(request.form.get('comment')).strip().replace("'", ""),
         book=book,
@@ -175,15 +176,15 @@ def add_comment(username, book_id):
 @check_actual_password
 def edit_comment(username, comment_id, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     comment = Comment.query.filter_by(id=comment_id).first()
     if comment is None:
-        return render_template('400.html')
+        return abort(400)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
     comment.timestamp = datetime.now()
     database.session.add(comment)
@@ -204,12 +205,12 @@ def edit_comment(username, comment_id, book_id):
 @check_actual_password
 def give_grade(username, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     grade = int(request.args.get('grade'))
     previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
     if previous_grade:
@@ -226,13 +227,13 @@ def give_grade(username, book_id):
 @check_actual_password
 def comment_delete(username, book_id, comment_id, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     page = int(page)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
     if not book_passed_moderation(book):
-        return render_template('403.html')
+        return abort(403)
     comment = book.comments.filter_by(id=comment_id).first()
     database.session.delete(comment)
     database.session.commit()
@@ -290,7 +291,7 @@ def get_categories_page(page):
 def category(id):
     category = Category.query.filter_by(id=id).first()
     if category is None:
-        return render_template('400.html')
+        return abort(400)
     list_id = request.args.get('list_id', None, type=int)
     books = database.session.execute(
             database.select(Book)
@@ -333,7 +334,7 @@ def search_by_category(id):
         current_user_is_auth = False; username = None
     category = Category.query.filter_by(id=id).first()
     if category is None:
-        return render_template('400.html')
+        return abort(400)
     res = database.session.execute(
             database.select(Book)
                     .join(Book.category)
@@ -421,7 +422,7 @@ def forum():
 def topic(topic_id):
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
     if topic is None:
-        return render_template('400.html')
+        return abort(400)
     posts_page = request.args.get('posts_page', 1, type=int)
     if current_user.is_authenticated and current_user.role == Role.ADMIN:
         user_is_admin = 1
@@ -544,7 +545,7 @@ def get_categories_page_on_forum(page):
 def get_posts_page(topic_id, page):
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
     if topic is None:
-        return render_template('400.html')
+        return abort(400)
     posts_pagination = (topic.posts
                         .order_by(TopicPost.id)
                         .paginate(page, per_page=ELEMS_COUNT, error_out=False))
@@ -780,10 +781,10 @@ def search_category_on_forum():
 @check_actual_password
 def add_topic(username, category_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     cur_category = Category.query.filter_by(id=category_id).first()
     if cur_category is None:
-        return render_template('400.html')
+        return abort(400)
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
     result = True
     for topic in cur_category.topics.all():
@@ -831,7 +832,7 @@ def get_topics_page_on_forum(category_id, page):
         is_admin = False
     category = Category.query.filter_by(id=category_id).first()
     if category is None:
-        return render_template('400.html')
+        return abort(400)
     topics_pagination = (category.topics
                          .order_by()
                          .paginate(page, per_page=ELEMS_COUNT, error_out=False))
@@ -858,7 +859,7 @@ def topic_delete(category_id, topic_id, page):
         database.session.delete(topic)
         database.session.commit()
     else:
-        return render_template('404.html')
+        return abort(404)
 
     if topics := category.topics.all():
         has_elems = True
@@ -1163,7 +1164,7 @@ def private_chats():
 def delete_private_chat(chat_id, page):
     private_chat = current_user.private_chats.filter_by(id=chat_id).first()
     if private_chat is None:
-        return render_template('400.html')
+        return abort(400)
     database.session.delete(private_chat)
     database.session.commit()
         
@@ -1258,10 +1259,10 @@ def get_chats_page(page):
 def private_chat(chat_id):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     if private_chat is None:
-        return render_template('400.html')
+        return abort(400)
     if (chat not in current_user.private_chats and
         not current_user.chats_invitations.filter_by(private_chat=chat).first()):
-        return render_template('403.html')
+        return abort(403)
 
     participants_count = chat.invitations.count() + 1
     if current_user.is_authenticated and current_user.role == Role.ADMIN:
@@ -1346,7 +1347,7 @@ def private_chat(chat_id):
 def get_posts_page_on_chat_disc(chat_id, page):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     if chat is None:
-        return render_template('400.html')
+        return abort(400)
     posts = list()
     posts_pagination = (chat.posts
                         .order_by(PrivateChatPost.id).
@@ -1527,7 +1528,7 @@ def get_posts_page_on_chat_disc(chat_id, page):
 def get_role_name():
     role = Role.by_id(role_id)
     if role is None:
-        return render_template('500.html')
+        return abort(500)
     return role.name
 
 
@@ -1546,7 +1547,7 @@ def get_role_name_list():
 def get_users_page_to_invite(chat_id, page):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     if chat is None:
-        return render_template('400.html')
+        return abort(400)
     invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
     users_pagination = (User.query
                         .filter(User.id != current_user.id)
@@ -1576,7 +1577,7 @@ def change_topic_name(category_id, topic_id):
     category = Category.query.filter_by(id=category_id).first()
     topic = category.topics.filter_by(id=topic_id).first()
     if chat is None or topic is None:
-        return render_template('400.html')
+        return abort(400)
     topic.name = str(request.form.get('topic_changed_name')).strip().replace("'", "")
     database.session.add(topic)
     database.session.commit()
