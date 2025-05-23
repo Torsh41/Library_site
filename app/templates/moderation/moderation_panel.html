@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
+  <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/pagination.js')}}"></script> -->
+  <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/search_users.js')}}"></script> -->
+  <script src="{{ url_for('static', filename='js/moderation/book/book_item.js')}}"></script>
+  <script>
+    // $('#list_res').off();
+    $('#list_res').on('click', function(event) {
+        let target = event.target;
+        if (target.tagName === 'A' && target.id.includes('book_d'))
+        {
+            let url_path = target.dataset?.url;
+            del_book_from_site(url_path);
+        }
+    });
+
+        function search_books_on_category() {
+            if (document.getElementById('search_res_id').value.trim() && document.getElementById('search_res_id').value.trim().length <= 200)
+            {
+            $.ajax({
+                method: 'post',
+                url: $('#category_book_search').attr('action'),
+                dataType: 'json',
+                data: $('#category_book_search').serialize(),
+                success: function (response) {
+                    books = Array.from(response);
+                    $('li').filter(function () {
+                        return this.id.match(/book_info/);
+                    }).remove();
+                    $('div').filter(function () {
+                        return this.id.match("nothing");
+                    }).remove();
+                    $('ul').filter(function () {
+                        return this.id.match('3pagination');
+                        }).remove();
+
+                    html = "";
+                    if (books[0].has_books)
+                    {
+                        books.forEach(book => {
+                            html += `<li class="list__book" id="${book.id}book_info">
+                                        
+                                        <a href="/book-page/${book.id}" class="list__book-set">
+                                        <img class="list__book-set" src="/${book.id}/get-cover" alt=""> 
+                                        </a>
+                                            
+                                        
+                                        <div class="list__book-wrap">`;
+                                        if (book.name.length > 10)
+                                        {
+                                        book.name = book.name.slice(0, 10) + "...";
+                                        }
+                                        if (book.author.length > 10)
+                                        {
+                                        book.author = book.author.slice(0, 10) + "...";
+                                        }
+                                        html += `<a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
+                                                <span class="list__link"><b>Автор:</b> ${book.author}</span>
+                                                <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
+                                                <a id='${book.id}book_d' class="list__book-delete-btn" data-url='/admin/${book.username}/del_book/${book.category}/${book.id}/${1}'>Удалить книгу</a>
+                                        </div>
+                                    </li>`;
+                        });
+                        ul = document.getElementById('list_res');
+                        ul.insertAdjacentHTML('beforeend', html);
+                        document.getElementById('search_res_id').value = "";
+
+                        // собираем пагинацию
+                        html = `<div class="list__pagination pagination" id="3pagination_container">
+                                    <ul class="pagination__list list-reset" id="3pagination">
+                                <li class="pagination__item disabled">&bull;</li>`;
+
+                        books[0].pages_count.forEach((page) => {
+                        if (page)
+                        {
+                            if (page == books[0].cur_page)
+                            {
+                            html += `<li class="pagination__item_cur_page">
+                                        <a id="${page}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${page}'>${page}</a>
+                                    </li>`;
+                            }
+                            else
+                            {
+                            
+                            html += `<li class="pagination__item active">
+                                        <a id="${page}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${page}'>${page}</a>
+                                        </li>`;
+                            }
+                        }
+                        else
+                        {
+                            html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
+                        }
+                        });
+
+                        html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
+                        div = document.getElementById('2cont');
+                        div.insertAdjacentHTML('beforeend', html);
+                    }
+                    else
+                    {
+                        html = `<div class="container list__container" id="nothing">
+                                    <div class="list__wrap">
+                                    <h2 class="list__title title">Ничего не найдено</h2>
+                                    </div>
+                                </div>`;
+                        ul = document.getElementById('list_res');
+                        ul.insertAdjacentHTML('beforeend', html);  
+                        document.getElementById('search_res_id').value = "";
+                    }
+                },
+                error: function(jqXHR, exception) {
+                    if (exception === 'parsererror')
+                    {
+                        window.location.href = '/auth/login';
+                    }
+                    else
+                    {
+                        console.log(exception);
+                    }
+                }
+            });
+            }
+            else if (document.getElementById('search_res_id').value.trim().length > 200)
+            {
+                alert('Слишком длинный ввод');
+            }
+            else
+            {
+                alert('Заполните поле');
+                document.getElementById('search_res_id').value = '';
+            }
+        }
+  </script>
+  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
+
+<style>
+.status__lamp__parent {
+    position: relative;
+}
+
+.status__lamp {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    border: 1px solid;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+</style>
+<style>
+#book_search_filters_form {
+    margin: 10px;
+    display: block;
+
+}
+#book_search_filters_form > div {
+    display: flex;
+    justify-content: space-between;
+
+}
+</style>
+</head>
+
+<body>
+</head>
+
+<body>
+  <div class="content">
+    <header class="header">
+      <div class="header__container container">
+        <a class="header__logo" href="{{url_for('main.index')}}">
+          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+            alt="Логотип MAGIC BOOK KEEPER">
+        </a>
+
+        <div class="header__admin admin">
+          <a href="{{url_for('personal.person', username=current_user.username)}}" class="admin__link">
+            <div class="admin__set">
+              <img src="{{url_for('personal.avatar', username=current_user.username)}}" alt="" class="admin__img">
+              <!--Фото админа из его личного кабинета-->
+            </div>
+            {{ current_user.username }} <!--Имя админа и ссылка обратно в личный кабинет-->
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="main">
+        <div class="main__container container">
+
+          <div class="main__top">
+
+            <h1 class="main__title">Hello, {{ current_user.username }} admin</h1>
+            <!--Hello, имя пользователя!-->
+
+            <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
+            </svg>
+
+          </div>
+
+          <nav class=" header__nav">
+            <ul class="nav__admin-list list-reset">
+              <li class="nav__admin-item">
+                <a id="users_list" class="nav__admin-link" data-info="users_search">Список пользователей</a>
+              </li>
+              <li class="nav__admin-item">
+                <a id="categories_list" class="nav__admin-link" data-info="book_categories">Список категорий книг</a>
+              </li>
+              <li class="nav__admin-item">
+                <a class="nav__admin-link">Настройки</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </section>
+
+      <section id="book_search">
+        <div class="container list__container" id="books_keeper_cont">
+          <div class="list__wrap" id="2cont">
+            <h2 class="list__title title" id="category_title">Модерация книг</h2>
+            <div class="list">
+              <form style="display:block;" id="book_search_filters_form" action="{{url_for('moderation.book_search')}}" method="post">
+                {{form.hidden_tag()}}
+                <div>
+                  <h2>Поиск по фильтрам</h2>
+                </div>
+                <div>
+                  <!-- TODO: keep filter values after request -->
+                  <span>Название книги:</span>
+                  {{ form.bookname(type="text") }}
+                </div>
+                <div>
+                  <span>Имя пользователя:</span>
+                  {{ form.username(type="text") }}
+                </div>
+                <div>
+                  <span>Категория:</span>
+                  {{ form.category() }}
+                </div>
+                <div>
+                  <span>Статус заявки:</span>
+                  {{ form.status() }}
+                </div>
+                <div>
+                  <!-- TODO: the button -->
+                  <input type="submit" value="Подтвердить">
+                </div>
+              </form>
+              <ul class="list-reset" id="moderation_books">
+                <li>
+                  <h2>Результаты поиска</h4>
+                </li>
+                {% if book_list|length > 0 %}
+                  {% for book in book_list %}
+                    <li class="item__list__container status__lamp__parent" id="book_{{ book.id }}">
+                      {# Book item header #}
+                      <a class="item__list__header book__btn" id="book_header_{{ book.id }}" href="javascript:bookItemDetailOpen('{{ book.id }}');">
+                        <div>
+                          <!-- <img src="/user/{{ book.name }}/edit-profile/edit-avatar" alt="" class="users__img">  -->
+                          <img class="moderation__book__img" src="/{{ book.id }}/get-cover" alt="">
+                        </div>
+                        <div class="item__list__detail">
+                          <div><b>Книга:</b><span>{{ book.name }}</span></div>
+                          <div><b>Пользователь: </b><span>{{ book.user.username }}</span></div>
+                          <div><b>Время загрузки: </b><span>{{ book.timestamp.strftime("%H:%M %d.%m.%Y") }}</span></div>
+                          <div><b>Статус заявки:</b><span>{{ book.moderation_request.status_str() }}</span></div>
+                          <div><b></b><i>v раскрыть v</i></div>
+                        </div>
+                      </a>
+                      {# Book item detailes #}
+                      <div class="item__list__detail" id="book_detail_{{ book.id }}", style="display: none;">
+                        {% if book.name %}
+                          <div><b>Название:</b> {{ book.name }}</div>
+                        {% endif %}
+                        {% if book.author %}
+                          <div><b>Автор:</b> {{ book.author }}</div>
+                        {% endif %}
+                        {% if book.description %}
+                          <div><b>Описание:</b> {{ book.description }}</div>
+                        {% endif %}
+                        {% if book.reference_url %}
+                          <div><b>Ссылка:</b><a href="{{ book.reference_url }}">{{ book.reference_url }}</a></div>
+                        {% endif %}
+                        {% if book.isbn %}
+                          <div><b>ISBN:</b> {{ book.isbn }}</div>
+                        {% endif %}
+                        {% if book.publishing_house %}
+                          <div><b>Издательство:</b> {{ book.publishing_house }}</div>
+                        {% endif %}
+                        {% if book.release_date %}
+                          <div><b>Дата выпуска:</b> {{ book.release_date }}</div>
+                        {% endif %}
+                        {% if book.count_of_chapters %}
+                          <div><b>Количество глав:</b> {{ book.count_of_chapters }}</div>
+                        {% endif %}
+                        {% if book.category.name %}
+                          <div><b>Категория:</b> {{ book.category.name }}</div>
+                        {% endif %}
+                      </div>
+                      {# Book item moderation stuff #}
+                      <form class="item__list__footer" id="status_form_{{ book.id }}">
+                        {{ status_form.hidden_tag() }}
+                        {{ status_form.book_id(type="hidden", value=book.id) }}
+                        {{ status_form._comment(placeholder="Комментарий... (Не больше 128 символов)", default=book.moderation_request.comment) }}
+                        {{ status_form.status(id="status_select_" ~ book.id) }}
+                        <input type="submit" value="Отправить">
+                      </form>
+                      <script type="text/javascript">
+                          setStatusOnSubmit("status_form_{{ book.id }}");
+                          setStatusSelectedValue("status_select_{{ book.id }}", {{ book.moderation_request.status }});
+                      </script>
+
+                      {# Display ModerationRequest.status as a colored indication in the top-right corner #}
+                      {% if book.moderation_request.status == book.moderation_request.STATUS_OPEN %}
+                        <div class="status__lamp" style="background-color: gray;"></div>
+                      {% elif book.moderation_request.status == book.moderation_request.STATUS_ACCEPTED %}
+                        <div class="status__lamp" style="background-color: MediumSeaGreen;"></div>
+                      {% else %}
+                        <div class="status__lamp" style="background-color: red;"></div>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                {% else %}
+                  <li>
+                    <span>Не найдено ни одной книги</span>
+                  </div>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <script>scroll('add_category')</script>
+    </main>
+  </div>
+  
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="#" class="footer__wrap">© MBK | Community Magic Book Keeper</a>
+    </div>
+  </footer>
+</body>
+</html>

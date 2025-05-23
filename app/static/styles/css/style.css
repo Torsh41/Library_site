@@ -9,6 +9,7 @@
 @import url(_form.css);
 @import url(_profile.css);
 @import url(_lists.css);
+@import url(_item_list.css);
 @import url(_book.css);
 @import url(_comments.css);
 @import url(admin.css);

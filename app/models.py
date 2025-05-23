@@ -8,10 +8,10 @@ from sqlalchemy_serializer import SerializerMixin
 
 
 class Role(database.Model, SerializerMixin):
-    USER = 0
-    ADMIN = 1
-    MODERATOR = 2
-    TEACHER = 3
+    USER = 1
+    ADMIN = 2
+    MODERATOR = 3
+    TEACHER = 4
     __tablename__ = "roles"
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.String(16), unique=True)
@@ -19,6 +19,9 @@ class Role(database.Model, SerializerMixin):
     def __repr__(self):
         return self.name
     
+    def get_name(self):
+        return self.name
+
     @staticmethod
     def by_id(role_id):
         """Get existing Role object from database.
@@ -265,9 +268,9 @@ class Item(database.Model, SerializerMixin):
 
 class ModerationRequest(database.Model, SerializerMixin):
     # enum of possible status values
-    STATUS_OPEN = 0
-    STATUS_ACCEPTED = 1
-    STATUS_REJECTED = 2
+    STATUS_OPEN = 1
+    STATUS_ACCEPTED = 2
+    STATUS_REJECTED = 3
 
     status_dict = {
         STATUS_OPEN: "Обрабатывается",
@@ -280,6 +283,7 @@ class ModerationRequest(database.Model, SerializerMixin):
     book = database.relationship('Book', backref='moderation_request', uselist=False, cascade="all, delete, delete-orphan")
     _status = database.Column(database.Integer, default=STATUS_OPEN)
     comment = database.Column(database.String(128), default="")
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
 
     @property
     def status(self):
@@ -291,6 +295,7 @@ class ModerationRequest(database.Model, SerializerMixin):
     @status.setter
     def status(self, status) -> bool:
         if status not in ModerationRequest.status_dict.keys():
+            raise ValueError(ModerationRequest.status_dict.keys())
             raise ValueError(f"ModerationRequest status={status} is not defined in app/models.py")
         self._status = status
         database.session.add(self)
