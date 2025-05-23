@@ -5,17 +5,6 @@ from functools import wraps
 from . import database
 
 
-def admin_required(func):
-    @wraps(func)
-    @login_required
-    def decorated_func(*args, **kwargs):
-        if current_user.role == Role.ADMIN:
-            return func(*args, **kwargs)
-        else:
-            abort(403)
-    return decorated_func
-
-
 def check_actual_password(func):
     @wraps(func)
     def decorated_func(*args, **kwargs):
@@ -27,6 +16,30 @@ def check_actual_password(func):
                 session.pop('password_hash', None)
                 return redirect(url_for('auth.login'))
         return func(*args, **kwargs)
+    return decorated_func
+
+
+def admin_required(func):
+    @wraps(func)
+    @login_required
+    @check_actual_password
+    def decorated_func(*args, **kwargs):
+        if current_user.role == Role.ADMIN:
+            return func(*args, **kwargs)
+        else:
+            abort(403)
+    return decorated_func
+
+
+def moderator_required(func):
+    @wraps(func)
+    @login_required
+    @check_actual_password
+    def decorated_func(*args, **kwargs):
+        if current_user.role == Role.ADMIN or current_user.role == Role.MODERATOR:
+            return func(*args, **kwargs)
+        else:
+            abort(403)
     return decorated_func
 
 
