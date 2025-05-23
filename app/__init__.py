@@ -20,17 +20,6 @@ migrate = Migrate(app, database)
 #manager = Manager(app)
 
 
-def init_roles():
-    from .models import Role
-    roles = Role.get_defined_roles()
-    for role in roles:
-        existing_role = database.session.execute(
-                database.select(Role).filter_by(name=role.name)
-        ).scalar_one_or_none()
-        if existing_role is None:
-            database.session.add(role)
-    database.session.commit()
-
 def create_app(config_name):
   app.config.from_object(config[config_name])
   config[config_name].init_app(app)
@@ -54,7 +43,6 @@ def create_app(config_name):
   database.init_app(app)
   with app.app_context():
     database.create_all()
-    init_roles()
       
   # здесь выполняется подключение маршрутов и
   # нестандартных страниц с сообщениями об ошибках

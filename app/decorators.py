@@ -24,7 +24,7 @@ def admin_required(func):
     @login_required
     @check_actual_password
     def decorated_func(*args, **kwargs):
-        if current_user.role == Role.ADMIN:
+        if current_user.role_id == Role.ADMIN:
             return func(*args, **kwargs)
         else:
             abort(403)
@@ -36,7 +36,7 @@ def moderator_required(func):
     @login_required
     @check_actual_password
     def decorated_func(*args, **kwargs):
-        if current_user.role == Role.ADMIN or current_user.role == Role.MODERATOR:
+        if current_user.role_id == Role.ADMIN or current_user.role_id == Role.MODERATOR:
             return func(*args, **kwargs)
         else:
             abort(403)
@@ -53,8 +53,8 @@ def book_passed_moderation(book: Book) -> bool:
     if book.moderation_request.status == ModerationRequest.STATUS_ACCEPTED:
         return True
     if (current_user.is_authenticated and
-        (current_user.role == Role.MODERATOR or
-         current_user.role == Role.ADMIN)):
+        (current_user.role_id == Role.MODERATOR or
+         current_user.role_id == Role.ADMIN)):
         return True
     return False
 

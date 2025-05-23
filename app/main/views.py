@@ -100,7 +100,7 @@ def get_comments_page(book_id, page):
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
     users = list()
-    user_is_admin = True if (current_user.is_authenticated and current_user.role == Role.ADMIN) else False
+    user_is_admin = True if (current_user.is_authenticated and current_user.role_id == Role.ADMIN) else False
     name_of_current_user = current_user.username if (current_user.is_authenticated) else None
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
@@ -150,7 +150,7 @@ def add_comment(username, book_id):
                            .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
-    user_is_admin = True if current_user.role == Role.ADMIN else False
+    user_is_admin = True if current_user.role_id == Role.ADMIN else False
     users = list()
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
@@ -424,7 +424,7 @@ def topic(topic_id):
     if topic is None:
         return abort(400)
     posts_page = request.args.get('posts_page', 1, type=int)
-    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+    if current_user.is_authenticated and current_user.role_id == Role.ADMIN:
         user_is_admin = 1
     else:
         user_is_admin = 0
@@ -519,7 +519,7 @@ def get_categories_page_on_forum(page):
 
     if current_user.is_authenticated:
         username_of_cur_user = current_user.username
-        if current_user.role == Role.ADMIN:
+        if current_user.role_id == Role.ADMIN:
             is_admin = True
         else:
             is_admin = False
@@ -553,7 +553,7 @@ def get_posts_page(topic_id, page):
     posts = list()
     if current_user.is_authenticated:
         username = current_user.username
-        if current_user.role == Role.ADMIN:
+        if current_user.role_id == Role.ADMIN:
             user_is_admin = True
         else:
             user_is_admin = False
@@ -753,7 +753,7 @@ def search_category_on_forum():
             categories_topics[category.id] = copy.deepcopy(category_topics)
 
         if current_user.is_authenticated:
-            if current_user.role == Role.ADMIN:
+            if current_user.role_id == Role.ADMIN:
                 is_admin = True
             else:
                 is_admin = False
@@ -805,7 +805,7 @@ def add_topic(username, category_id):
                              .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
         pages_count = list(topics_pagination.iter_pages())
         topics_for_cur_category_by_page = topics_pagination.items
-        if current_user.role == Role.ADMIN:
+        if current_user.role_id == Role.ADMIN:
             is_admin = True
         else:
             is_admin = False
@@ -826,7 +826,7 @@ def add_topic(username, category_id):
 
 @main.route('/get_topics_page_on_forum/<int:category_id>/<int:page>', methods=['GET'])
 def get_topics_page_on_forum(category_id, page):
-    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+    if current_user.is_authenticated and current_user.role_id == Role.ADMIN:
         is_admin = True
     else:
         is_admin = False
@@ -1265,7 +1265,7 @@ def private_chat(chat_id):
         return abort(403)
 
     participants_count = chat.invitations.count() + 1
-    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+    if current_user.is_authenticated and current_user.role_id == Role.ADMIN:
         user_is_admin = 1
     else:
         user_is_admin = 0
@@ -1354,7 +1354,7 @@ def get_posts_page_on_chat_disc(chat_id, page):
                         paginate(page, per_page=ELEMS_COUNT, error_out=False))
     pages_count = list(posts_pagination.iter_pages())
     username = current_user.username
-    if current_user.role == Role.ADMIN:
+    if current_user.role_id == Role.ADMIN:
         user_is_admin = True
     else:
         user_is_admin = False
@@ -1526,19 +1526,14 @@ def get_posts_page_on_chat_disc(chat_id, page):
 
 @main.route('/get_role_name/<int:role_id>', methods=['GET'])
 def get_role_name():
-    role = Role.by_id(role_id)
-    if role is None:
+    if role_id not in Role.role_dict.keys():
         return abort(500)
-    return role.name
+    return Role(role_id).name
 
 
 @main.route('/get_role_name_list', methods=['GET'])
 def get_role_name_list():
-    role_list = database.session.scalars(database.select(Role)).all()
-    ret = {}
-    for role in role_list:
-        ret[role.id] = role.name
-    return jsonify(ret)
+    return jsonify(Role.role_dict)
 
 
 @main.route('/forum/private_chat/<int:chat_id>/get_users_page_to_invite/<int:page>', methods=['GET'])

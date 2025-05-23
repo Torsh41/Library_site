@@ -139,7 +139,7 @@
               {% endif %}
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
-              {% if current_user.role == Role.ADMIN %}
+              {% if current_user.role_id == Role.ADMIN %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
                 <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
               {% endif %}
@@ -174,7 +174,7 @@
             <!--Пример: Средняя оценка - 4.5 из 5-->
           </div>
 
-          {% if current_user.role == Role.ADMIN %}
+          {% if current_user.role_id == Role.ADMIN %}
             <a class="main__form-btn btn" href="{{url_for('admin.change_book_info', username=current_user.username, book_id=book.id)}}">Редактировать данные о книге</a>
           {% endif %}
         </div>
@@ -384,7 +384,7 @@
                   {% if comment.user.username == current_user.username %}
                     <a id="{{comment.id}}edit_com_a" data-combody="{{ comment.body }}" data-username="{{current_user.username}}" data-bookid="{{book.id}}" data-comid="{{comment.id}}" class="comments__command">Редактировать</a>
                     <a class="comments__command" data-url="/{{current_user.username}}/{{book.id}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
-                  {% elif current_user.role == Role.ADMIN %}
+                  {% elif current_user.role_id == Role.ADMIN %}
                     <a class="comments__command">Админ</a>
                     <a class="comments__command" data-url="/{{current_user.username}}/{{book.id}}/delete-comment/{{comment.id}}/{{1}}" id="{{ comment.id }}del">Удалить</a>
                   {% endif %}

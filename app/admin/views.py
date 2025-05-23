@@ -227,12 +227,9 @@ def set_user_role(user_id, role_id):
     user = database.session.execute(
             database.select(User).filter_by(id=user_id)
     ).scalar_one_or_none()
-    role = database.session.execute(
-            database.select(Role).filter_by(id=role_id)
-    ).scalar_one_or_none()
-    if user is None or role is None:
+    if user is None or not Role(role_id).is_valid():
         return abort(400)
-    user.role = role.id
+    user.role_id = role_id
     database.session.add(user)
     database.session.commit()
     return "{}"

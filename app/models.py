@@ -7,38 +7,35 @@ from jose import jwt
 from sqlalchemy_serializer import SerializerMixin
 
 
-class Role(database.Model, SerializerMixin):
+class Role():
+    # enum of possible role values
     USER = 1
     ADMIN = 2
     MODERATOR = 3
     TEACHER = 4
-    __tablename__ = "roles"
-    id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(16), unique=True)
+
+    role_dict = {
+        USER: "Пользователь",
+        ADMIN: "Администратор",
+        MODERATOR: "Модератор",
+        TEACHER: "Преподаватель",
+    }
+
+    def __init__(self, role_id):
+        self._is_valid = False
+        if role_id in Role.role_dict.keys():
+            self._is_valid = True
+            self.role_id = role_id
+
+    @property
+    def name(self):
+        return Role.role_dict[self.role_id]
+
+    def is_valid(self):
+        return self.is_valid
 
     def __repr__(self):
         return self.name
-    
-    def get_name(self):
-        return self.name
-
-    @staticmethod
-    def by_id(role_id):
-        """Get existing Role object from database.
-        Example: Role.by_id(Role.ADMIN)
-        """
-        role = db.session.execute(
-            database.select(Role).filter_by(id=role_id)
-        ).scalar_one_or_none()
-        return role
-
-    @staticmethod
-    def get_defined_roles():
-        """Get a list of Role objects, to populate the Role table after creating it."""
-        return [Role(id=Role.USER, name="User"),
-                Role(id=Role.ADMIN, name="Admin"),
-                Role(id=Role.MODERATOR, name="Moderator"),
-                Role(id=Role.TEACHER, name="Teacher")]
 
 
 #отношение один ко многим
@@ -63,7 +60,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     posts_from_all_private_chats = database.relationship('PrivateChatPost', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")
     confirmed = database.Column(database.Boolean, default=False)
-    role = database.Column(database.Integer, database.ForeignKey('roles.id'))
+    role_id = database.Column(database.Integer, default=Role.USER)
     
     def generate_confirmation_token(self): #30 минут время действия токена
         now = datetime.now()
@@ -136,14 +133,24 @@ class User(UserMixin, database.Model, SerializerMixin):
                   "WARNING: To create Admin user, " +
                   "define an envirounment variable `MBK_ADMIN=['admin@email.com']`.")
         elif self.email in default_admins:
-            self.role = Role.ADMIN
+            self.role_id = Role.ADMIN
         else:
-            self.role = Role.USER
+            self.role_id = Role.USER
             
     def default_ava(self):
         # with app.open_resource(app.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
         with app.open_resource(app.root_path + '/static/styles/img/default_avatar.jpg', 'rb') as f:
             self.avatar = f.read()
+
+    @property
+    def role(self):
+        return Role(self.role_id).name
+
+    @role.setter
+    def role(self, role_id):
+        if not Role(role_id).is_valid():
+            raise ValueError(f"Role '{role}' is not defined in app/models.py")
+        self.role_id = role_id
             
             
 class Category(database.Model, SerializerMixin):
@@ -295,7 +302,6 @@ class ModerationRequest(database.Model, SerializerMixin):
     @status.setter
     def status(self, status) -> bool:
         if status not in ModerationRequest.status_dict.keys():
-            raise ValueError(ModerationRequest.status_dict.keys())
             raise ValueError(f"ModerationRequest status={status} is not defined in app/models.py")
         self._status = status
         database.session.add(self)
