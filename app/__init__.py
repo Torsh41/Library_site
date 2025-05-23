@@ -47,6 +47,8 @@ def create_app(config_name):
   app.register_blueprint(personal_blueprint, url_prefix='/user')
   from .admin import admin as admin_blueprint
   app.register_blueprint(admin_blueprint, url_prefix='/admin')
+  from .moderation import moderation as moderation_blueprint
+  app.register_blueprint(moderation_blueprint, url_prefix='/moderation')
   from . import errors
   
   database.init_app(app)
