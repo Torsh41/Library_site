@@ -38,11 +38,15 @@ function bookItemDetailClose(itemId) {
     document.getElementById("book_detail_" + itemId).style.display = "none";
 }
 
-$('#search_users_form').submit(function(event) {
-    search_users_on_forum();
-    event.preventDefault();
-});
-
-$('#get_users').click(function(event) {
-    search_users_on_forum();
+$("#item_pagination_container").off();
+$("#item_pagination_container").on("click", function(event) {
+    let target = event.target;
+    // check if an <a> tag was clicked
+    if (target.tagName === 'A' && target.id.includes("item_p")) {
+        var filters_form = document.getElementById("book_search_filters_form");
+        // get url for the next page, and replace form.action with it
+        filters_form.action = target.dataset?.url;
+        filters_form.submit();
+        console.log("Hallelujah");
+    }
 });

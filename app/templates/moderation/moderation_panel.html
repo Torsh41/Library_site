@@ -14,10 +14,10 @@
   <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/search_users.js')}}"></script> -->
   <script src="{{ url_for('static', filename='js/moderation/book/book_item.js')}}"></script>
   <script>
-    // $('#list_res').off();
-    $('#list_res').on('click', function(event) {
+    // $("#list_res").off();
+    $("#list_res").on("click", function(event) {
         let target = event.target;
-        if (target.tagName === 'A' && target.id.includes('book_d'))
+        if (target.tagName === 'A' && target.id.includes("book_d"))
         {
             let url_path = target.dataset?.url;
             del_book_from_site(url_path);
@@ -228,12 +228,12 @@
         </div>
       </section>
 
-      <section id="book_search">
+      <section class="list" id="book_search">
         <div class="container list__container" id="books_keeper_cont">
           <div class="list__wrap" id="2cont">
             <h2 class="list__title title" id="category_title">Модерация книг</h2>
-            <div class="list">
-              <form style="display:block;" id="book_search_filters_form" action="{{url_for('moderation.book_search')}}" method="post">
+            <div>
+                <form style="display:block;" id="book_search_filters_form" action="{{ url_for('moderation.book_search') }}" method="post">
                 {{form.hidden_tag()}}
                 <div>
                   <h2>Поиск по фильтрам</h2>
@@ -323,7 +323,6 @@
                           setStatusOnSubmit("status_form_{{ book.id }}");
                           setStatusSelectedValue("status_select_{{ book.id }}", {{ book.moderation_request.status }});
                       </script>
-
                       {# Display ModerationRequest.status as a colored indication in the top-right corner #}
                       {% if book.moderation_request.status == book.moderation_request.STATUS_OPEN %}
                         <div class="status__lamp" style="background-color: gray;"></div>
@@ -341,10 +340,30 @@
                 {% endif %}
               </ul>
             </div>
+            {# Pagination  #}
+            <div class="list__pagination pagination" id="item_pagination_container">
+              <ul class="pagination__list list-reset" id="1pagination">
+                <li class="pagination__item disabled">&bull;</li>
+                  {% for page in pagination.iter_pages() %}
+                    {% if page is not none %}
+                      {% if page == pagination.page %}
+                        <li class="pagination__item_cur_page">
+                      {% else %}
+                        <li class="pagination__item active">
+                      {% endif %}
+                          <a id="{{ page }}item_p" data-url="{{ url_for('moderation.book_search') }}/{{ page }}" data-pagid="1pagination">{{ page }}</a>
+                        </li>
+                    {% else %}
+                      <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                    {% endif %}
+                  {% endfor %}
+                <li class="pagination__item disabled">&bull;</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
-      <script>scroll('add_category')</script>
+      <script>scroll("add_category")</script>
     </main>
   </div>
   
