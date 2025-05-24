@@ -16,8 +16,9 @@ def admin_panel(username):
     form = AddCategoryForm()
     category_page = request.args.get('category_page', None, type=int)
     if not category_page:
-        category_pagination = (Category.query
-                               .paginate(1, per_page=RESULT_COUNT, error_out=False))
+        category_pagination = database.paginate(
+                Category.query,
+                page=1, per_page=RESULT_COUNT, error_out=False)
         categories = category_pagination.items
         return render_template(
             'admin/admin_panel.html',
@@ -32,8 +33,9 @@ def admin_panel(username):
             }
         )
     else:
-        category_pagination = (Category.query
-                               .paginate(category_page, per_page=RESULT_COUNT, error_out=False))
+        category_pagination = database.paginate(
+                Category.query,
+                page=category_page, per_page=RESULT_COUNT, error_out=False)
         categories = category_pagination.items
         return render_template(
             'admin/admin_panel.html',
@@ -65,9 +67,9 @@ def user_search(username):
         last_page = (len(users) - 1) // USERS_COUNT
         if len(users) % USERS_COUNT > 0:
             last_page += 1
-        user_pagination = (User.query
-                            .filter(User.username != current_user.username)
-                            .paginate(1, per_page=USERS_COUNT, error_out=False))
+        user_pagination = database.paginate(
+                User.query.filter(User.username != current_user.username),
+                page=1, per_page=USERS_COUNT, error_out=False)
         if user_pagination.items:
             users = user_pagination.items
             result = True
@@ -112,9 +114,9 @@ def user_search(username):
 @admin_required
 @check_actual_password
 def get_user_search_page(page):
-    user_pagination = (User.query
-                       .filter(User.username != current_user.username)
-                       .paginate(page, per_page=USERS_COUNT, error_out=False))
+    user_pagination = database.paginate(
+            User.query.filter(User.username != current_user.username),
+            page=page, per_page=USERS_COUNT, error_out=False)
     pages_count = list(user_pagination.iter_pages())
     users = user_pagination.items
     return jsonify([
@@ -136,8 +138,9 @@ def get_user_search_page(page):
 @admin_required
 @check_actual_password
 def get_category_search_page(username, page):
-    category_pagination = (Category.query
-                           .paginate(page, per_page=RESULT_COUNT, error_out=False))
+    category_pagination = database.paginate(
+            Category.query,
+            page=page, per_page=RESULT_COUNT, error_out=False)
     pages_count = list(category_pagination.iter_pages())
     categories = category_pagination.items
     return jsonify([
@@ -172,8 +175,9 @@ def add_category(username):
             category_page=last_page
         ))
     category_page = request.args.get('category_page', 1, type=int)
-    category_pagination = (Category.query
-                           .paginate(category_page, per_page=RESULT_COUNT, error_out=False))
+    category_pagination = database.paginate(
+            Category.query,
+            page=category_page, per_page=RESULT_COUNT, error_out=False)
     categories = category_pagination.items
     return render_template(
         'admin/admin_panel.html',
@@ -203,9 +207,9 @@ def user_delete(user_id, page):
     database.session.commit()
     if User.query.filter(User.id != current_user.id).all():
         has_elems = True
-        user_pagination = (User.query
-                           .filter(User.id != current_user.id)
-                           .paginate(page, per_page=USERS_COUNT, error_out=False))
+        user_pagination = database.paginate(
+                User.query.filter(User.id != current_user.id),
+                page=page, per_page=USERS_COUNT, error_out=False)
         pages_count = list(user_pagination.iter_pages())
         if not user_pagination.items:
             page -= 1
@@ -246,7 +250,9 @@ def category_delete(username, category_id, page):
     database.session.commit()
     if Category.query.all():
         has_elems = True
-        category_pagination = Category.query.paginate(page, per_page=RESULT_COUNT, error_out=False)
+        category_pagination = database.paginate(
+                Category.query,
+                page=page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(category_pagination.iter_pages())
         if not category_pagination.items:
             page = page - 1
@@ -337,10 +343,10 @@ def search_books_on_admin_panel(username, category_id):
             return jsonify([dict(has_books=False)])
 
     elif page := request.args.get('page', None, type=int):
-        cur_result_pagination = (SearchResult.query
-                                 .filter_by(searcher_id=current_user.id)
-                                 .order_by(SearchResult.id)
-                                 .paginate(page, per_page=RESULT_COUNT, error_out=False))
+        cur_result_pagination = database.paginate(
+                (SearchResult.query.filter_by(searcher_id=current_user.id)
+                                   .order_by(SearchResult.id)),
+                page=page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(cur_result_pagination.iter_pages())
         cur_result = cur_result_pagination.items
         if cur_result:
@@ -378,7 +384,9 @@ def del_book(username, category_id, book_id, page):
     database.session.commit()
     if SearchResult.query.filter_by(searcher_id=current_user.id).all():
         has_elems = True
-        books_result_pagination = SearchResult.query.filter_by(searcher_id=current_user.id).paginate(page, per_page=RESULT_COUNT, error_out=False)
+        books_result_pagination = database.paginate(
+                SearchResult.query.filter_by(searcher_id=current_user.id),
+                page=page, per_page=RESULT_COUNT, error_out=False)
         pages_count = list(books_result_pagination.iter_pages())
         if not books_result_pagination.items:
             page = page - 1
@@ -404,7 +412,9 @@ def change_book_info(username, book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
         return abort(400)
-    pagination = Category.query.paginate(1, per_page=CATEGORIES_COUNT, error_out=False)
+    pagination = database.paginate(
+            Category.query,
+            page=1, per_page=CATEGORIES_COUNT, error_out=False)
     categories = pagination.items
     form = ChangeBookInfoForm(book=book)
     if form.validate_on_submit():
