@@ -62,20 +62,15 @@ $(function() {
                                 </div>
               
                                 <div class="message__name-info" id="${post.id}user_info">
-                                  <p class="message__info">  
-                                  <span class="message__span">
-                                    ${post.age}
-                                  </span>
-                                  <span class="message__span">
-                                    ${post.gender}
-                                  </span>
-                                  <span class="message__span">
-                                    ${post.city}
-                                  </span>
-                                  <span class="message__span">
-                                    ${post.about_me}
-                                  </span>
-                                  </p>
+                                  <p class="message__info">`;
+                    for (field of [post.age, post.gender, post.city, post.about_me]) {
+                        if (field !== null) {
+                            html += `<span class="message__span">
+                               ${field}
+                             </span>`;
+                        }
+                    }
+                    html += `</p>
                                   <span class="message__span">На сайте с ${post.user_day + " " + post.user_month +
                                   " " + post.user_year}</span>`;
                                   if (post.edited)
