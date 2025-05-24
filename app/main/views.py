@@ -63,9 +63,9 @@ def book_page(book_id):
         return abort(400)
     if not book_passed_moderation(book):
         return abort(403)
-    pagination = (book.comments
-                        .order_by(Comment.timestamp.asc())
-                        .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    pagination = database.paginate(
+            book.comments.order_by(Comment.timestamp.asc()),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     comments = pagination.items
     grades = book.grades.all()
     try:
@@ -94,9 +94,9 @@ def get_comments_page(book_id, page):
         return abort(400)
     if not book_passed_moderation(book):
         return abort(403)
-    comments_pagination = (book.comments
-                           .order_by(Comment.timestamp.asc())
-                           .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    comments_pagination = database.paginate(
+            book.comments.order_by(Comment.timestamp.asc()),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
     users = list()
@@ -145,9 +145,9 @@ def add_comment(username, book_id):
     id_of_added_comment = comments[-1].id
     if len(comments) % ELEMS_COUNT > 0:
         last_page += 1
-    comments_pagination = (book.comments
-                           .order_by(Comment.timestamp.asc())
-                           .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
+    comments_pagination = database.paginate(
+            book.comments.order_by(Comment.timestamp.asc()),
+            page=last_page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
     user_is_admin = True if current_user.role_id == Role.ADMIN else False
@@ -239,9 +239,9 @@ def comment_delete(username, book_id, comment_id, page):
     database.session.commit()
     if book.comments.all():
         has_elems = True
-        comments_pagination = (book.comments
-                               .order_by(Comment.timestamp.asc())
-                               .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+        comments_pagination = database.paginate(
+                book.comments.order_by(Comment.timestamp.asc()),
+                page=page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(comments_pagination.iter_pages())
         if not comments_pagination.items:
             page -= 1
@@ -258,9 +258,9 @@ def comment_delete(username, book_id, comment_id, page):
 @main.route('/categories', methods=['GET'])
 def categories():
     list_id = request.args.get('list_id', None, type=int)
-    category_pagination = (Category.query
-                           .order_by()
-                           .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    category_pagination = database.paginate(
+            Category.query.order_by(),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     categories = category_pagination.items
     return render_template(
         'main/categories.html',
@@ -272,9 +272,9 @@ def categories():
 
 @main.route('/get_categories_page/<int:page>', methods=['GET'])
 def get_categories_page(page):
-    categories_pagination = (Category.query
-                             .order_by()
-                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    categories_pagination = database.paginate(
+            Category.query.order_by(),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
     return jsonify([
@@ -398,15 +398,16 @@ def search_by_category(id):
 
 @main.route('/forum')
 def forum():
-    category_pagination = (Category.query
-                           .order_by()
-                           .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    category_pagination = database.paginate(
+            Category.query.order_by(),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     categories = category_pagination.items
     pagination_for_topics_foreach_category = list()
     for category in categories:
-        pagination_for_topics_foreach_category.append(category.topics
-                            .order_by()
-                            .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+        pagination_for_topics_foreach_category.append(
+                database.paginate(
+                    category.topics.order_by(),
+                    page=1, per_page=ELEMS_COUNT, error_out=False))
     return render_template(
         'main/forum.html',
         pagination_for_topics_foreach_category=pagination_for_topics_foreach_category,
@@ -428,9 +429,9 @@ def topic(topic_id):
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = (topic.posts
-                        .order_by(TopicPost.id)
-                        .paginate(posts_page, per_page=ELEMS_COUNT, error_out=False))
+    posts_pagination = database.paginate(
+            topic.posts.order_by(TopicPost.id),
+            page=posts_page, per_page=ELEMS_COUNT, error_out=False)
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
@@ -499,16 +500,16 @@ def topic(topic_id):
 
 @main.route('/get_categories_page_on_forum/<int:page>', methods=['GET'])
 def get_categories_page_on_forum(page):
-    categories_pagination = (Category.query
-                             .order_by()
-                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    categories_pagination = database.paginate(
+            Category.query.order_by(),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
     categories_topics = dict()
     for category in categories:
-        topics_pagination = (category.topics
-                             .order_by()
-                             .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+        topics_pagination = database.paginate(
+                category.topics.order_by(),
+                page=1, per_page=ELEMS_COUNT, error_out=False)
         category_topics = [dict(
             id=topic.id,
             name=topic.name,
@@ -546,9 +547,9 @@ def get_posts_page(topic_id, page):
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
     if topic is None:
         return abort(400)
-    posts_pagination = (topic.posts
-                        .order_by(TopicPost.id)
-                        .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    posts_pagination = database.paginate(
+            topic.posts.order_by(TopicPost.id),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     posts = list()
     if current_user.is_authenticated:
@@ -734,16 +735,18 @@ def search_category_on_forum():
         page = 1
         cur_page_items = list()
         while True:
-            cur_page_items = (Category.query
-                              .order_by()
-                              .paginate(page, per_page=ELEMS_COUNT, error_out=False)).items
+            cur_page_items = database.paginate(
+                    Category.query.order_by(),
+                    page=page, per_page=ELEMS_COUNT, error_out=False).items
             if found_category in cur_page_items:
                 break
             page += 1
 
         categories_topics = dict()
         for category in cur_page_items:
-            topics_pagination = category.topics.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
+            topics_pagination = database.paginate(
+                    category.topics.order_by(),
+                    page=1, per_page=ELEMS_COUNT, error_out=False)
             category_topics = [dict(
                 id=topic.id,
                 name=topic.name,
@@ -800,9 +803,9 @@ def add_topic(username, category_id):
         if len(topics_for_cur_category) % ELEMS_COUNT > 0:
             last_page += 1
             
-        topics_pagination = (cur_category.topics
-                             .order_by()
-                             .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
+        topics_pagination = database.paginate(
+                cur_category.topics.order_by(),
+                page=last_page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(topics_pagination.iter_pages())
         topics_for_cur_category_by_page = topics_pagination.items
         if current_user.role_id == Role.ADMIN:
@@ -833,9 +836,9 @@ def get_topics_page_on_forum(category_id, page):
     category = Category.query.filter_by(id=category_id).first()
     if category is None:
         return abort(400)
-    topics_pagination = (category.topics
-                         .order_by()
-                         .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    topics_pagination = database.paginate(
+            category.topics.order_by(),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(topics_pagination.iter_pages())
     topics = topics_pagination.items
     return jsonify([
@@ -863,9 +866,9 @@ def topic_delete(category_id, topic_id, page):
 
     if topics := category.topics.all():
         has_elems = True
-        topics_pagination = (category.topics
-                             .order_by()
-                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+        topics_pagination = database.paginate(
+                category.topics.order_by(),
+                page=page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(topics_pagination.iter_pages())
         if not topics_pagination.items:
             page -= 1
@@ -885,9 +888,9 @@ def topic_delete(category_id, topic_id, page):
 @admin_required
 @check_actual_password
 def books_relevance():
-    pagination = (BooksMaintaining.query
-                  .order_by()
-                  .paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    pagination = database.paginate(
+            BooksMaintaining.query.order_by(),
+            page=1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     return render_template(
         'main/books_maintaining.html',
         info=pagination.items,
@@ -932,9 +935,9 @@ def add_new_books_info():
     if data_len % BOOKS_MAINTAINING_PER_PAGE > 0:
         pages += 1
     # pages - она же последняя страница
-    data_pagination = (BooksMaintaining.query
-                       .order_by()
-                       .paginate(pages, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    data_pagination = database.paginate(
+            BooksMaintaining.query.order_by(),
+            page=pages, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     pages_count_arr = list(data_pagination.iter_pages())
     data = data_pagination.items
     
@@ -982,8 +985,9 @@ def search_book():
     if not book:
         return jsonify([dict(result=False)])
     
-    pagination = (BooksMaintaining.query
-                  .paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    pagination = database.paginate(
+            BooksMaintaining.query,
+            page=1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     if book in pagination.items:
         pages_count_arr = list(pagination.iter_pages())
         return jsonify([
@@ -1008,8 +1012,9 @@ def search_book():
             ) for book_info in pagination.items
         ])
     for page in range(2, pagination.pages + 1):  
-        items_pagination = (BooksMaintaining.query
-                            .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+        items_pagination = database.paginate(
+                BooksMaintaining.query,
+                page=page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
         items = items_pagination.items
         if book in items:
             pages_count_arr = list(items_pagination.iter_pages())
@@ -1040,9 +1045,9 @@ def search_book():
 @admin_required
 @check_actual_password
 def get_books_info_page(page):
-    data_pagination = (BooksMaintaining.query
-                       .order_by()
-                       .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    data_pagination = database.paginate(
+            BooksMaintaining.query.order_by(),
+            page=page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     pages_count_arr = list(data_pagination.iter_pages())
     data = data_pagination.items
     return jsonify([
@@ -1089,9 +1094,9 @@ def book_del():
         
         # получаем данные для перестройки пагинации
         if BooksMaintaining.query.all():
-            data_pagination = (BooksMaintaining.query
-                               .order_by()
-                               .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+            data_pagination = database.paginate(
+                    BooksMaintaining.query.order_by(),
+                    page=page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
             pages_count_arr = list(data_pagination.iter_pages())
             if not data_pagination.items:
                 page -= 1
@@ -1269,9 +1274,9 @@ def private_chat(chat_id):
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = (chat.posts
-                        .order_by(PrivateChatPost.id)
-                        .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    posts_pagination = database.paginate(
+            chat.posts.order_by(PrivateChatPost.id),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
@@ -1349,9 +1354,9 @@ def get_posts_page_on_chat_disc(chat_id, page):
     if chat is None:
         return abort(400)
     posts = list()
-    posts_pagination = (chat.posts
-                        .order_by(PrivateChatPost.id).
-                        paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    posts_pagination = database.paginate(
+            chat.posts.order_by(PrivateChatPost.id),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     username = current_user.username
     if current_user.role_id == Role.ADMIN:
@@ -1544,11 +1549,11 @@ def get_users_page_to_invite(chat_id, page):
     if chat is None:
         return abort(400)
     invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
-    users_pagination = (User.query
-                        .filter(User.id != current_user.id)
-                        .filter(User.id != chat.creator.id)
-                        .filter(~User.id.in_(invited_users_id_to_cur_chat))
-                        .paginate(page, per_page=USERS_COUNT, error_out=False))
+    users_pagination = database.paginate(
+            (User.query.filter(User.id != current_user.id)
+                       .filter(User.id != chat.creator.id)
+                       .filter(~User.id.in_(invited_users_id_to_cur_chat))),
+            page=page, per_page=USERS_COUNT, error_out=False)
     if not users_pagination.items:
         return jsonify([dict(result=False)])
     pages_count = list(users_pagination.iter_pages())
