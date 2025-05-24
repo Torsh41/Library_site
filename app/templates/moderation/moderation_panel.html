@@ -195,6 +195,7 @@ function setStatusLampColor(lampId, status) {
                         {% if book.category.name %}
                           <div><b>Категория:</b><span>{{ book.category.name }}</span></div>
                         {% endif %}
+                        <div><b></b><a class="item__button" href="/admin/{{ current_user.username }}/change_book_info/{{ book.id }}">Изменить значения</a></div>
                       </div>
                       {# Book item moderation stuff #}
                       <form class="item__list__footer" id="status_form_{{ book.id }}">
