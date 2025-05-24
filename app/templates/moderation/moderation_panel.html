@@ -169,31 +169,31 @@ function setStatusLampColor(lampId, status) {
                       {# Book item detailes #}
                       <div class="item__list__detail" id="book_detail_{{ book.id }}", style="display: none;">
                         {% if book.name %}
-                          <div><b>Название:</b> {{ book.name }}</div>
+                          <div><b>Название:</b><span>{{ book.name }}</span></div>
                         {% endif %}
                         {% if book.author %}
-                          <div><b>Автор:</b> {{ book.author }}</div>
+                          <div><b>Автор:</b><span>{{ book.author }}</span></div>
                         {% endif %}
                         {% if book.description %}
-                          <div><b>Описание:</b> {{ book.description }}</div>
+                          <div><b>Описание:</b><span>{{ book.description }}</span></div>
                         {% endif %}
                         {% if book.reference_url %}
                           <div><b>Ссылка:</b><a href="{{ book.reference_url }}">{{ book.reference_url }}</a></div>
                         {% endif %}
                         {% if book.isbn %}
-                          <div><b>ISBN:</b> {{ book.isbn }}</div>
+                          <div><b>ISBN:</b><span>{{ book.isbn }}</span></div>
                         {% endif %}
                         {% if book.publishing_house %}
-                          <div><b>Издательство:</b> {{ book.publishing_house }}</div>
+                          <div><b>Издательство:</b><span>{{ book.publishing_house }}</span></div>
                         {% endif %}
                         {% if book.release_date %}
-                          <div><b>Дата выпуска:</b> {{ book.release_date }}</div>
+                          <div><b>Дата выпуска:</b><span>{{ book.release_date }}</span></div>
                         {% endif %}
                         {% if book.count_of_chapters %}
-                          <div><b>Количество глав:</b> {{ book.count_of_chapters }}</div>
+                          <div><b>Количество глав:</b><span>{{ book.count_of_chapters }}</span></div>
                         {% endif %}
                         {% if book.category.name %}
-                          <div><b>Категория:</b> {{ book.category.name }}</div>
+                          <div><b>Категория:</b><span>{{ book.category.name }}</span></div>
                         {% endif %}
                       </div>
                       {# Book item moderation stuff #}
