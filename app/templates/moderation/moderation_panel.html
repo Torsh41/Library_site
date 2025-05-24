@@ -14,133 +14,18 @@
   <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/search_users.js')}}"></script> -->
   <script src="{{ url_for('static', filename='js/moderation/book/book_item.js')}}"></script>
   <script>
-    // $('#list_res').off();
-    $('#list_res').on('click', function(event) {
-        let target = event.target;
-        if (target.tagName === 'A' && target.id.includes('book_d'))
-        {
-            let url_path = target.dataset?.url;
-            del_book_from_site(url_path);
-        }
-    });
-
-        function search_books_on_category() {
-            if (document.getElementById('search_res_id').value.trim() && document.getElementById('search_res_id').value.trim().length <= 200)
-            {
-            $.ajax({
-                method: 'post',
-                url: $('#category_book_search').attr('action'),
-                dataType: 'json',
-                data: $('#category_book_search').serialize(),
-                success: function (response) {
-                    books = Array.from(response);
-                    $('li').filter(function () {
-                        return this.id.match(/book_info/);
-                    }).remove();
-                    $('div').filter(function () {
-                        return this.id.match("nothing");
-                    }).remove();
-                    $('ul').filter(function () {
-                        return this.id.match('3pagination');
-                        }).remove();
-
-                    html = "";
-                    if (books[0].has_books)
-                    {
-                        books.forEach(book => {
-                            html += `<li class="list__book" id="${book.id}book_info">
-                                        
-                                        <a href="/book-page/${book.id}" class="list__book-set">
-                                        <img class="list__book-set" src="/${book.id}/get-cover" alt=""> 
-                                        </a>
-                                            
-                                        
-                                        <div class="list__book-wrap">`;
-                                        if (book.name.length > 10)
-                                        {
-                                        book.name = book.name.slice(0, 10) + "...";
-                                        }
-                                        if (book.author.length > 10)
-                                        {
-                                        book.author = book.author.slice(0, 10) + "...";
-                                        }
-                                        html += `<a href="/book-page/${book.id}" class="list__link-book"><u>Книга:</u> ${book.name}</a>
-                                                <span class="list__link"><b>Автор:</b> ${book.author}</span>
-                                                <span class="list__mark-visible"><b>Оценка:</b> ${book.grade}</span>
-                                                <a id='${book.id}book_d' class="list__book-delete-btn" data-url='/admin/${book.username}/del_book/${book.category}/${book.id}/${1}'>Удалить книгу</a>
-                                        </div>
-                                    </li>`;
-                        });
-                        ul = document.getElementById('list_res');
-                        ul.insertAdjacentHTML('beforeend', html);
-                        document.getElementById('search_res_id').value = "";
-
-                        // собираем пагинацию
-                        html = `<div class="list__pagination pagination" id="3pagination_container">
-                                    <ul class="pagination__list list-reset" id="3pagination">
-                                <li class="pagination__item disabled">&bull;</li>`;
-
-                        books[0].pages_count.forEach((page) => {
-                        if (page)
-                        {
-                            if (page == books[0].cur_page)
-                            {
-                            html += `<li class="pagination__item_cur_page">
-                                        <a id="${page}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${page}'>${page}</a>
-                                    </li>`;
-                            }
-                            else
-                            {
-                            
-                            html += `<li class="pagination__item active">
-                                        <a id="${page}get_books_p" data-url='/admin/${books[0].username}/search_books_on_admin_panel/${books[0].category}?page=${page}'>${page}</a>
-                                        </li>`;
-                            }
-                        }
-                        else
-                        {
-                            html += `<li class="pagination__item disabled"><a href="#">&hellip;</a></li>`;
-                        }
-                        });
-
-                        html += `<li class="pagination__item disabled">&bull;</li></ul></div>`;
-                        div = document.getElementById('2cont');
-                        div.insertAdjacentHTML('beforeend', html);
-                    }
-                    else
-                    {
-                        html = `<div class="container list__container" id="nothing">
-                                    <div class="list__wrap">
-                                    <h2 class="list__title title">Ничего не найдено</h2>
-                                    </div>
-                                </div>`;
-                        ul = document.getElementById('list_res');
-                        ul.insertAdjacentHTML('beforeend', html);  
-                        document.getElementById('search_res_id').value = "";
-                    }
-                },
-                error: function(jqXHR, exception) {
-                    if (exception === 'parsererror')
-                    {
-                        window.location.href = '/auth/login';
-                    }
-                    else
-                    {
-                        console.log(exception);
-                    }
-                }
-            });
-            }
-            else if (document.getElementById('search_res_id').value.trim().length > 200)
-            {
-                alert('Слишком длинный ввод');
-            }
-            else
-            {
-                alert('Заполните поле');
-                document.getElementById('search_res_id').value = '';
-            }
-        }
+function setStatusLampColor(lampId, status) {
+    statusLamp = document.getElementById(lampId);
+    if (status == {{ ModerationRequest.STATUS_OPEN }}) {
+        statusLamp.style["background-color"] = "gray";
+    } else if (status == {{ ModerationRequest.STATUS_ACCEPTED }}) {
+        statusLamp.style["background-color"] = "MediumSeaGreen";
+    } else if (status == {{ ModerationRequest.STATUS_REJECTED }}) {
+        statusLamp.style["background-color"] = "red";
+    } else {
+        console.log("Error: unexpected ModerationRequest.status value: " + status);
+    }
+}
   </script>
   <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
 
@@ -228,12 +113,12 @@
         </div>
       </section>
 
-      <section id="book_search">
+      <section class="list" id="book_search">
         <div class="container list__container" id="books_keeper_cont">
           <div class="list__wrap" id="2cont">
             <h2 class="list__title title" id="category_title">Модерация книг</h2>
-            <div class="list">
-              <form style="display:block;" id="book_search_filters_form" action="{{url_for('moderation.book_search')}}" method="post">
+            <div>
+                <form style="display:block;" id="book_search_filters_form" action="{{ url_for('moderation.book_search') }}" method="post">
                 {{form.hidden_tag()}}
                 <div>
                   <h2>Поиск по фильтрам</h2>
@@ -277,39 +162,40 @@
                           <div><b>Книга:</b><span>{{ book.name }}</span></div>
                           <div><b>Пользователь: </b><span>{{ book.user.username }}</span></div>
                           <div><b>Время загрузки: </b><span>{{ book.timestamp.strftime("%H:%M %d.%m.%Y") }}</span></div>
-                          <div><b>Статус заявки:</b><span>{{ book.moderation_request.status_str() }}</span></div>
+                          <div><b>Статус заявки:</b><span id="item_header_status_{{ book.id }}">{{ book.moderation_request.status_str() }}</span></div>
                           <div><b></b><i>v раскрыть v</i></div>
                         </div>
                       </a>
                       {# Book item detailes #}
                       <div class="item__list__detail" id="book_detail_{{ book.id }}", style="display: none;">
                         {% if book.name %}
-                          <div><b>Название:</b> {{ book.name }}</div>
+                          <div><b>Название:</b><span>{{ book.name }}</span></div>
                         {% endif %}
                         {% if book.author %}
-                          <div><b>Автор:</b> {{ book.author }}</div>
+                          <div><b>Автор:</b><span>{{ book.author }}</span></div>
                         {% endif %}
                         {% if book.description %}
-                          <div><b>Описание:</b> {{ book.description }}</div>
+                          <div><b>Описание:</b><span>{{ book.description }}</span></div>
                         {% endif %}
                         {% if book.reference_url %}
                           <div><b>Ссылка:</b><a href="{{ book.reference_url }}">{{ book.reference_url }}</a></div>
                         {% endif %}
                         {% if book.isbn %}
-                          <div><b>ISBN:</b> {{ book.isbn }}</div>
+                          <div><b>ISBN:</b><span>{{ book.isbn }}</span></div>
                         {% endif %}
                         {% if book.publishing_house %}
-                          <div><b>Издательство:</b> {{ book.publishing_house }}</div>
+                          <div><b>Издательство:</b><span>{{ book.publishing_house }}</span></div>
                         {% endif %}
                         {% if book.release_date %}
-                          <div><b>Дата выпуска:</b> {{ book.release_date }}</div>
+                          <div><b>Дата выпуска:</b><span>{{ book.release_date }}</span></div>
                         {% endif %}
                         {% if book.count_of_chapters %}
-                          <div><b>Количество глав:</b> {{ book.count_of_chapters }}</div>
+                          <div><b>Количество глав:</b><span>{{ book.count_of_chapters }}</span></div>
                         {% endif %}
                         {% if book.category.name %}
-                          <div><b>Категория:</b> {{ book.category.name }}</div>
+                          <div><b>Категория:</b><span>{{ book.category.name }}</span></div>
                         {% endif %}
+                        <div><b></b><a class="item__button" href="/admin/{{ current_user.username }}/change_book_info/{{ book.id }}">Изменить значения</a></div>
                       </div>
                       {# Book item moderation stuff #}
                       <form class="item__list__footer" id="status_form_{{ book.id }}">
@@ -320,18 +206,12 @@
                         <input type="submit" value="Отправить">
                       </form>
                       <script type="text/javascript">
-                          setStatusOnSubmit("status_form_{{ book.id }}");
+                          setStatusOnSubmit("{{ book.id }}");
                           setStatusSelectedValue("status_select_{{ book.id }}", {{ book.moderation_request.status }});
                       </script>
-
                       {# Display ModerationRequest.status as a colored indication in the top-right corner #}
-                      {% if book.moderation_request.status == book.moderation_request.STATUS_OPEN %}
-                        <div class="status__lamp" style="background-color: gray;"></div>
-                      {% elif book.moderation_request.status == book.moderation_request.STATUS_ACCEPTED %}
-                        <div class="status__lamp" style="background-color: MediumSeaGreen;"></div>
-                      {% else %}
-                        <div class="status__lamp" style="background-color: red;"></div>
-                      {% endif %}
+                      <div class="status__lamp" id="lamp_{{ book.id }}" style="background-color: gray;"></div>
+                      <script>setStatusLampColor("lamp_{{ book.id }}", {{ book.moderation_request.status }});</script>
                     </li>
                   {% endfor %}
                 {% else %}
@@ -341,10 +221,30 @@
                 {% endif %}
               </ul>
             </div>
+            {# Pagination  #}
+            <div class="list__pagination pagination" id="item_pagination_container">
+              <ul class="pagination__list list-reset" id="1pagination">
+                <li class="pagination__item disabled">&bull;</li>
+                  {% for page in pagination.iter_pages() %}
+                    {% if page is not none %}
+                      {% if page == pagination.page %}
+                        <li class="pagination__item_cur_page">
+                      {% else %}
+                        <li class="pagination__item active">
+                      {% endif %}
+                          <a id="{{ page }}item_p" data-url="{{ url_for('moderation.book_search') }}/{{ page }}" data-pagid="1pagination">{{ page }}</a>
+                        </li>
+                    {% else %}
+                      <li class="pagination__item disabled"><a href="#">&hellip;</a></li>
+                    {% endif %}
+                  {% endfor %}
+                <li class="pagination__item disabled">&bull;</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
-      <script>scroll('add_category')</script>
+      <script>scroll("add_category")</script>
     </main>
   </div>
   
