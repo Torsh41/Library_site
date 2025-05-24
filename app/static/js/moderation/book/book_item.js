@@ -7,9 +7,9 @@ function setStatusSelectedValue(selectId, moderation_status) {
     }
 }
 
-function setStatusOnSubmit(formId) {
+function setStatusOnSubmit(bookId) {
     const uri = "/moderation/book/set_moderation_status";
-    const form = document.getElementById(formId);
+    const form = document.getElementById("status_form_" + bookId);
     console.log(form);
     form.addEventListener("submit", e => {
         e.preventDefault();
@@ -17,14 +17,21 @@ function setStatusOnSubmit(formId) {
             method: 'post',
             body: new FormData(e.target)
         }).then(response => {
-            console.log(response);
-            if (response.ok) {
+            if (!response.ok) {
+                throw new Error(`Something wrong with request to '${uri}'. Status code: ${response.status}.`);
             }
-            return response.json;
+            return response.json();
         }).then(data => {
-              console.log(data);
-              // Handle response here.
-          });
+            console.log(data);
+            if (data.result == true) {
+                // Update status
+                setStatusLampColor("lamp_" + bookId, data.status_id);
+                const statusSpan = document.getElementById("item_header_status_" + bookId);
+                statusSpan.textContent = data.status_name;
+            }
+        }).catch(error => {
+            console.log(error);
+        });
     });
 }
 

@@ -45,7 +45,8 @@ def book_search_pagination(page):
         book_list=book_list,
         pagination=pagintaion,
         form=form,
-        status_form=SetModerationStatusForm()
+        status_form=SetModerationStatusForm(),
+        ModerationRequest=ModerationRequest
     )
 
 
@@ -74,7 +75,11 @@ def set_moderation_status():
         book.moderation_request.timestamp = datetime.now()
         database.session.add(book.moderation_request)
         database.session.commit()
-        return jsonify({"result": True}), 200
+        return jsonify({
+            "result": True,
+            "status_id": int(form.status.data),
+            "status_name": ModerationRequest.status_dict[int(form.status.data)]
+            }), 200
     return jsonify({
         "result": False,
         "errors": form.errors
