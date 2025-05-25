@@ -17,52 +17,9 @@
 
 <body>
   <div class="content">
-    <header class="header">
-      <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
-  
-        <div class="header__right">
-          <span class="header__menu">Меню</span>
-          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-            <span class="hamburger__box">
-              <span class="hamburger__inner"></span>
-            </span>
-          </button>
-        </div>
-  
-        <nav class="nav header__nav">
-          <div class="nav__menu js-menu-wrap">
-            <ul class="nav__list list-reset">
-              {% if current_user.is_anonymous %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
-              {% endif %}
-  
-              {% if current_user.is_authenticated %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              {% else %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
-              {% endif %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
-              {% if current_user.role_id == Role.ADMIN %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
-                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
-              {% endif %}
-              {% if current_user.is_authenticated %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
-              {% endif %}
-            </ul>
-          </div>
-  
-        </nav>
-      </div>
-    </header>
+    {% include "common/header.html" %}
   
     <main>
-  
       <section class="main">
         <div class="main__container container">
   

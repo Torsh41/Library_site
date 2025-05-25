@@ -13,6 +13,7 @@
   <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/pagination.js')}}"></script> -->
   <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/search_users.js')}}"></script> -->
   <script src="{{ url_for('static', filename='js/moderation/book/book_item.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
   <script>
 function setStatusLampColor(lampId, status) {
     statusLamp = document.getElementById(lampId);
@@ -63,24 +64,7 @@ function setStatusLampColor(lampId, status) {
 
 <body>
   <div class="content">
-    <header class="header">
-      <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
-
-        <div class="header__admin admin">
-          <a href="{{url_for('personal.person', username=current_user.username)}}" class="admin__link">
-            <div class="admin__set">
-              <img src="{{url_for('personal.avatar', username=current_user.username)}}" alt="" class="admin__img">
-              <!--Фото админа из его личного кабинета-->
-            </div>
-            {{ current_user.username }} <!--Имя админа и ссылка обратно в личный кабинет-->
-          </a>
-        </div>
-      </div>
-    </header>
+    {% include "common/header.html" %}
 
     <main>
       <section class="main">

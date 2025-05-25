@@ -1,38 +1,66 @@
     <header class="header style-1">
       <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
+        <div class="header__flex">
+          <a class="header__logo" href="{{url_for('main.index')}}">
+            <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
+              alt="Логотип MAGIC BOOK KEEPER">
+          </a>
+        </div>
 
-        <div class="header__right">
+        <div class="header__flex">
+          {% if current_user.is_authenticated %}
+            <div style="margin-left: 30px;">
+              <a href="{{url_for('personal.person', username=current_user.username)}}" class="header__user-link">
+                <span>{{ current_user.username }}</span>
+                <div class="header__user-set">
+                  <img src="{{url_for('personal.avatar', username=current_user.username)}}" alt="" class="header__user-image">
+                </div>
+              </a>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="header__flex">
           <span class="header__menu">Меню</span>
           <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
             <span class="hamburger__box">
               <span class="hamburger__inner"></span>
             </span>
           </button>
+          {% if current_user.is_authenticated %}
+            {% set invitation_count = current_user.invitation_count %}
+            {% if invitation_count > 0 %} <span class="header__count">{{ invitation_count }}</span> {% endif %}
+          {% endif %}
         </div>
+      </div>
 
-        <nav class="nav header__nav">
-          <div class="nav__menu js-menu-wrap">
-            <ul class="nav__list list-reset">
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+      <nav class="nav header__nav">
+        <div class="nav__menu js-menu-wrap">
+          <ul class="nav__list list-reset">
+            <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
+            {% if current_user.is_anonymous %}
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Авторизация</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+            {% elif current_user.is_authenticated %}
               <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
               {% if current_user.role_id == Role.MODERATOR %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('moderation.book_search')}}">Страница модерации</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('moderation.book_search')}}">Страница модерации</a></li>
               {% endif %}
               {% if current_user.role_id == Role.ADMIN %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('moderation.book_search')}}">Страница модерации</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('moderation.book_search')}}">Страница модерации</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
               {% endif %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
-            </ul>
-          </div>
-        </nav>
-      </div>
+                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
+              {% if invitation_count > 0 %} 
+                <span class="nav__count">{{ invitation_count }}</span>  <!--Уведомления-->
+              {% endif %}
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
     </header>

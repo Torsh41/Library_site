@@ -17,35 +17,7 @@
 
 <body>
     <div class="content">
-        <header class="header">
-            <div class="header__container container">
-                <a class="header__logo" href="{{url_for('main.index')}}">
-                    <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-                        alt="Логотип MAGIC BOOK KEEPER">
-                </a>
-    
-                <div class="header__right">
-                    <span class="header__menu">Меню</span>
-                    <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-                        <span class="hamburger__box">
-                            <span class="hamburger__inner"></span>
-                        </span>
-                    </button>
-                </div>
-    
-                <nav class="nav header__nav">
-                    <div class="nav__menu js-menu-wrap">
-                        <ul class="nav__list list-reset">
-                            <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a>
-                            </li>
-                        </ul>
-                    </div>
-    
-                </nav>
-    
-    
-            </div>
-        </header>
+        {% include "common/header.html" %}
     
         <main>
             <section class="main">

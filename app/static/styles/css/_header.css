@@ -11,7 +11,7 @@
   color: #cec8bd;
 }
 
-.header__right {
+.header__flex {
   position: relative;
   display: flex;
   justify-content: center;
@@ -51,4 +51,38 @@
 .header__logo-image {
   width: 50px;
   height: 50px;
+}
+
+.header__user-image {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+  background-color: #EFF6F2;
+}
+
+
+.header__user-set {
+  position: relative;
+  display: block;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: #EFF6F2;
+}
+
+.header__user-link {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  cursor: pointer;
+}
+
+.header__user-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
