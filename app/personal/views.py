@@ -253,12 +253,13 @@ def add_new_book(username):
             reference_url = form.reference_url.data.strip(),
             publishing_house = form.publishing_house.data.strip(),
             description = form.description.data.strip(),
-            release_year = int(form.release_year.data),
             count_of_chapters = form.chapters_count.data,
             category = category,
             user = current_user._get_current_object(),
             moderation_request = moderation_request
         )
+        if form.release_year.data:
+            book.release_year = int(form.release_year.data)
         if not book.cover:
             book.default_cover()
         database.session.add(book)
