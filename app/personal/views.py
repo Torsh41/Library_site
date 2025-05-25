@@ -86,27 +86,33 @@ def person(username, flag=False):
 @login_required
 @check_actual_password
 def edit(username):
-    if current_user.username != username:
+    user = database.session.execute(
+        database.select(User).filter(User.username==username)
+    ).scalar_one_or_none()
+    if user is None:
         return abort(403)
+
     form = EditProfileForm()
     if form.validate_on_submit():
-        if request.files['avatar']:
-            current_user.avatar = bytes(request.files['avatar'].read())
-        current_user.username = form.username.data.strip()
-        current_user.city = form.city.data
-        current_user.gender = str(request.form.get('gender'))
-        current_user.age = form.age.data
-        current_user.about_me = str(request.form.get('description')).strip()
-        database.session.add(current_user._get_current_object())
+        from app import app
+        app.logger.info('%s ', form.avatar.__dict__)
+        app.logger.info('%s ', user)
+        app.logger.info('%s ', user.__dict__)
+        if form.avatar.object_data is not None:
+            user.avatar = bytes(form.avatar.object_data)
+        username = form.username.data.strip().replace("'", "")
+        # if user.username != username:
+        user.username = username
+        user.city = form.city.data
+        user.gender = form.gender.data
+        user.age = form.age.data
+        user.about_me = form.about_me.data
+        database.session.add(user)
         database.session.commit()
-        return redirect(url_for('.person', username=current_user.username))
+        return redirect(url_for('.person', username=user.username))
     return render_template(
         'personal/edit_user_page_profile.html',
         form=form,
-        city=current_user.city,
-        gender=current_user.gender,
-        age=current_user.age,
-        about_me=current_user.about_me
     )
 
 

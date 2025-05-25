@@ -1,18 +1,42 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaField, DateField
+from flask_login import current_user
+from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Regexp, NumberRange, URL, Optional
 from wtforms import ValidationError
-from ..models import Book
+from flask_wtf.file import FileAllowed, FileRequired
+from ..models import Book, User
 from isbnlib import is_isbn10, is_isbn13
 
 
+def username_exists(form, field):
+    existing_user = User.query.filter_by(
+            username=form.username.data.strip().replace("'", "")).first()
+    if existing_user and existing_user.username != current_user.username:
+        raise ValidationError('Указаный псевдоним уже занят.')
+
+# TODO: check if username already exists
 class EditProfileForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0, 'Логин содержит только буквы, цифры, точки или символы подчеркивания.')])
+    avatar = FileField('ImageFile', validators=[FileAllowed(
+        ["jpg", "png", "webp"], "Можно загружать только картинки.")])
+    username = StringField('Username', validators=[
+        DataRequired('Поля не должны быть пустыми.'), Length(max=64),
+        Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0, 'Логин содержит только буквы, ' +
+            'цифры, точки или символы подчеркивания.'), username_exists])
     avatar = FileField('Photo')
-    city = StringField('City', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Название города должно содержать только буквы и пробелы.')])
-    age = IntegerField('Age', validators=[DataRequired('Поле не должно быть пустым.'), NumberRange(1, 100, message='Здесь невозможно ошибиться:)')])
-    submit = SubmitField('Сохранить')
+    city = StringField('City', validators=[Optional(), Length(max=64),
+        Regexp('[A-Za-zА-Яа-яЁё ]', 0,
+            'Название города должно содержать только буквы и пробелы.')])
+    gender = SelectField('Gender', choices=[("", "--выберите пол--"),
+                                            ("муж", "мужской"),
+                                            ("жен", "женcкий")])
+    age = IntegerField('Age')
+    about_me = TextAreaField('Description', validators=[Length(max=250)])
+
+    def _about_me(self, **kwargs):
+        # Set default value of TextAreaField
+        if kwargs["default"]:
+            self.about_me.process_data(kwargs["default"])
+        return self.about_me(**kwargs)
     
               
 def validate_bookname(form, field):

@@ -42,35 +42,76 @@
           <div class="profile__wrap">
             <form class="profile__form" enctype="multipart/form-data" method="post">
               <!--Вопрос по поводу enctype(action?)-->
-              {{form.hidden_tag()}}
-              <span class="profile__span">Фото профиля</span>
-              <div class="profile__image profile__image-edit">
-                <!--Тут добавленная фотка пользователем-->
-                <input class="profile__foto" type="file" name="avatar" multiple accept="image/*,image/jpeg">
+              {{ form.hidden_tag() }}
+
+              <div>
+                <div class=profile__container>
+                  <span class="profile__span" style="">Фото профиля</span>
+                </div>
+                <div class="profile__image profile__image-edit">
+                  <!--Тут добавленная фотка пользователем-->
+                  {{ form.avatar(class="profile__foto") }}
+                </div>
               </div>
-              {{form.username(class="profile__input", value=current_user.username, placeholder="Введите ваше имя на сайте..")}}
-              {{form.city(class="profile__input", value=city, placeholder="Введите город..")}}
+
+              <div>
+                <div><span>Ваш псевдоним:</span></div>
+                {{ form.username(class="profile__input", value=current_user.username, placeholder="Введите ваше имя на сайте...") }}
+              </div>
+
+              <div>
+                <div><span>Ваш город:</span></div>
+                {% if current_user.city is none %}
+                  {{ form.city(class="profile__input", placeholder="Введите город..") }}
+                {% else %}
+                  {{ form.city(class="profile__input", value=current_user.city, placeholder="Введите город..") }}
+                {% endif %}
+              </div>
     
-              <label class="profile__info">
-                <span class="profile__span">Пол:</span>
-                <select name="gender" id="" class="profile__select">
-                  <option value="муж" {%if gender == "муж"%}selected{%endif%}>муж</option>
-                  <option value="жен" {%if gender == "жен"%}selected{%endif%}>жен</option>
-                </select>
-              </label>
+              <div>
+                <label class="profile__info">
+                  <span class="profile__span">Пол:</span>
+                  {{ form.gender(class="profile__select", id="select_gender") }}
+                </label>
+                {% if current_user.gender is not none %}
+<script>
+{
+    // set option selected by default
+    const selector = document.getElementById("select_gender");
+    console.log(selector);
+    for (const option of selector) {
+        if (option.value == "{{ current_user.gender }}") {
+            option.defaultSelected = true;
+        }
+    }
+}
+</script>
+                {% endif %}
+              <div>
     
-              {{form.age(class="profile__input", value=age, placeholder="Введите возраст..")}}
-              <textarea class="profile__text" id="description" maxlength="40" name="description" placeholder="Расскажите о себе.." required="" rows="5">{{ about_me }}</textarea>
-              {{form.submit(class="profile__edit-btn")}}
+              <div>
+                <div><span>Ваш возраст:</span></div>
+                {% if current_user.age is none %}
+                 {{ form.age(class="profile__input", placeholder="Введите возраст..") }}
+                {% else %}
+                 {{ form.age(class="profile__input", value=current_user.age, placeholder="Введите возраст..") }}
+                {% endif %}
+              </div>
+
+              <div>
+                <div><span>Информация о вас:</span></div>
+                {% if current_user.about_me is none %}
+                 {{ form._about_me(class="profile__text", placeholder="Расскажите о себе..", rows="5") }}
+                {% else %}
+                 {{ form._about_me(class="profile__text", default=current_user.about_me, placeholder="Расскажите о себе..", rows="5") }}
+                {% endif %}
+              </div>
+              <input type="submit" class="profile__edit-btn" value="Сохранить">
             </form>
-    
     
             <a class="profile__exit" href="{{url_for('personal.person', username=current_user.username)}}">Отмена</a>
           </div>
-          
-  
         </div>
-  
       </section>
     </main>
   </div>
@@ -81,7 +122,6 @@
       <a href="#" class="footer__wrap">© MBK | Community Magic Book Keeper</a>
     </div>
   </footer>
-
 </body>
 
 </html>
