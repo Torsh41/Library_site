@@ -22,7 +22,7 @@
   <!--<script defer src="{{ url_for('static', filename='js/select.js')}}"></script>-->
   <script defer src="{{ url_for('static', filename='js/book.js')}}"></script>
   <script src="{{ url_for('static', filename='js/personal/change_read_state/change_read_state.js')}}"></script>
-  {% if current_user.role_id == Role.ADMIN %}
+  {% if current_user.role_id in [Role.TEACHER, Role.MODERATOR, Role.ADMIN] %}
     <script src="{{ url_for('static', filename='js/personal/user_page/add_many_books.js')}}"></script>
   {% endif %}
   <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
@@ -70,7 +70,7 @@
             </div>
           </nav>
 
-        {% if current_user.role_id == Role.ADMIN %}
+        {% if current_user.role_id in [Role.TEACHER, Role.MODERATOR, Role.ADMIN] %}
           <section class="popup" id="add_many_books_sec" style="display: none;">
             <div class="popup__formPopup">
                 <h2 class="popup__title title">Добавление информации о книгах</h2>
@@ -113,7 +113,7 @@
             <a class="main__bottom-item" href="{{url_for('auth.change_password_try')}}">Сменить пароль</a>
           </div>
           <a class="main__form-btn btn" href="{{url_for('personal.add_new_book', username=current_user.username)}}">Добавить новую книгу</a>
-          {% if current_user.role_id == Role.ADMIN %}
+          {% if current_user.role_id in [Role.TEACHER, Role.MODERATOR, Role.ADMIN] %}
             <a id="add_info" class="main__form-btn btn">Добавить множество книг</a>
           {% endif %}
         </div>
