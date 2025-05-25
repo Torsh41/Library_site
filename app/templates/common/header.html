@@ -6,16 +6,13 @@
             <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
               alt="Логотип MAGIC BOOK KEEPER">
           </a>
-        </div>
-
-        <div class="header__flex">
           {% if current_user.is_authenticated %}
             <div style="margin-left: 30px;">
               <a href="{{url_for('personal.person', username=current_user.username)}}" class="header__user-link">
-                <span>{{ current_user.username }}</span>
                 <div class="header__user-set">
                   <img src="{{url_for('personal.avatar', username=current_user.username)}}" alt="" class="header__user-image">
                 </div>
+                <span>{{ current_user.username }}</span>
               </a>
             </div>
           {% endif %}
