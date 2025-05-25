@@ -8,6 +8,7 @@ from app.decorators import *
 from app.parse_excel import *
 import copy
 from datetime import datetime
+from .forms import BookSearchForm
 
 
 @main.app_context_processor
@@ -292,6 +293,9 @@ def category(id):
     category = Category.query.filter_by(id=id).first()
     if category is None:
         return abort(400)
+    form = BookSearchForm()
+    if form.validate_on_submit():
+        pass
     list_id = request.args.get('list_id', None, type=int)
     books = database.session.execute(
             database.select(Book)
@@ -316,6 +320,7 @@ def category(id):
         new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
     return render_template(
         'main/category_page.html',
+        form=form,
         top_books=top_books,
         new_books=new_books,
         name=category.name,
