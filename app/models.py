@@ -237,6 +237,16 @@ class Book(database.Model, SerializerMixin):
         with app.open_resource(app.root_path + '/static/styles/img/book.jpg', 'rb') as f:
             self.cover = f.read()
 
+    @property
+    def release_year(self) -> int:
+        return self.release_date.year
+
+    @release_year.setter
+    def release_year(self, year: int):
+        if self.release_date is None:
+            self.release_date = datetime.fromtimestamp(0)
+        self.release_date = self.release_date.replace(year=year)
+
 
 class BookGrade(database.Model, SerializerMixin):
     __tablename__ = "grades"

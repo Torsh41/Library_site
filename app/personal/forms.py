@@ -42,7 +42,7 @@ class AddNewBookForm(FlaskForm):
     publishing_house = StringField('HouseName', validators=[Optional(), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название издательсва должно содержать только буквы и пробелы.'), Length(1, 64)])
     description = TextAreaField('Description', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 1024)])
-    release_date = DateField('ReleaseDate', validators=[Optional()])
+    release_year = StringField('ReleaseDate', validators=[Optional(), Length(max=4), Regexp('[0-9]')])
     chapters_count = IntegerField('ChaptersCount', validators=[Optional(), NumberRange(2, 100, message='Здесь невозможно ошибиться:)')]) # Верим...
     submit = SubmitField('Добавить книгу в базу')
 

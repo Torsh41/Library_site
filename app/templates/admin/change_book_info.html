@@ -183,16 +183,16 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Дата выхода</span>
-              {% if form.release_date.errors %}
-              {{form.release_date(class="form__input", value=book.release_date)}}
+              <span class="form__span">Год выхода</span>
+              {% if form.release_year.errors %}
+              {{form.release_year(class="form__input", value=book.release_year)}}
               <span>
-                {% for msg in form.release_date.errors %}
+                {% for msg in form.release_year.errors %}
                 {{ msg }}
                 {% endfor %}
               </span>
               {% else %}
-              {{form.release_date(class="form__input", value=book.release_date)}}
+              {{form.release_year(class="form__input", value=book.release_year)}}
               {% endif %}
               <!--<input type="date" class="form__input" required>-->
             </label>

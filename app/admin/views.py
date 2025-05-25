@@ -429,7 +429,7 @@ def change_book_info(username, book_id):
         book.reference_url = form.reference_url.data.strip()
         book.publishing_house = form.publishing_house.data.strip()
         book.description = request.form.get('description').strip()
-        book.release_date = form.release_date.data
+        book.release_year = int(form.release_year.data)
         book.count_of_chapters = form.chapters_count.data
         book.category = category
         book.user = current_user._get_current_object()
