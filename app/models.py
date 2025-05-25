@@ -143,6 +143,11 @@ class User(UserMixin, database.Model, SerializerMixin):
             self.avatar = f.read()
 
     @property
+    def invitation_count(self):
+        invitations = len(self.chats_invitations.filter_by(viewed=False).all())
+        return invitations
+
+    @property
     def role(self):
         return Role(self.role_id).name
 
