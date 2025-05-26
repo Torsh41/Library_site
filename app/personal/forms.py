@@ -14,7 +14,6 @@ def username_exists(form, field):
     if existing_user and existing_user.username != current_user.username:
         raise ValidationError('Указаный псевдоним уже занят.')
 
-# TODO: check if username already exists
 class EditProfileForm(FlaskForm):
     avatar = FileField('ImageFile', validators=[FileAllowed(
         ["jpg", "png", "webp"], "Можно загружать только картинки.")])
@@ -32,9 +31,9 @@ class EditProfileForm(FlaskForm):
     age = IntegerField('Age')
     about_me = TextAreaField('Description', validators=[Length(max=250)])
 
-    def _about_me(self, **kwargs):
+    def _about_me(self, default="", **kwargs):
         # Set default value of TextAreaField
-        if kwargs["default"]:
+        if default:
             self.about_me.process_data(kwargs["default"])
         return self.about_me(**kwargs)
     
