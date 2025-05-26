@@ -26,7 +26,8 @@ def cover(book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
         return abort(400)
-    if not book_passed_moderation(book):
+    if not (book_passed_moderation(book) or 
+            current_user.username == book.user.username):
         return abort(403)
     cover = make_response(book.cover)
     return cover
