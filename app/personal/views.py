@@ -235,6 +235,7 @@ def get_books_page(username, cataloge_id, page):
 @login_required
 @check_actual_password
 def show_added_books_pagination(username, page):
+    PAGINATION_PER_PAGE = 8
     if current_user.username != username:
         return abort(403)
     user = database.session.execute(
@@ -244,7 +245,7 @@ def show_added_books_pagination(username, page):
         return abort(404)
     pagination = database.paginate(
             database.select(Book).filter(Book.user==user).order_by(Book.timestamp),
-            page=page, per_page=2)
+            page=page, per_page=PAGINATION_PER_PAGE)
 
     return render_template(
         'personal/show_added_books.html',
