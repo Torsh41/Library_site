@@ -14,9 +14,6 @@ PAGINATION_PER_PAGE = 10
 @moderation.route('/book/search/<int:page>', methods=['GET', 'POST'])
 @moderator_required
 def book_search_pagination(page):
-    from app import app
-    # import flask
-    app.logger.info("Page: %s", page)
     category_list = database.session.execute(
             database.select(Category).order_by(Category.name)
     ).scalars().all()
@@ -35,13 +32,10 @@ def book_search_pagination(page):
             query = query.join(Book.moderation_request)
             query = query.filter(ModerationRequest._status==int(form.status.data))
     query = query.order_by(Book.timestamp)
-    app.logger.info("Page: %s", page)
     pagintaion = database.paginate(query, page=page, per_page=PAGINATION_PER_PAGE)
-    app.logger.info("Page: %s", page)
     book_list = pagintaion.items
     return render_template(
         'moderation/moderation_panel.html',
-        category_select_list=category_select_list,
         book_list=book_list,
         pagination=pagintaion,
         form=form,
