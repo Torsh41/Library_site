@@ -34,9 +34,9 @@ class SetModerationStatusForm(FlaskForm):
                     choices=list(ModerationRequest.status_dict.items()),
                     validators=[DataRequired("Отсутствует параметр status...")])
 
-    def _comment(self, **kwargs):
+    def _comment(self, default="", **kwargs):
         # Set default value of TextAreaField
-        if kwargs["default"]:
+        if default:
             self.comment.process_data(kwargs["default"])
         return self.comment(**kwargs)
 
