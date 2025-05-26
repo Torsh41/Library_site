@@ -91,17 +91,11 @@ def edit(username):
     ).scalar_one_or_none()
     if user is None:
         return abort(403)
-
     form = EditProfileForm()
     if form.validate_on_submit():
-        from app import app
-        app.logger.info('%s ', form.avatar.__dict__)
-        app.logger.info('%s ', user)
-        app.logger.info('%s ', user.__dict__)
-        if form.avatar.object_data is not None:
-            user.avatar = bytes(form.avatar.object_data)
+        if form.avatar.data.filename != "":
+            user.avatar = form.avatar.data.read()
         username = form.username.data.strip().replace("'", "")
-        # if user.username != username:
         user.username = username
         user.city = form.city.data
         user.gender = form.gender.data
