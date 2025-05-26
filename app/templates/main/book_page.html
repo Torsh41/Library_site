@@ -105,6 +105,8 @@
   </style>
 </head>
 
+{% set book_has_passed_moderation = (book.moderation_request.status == book.moderation_request.STATUS_ACCEPTED) %}
+
 <body>
   <div class="content">
     {% include "common/header.html" %}
@@ -143,6 +145,7 @@
                   <!--Тут обложка книги-->
                   <img class="book__image-set" src="{{url_for('main.cover', book_id=book.id)}}">
   
+                {% if book_has_passed_moderation %}
                   <div class="book__set">
                     <!--Выборка доступна только авторизированным пользователям-->
                     {% if current_user.is_authenticated %}
@@ -158,6 +161,7 @@
   
                     {% endif %}
                   </div>
+                {% endif %}
                 </div>
   
   
@@ -196,6 +200,7 @@
                 <!--описание книги текстом-->
               </div>
   
+              {% if book_has_passed_moderation %}
               <!--Если авторизированный пользователь -->
               {% if current_user.is_authenticated %}
                 <div class="book__footer">
@@ -244,14 +249,15 @@
                   <h2 class="book__title title">Ставить оценки могут только авторизованные пользователи.</h2>
                 </div>
               {% endif %}
+              {% endif %}
             </div>
           </div>
         </section>
   
         <!--Кнопка доступна только авторизированным пользователям-->
   
+        {% if current_user.is_authenticated and book_has_passed_moderation %}
         <!--После нажатия кнопки - открываются созданные пользователем в своем лк списки, пользователь выбирает в какой свой список добавить -->
-        {% if current_user.is_authenticated %}
           <div class="container lists__create">
             <button class="lists__btn">Добавить в список
               <svg class="list__svg" width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -270,7 +276,7 @@
         {% endif %}
       </form>
       
-      {% if current_user.is_authenticated %}
+      {% if current_user.is_authenticated and book_has_passed_moderation %}
         <section class="popup" id="edit_comment_sec" style="display: {{ display }}">
           <div class="popup__formPopup">
             <h2 class="popup__title title">Редактирование комментария</h2>
@@ -285,6 +291,7 @@
         </section>
       {% endif %}
 
+      {% if book_has_passed_moderation %}
       <!--Блок комментирования книги-->
       <section class="comments">
         <div class="comments__container container">
@@ -369,6 +376,7 @@
           </div>
         </div>
       </section>
+      {% endif %}
   
   
     </main>
