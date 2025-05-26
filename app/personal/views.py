@@ -289,6 +289,7 @@ def add_new_book(username):
         )
         if form.release_year.data:
             book.release_year = int(form.release_year.data)
+        cover = request.files['cover']
         if cover.filename != "":
             book.cover = cover.read()
         else:
