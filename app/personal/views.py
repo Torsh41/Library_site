@@ -275,7 +275,6 @@ def add_new_book(username):
         category = Category.query.filter_by(name=str(request.form.get('category'))).first()
         moderation_request = ModerationRequest()
         book = Book(
-            # cover = bytes(request.files['cover'].read()),
             isbn = form.isbn.data.strip(),
             name = form.name.data.strip().lower().replace("'", ""),
             author = form.author.data.strip().lower(),
@@ -289,7 +288,9 @@ def add_new_book(username):
         )
         if form.release_year.data:
             book.release_year = int(form.release_year.data)
-        if not book.cover:
+        if cover.filename != "":
+            book.cover = cover.read()
+        else:
             book.default_cover()
         database.session.add(book)
         database.session.commit()
