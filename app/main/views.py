@@ -298,11 +298,10 @@ def category(id):
         pass
     list_id = request.args.get('list_id', None, type=int)
     books = database.session.execute(
-            database.select(Book)
-                    .join(Book.category)
-                    .filter_by(id=category.id)
-                    .join(Book.moderation_request)
-                    .filter_by(status=ModerationRequest.STATUS_ACCEPTED)
+        database.select(Book)
+                .filter(Book.category_id==category.id)
+                .join(ModerationRequest, Book.moderation_request_id == ModerationRequest.id)
+                .filter(ModerationRequest._status==ModerationRequest.STATUS_ACCEPTED)
     ).scalars().all()
     top_books = list(); new_books = list()
     for book in books:
@@ -341,12 +340,11 @@ def search_by_category(id):
     if category is None:
         return abort(400)
     res = database.session.execute(
-            database.select(Book)
-                    .join(Book.category)
-                    .filter_by(id=category.id)
-                    .join(Book.moderation_request)
-                    .filter_by(status=ModerationRequest.STATUS_ACCEPTED)
-           .order_by(Book.id)
+        database.select(Book)
+                .filter(Book.category_id==category.id)
+                .join(ModerationRequest, Book.moderation_request_id == ModerationRequest.id)
+                .filter(ModerationRequest._status==ModerationRequest.STATUS_ACCEPTED)
+                .order_by(Book.id)
     ).scalars().all()
     result = str(request.form.get('search_result')).strip().lower()
     if result == '*':
