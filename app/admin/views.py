@@ -421,15 +421,19 @@ def change_book_info(username, book_id):
         category = Category.query.filter_by(name=request.form.get('category')).first()
         if category is None:
             return abort(400)
-        if cover := bytes(request.files['cover'].read()):
-            book.cover = cover
+        cover = request.files['cover']
+        if cover.filename != "":
+            book.cover = cover.read()
+        else:
+            book.default_cover()
         book.isbn = form.isbn.data.strip()
         book.name = form.name.data.strip().lower().replace("'", "")
         book.author = form.author.data.strip().lower()
         book.reference_url = form.reference_url.data.strip()
         book.publishing_house = form.publishing_house.data.strip()
         book.description = request.form.get('description').strip()
-        book.release_year = int(form.release_year.data)
+        if form.release_year.data:
+            book.release_year = int(form.release_year.data)
         book.count_of_chapters = form.chapters_count.data
         book.category = category
         book.user = current_user._get_current_object()
