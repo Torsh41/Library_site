@@ -34,7 +34,7 @@ class EditProfileForm(FlaskForm):
     def _about_me(self, default="", **kwargs):
         # Set default value of TextAreaField
         if default:
-            self.about_me.process_data(kwargs["default"])
+            self.about_me.process_data(default)
         return self.about_me(**kwargs)
     
               

@@ -37,7 +37,7 @@ class SetModerationStatusForm(FlaskForm):
     def _comment(self, default="", **kwargs):
         # Set default value of TextAreaField
         if default:
-            self.comment.process_data(kwargs["default"])
+            self.comment.process_data(default)
         return self.comment(**kwargs)
 
 
