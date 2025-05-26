@@ -329,7 +329,6 @@ def category(id):
     )
         
         
-# TODO: unused method
 @main.route('/category/<int:id>/search', methods=['POST'])
 def search_by_category(id):
     if current_user.is_authenticated:

@@ -77,6 +77,7 @@
           {% if current_user.role_id in [Role.TEACHER, Role.MODERATOR, Role.ADMIN] %}
             <a id="add_info" class="main__form-btn btn">Добавить множество книг</a>
           {% endif %}
+          <a class="main__form-btn btn" href="{{url_for('personal.show_added_books', username=current_user.username)}}">Мои добавленные книги</a>
         </div>
       </section>
   

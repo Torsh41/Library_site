@@ -231,6 +231,35 @@ def get_books_page(username, cataloge_id, page):
     ])
 
 
+@personal.route('/<username>/books/<int:page>', methods=['GET'])
+@login_required
+@check_actual_password
+def show_added_books_pagination(username, page):
+    if current_user.username != username:
+        return abort(403)
+    user = database.session.execute(
+        database.select(User).filter(User.username==username)
+    ).scalar_one_or_none()
+    if user is None:
+        return abort(404)
+    pagination = database.paginate(
+            database.select(Book).filter(Book.user==user).order_by(Book.timestamp),
+            page=page, per_page=2)
+
+    return render_template(
+        'personal/show_added_books.html',
+        book_list=pagination.items,
+        pagination=pagination,
+    )
+
+
+@personal.route('/<username>/books', methods=['GET'])
+@login_required
+@check_actual_password
+def show_added_books(username):
+    return show_added_books_pagination(username, 1)
+
+
 @personal.route('/<username>/add-new-book', methods=['GET', 'POST'])
 @login_required
 @check_actual_password
