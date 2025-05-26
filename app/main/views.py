@@ -59,10 +59,10 @@ def index():
 def book_page(book_id):
     list_id = request.args.get('list_id', None, type=int)
     book = Book.query.filter_by(id=book_id).first()
-    from flask import abort
     if book is None:
         return abort(400)
-    if not book_passed_moderation(book):
+    if not (book_passed_moderation(book) or 
+            current_user.username == book.user.username):
         return abort(403)
     pagination = database.paginate(
             book.comments.order_by(Comment.timestamp.asc()),
