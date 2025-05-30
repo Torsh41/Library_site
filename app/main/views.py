@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 from app.decorators import *
 from app.parse_excel import *
 import copy
-from datetime import datetime
+import datetime
 from .forms import BookSearchForm
 
 
@@ -188,7 +188,7 @@ def edit_comment(username, comment_id, book_id):
     if not book_passed_moderation(book):
         return abort(403)
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
-    comment.timestamp = datetime.now()
+    comment.timestamp = datetime.datetime.now()
     database.session.add(comment)
     database.session.commit()
     return jsonify(dict(
