@@ -32,12 +32,12 @@ def book_search_pagination(page):
             query = query.join(Book.moderation_request)
             query = query.filter(ModerationRequest._status==int(form.status.data))
     query = query.order_by(Book.timestamp)
-    pagintaion = database.paginate(query, page=page, per_page=PAGINATION_PER_PAGE)
-    book_list = pagintaion.items
+    pagination = database.paginate(query, page=page, per_page=PAGINATION_PER_PAGE)
+    book_list = pagination.items
     return render_template(
         'moderation/moderation_panel.html',
         book_list=book_list,
-        pagination=pagintaion,
+        pagination=pagination,
         form=form,
         status_form=SetModerationStatusForm(),
         ModerationRequest=ModerationRequest
