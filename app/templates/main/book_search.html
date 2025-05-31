@@ -39,7 +39,7 @@
           </div>
 
           <div class="main__bottom">
-            <form id="search-form" class="main__form" action="/book/search/" method="post">
+            <form id="search-form" class="main__form" action="{{ url_for('common.book_search_filters') }}" method="post">
               {{form.hidden_tag()}}
               <label class="main__form-label">
                 <svg class="main__form-icon" width="27" height="26" viewBox="0 0 27 26" fill="none"
