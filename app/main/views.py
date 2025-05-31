@@ -8,8 +8,7 @@ from app.decorators import *
 from app.parse_excel import *
 import copy
 import datetime
-from .forms import BookSearchForm
-
+from app.common.forms import BookSearchForm
 
 @main.app_context_processor
 def inject_roles():
@@ -397,6 +396,20 @@ def search_by_category(id):
             
         return jsonify(dict(result=True, data=res))
     return jsonify(dict(result=False))
+
+
+@main.route('/book/search', methods=['GET'])
+def book_search():
+    return render_template(
+        'main/book_search.html',
+        form=BookSearchForm(),
+        top_books=[],
+        new_books=[],
+        name="category.name",
+        id="category.id",
+        list_id="list_id",
+        len=len
+    )
 
 
 @main.route('/forum')

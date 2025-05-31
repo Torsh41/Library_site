@@ -38,6 +38,8 @@ def create_app(config_name):
   app.register_blueprint(admin_blueprint, url_prefix='/admin')
   from .moderation import moderation as moderation_blueprint
   app.register_blueprint(moderation_blueprint, url_prefix='/moderation')
+  from .common import common as common_blueprint
+  app.register_blueprint(common_blueprint)
   from . import errors
   
   database.init_app(app)
