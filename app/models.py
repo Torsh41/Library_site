@@ -244,6 +244,8 @@ class Book(database.Model, SerializerMixin):
 
     @property
     def release_year(self) -> int:
+        if self.release_date is None:
+            return None
         return self.release_date.year
 
     @release_year.setter
