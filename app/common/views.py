@@ -13,6 +13,7 @@ def book_search_filters():
     PAGINATION_PER_PAGE = 12
     form = BookSearchForm(request.form)
     page = form.page.data if form.page.data else 1
+    extended = form.extended.data if form.extended.data else True
 
     # NOTE: not fully tested, errors might occur
     query = database.select(Book)
@@ -55,15 +56,28 @@ def book_search_filters():
     for book in pagination.items:
         grade_list = [0] + [grade.grade for grade in book.grades.all()]
         grade_avg = sum(grade_list) / len(grade_list)
-        book_list.append({
+        book_info = {
             "id": book.id,
             "name": book.name,
             "author": book.author,
-            "release_date": book.release_date,
+            "release_year": book.release_year,
             "moderation_status": book.moderation_request.status_str(),
             "category": book.category.name,
             "grade_avg": grade_avg,
-        })
+        }
+        # Add extended info
+        if extended:
+            book_info |= {
+                "isbn": book.isbn,
+                "reference_url": book.reference_url,
+                "publishing_house": book.publishing_house,
+                "upload_datetime": book.timestamp.isoformat(),
+                "description": book.description,
+                "count_of_chapters": book.count_of_chapters,
+                "moderation_comment": book.moderation_request.comment,
+                "username": book.user.username,
+            }
+        book_list.append(book_info)
     return jsonify({
         "result": True,
         "book_list": book_list,

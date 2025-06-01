@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField, IntegerField
+from wtforms import StringField, TextAreaField, SelectField, IntegerField, BooleanField
 from wtforms.validators import DataRequired, Length, Regexp, NumberRange, URL, Optional
 from wtforms import ValidationError
 from app import database
@@ -9,6 +9,7 @@ from app.models import Category, ModerationRequest
 # TODO: use this form in category_page.html and admin_panel.html
 class BookSearchForm(FlaskForm):
     page = IntegerField()
+    extended = BooleanField()
     bookname = StringField(validators=[Optional(), Length(1, 128)])
     author = StringField(validators=[Optional(), Length(1, 128)])
     publishing_house = StringField('housename', validators=[Optional(), Length(1, 64)])
