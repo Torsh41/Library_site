@@ -4,50 +4,24 @@ from flask import render_template, redirect, abort, url_for, request, jsonify
 from .. import database
 from app.models import User, Role, Book, Category, SearchResult
 from .forms import BookSearchFiltersForm, SetModerationStatusForm
+from app.common.forms import BookSearchForm
 from app.decorators import *
 from datetime import datetime
 
 
-PAGINATION_PER_PAGE = 10
-
-
-@moderation.route('/book/search/<int:page>', methods=['GET', 'POST'])
-@moderator_required
-def book_search_pagination(page):
-    category_list = database.session.execute(
-            database.select(Category).order_by(Category.name)
-    ).scalars().all()
-    category_select_list = [(cy.id, cy.name) for cy in category_list]
-    form = BookSearchFiltersForm(category_list=category_select_list)
-    query = database.select(Book)
-    if form.validate_on_submit():
-        if form.category.data:
-            query = query.filter(Book.category_id==int(form.category.data))
-        if form.bookname.data:
-            query = query.filter(Book.name.like(f"%{form.bookname.data}%"))
-        if form.username.data:
-            query = query.join(Book.user)
-            query = query.filter(User.username.like(f"%{form.username.data}%"))
-        if form.status.data:
-            query = query.join(Book.moderation_request)
-            query = query.filter(ModerationRequest._status==int(form.status.data))
-    query = query.order_by(Book.timestamp)
-    pagination = database.paginate(query, page=page, per_page=PAGINATION_PER_PAGE)
-    book_list = pagination.items
-    return render_template(
-        'moderation/moderation_panel.html',
-        book_list=book_list,
-        pagination=pagination,
-        form=form,
-        status_form=SetModerationStatusForm(),
-        ModerationRequest=ModerationRequest
-    )
+# TODO: dynamically assign per_page parameter
+# PAGINATION_PER_PAGE = 10
 
 
 @moderation.route('/book/search', methods=['GET', 'POST'])
 @moderator_required
 def book_search():
-    return book_search_pagination(1)
+    return render_template(
+        'moderation/moderation_panel.html',
+        form=BookSearchForm(),
+        status_form=SetModerationStatusForm(),
+        ModerationRequest=ModerationRequest
+    )
 
 
 @moderation.route('/book/set_moderation_status', methods=['POST'])
