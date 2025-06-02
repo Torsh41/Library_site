@@ -39,10 +39,12 @@
             {% if current_user.is_anonymous %}
               <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Авторизация</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.book_search')}}">Каталог</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
             {% elif current_user.is_authenticated %}
               <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.book_search')}}">Каталог</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
               {% if current_user.role_id == Role.MODERATOR %}
@@ -50,7 +52,7 @@
               {% endif %}
               {% if current_user.role_id == Role.ADMIN %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('moderation.book_search')}}">Страница модерации</a></li>
-                <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
+                <!-- <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li> -->
                 <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
               {% endif %}
                 <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
