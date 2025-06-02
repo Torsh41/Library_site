@@ -62,7 +62,8 @@ def book_page(book_id):
     if book is None:
         return abort(400)
     if not (book_passed_moderation(book) or 
-            current_user.username == book.user.username):
+            (current_user.is_authenticated and
+             current_user.username == book.user.username)):
         return abort(403)
     pagination = database.paginate(
             book.comments.order_by(Comment.timestamp.asc()),
@@ -187,7 +188,7 @@ def edit_comment(username, comment_id, book_id):
     if not book_passed_moderation(book):
         return abort(403)
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
-    comment.timestamp = datetime.datetime.now(timezone.utc)
+    comment.timestamp = datetime.datetime.now(datetime.timezone.utc)
     database.session.add(comment)
     database.session.commit()
     return jsonify(dict(

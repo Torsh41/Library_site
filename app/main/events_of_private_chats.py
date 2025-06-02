@@ -5,7 +5,7 @@ from app import database
 from app.models import User, PrivateChatPost, PrivateChat, ChatInvitation
 from flask_login import current_user, login_required
 from app.decorators import check_actual_password
-from datetime import datetime
+import datetime
 
 
 @socketio.on('join', namespace='/private_chat')
@@ -108,7 +108,7 @@ def edit_post(data):
     room = int(data['chat_id'])
     post = PrivateChatPost.query.filter_by(id=data['post_id']).first()
     post.body = str(data['new_post']).strip().replace("'", "")
-    post.timestamp = datetime.now(datetime.utc)
+    post.timestamp = datetime.datetime.now(datetime.timezone.utc)
     post_date = str(post.timestamp.date().day) + " " + months_dict[post.timestamp.date().month] + " " + str(post.timestamp.date().year)
     post.edited = True
     database.session.add(post)

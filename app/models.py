@@ -2,7 +2,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import database, login_manager, app
 from flask import current_app, url_for, session
-from datetime import datetime, timedelta
+import datetime
 from jose import jwt
 from sqlalchemy_serializer import SerializerMixin
 
@@ -44,7 +44,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.Text(), unique=True, index=True)
     username = database.Column(database.Text(), unique=True, index=True)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now(timezone.utc))
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     avatar = database.Column(database.LargeBinary)
     city = database.Column(database.Text())
     gender = database.Column(database.String(4))
@@ -68,11 +68,11 @@ class User(UserMixin, database.Model, SerializerMixin):
         # - does it actually expire after 30 min?
         # - is SECRET_KEY or JWT_SECRET_KEY used here at all?
         # - What even is SECRET_KEY???
-        now = datetime.now()
+        now = datetime.datetime.now()
         payload = {
             'iat': 0,
             'ref': 0,
-            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'exp': now + datetime.timedelta(seconds=current_app.config['JWT_EXPIRATION']),
             'scope': 'access_token',
             'user': self.username,
         }
@@ -80,11 +80,11 @@ class User(UserMixin, database.Model, SerializerMixin):
         return access_token
     
     def generate_change_token(self): #30 минут время действия токена
-        now = datetime.now()
+        now = datetime.datetime.now()
         payload = {
             'iat': 0,
             'ref': 0,
-            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'exp': now + datetime.timedelta(seconds=current_app.config['JWT_EXPIRATION']),
             'scope': 'access_token',
             'user': self.id,
         }
@@ -186,7 +186,7 @@ class TopicPost(database.Model, SerializerMixin):
     file = database.Column(database.LargeBinary)
     answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
 
@@ -195,7 +195,7 @@ class PrivateChat(database.Model, SerializerMixin):
     __tablename__ = "private_chats"
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.Text(), unique=False, index=True)
-    activity = database.Column(database.DateTime, index=True, default=datetime.now)
+    activity = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     posts = database.relationship('PrivateChatPost', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
     invitations = database.relationship('ChatInvitation', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
     creator_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -208,7 +208,7 @@ class PrivateChatPost(database.Model, SerializerMixin):
     file = database.Column(database.LargeBinary)
     answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     private_chat_id = database.Column(database.Integer, database.ForeignKey('private_chats.id')) 
        
@@ -231,7 +231,7 @@ class Book(database.Model, SerializerMixin):
     author = database.Column(database.Text(), unique=False)
     reference_url = database.Column(database.Text(), unique=False)
     publishing_house = database.Column(database.Text(), unique=False)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
@@ -256,7 +256,7 @@ class Book(database.Model, SerializerMixin):
     @release_year.setter
     def release_year(self, year: int):
         if self.release_date is None:
-            self.release_date = datetime.fromtimestamp(0)
+            self.release_date = datetime.datetime.fromtimestamp(0)
         self.release_date = self.release_date.replace(year=year)
 
 
@@ -272,7 +272,7 @@ class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.Text())
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
@@ -312,7 +312,7 @@ class ModerationRequest(database.Model, SerializerMixin):
     book = database.relationship('Book', backref='moderation_request', uselist=False, cascade="all, delete, delete-orphan")
     _status = database.Column(database.Integer, default=STATUS_OPEN)
     comment = database.Column(database.String(128), default="")
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
 
     @property
     def status(self):

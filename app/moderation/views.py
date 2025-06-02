@@ -6,7 +6,7 @@ from app.models import User, Role, Book, Category, SearchResult
 from .forms import BookSearchFiltersForm, SetModerationStatusForm
 from app.common.forms import BookSearchForm
 from app.decorators import *
-from datetime import datetime
+import datetime
 
 
 # TODO: dynamically assign per_page parameter
@@ -40,7 +40,7 @@ def set_moderation_status():
             }), 200
         book.moderation_request.comment = form.comment.data.strip()
         book.moderation_request.status = int(form.status.data)
-        book.moderation_request.timestamp = datetime.now()
+        book.moderation_request.timestamp = datetime.datetime.now()
         database.session.add(book.moderation_request)
         database.session.commit()
         return jsonify({

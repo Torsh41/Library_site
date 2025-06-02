@@ -6,7 +6,7 @@ from .. import database
 from app.models import User, Cataloge, Book, ModerationRequest, Item, Category, Role
 from app.decorators import *
 from app.parse_excel import add_many_books
-from datetime import datetime
+import datetime
 import copy
 LISTS_COUNT = 2
 BOOKS_COUNT = 5
@@ -530,9 +530,9 @@ def add_new_books():
         if Book.query.filter_by(name=book[1]).first() or not category:
             continue
         try:
-            datetime.strptime(book[6], "%d.%m.%Y")
+            datetime.datetime.strptime(book[6], "%d.%m.%Y")
         except:
-            book[6] = datetime.today()
+            book[6] = datetime.datetime.today()
         book_obj = Book(
             cover=False,
             name=book[1],

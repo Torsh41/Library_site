@@ -5,7 +5,7 @@ from app import database
 from app.models import User, TopicPost, DiscussionTopic
 from flask_login import current_user, login_required
 from app.decorators import check_actual_password
-from datetime import datetime
+import datetime
 
 
 @socketio.on('send post')
@@ -97,7 +97,7 @@ def post_delete(data):
 def edit_post(topic_id, post_id, new_comment):
     post = TopicPost.query.filter_by(id=post_id).first()
     post.body = str(new_comment).strip().replace("'", "")
-    post.timestamp = datetime.now(timezone.utc)
+    post.timestamp = datetime.datetime.now(datetime.timezone.utc)
     post_date = str(post.timestamp.date().day) + " " + months_dict[post.timestamp.date().month] + " " + str(post.timestamp.date().year)
     post.edited = True
     database.session.add(post)
