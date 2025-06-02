@@ -46,7 +46,7 @@ function renderBookTemplate(response) {
     </div>
     <div class="item__list__detail">
       <div><b>Книга:</b><span>${book.name}</span></div>
-      <div><b>Пользователь:</b><span>${response.current_user.username}</span></div>
+      <div><b>Пользователь:</b><span>${book.username}</span></div>
       <div><b>Время загрузки:</b><span>${upload_datetime}</span></div>
       <div><b>Статус заявки:</b><span id="item_header_status_${book.id}">${book.moderation_status}</span></div>
       <div><b></b><i>v раскрыть v</i></div>
