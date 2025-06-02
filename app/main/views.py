@@ -187,7 +187,7 @@ def edit_comment(username, comment_id, book_id):
     if not book_passed_moderation(book):
         return abort(403)
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
-    comment.timestamp = datetime.datetime.now()
+    comment.timestamp = datetime.datetime.now(timezone.utc)
     database.session.add(comment)
     database.session.commit()
     return jsonify(dict(

@@ -44,7 +44,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.Text(), unique=True, index=True)
     username = database.Column(database.Text(), unique=True, index=True)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.now(timezone.utc))
     avatar = database.Column(database.LargeBinary)
     city = database.Column(database.Text())
     gender = database.Column(database.String(4))
@@ -63,6 +63,11 @@ class User(UserMixin, database.Model, SerializerMixin):
     role_id = database.Column(database.Integer, default=Role.USER)
     
     def generate_confirmation_token(self): #30 минут время действия токена
+        # TODO: Does this even work???
+        # - should it use UTC time?
+        # - does it actually expire after 30 min?
+        # - is SECRET_KEY or JWT_SECRET_KEY used here at all?
+        # - What even is SECRET_KEY???
         now = datetime.now()
         payload = {
             'iat': 0,

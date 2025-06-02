@@ -108,7 +108,7 @@ def edit_post(data):
     room = int(data['chat_id'])
     post = PrivateChatPost.query.filter_by(id=data['post_id']).first()
     post.body = str(data['new_post']).strip().replace("'", "")
-    post.timestamp = datetime.now()
+    post.timestamp = datetime.now(datetime.utc)
     post_date = str(post.timestamp.date().day) + " " + months_dict[post.timestamp.date().month] + " " + str(post.timestamp.date().year)
     post.edited = True
     database.session.add(post)
