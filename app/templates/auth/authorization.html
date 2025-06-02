@@ -72,8 +72,13 @@
   
             <button class="btn form__btn ">Войти</button>
 
-            <p class="form__span">Забыли пароль? <a class="form__forget" href="{{url_for('auth.change_password_try')}}">Нажмите здесь, чтобы
-              заменить его</a>.</p>
+            <p class="form__span">Забыли пароль?
+              <u><a class="form__forget" href="{{ url_for('auth.change_password_try') }}">Нажмите здесь для смены пароля.</a></u>
+            </p>
+            <p class="form__span">Еще не прошли регистрацию?
+              <u><a class="form__forget" href="{{ url_for('auth.register') }}">Нажмите здесь для регистрации.</a></u>
+            </p>
+
           </form>
           
         </div>
