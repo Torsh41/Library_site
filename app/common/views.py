@@ -38,13 +38,14 @@ def book_search_filters():
         if form.username.data:
             query = query.join(Book.user)
             query = query.filter(User.username.like(f"%{form.username.data.strip()}%"))
-        if form.status.data:
-            @moderator_required
-            def filter_moderation_status(query):
-                query = query.join(Book.moderation_request)
-                query = query.filter(ModerationRequest._status==int(form.status.data))
-                return query
-            query = filter_moderation_status(query)
+        if (form.status.data and current_user.is_authenticated and
+                (current_user.role_id == Role.ADMIN or
+                 current_user.role_id == Role.MODERATOR)):
+            query = query.join(Book.moderation_request)
+            query = query.filter(ModerationRequest._status==int(form.status.data))
+        else:
+            query = query.join(Book.moderation_request)
+            query = query.filter(ModerationRequest._status==ModerationRequest.STATUS_ACCEPTED)
     else:
         app.logger.info("ERROR VALIDATE ON SUBMIT")
         app.logger.info(form.errors)
