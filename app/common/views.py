@@ -38,11 +38,12 @@ def book_search_filters():
         if form.username.data:
             query = query.join(Book.user)
             query = query.filter(User.username.like(f"%{form.username.data.strip()}%"))
-        if (form.status.data and current_user.is_authenticated and
-                (current_user.role_id == Role.ADMIN or
-                 current_user.role_id == Role.MODERATOR)):
-            query = query.join(Book.moderation_request)
-            query = query.filter(ModerationRequest._status==int(form.status.data))
+        if (current_user.is_authenticated and
+            (current_user.role_id == Role.ADMIN or
+             current_user.role_id == Role.MODERATOR)):
+            if form.status.data:
+                query = query.join(Book.moderation_request)
+                query = query.filter(ModerationRequest._status==int(form.status.data))
         else:
             query = query.join(Book.moderation_request)
             query = query.filter(ModerationRequest._status==ModerationRequest.STATUS_ACCEPTED)
