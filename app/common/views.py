@@ -56,8 +56,10 @@ def book_search_filters():
     pagination = database.paginate(query, page=page, per_page=PAGINATION_PER_PAGE)
     book_list = []
     for book in pagination.items:
-        grade_list = [0] + [grade.grade for grade in book.grades.all()]
-        grade_avg = sum(grade_list) / len(grade_list)
+        grade_list = [grade.grade for grade in book.grades.all()]
+        grade_avg = 0
+        if len(grade_list) > 0:
+            grade_avg = sum(grade_list) / len(grade_list)
         book_info = {
             "id": book.id,
             "name": book.name,
