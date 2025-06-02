@@ -88,3 +88,4 @@ function renderPaginationTemplate(response) {
 
 form.renderBookTemplate = renderBookTemplate;
 form.renderPaginationTemplate = renderPaginationTemplate;
+form.submit(1);
