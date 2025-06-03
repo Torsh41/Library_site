@@ -135,16 +135,24 @@
                 <div class="message__name-info" id="{{post.id}}user_info">
                   <p class="message__info">
                     <span class="message__span">
-                      {{post["age"]}}
+                      {% if post["age"] %}
+                        {{post["age"]}}
+                      {% endif %}
                     </span>
                     <span class="message__span">
-                      {{post["gender"]}}
+                      {% if post["gender"] %}
+                        {{post["gender"]}}
+                      {% endif %}
                     </span>
                     <span class="message__span">
-                      {{post["city"]}}
+                      {% if post["city"] %}
+                        {{post["city"]}}
+                      {% endif %}
                     </span>
                     <span class="message__span">
-                      {{post["about_me"]}}
+                      {% if post["about_me"] %}
+                        {{post["about_me"]}}
+                      {% endif %}
                     </span>
                   </p>
                   <span class="message__span">На сайте с {{ str(post["user_timestamp"].date().day) + " " + months_dict[post["user_timestamp"].date().month] + " " + str(post["user_timestamp"].date().year) }}</span>
