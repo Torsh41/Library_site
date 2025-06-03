@@ -5,6 +5,7 @@ from app.models import *
 from flask import render_template, request, redirect, abort, url_for, make_response, jsonify
 from flask_login import current_user, login_required
 from app.decorators import *
+from app import app
 import datetime
 
 
@@ -19,10 +20,11 @@ def book_search_filters():
     query = database.select(Book)
     if form.validate_on_submit():
         app.logger.info("VALIDATED_ON_SUBMIT")
-        search_result = str(request.form.get('search_result')).strip().lower()
+        search_result = request.form.get("search_result")
         if search_result:
-            query = query.filter((Book.name.like("%{}%".format(search_result))) |
-                                  (Book.author.like("%{}%".format(search_result))))
+            q = str(search_result).strip().lower()
+            query = query.filter((Book.name.like("%{}%".format(q))) |
+                                  (Book.author.like("%{}%".format(q))))
         if form.category.data:
             query = query.filter(Book.category_id==int(form.category.data))
         if form.bookname.data:
@@ -58,6 +60,7 @@ def book_search_filters():
 
     query = query.order_by(Book.timestamp)
     pagination = database.paginate(query, page=page, per_page=PAGINATION_PER_PAGE)
+    app.logger.info(pagination.items)
     book_list = []
     for book in pagination.items:
         grade_list = [grade.grade for grade in book.grades.all()]
