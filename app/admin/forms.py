@@ -38,8 +38,8 @@ def validate_isbn(form, field):
 # Unique constraint validation methods have to be redefined.
 class ChangeBookInfoForm(AddNewBookForm): 
     isbn = StringField('BookISBN', validators=[Optional(), Length(1, 128), validate_isbn, validate_isbn_10_or_13])
-    name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Название книги должно содержать только буквы и пробелы.'), validate_bookname])
+    name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё0-9 ]', 0,
+    'Поле содержит недопустимые символы.'), validate_bookname])
     submit = SubmitField('Изменить данные')
     
     def __init__(self, book, *args, **kwargs):
