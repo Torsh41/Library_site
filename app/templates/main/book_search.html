@@ -56,10 +56,6 @@
                 </svg>
                 <input id="books_find_field" type="text" class="main__form-input" name="search_result" maxlength="120" placeholder="Введите название книги или автора..">
               </label>
-              <div>
-                  <!-- TODO: realign -->
-                <span class="main__help">Для просмотра всех книг из данной категории введите символ *</span>
-              </div>
 
               {% macro form_input_errors(input) %}
               {% if input.errors %}
@@ -116,6 +112,8 @@
           </div>
         </div>
       </section>
+
+      <div style="height: 200px;"></div>
 
       <section class="list" id="book-list-section">
       </section>
