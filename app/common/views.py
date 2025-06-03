@@ -19,6 +19,10 @@ def book_search_filters():
     query = database.select(Book)
     if form.validate_on_submit():
         app.logger.info("VALIDATED_ON_SUBMIT")
+        search_result = str(request.form.get('search_result')).strip().lower()
+        if search_result:
+            query = query.filter((Book.name.like("%{}%".format(search_result))) |
+                                  (Book.author.like("%{}%".format(search_result))))
         if form.category.data:
             query = query.filter(Book.category_id==int(form.category.data))
         if form.bookname.data:
