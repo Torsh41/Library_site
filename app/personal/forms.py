@@ -57,10 +57,10 @@ def validate_isbn_10_or_13(form, field):
 # Whenever adding/removing fields, also take a look at the other class.
 class AddNewBookForm(FlaskForm):
     isbn = StringField('BookISBN', validators=[Optional(), Length(1, 128), validate_isbn, validate_isbn_10_or_13])
-    name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Название книги должно содержать только буквы и пробелы.'), validate_bookname])
-    author = StringField('AuthorName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Имя автора должно содержать только буквы и пробелы.')])
+    name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё0-9 ]', 0,
+    'Поле содержит недопустимые символы.'), validate_bookname])
+    author = StringField('AuthorName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё0-9 ]', 0,
+    'Поле содержит недопустимые символы.')])
     reference_url = StringField('ReferenceLink', default='', validators=[Optional(), URL(message='Поле содержит недопустимые символы.')])
     publishing_house = StringField('HouseName', validators=[Optional(), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название издательсва должно содержать только буквы и пробелы.'), Length(1, 64)])
