@@ -38,16 +38,16 @@
           <form class="form__wrap" action="" method="post">
             {{form.hidden_tag()}}
             <label class="form__label">
-              <span class="form__span">Ваш email</span>
-              {% if form.email.errors %}
-              {{form.email(class="form__input", placeholder='Введите email')}}
+              <span class="form__span">Ваш логин</span>
+              {% if form.email_or_login.errors %}
+              {{form.email_or_login(class="form__input", placeholder='Введите псевдоним или email')}}
               <span class="form__help">
-                {% for msg in form.email.errors %}
+                {% for msg in form.email_or_login.errors %}
                 {{ msg }}
                 {% endfor %}
               </span>
               {% else %}
-              {{form.email(class="form__input", placeholder='Введите email')}}
+              {{form.email_or_login(class="form__input", placeholder='Введите email или логин')}}
               {% endif %}
             </label>
   
