@@ -41,6 +41,7 @@
               <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Авторизация</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.book_search')}}">Каталог</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории</a></li>
+              <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
             {% elif current_user.is_authenticated %}
               <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
               <li class="nav__item"><a class="nav__link" href="{{url_for('main.book_search')}}">Каталог</a></li>
