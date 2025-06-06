@@ -55,12 +55,12 @@
               </div>
 
               <div>
-                <div><span>Ваш псевдоним:</span></div>
+                <div><span class="profile__span">Ваш псевдоним:</span></div>
                 {{ form.username(class="profile__input", value=current_user.username, placeholder="Введите ваше имя на сайте...") }}
               </div>
 
               <div>
-                <div><span>Ваш город:</span></div>
+                <div><span class="profile__span">Ваш город:</span></div>
                 {% if current_user.city is none %}
                   {{ form.city(class="profile__input", placeholder="Введите город..") }}
                 {% else %}
@@ -87,10 +87,10 @@
 }
 </script>
                 {% endif %}
-              <div>
+              </div>
     
               <div>
-                <div><span>Ваш возраст:</span></div>
+                <div><span class="profile__span">Ваш возраст:</span></div>
                 {% if current_user.age is none %}
                  {{ form.age(class="profile__input", placeholder="Введите возраст..") }}
                 {% else %}
@@ -99,7 +99,7 @@
               </div>
 
               <div>
-                <div><span>Информация о вас:</span></div>
+                <div><span class="profile__span">Информация о вас:</span></div>
                 {% if current_user.about_me is none %}
                  {{ form._about_me(class="profile__text", placeholder="Расскажите о себе..", rows="5") }}
                 {% else %}
