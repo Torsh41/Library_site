@@ -9,16 +9,22 @@ from app import app
 import datetime
 
 
-@common.route('/book/search/', methods=['POST'])
+@common.route('/book/search/', methods=['GET', 'POST'])
 def book_search_filters():
     PAGINATION_PER_PAGE = 12
-    form = BookSearchForm(request.form)
+    form = None
+    if request.method == "GET":
+        form = BookSearchForm(request.args)
+    elif request.method == "POST":
+        form = BookSearchForm(request.form)
+    else:
+        return abort(400)
     page = form.page.data if form.page.data else 1
     extended = form.extended.data if form.extended.data else True
 
     # NOTE: not fully tested, errors might occur
     query = database.select(Book)
-    if form.validate_on_submit():
+    if request.method == "GET" or form.validate_on_submit():
         app.logger.info("VALIDATED_ON_SUBMIT")
         search_result = request.form.get("search_result")
         if search_result:
@@ -60,7 +66,6 @@ def book_search_filters():
 
     query = query.order_by(Book.timestamp)
     pagination = database.paginate(query, page=page, per_page=PAGINATION_PER_PAGE)
-    app.logger.info(pagination.items)
     book_list = []
     for book in pagination.items:
         grade_list = [grade.grade for grade in book.grades.all()]
