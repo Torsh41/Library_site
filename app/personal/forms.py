@@ -15,21 +15,19 @@ def username_exists(form, field):
         raise ValidationError('Указаный псевдоним уже занят.')
 
 class EditProfileForm(FlaskForm):
-    avatar = FileField('ImageFile', validators=[FileAllowed(
-        ["jpg", "png", "webp"], "Можно загружать только картинки.")])
+    avatar = FileField('ImageFile', validators=[Optional(),
+        FileAllowed(["jpg", "png", "webp"], "Можно загружать только картинки.")])
     username = StringField('Username', validators=[
-        DataRequired('Поля не должны быть пустыми.'), Length(max=64),
+        DataRequired('Поля не должны быть пустыми.'), Length(max=64), username_exists,
         Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0, 'Логин содержит только буквы, ' +
-            'цифры, точки или символы подчеркивания.'), username_exists])
-    avatar = FileField('Photo')
+               'цифры, точки или символы подчеркивания.')])
+    avatar = FileField('Photo', validators=[Optional()])
     city = StringField('City', validators=[Optional(), Length(max=64),
-        Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-            'Название города должно содержать только буквы и пробелы.')])
-    gender = SelectField('Gender', choices=[("", "--выберите пол--"),
-                                            ("муж", "мужской"),
-                                            ("жен", "женcкий")])
-    age = IntegerField('Age')
-    about_me = TextAreaField('Description', validators=[Length(max=250)])
+        Regexp('[A-Za-zА-Яа-яЁё ]', 0, 'Название города должно содержать только буквы и пробелы.')])
+    gender = SelectField('Gender', validators=[Optional()],
+                         choices=[("", "--выберите пол--"), ("муж", "мужской"), ("жен", "женcкий")])
+    age = IntegerField('Age', validators=[Optional()])
+    about_me = TextAreaField('Description', validators=[Optional(), Length(max=250)])
 
     def _about_me(self, default="", **kwargs):
         # Set default value of TextAreaField
