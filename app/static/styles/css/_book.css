@@ -193,7 +193,7 @@
 }
 
 .book__text {
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .book__count {

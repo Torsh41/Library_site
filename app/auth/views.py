@@ -12,7 +12,11 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         next_url = request.args.get('next', '')
-        user = User.query.filter_by(email=form.email.data.lower()).first()
+        username_or_email = form.email_or_login.data
+        user = User.query.filter(
+            (User.username == username_or_email) |
+            (User.email == username_or_email)
+        ).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
             session['username'] = user.username

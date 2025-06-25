@@ -28,15 +28,20 @@ class RegistrationForm(FlaskForm):
 
 
 def validate_user(form, field):
-    user = User.query.filter_by(email=field.data.lower()).first()
+    username_or_email = field.data
+    user = User.query.filter(
+        (User.username == username_or_email) |
+        (User.email == username_or_email)
+    ).first()
     if user is None:
         raise ValidationError(
             'Такого пользователя нет в базе. Пожалуйста, пройдите регистрацию.')
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired('Поля не должны быть пустыми.'), Length(
-        1, 64), Email('Неверный email адрес.'), validate_user])
+    email_or_login = StringField('EmailOrLogin',
+            validators=[DataRequired('Поля не должны быть пустыми.'),
+                        Length(max=64), validate_user])
     password = PasswordField('Password', validators=[DataRequired(
         'Поля не должны быть пустыми.')])
     remember_me = BooleanField('Keep me logged in')

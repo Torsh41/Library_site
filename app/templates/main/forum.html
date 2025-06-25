@@ -15,57 +15,11 @@
   {% if current_user.is_authenticated %}
     <script src="{{ url_for('static', filename='js/main/forum/create_private_chat.js')}}"></script>
   {% endif %}
-  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
-
 </head>
 
 <body>
   <div class="content">
-    <header class="header">
-      <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
-
-        <div class="header__right">
-          <span class="header__menu">Меню</span>
-          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-            <span class="hamburger__box">
-              <span class="hamburger__inner"></span>
-            </span>
-          </button>
-        </div>
-
-        <nav class="nav header__nav">
-          <div class="nav__menu js-menu-wrap">
-            <ul class="nav__list list-reset">
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-              {% if current_user.is_authenticated %}
-              <li class="nav__item"><a class="nav__link"
-                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              {% else %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
-              {% endif %}
-              {% if current_user.role == Role.ADMIN %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a>
-              </li>
-              <li class="nav__item"><a class="nav__link"
-                  href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a>
-              </li>
-              {% endif %}
-              {% if current_user.is_authenticated %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a>
-              </li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.logout')}}">Выйти</a></li>
-              {% endif %}
-            </ul>
-          </div>
-        </nav>
-
-      </div>
-    </header>
+    {% include "common/header.html" %}
 
     <main id="main_block">
       {% if current_user.is_authenticated %}
@@ -98,7 +52,7 @@
         </section>
       {% endif %}
 
-      {% if current_user.role == Role.ADMIN %}
+      {% if current_user.role_id == Role.ADMIN %}
         <section class="popup" id="change_topic_name_sec" style="display: none">
           <div class="popup__formPopup">
             <form id="change_topic_name_form" class="popup__formContainer" action="" method="post">
@@ -204,7 +158,7 @@
                       <p class="fraction__text-error" id="{{category.id}}{{topic.id}}top_name">{{ topic.name }}</p>
                     </div>
                   </a>
-                  {% if current_user.role == Role.ADMIN %}
+                  {% if current_user.role_id == Role.ADMIN %}
                     <div class="fraction__wrapper-command">
                       <a class="comments__command" id="{{category.id}}{{topic.id}}admin_mark">Админ</a>
                       <a id="{{category.id}}{{topic.id}}change_topic_name" class="comments__command"

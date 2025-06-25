@@ -1,0 +1,54 @@
+main/book_page.html:    {% include "common/header.html" %}
+main/forum.html:    {% include "common/header.html" %}
+main/books_maintaining.html:        {% include "common/header.html" %}
+main/private_chat_discussion.html:    {% include "common/header.html" %}
+main/category_page.html:    {% include "common/header.html" %}
+main/index.html:    {% include "common/header.html" %}
+main/private_chats.html:            {% include "common/header.html" %}
+main/forum_discussion.html:    {% include "common/header.html" %}
+main/categories.html:    {% include "common/header.html" %}
+personal/user_page.html:    {% include "common/header.html" %}
+personal/user_page_add_book.html:    {% include "common/header.html" %}
+personal/add_book.html:    {% include "common/header.html" %}
+personal/edit_user_page_profile.html:    {% include "common/header.html" %}
+403.html:<div class="page-header">
+common/header.html:    <header class="header style-1">
+400.html:<div class="page-header">
+401.html:<div class="page-header">
+moderation/moderation_panel.html:    {% include "common/header.html" %}
+404.html:<div class="page-header">
+500.html:<div class="page-header">
+admin/admin_panel.html:    {% include "common/header.html" %}
+admin/change_book_info.html:    {% include "common/header.html" %}
+auth/change_password.html:    {% include "common/header.html" %}
+auth/authorization.html:    {% include "common/header.html" %}
+auth/unconfirmed.html:        {% include "common/header.html" %}
+auth/registraton.html:    {% include "common/header.html" %}
+auth/change_password_try.html:    {% include "common/header.html" %}
+tmp:main/book_page.html:    {% include "common/header.html" %}
+
+
+
+
+main/book_page.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/forum.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/books_maintaining.html:    <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/private_chat_discussion.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/category_page.html:    <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/index.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/private_chats.html:        <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/forum_discussion.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+main/categories.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+personal/user_page.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+personal/user_page_add_book.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+personal/add_book.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+personal/edit_user_page_profile.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+common/header.html:          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
+moderation/moderation_panel.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+admin/change_book_info.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+auth/change_password.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+auth/authorization.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+auth/unconfirmed.html:    <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+auth/registraton.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+auth/change_password_try.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
+tmp:main/book_page.html:  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>

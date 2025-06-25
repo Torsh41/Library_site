@@ -2,40 +2,40 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import database, login_manager, app
 from flask import current_app, url_for, session
-from datetime import datetime, timedelta
+import datetime
 from jose import jwt
 from sqlalchemy_serializer import SerializerMixin
 
 
-class Role(database.Model, SerializerMixin):
-    USER = 0
-    ADMIN = 1
-    MODERATOR = 2
-    TEACHER = 3
-    __tablename__ = "roles"
-    id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(16), unique=True)
+class Role():
+    # enum of possible role values
+    USER = 1
+    ADMIN = 2
+    MODERATOR = 3
+    TEACHER = 4
+
+    role_dict = {
+        USER: "Пользователь",
+        ADMIN: "Администратор",
+        MODERATOR: "Модератор",
+        TEACHER: "Преподаватель",
+    }
+
+    def __init__(self, role_id):
+        self._is_valid = False
+        if role_id in Role.role_dict.keys():
+            self._is_valid = True
+            self.role_id = role_id
+
+    @property
+    def name(self):
+        return Role.role_dict[self.role_id]
+
+    def is_valid(self):
+        return self.is_valid
 
     def __repr__(self):
         return self.name
-    
-    @staticmethod
-    def by_id(role_id):
-        """Get existing Role object from database.
-        Example: Role.by_id(Role.ADMIN)
-        """
-        role = db.session.execute(
-            database.select(Role).filter_by(id=role_id)
-        ).scalar_one_or_none()
-        return role
-
-    @staticmethod
-    def get_defined_roles():
-        """Get a list of Role objects, to populate the Role table after creating it."""
-        return [Role(id=Role.USER, name="User"),
-                Role(id=Role.ADMIN, name="Admin"),
-                Role(id=Role.MODERATOR, name="Moderator"),
-                Role(id=Role.TEACHER, name="Teacher")]
 
 
 #отношение один ко многим
@@ -44,7 +44,7 @@ class User(UserMixin, database.Model, SerializerMixin):
     id = database.Column(database.Integer, primary_key=True)
     email = database.Column(database.Text(), unique=True, index=True)
     username = database.Column(database.Text(), unique=True, index=True)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     avatar = database.Column(database.LargeBinary)
     city = database.Column(database.Text())
     gender = database.Column(database.String(4))
@@ -60,14 +60,19 @@ class User(UserMixin, database.Model, SerializerMixin):
     posts_from_all_private_chats = database.relationship('PrivateChatPost', backref='user', cascade="all, delete, delete-orphan")
     cataloges = database.relationship('Cataloge', backref='user', lazy='dynamic', cascade="all, delete, delete-orphan")
     confirmed = database.Column(database.Boolean, default=False)
-    role = database.Column(database.Integer, database.ForeignKey('roles.id'))
+    role_id = database.Column(database.Integer, default=Role.USER)
     
     def generate_confirmation_token(self): #30 минут время действия токена
-        now = datetime.now()
+        # TODO: Does this even work???
+        # - should it use UTC time?
+        # - does it actually expire after 30 min?
+        # - is SECRET_KEY or JWT_SECRET_KEY used here at all?
+        # - What even is SECRET_KEY???
+        now = datetime.datetime.now()
         payload = {
             'iat': 0,
             'ref': 0,
-            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'exp': now + datetime.timedelta(seconds=current_app.config['JWT_EXPIRATION']),
             'scope': 'access_token',
             'user': self.username,
         }
@@ -75,11 +80,11 @@ class User(UserMixin, database.Model, SerializerMixin):
         return access_token
     
     def generate_change_token(self): #30 минут время действия токена
-        now = datetime.now()
+        now = datetime.datetime.now()
         payload = {
             'iat': 0,
             'ref': 0,
-            'exp': now + timedelta(seconds=current_app.config['JWT_EXPIRATION']),
+            'exp': now + datetime.timedelta(seconds=current_app.config['JWT_EXPIRATION']),
             'scope': 'access_token',
             'user': self.id,
         }
@@ -133,14 +138,29 @@ class User(UserMixin, database.Model, SerializerMixin):
                   "WARNING: To create Admin user, " +
                   "define an envirounment variable `MBK_ADMIN=['admin@email.com']`.")
         elif self.email in default_admins:
-            self.role = Role.ADMIN
+            self.role_id = Role.ADMIN
         else:
-            self.role = Role.USER
+            self.role_id = Role.USER
             
     def default_ava(self):
         # with app.open_resource(app.root_path + url_for('static', filename='styles/img/default_avatar.jpg'), 'rb') as f:
         with app.open_resource(app.root_path + '/static/styles/img/default_avatar.jpg', 'rb') as f:
             self.avatar = f.read()
+
+    @property
+    def invitation_count(self):
+        invitations = len(self.chats_invitations.filter_by(viewed=False).all())
+        return invitations
+
+    @property
+    def role(self):
+        return Role(self.role_id).name
+
+    @role.setter
+    def role(self, role_id):
+        if not Role(role_id).is_valid():
+            raise ValueError(f"Role '{role}' is not defined in app/models.py")
+        self.role_id = role_id
             
             
 class Category(database.Model, SerializerMixin):
@@ -166,7 +186,7 @@ class TopicPost(database.Model, SerializerMixin):
     file = database.Column(database.LargeBinary)
     answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     discussion_topic_id = database.Column(database.Integer, database.ForeignKey('topics.id'))
 
@@ -175,7 +195,7 @@ class PrivateChat(database.Model, SerializerMixin):
     __tablename__ = "private_chats"
     id = database.Column(database.Integer, primary_key=True)
     name = database.Column(database.Text(), unique=False, index=True)
-    activity = database.Column(database.DateTime, index=True, default=datetime.now)
+    activity = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     posts = database.relationship('PrivateChatPost', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
     invitations = database.relationship('ChatInvitation', backref='private_chat', lazy='dynamic', cascade="all, delete, delete-orphan")
     creator_id = database.Column(database.Integer, database.ForeignKey('users.id'))
@@ -188,7 +208,7 @@ class PrivateChatPost(database.Model, SerializerMixin):
     file = database.Column(database.LargeBinary)
     answer_to_post = database.Column(database.Integer)
     edited = database.Column(database.Boolean, default=False)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     private_chat_id = database.Column(database.Integer, database.ForeignKey('private_chats.id')) 
        
@@ -205,14 +225,17 @@ class Book(database.Model, SerializerMixin):
     __tablename__ = "books"
     id = database.Column(database.Integer, primary_key=True)
     cover = database.Column(database.LargeBinary)
-    isbn = database.Column(database.Text(), unique=True)
+    # Make isbn non-unique to allow multiple null values. Please, find a better solution.
+    isbn = database.Column(database.Text(), unique=False)
     name = database.Column(database.Text(), unique=True, index=True)
     author = database.Column(database.Text(), unique=False)
+    reference_url = database.Column(database.Text(), unique=False)
     publishing_house = database.Column(database.Text(), unique=False)
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     description = database.Column(database.Text(), unique=False)
     release_date = database.Column(database.Date(), unique=False)
     count_of_chapters = database.Column(database.Integer, unique=False)
+    moderation_request_id = database.Column(database.Integer, database.ForeignKey('moderation_requests.id'))
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     category_id = database.Column(database.Integer, database.ForeignKey('categories.id'))
     cataloge_items = database.relationship('Item', backref='book', cascade="all, delete, delete-orphan")
@@ -220,9 +243,22 @@ class Book(database.Model, SerializerMixin):
     comments = database.relationship('Comment', backref='book', lazy='dynamic', cascade="all, delete, delete-orphan")
     
     def default_cover(self):
-        with app.open_resource(app.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
+        # with app.open_resource(app.root_path + url_for('static', filename='styles/img/book.jpg'), 'rb') as f:
+        with app.open_resource(app.root_path + '/static/styles/img/book.jpg', 'rb') as f:
             self.cover = f.read()
-    
+
+    @property
+    def release_year(self) -> int:
+        if self.release_date is None:
+            return None
+        return self.release_date.year
+
+    @release_year.setter
+    def release_year(self, year: int):
+        if self.release_date is None:
+            self.release_date = datetime.datetime.fromtimestamp(0)
+        self.release_date = self.release_date.replace(year=year)
+
 
 class BookGrade(database.Model, SerializerMixin):
     __tablename__ = "grades"
@@ -236,7 +272,7 @@ class Comment(database.Model, SerializerMixin):
     __tablename__ = "comments"
     id = database.Column(database.Integer, primary_key=True)
     body = database.Column(database.Text())
-    timestamp = database.Column(database.DateTime, index=True, default=datetime.now)
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
     #disabled = database.Column(database.Boolean)
     user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
     book_id = database.Column(database.Integer, database.ForeignKey('books.id'))
@@ -257,6 +293,40 @@ class Item(database.Model, SerializerMixin):
     read_state = database.Column(database.String(64), unique=False, default=None) #прочитано или читаю или планирую или заброшено  
     cataloge_id = database.Column(database.Integer, database.ForeignKey('catalogues.id')) 
     book_id = database.Column(database.Integer, database.ForeignKey('books.id')) 
+
+
+class ModerationRequest(database.Model, SerializerMixin):
+    # enum of possible status values
+    STATUS_OPEN = 1
+    STATUS_ACCEPTED = 2
+    STATUS_REJECTED = 3
+
+    status_dict = {
+        STATUS_OPEN: "Обрабатывается",
+        STATUS_ACCEPTED: "Одобрено",
+        STATUS_REJECTED: "Отклонено",
+    }
+
+    __tablename__ = "moderation_requests"
+    id = database.Column(database.Integer, primary_key=True)
+    book = database.relationship('Book', backref='moderation_request', uselist=False, cascade="all, delete, delete-orphan")
+    _status = database.Column(database.Integer, default=STATUS_OPEN)
+    comment = database.Column(database.String(128), default="")
+    timestamp = database.Column(database.DateTime, index=True, default=datetime.datetime.now(datetime.timezone.utc))
+
+    @property
+    def status(self):
+        return self._status
+
+    def status_str(self):
+        return ModerationRequest.status_dict[self._status]
+
+    @status.setter
+    def status(self, status) -> bool:
+        if status not in ModerationRequest.status_dict.keys():
+            raise ValueError(f"ModerationRequest status={status} is not defined in app/models.py")
+        self._status = status
+        database.session.add(self)
 
 
 class SearchResult(database.Model, SerializerMixin):

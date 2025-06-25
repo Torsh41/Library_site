@@ -1,18 +1,39 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaField, DateField
-from wtforms.validators import DataRequired, Length, Regexp, NumberRange
+from flask_login import current_user
+from wtforms import StringField, SubmitField, FileField, IntegerField, TextAreaField, SelectField
+from wtforms.validators import DataRequired, Length, Regexp, NumberRange, URL, Optional
 from wtforms import ValidationError
-from ..models import Book
+from flask_wtf.file import FileAllowed, FileRequired
+from ..models import Book, User
 from isbnlib import is_isbn10, is_isbn13
 
 
+def username_exists(form, field):
+    existing_user = User.query.filter_by(
+            username=form.username.data.strip().replace("'", "")).first()
+    if existing_user and existing_user.username != current_user.username:
+        raise ValidationError('Указаный псевдоним уже занят.')
+
 class EditProfileForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired('Поля не должны быть пустыми.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0, 'Логин содержит только буквы, цифры, точки или символы подчеркивания.')])
-    avatar = FileField('Photo')
-    city = StringField('City', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 64), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Название города должно содержать только буквы и пробелы.')])
-    age = IntegerField('Age', validators=[DataRequired('Поле не должно быть пустым.'), NumberRange(1, 100, message='Здесь невозможно ошибиться:)')])
-    submit = SubmitField('Сохранить')
+    avatar = FileField('ImageFile', validators=[Optional(),
+        FileAllowed(["jpg", "png", "webp"], "Можно загружать только картинки.")])
+    username = StringField('Username', validators=[
+        DataRequired('Поля не должны быть пустыми.'), Length(max=64), username_exists,
+        Regexp('[A-Za-zА-Яа-яЁё0-9_.]', 0, 'Логин содержит только буквы, ' +
+               'цифры, точки или символы подчеркивания.')])
+    avatar = FileField('Photo', validators=[Optional()])
+    city = StringField('City', validators=[Optional(), Length(max=64),
+        Regexp('[A-Za-zА-Яа-яЁё ]', 0, 'Название города должно содержать только буквы и пробелы.')])
+    gender = SelectField('Gender', validators=[Optional()],
+                         choices=[("", "--выберите пол--"), ("муж", "мужской"), ("жен", "женcкий")])
+    age = IntegerField('Age', validators=[Optional()])
+    about_me = TextAreaField('Description', validators=[Optional(), Length(max=250)])
+
+    def _about_me(self, default="", **kwargs):
+        # Set default value of TextAreaField
+        if default:
+            self.about_me.process_data(default)
+        return self.about_me(**kwargs)
     
               
 def validate_bookname(form, field):
@@ -30,16 +51,20 @@ def validate_isbn_10_or_13(form, field):
         raise ValidationError('ISBN должен соответствовать стандарту ISBN 10 или ISBN 13.')
     
     
+# The app.admin.forms.ChangeBookInfoForm depends on this class implementation.
+# Whenever adding/removing fields, also take a look at the other class.
 class AddNewBookForm(FlaskForm):
-    isbn = StringField('BookISBN', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), validate_isbn, validate_isbn_10_or_13])
-    name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Название книги должно содержать только буквы и пробелы.'), validate_bookname])
-    author = StringField('AuthorName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
-    'Имя автора должно содержать только буквы и пробелы.')])
-    publishing_house = StringField('HouseName', validators=[DataRequired('Поле не должно быть пустым.'), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
+    isbn = StringField('BookISBN', validators=[Optional(), Length(1, 128), validate_isbn, validate_isbn_10_or_13])
+    name = StringField('BookName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё0-9 ]', 0,
+    'Поле содержит недопустимые символы.'), validate_bookname])
+    author = StringField('AuthorName', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 128), Regexp('[A-Za-zА-Яа-яЁё0-9 ]', 0,
+    'Поле содержит недопустимые символы.')])
+    reference_url = StringField('ReferenceLink', default='', validators=[Optional(), URL(message='Поле содержит недопустимые символы.')])
+    publishing_house = StringField('HouseName', validators=[Optional(), Regexp('[A-Za-zА-Яа-яЁё ]', 0,
     'Название издательсва должно содержать только буквы и пробелы.'), Length(1, 64)])
-    description = TextAreaField('Description', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 1024)])
-    release_date = DateField('ReleaseDate', validators=[DataRequired('Поле не должно быть пустым.')])
-    chapters_count = IntegerField('ChaptersCount', validators=[DataRequired('Поле не должно быть пустым.'), NumberRange(2, 100, message='Здесь невозможно ошибиться:)')])
+    description = TextAreaField('Description', validators=[DataRequired('Поле не должно быть пустым.'), Length(1, 5000)])
+    release_year = StringField('ReleaseDate', validators=[Optional(), Length(max=4), Regexp('[0-9]')])
+    chapters_count = IntegerField('ChaptersCount', validators=[Optional(), NumberRange(2, 100, message='Здесь невозможно ошибиться:)')]) # Верим...
     submit = SubmitField('Добавить книгу в базу')
-    
+
+

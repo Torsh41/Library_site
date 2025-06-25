@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Books Moderation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css')}}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/style.css')}}" />
+  <link rel="icon" href="{{url_for('static', filename='styles/img/Logo.svg')}}">
+  <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
+  <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/pagination.js')}}"></script> -->
+  <!-- <script src="{{ url_for('static', filename='js/admin/admin_panel/search_users.js')}}"></script> -->
+  <script defer src="{{ url_for('static', filename='js/common/lunchbox.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/common/book_search_form.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/moderation/book/search.js')}}"></script>
+  <script>
+function setStatusLampColor(lampId, status) {
+    statusLamp = document.getElementById(lampId);
+    if (status == "{{ ModerationRequest.status_dict[ModerationRequest.STATUS_OPEN] }}") {
+        statusLamp.style["background-color"] = "gray";
+    } else if (status == "{{ ModerationRequest.status_dict[ModerationRequest.STATUS_ACCEPTED] }}") {
+        statusLamp.style["background-color"] = "MediumSeaGreen";
+    } else if (status == "{{ ModerationRequest.status_dict[ModerationRequest.STATUS_REJECTED] }}") {
+        statusLamp.style["background-color"] = "red";
+    } else {
+        console.log("Error: unexpected ModerationRequest.status value: " + status);
+    }
+}
+  </script>
+  <script src="{{ url_for('static', filename='js/page_scroll.js')}}"></script>
+
+<style>
+.status__lamp__parent {
+    position: relative;
+}
+
+.status__lamp {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    border: 1px solid;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+</style>
+<style>
+#book_search_filters_form {
+    margin: 10px;
+    display: block;
+
+}
+#book_search_filters_form > div {
+    display: flex;
+    justify-content: space-between;
+
+}
+</style>
+</head>
+
+<body>
+</head>
+
+<body>
+  <div class="content">
+    {% include "common/header.html" %}
+
+    <main>
+      <section class="main">
+        <div class="main__container container">
+          <div class="main__top">
+            <h1 class="main__title">Hello, {{ current_user.username }} admin</h1>
+            <!--Hello, имя пользователя!-->
+            <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line y1="0.5" x2="461" y2="0.5" stroke="#F5F5DC" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="list" id="book_search">
+        <div class="container list__container" id="books_keeper_cont">
+          <div class="list__wrap" id="2cont">
+            <h2 class="list__title title" id="category_title">Модерация книг</h2>
+            <div>
+                <form id="book_search_filters_form" action="{{ url_for('common.book_search_filters') }}" method="post">
+                {{form.hidden_tag()}}
+                <div>
+                  <h2>Поиск по фильтрам</h2>
+                </div>
+                <div>
+                  <!-- TODO: keep filter values after request -->
+                  <span>Название книги:</span>
+                  {{ form.bookname() }}
+                </div>
+                <div>
+                  <span>Имя пользователя:</span>
+                  {{ form.username() }}
+                </div>
+                <div>
+                  <span>Категория:</span>
+                  {{ form.category() }}
+                </div>
+                <div>
+                  <span>Статус заявки:</span>
+                  {{ form.status() }}
+                </div>
+                <div>
+                  <!-- TODO: the button -->
+                  <input type="submit" value="Подтвердить">
+                </div>
+              </form>
+              <ul class="list-reset" id="book-list-section">
+                <li>
+                  <h2>Результаты поиска</h4>
+                </li>
+              </ul>
+            </div>
+
+            <section id="status-form-template" style="display: none;">
+              <form name="status-form" class="item__list__footer status-form" action="{{ url_for('moderation.set_moderation_status') }}" method="post">
+                {{ status_form.hidden_tag() }}
+                {{ status_form.book_id(type="hidden", class="status-form-book-id") }}
+                {{ status_form._comment(class="status-form-comment", placeholder="Комментарий... (Не больше 128 символов)") }}
+                {{ status_form.status(class="status-form-status") }}
+                <input type="submit" class="status-form-submit" value="Отправить">
+              </form>
+            </section>
+
+            <section class="list__pagination pagination" id="pagination-section">
+            </section>
+          </div>
+        </div>
+      </section>
+      <script>scroll("add_category")</script>
+    </main>
+  </div>
+  
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="#" class="footer__wrap">© MBK | Community Magic Book Keeper</a>
+    </div>
+  </footer>
+</body>
+</html>

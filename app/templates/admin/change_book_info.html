@@ -14,56 +14,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
   <script src="{{url_for('static', filename='js/jquery.min.js.js')}}"></script>
   <script src="{{ url_for('static', filename='js/admin/admin_panel/book_changing_pagination.js')}}"></script>
-  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
-  
 </head>
 
 <body>
   <div class="content">
-    <header class="header style-1">
-      <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
-
-        <div class="header__right">
-          <span class="header__menu">Меню</span>
-          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-            <span class="hamburger__box">
-              <span class="hamburger__inner"></span>
-            </span>
-          </button>
-        </div>
-
-        <nav class="nav header__nav">
-          <div class="nav__menu js-menu-wrap">
-            <ul class="nav__list list-reset">
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-              <li class="nav__item"><a class="nav__link"
-                  href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              {% if current_user.role == Role.ADMIN %}
-              <li class="nav__item"><a class="nav__link"
-                  href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a>
-              </li>
-              {% endif %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
-              {% if current_user.role == Role.ADMIN %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a>
-              </li>
-              <li class="nav__item"><a class="nav__link"
-                  href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a>
-              </li>
-              {% endif %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a>
-              </li>
-            </ul>
-          </div>
-        </nav>
-
-      </div>
-    </header>
+    {% include "common/header.html" %}
 
     <main>
       <section class="main style-1">
@@ -81,11 +36,63 @@
         <div class="form__container container">
           <form class="form__wrap" enctype="multipart/form-data" method="post">
             {{form.hidden_tag()}}
+            <label class="form__label">
+                <span style="color: #0006">
+                    Обязательные поля отмечены *
+                </span>
+            </label>
             <span class="form__span">Обложка книги</span>
             <div class="profile__image profile__image-edit">
               <!--Тут получаем обложку для книги-->
               <input class="profile__foto" type="file" name="cover" multiple accept="image/*,image/jpeg">
             </div>
+
+            <label class="form__label">
+              <span class="form__span">Название*</span>
+              {% if form.name.errors %}
+              <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
+              {{form.name(class="form__input", placeholder="Введите название книги", value=book.name, id=book.id)}}
+              <span>
+                {% for msg in form.name.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.name(class="form__input", placeholder="Введите название книги", value=book.name)}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
+              <span class="form__span">Автор*</span>
+              {% if form.author.errors %}
+              <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
+              {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
+              <span>
+                {% for msg in form.author.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
+              {% endif %}
+            </label>
+
+            <label class="form__label">
+              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
+              <span class="form__span">Описание*</span>
+              {% if form.description.errors %}
+              {# default value for a TextAreaField is assigned in forms.py file #}
+              {{ form.description(class="form__input", placeholder="Описание книги..") }}
+              <span>
+                {% for msg in form.description.errors %}
+                {{ msg }}
+                {% endfor %}
+              </span>
+              {% else %}
+              {{ form.description(class="form__input", placeholder="Описание книги..") }}
+              {% endif %}
+            </label>
+
             <label class="form__label">
               <span class="form__span">ISBN</span>
               {% if form.isbn.errors %}
@@ -102,32 +109,16 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Название</span>
-              {% if form.name.errors %}
-              <!--<input type="text" class="form__input" placeholder="Введите название книги" required>-->
-              {{form.name(class="form__input", placeholder="Введите название книги", value=book.name, id=book.id)}}
+              <span class="form__span">Ссылка на источник</span>
+              {% if form.reference_url.errors %}
+              {{form.reference_url(class="form__input", placeholder="https://flibusta.su/book/122769-malenkiy-prints/read/", value=book.reference_url)}}
               <span>
-                {% for msg in form.name.errors %}
+                {% for msg in form.reference_url.errors %}
                 {{ msg }}
                 {% endfor %}
               </span>
               {% else %}
-              {{form.name(class="form__input", placeholder="Введите название книги", value=book.name)}}
-              {% endif %}
-            </label>
-
-            <label class="form__label">
-              <span class="form__span">Автор</span>
-              {% if form.author.errors %}
-              <!--<input type="text" class="form__input" placeholder="Иванов Иван Иванович" required>-->
-              {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
-              <span>
-                {% for msg in form.author.errors %}
-                {{ msg }}
-                {% endfor %}
-              </span>
-              {% else %}
-              {{form.author(class="form__input", placeholder="Иванов Иван Иванович", value=book.author)}}
+              {{form.reference_url(class="form__input", placeholder="https://flibusta.su/book/122769-malenkiy-prints/read/", value=book.reference_url)}}
               {% endif %}
             </label>
 
@@ -147,22 +138,16 @@
             </label>
 
             <label class="form__label">
-              <span class="form__span">Описание</span>
-              <textarea class="form__input" id="description" maxlength="512" minlength="1" name="description" placeholder="Описание книги.." required="" value="aasasasasa">{{book.description}}</textarea>
-              <!--<textarea type="text" class="form__input" rows="6" placeholder="Описание книги.." required></textarea>-->
-            </label>
-
-            <label class="form__label">
-              <span class="form__span">Дата выхода</span>
-              {% if form.release_date.errors %}
-              {{form.release_date(class="form__input", value=book.release_date)}}
+              <span class="form__span">Год выхода</span>
+              {% if form.release_year.errors %}
+              {{form.release_year(class="form__input", value=book.release_year)}}
               <span>
-                {% for msg in form.release_date.errors %}
+                {% for msg in form.release_year.errors %}
                 {{ msg }}
                 {% endfor %}
               </span>
               {% else %}
-              {{form.release_date(class="form__input", value=book.release_date)}}
+              {{form.release_year(class="form__input", value=book.release_year)}}
               {% endif %}
               <!--<input type="date" class="form__input" required>-->
             </label>

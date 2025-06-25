@@ -149,6 +149,7 @@
   }
 
   .form__input,
+  .form__date__range,
   .profile__info,
   .profile__input,
   .profile__text {
@@ -295,6 +296,7 @@
 @media (max-width: 767px) {
 
   .form__input,
+  .form__date__range,
   .profile__info {
     width: 300px;
     padding: 10px 20px;
@@ -506,7 +508,8 @@
     font-size: 9px;
   }
 
-  .form__input {
+  .form__input,
+  .form__date__range {
     font-size: 9px;
   }
 
@@ -594,6 +597,7 @@
   }
 
   .form__input,
+  .form__date__range,
   .profile__info {
     width: 200px;
     padding: 6px 15px;

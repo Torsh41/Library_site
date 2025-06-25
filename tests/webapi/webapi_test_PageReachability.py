@@ -26,7 +26,7 @@ class PersonalPagesTest(unittest.TestCase):
             book_name = "The Necessary Book"
             book = Book.query.filter_by(name=book_name).first()
             if book is None:
-                book = Book(isbn = book_isbn, name = book_name)
+                book = Book(isbn = book_isbn, name = book_name, category_id = category.id)
             db.session.add(book)
             db.session.commit()
 

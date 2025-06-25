@@ -23,19 +23,20 @@ function search_users_on_forum()
                 }).remove();
                 html = `<ul class="users__list list-reset" id="users_search_list">`;
                 users.forEach(user => {
+                    console.log(user);
                     html += `
                     <li id="${user.id}user_info">
                         <a class="users__item__header users__btn" id="user_header_${user.id}" href="javascript:usersItemDetailOpen('${user.id}');">
                             <div class="users__set">
                                 <img src="/user/${user.username}/edit-profile/edit-avatar" alt="" class="users__img"> 
                             </div>
-                                <span>${user.username}</span>
+                            <span>${user.username}</span>
                             <span>${user.email}</span>
                         </a>
                         <div class="users__item__detail" id="user_detail_${user.id}" style="display: none;">
                             <div><span>Имя:</span><span>${user.username}</span></div>
                             <div><span>Почта:</span><span>${user.email}</span></div>
-                            <div><span>Роль:</span><span id="user_role_${user.id}">${roles[user.role]}</span></div>
+                            <div><span>Роль:</span><span id="user_role_${user.id}">${user.role}</span></div>
                             <div>
                                 <select name="user_role" id="role_select_${user.id}">
                                     <option value="">-- Выберите роль --</option>`;
@@ -169,6 +170,7 @@ $(function() {
     Promise.all([promise])
         .then(results => {
             roles = results[0];
+            console.log(roles);
             $('#search_users_form').submit(function(event) {
                 search_users_on_forum();
                 event.preventDefault();

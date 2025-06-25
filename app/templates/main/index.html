@@ -12,62 +12,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
-  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
 <body>
   <div class="content">
-    <header class="header">
-      <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
-  
-        <div class="header__right">
-          <span class="header__menu">Меню</span>
-          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-            <span class="hamburger__box">
-              <span class="hamburger__inner"></span>
-            </span>
-          </button>
-        </div>
-  
-        <nav class="nav header__nav">
-          <div class="nav__menu js-menu-wrap">
-            <ul class="nav__list list-reset">
-              {% if current_user.is_anonymous %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
-              {% endif %}
-  
-              {% if current_user.is_authenticated %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('personal.person', username=current_user.username)}}">Личный кабинет</a></li>
-              {% else %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('auth.login')}}">Личный кабинет</a></li>
-              {% endif %}
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.forum')}}">Форум</a></li>
-              {% if current_user.role == Role.ADMIN %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('main.books_relevance')}}">Ведение книг</a></li>
-                <li class="nav__item"><a class="nav__link" href="{{url_for('admin.admin_panel', username=current_user.username)}}">Административная панель</a></li>
-              {% endif %}
-              {% if current_user.is_authenticated %}
-                <li class="nav__item"><a class="nav__link" href="{{url_for('main.private_chats')}}">Приватные чаты</a></li>
-              {% endif %}
-            </ul>
-          </div>
-  
-        </nav>
-      </div>
-    </header>
+    {% include "common/header.html" %}
   
     <main>
-  
       <section class="main">
         <div class="main__container container">
   
           <div class="main__top">
-            <span class="main__span">Цифровая кафедра РХТУ</span>
+            <span class="main__span">Кафедра ИКТ РХТУ</span>
             <h1 class="main__title ">Библиотека</h1>
   
             <svg width="461" height="1" viewBox="0 0 461 1" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +34,8 @@
   
           <div class="main__bottom">
           <a class="main__bottom-item" href="#1">О нас</a>
-          <a class="main__bottom-item" href="#2">Контакты</a>
+          <a class="main__bottom-item" href="#2">Инструкция</a>
+          <a class="main__bottom-item" href="#3">Контакты</a>
         </div>
       </section>
   
@@ -88,13 +45,17 @@
             <h2 class="about__title title">О нас</h2>
   
             <p class="about__text">
-              Mы удобный поисковик и общественная платформа по обсуждению тем, связанных с книгами, где переплетаются такие возможности, как добаление разнообразных книг в
-              общую библиотеку, так и поиск уже существующих.
-              На нашем сайте вы можете вести собственную библиотеку в своём профиле и обсуждать с другими пользователями различные темы.
-              Наша библиотека позволит вам не только прочитать всю доступную информацию о книге, но и ознакомиться с отзывами к
-              ней от других читателей, а также оставить свой.
-              Если вы обнаружите ошибку в работе сайта, или недостоверную информацию о книге, или у вас будут
-              предложения по улучшению данного проекта, то свяжитесь с нами в следующих соцсетях:
+              Mы - удобный поисковик и общественная платформа для обсуждения тем,
+              связанных с книгами, где переплетаются различные возможности, например:
+              добаление карточек книг в общую библиотеку, поиск уже
+              добавленных.  На нашем сайте вы можете вести собственную
+              библиотеку в своём профиле и вести обсуждения с другими пользователями
+              на различные темы.  Наша библиотека позволяет не только прочитать
+              всю доступную информацию о книге, но и ознакомиться с отзывами к
+              ней от других читателей, а также оставить свой отзыв.  Если вы
+              обнаружите ошибку в работе сайта, или недостоверную информацию о
+              книге, или у вас будут предложения по улучшению данного проекта,
+              то свяжитесь с нами в следующих соцсетях:
             </p>
   
             <ul class="about__icons list-reset">
@@ -104,14 +65,118 @@
               <li class="about__icon"><a href="t.me/headhuntersweb (https://t.me/headhuntersweb)" class="about__icon-link"
                   target="_blank"><img src="{{url_for('static', filename='styles/img/telegram.svg')}}" alt="Telegram"
                     class="about__icon-photo"></a></li>
+              <li class="about__icon"><a href="https://github.com/Torsh41/Library_site" class="about__icon-link"
+                  target="_blank"><img src="{{url_for('static', filename='styles/img/github.svg')}}" alt="Github"
+                    class="about__icon-photo"></a></li>
             </ul>
   
           </div>
   
         </div>
       </section>
+
+      {% macro make_anchor(condition, href, body) %}
+        {% if condition %}
+          <a href="{{ href }}">
+            <i>
+              {{ body }}
+            </i>
+          </a>
+        {% else %}
+          {{ body }}
+        {% endif %}
+      {% endmacro %}
+
+      <section id="2" class="about">
+        <div class="about__container container">
+          <div class="about__wrap">
+            <h2 class="about__title title">Инструкция для пользователя</h2>
+
+            <div>
+              <h3>Поиск книг</h3>
+              <p>
+                Для поиска книг, проделайте следующие действия: <br>
+                1) перейдите на {{ make_anchor(true, url_for('main.categories'), "страницу категорий") }}: <br>
+                &emsp; - раскройте меню (нажмите на кнопку в правом верхнем углу страницы), <br>
+                &emsp; - перейдите в раздел "категории книг", <br>
+                2) выберите одну из категорий, <br>
+                3) заполните один или несколько фильтров, и нажмите кнопку "найти".
+              </p>
+            </div>
+
+            <div>
+              <h3>Регистрация</h3>
+              <p>
+                Для регистрации, проделайте следующие действия: <br>
+                1) перейдите на {{ make_anchor(not current_user.is_authenticated, url_for('auth.register'), "страницу регистрации") }}: <br>
+                &emsp; - раскройте меню (нажмите на кнопку в правом верхнем углу страницы), <br>
+                &emsp; - перейдите в раздел "регистрация", <br>
+                2) введите адрес своей электронной почты, придумайте псевдоним и пароль, <br>
+                3) нажмите кнопку "зарегистрироваться". <br>
+                4) После регистрации, на ранее указанную электронную почту должно прийти письмо с ссылкой, по которой нужно перейти для того, чтобы завершить регистрацию.
+              </p>
+            </div>
+
+            <div>
+              <h3>Добавление книг</h3>
+              <p>
+                Для того, чтобы добавить новую книгу, проделайте следующие действия: <br>
+                1) {{ make_anchor(not current_user.is_authenticated, url_for('auth.register'), "зарегистрируйтесь") }}, <br>
+                2) перейдите на {{ make_anchor(current_user.is_authenticated, url_for('personal.person', username=current_user.username), "страницу профиля") }}: <br>
+                &emsp; - раскройте меню (нажмите на кнопку в правом верхнем углу страницы), <br>
+                &emsp; - перейдите в раздел "личный кабинет", <br>
+                3) нажмите на кнопку {{ make_anchor(current_user.is_authenticated, url_for('personal.add_new_book', username=current_user.username), '"добавить новую книгу"') }}, <br>
+                4) заполните обязательные и не обязательные поля, выберите категорию, к которой ближе всего относится загружаемая книга, и нажмите на кнопку "Добавить книгу в базу". <br>
+
+              </p>
+              <p> Затем, ваша книга будет добавлена в очередь на модерацию, и
+              рассмотрена модератором в течении нескольких дней. </p>
+            </div>
+
+            <div>
+              <h3>Получение доступа к расширенному функционалу</h3>
+              <p> Расширеный функционал предназначен для преподавателей,
+              сотрудников кафедр, профессоров, т.п., и позволяет делать большее
+              количество более удобных действий.</p>
+              <p> Для получения доступа к расширенному функционалу, необходимо
+              отправить письмо на электронную почту администратора:
+                <i>{{ config["MAIL_USERNAME"] }}</i>, для подтверждения
+              личности.</p>
+              <p> Письмо должно быть отправлено с такого адреса электронной
+              почты, по которому можно однозначно определить личность человека
+              (например, корпоративная почта, указаная на вебсайте вашей
+              организации).</p>
+              <p> Письмо должно быть составлено по следующему шаблону: </p>
+              <code>
+                  Адресат: {{ config["MAIL_USERNAME"] }} <br>
+                  Тема письма: Доступ к расширенному функционалу <br>
+                  Текст: <br>
+                  &emsp; Прошу предоставить роль в социальной библиотеке. <br>
+                  &emsp; email: <i>&lt;адрес почты зарегистрированного пользователя&gt;</i> <br>
+                  &emsp; username: <i>&lt;псевдоним зарегистрированного пользователя&gt;</i> <br>
+              </code>
+              <p> Затем, ваша просьба будет рассмотрена администратором в
+              течении нескольких дней. </p>
+            </div>
+
+            <div>
+              <h3>Обратная связь</h3>
+              <p> Данный проект только начинает развиваться, и ему просто
+              необходимо ваше мнение. Если вы встретили какую-то ошибку, или
+              хотите поделиться своим мнением, пожалуйста, оставьте сообщение
+              на форуме в разделе Общее, Обратная Связь. Или напишите напрямую
+              разработчикам: 
+              {{ make_anchor(true, "https://vk.com/kkolyabuzin", "Николай") }}
+              или в нашу группу в телеграмме:
+              {{ make_anchor(true, "https://t.me/+cIorhAgXLcE5YjUy", "MBK - Библиотека") }}.
+              </p>
+            </div>
+          </div>
   
-      <section id="2" class="contacts">
+        </div>
+      </section>
+  
+      <section id="3" class="contacts">
         <div class="contacts__container container">
           <div class="contacts__wrap">
             <h2 class="contacts__title title">Контакты</h2>

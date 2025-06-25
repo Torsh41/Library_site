@@ -12,40 +12,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet">
-  <script defer src="{{ url_for('static', filename='js/burger.js')}}"></script>
 </head>
 
 <body>
   <div class="content">
-    <header class="header style-1">
-      <div class="header__container container">
-        <a class="header__logo" href="{{url_for('main.index')}}">
-          <img class="header__logo-image" src="{{url_for('static', filename='styles/img/logo.png')}}"
-            alt="Логотип MAGIC BOOK KEEPER">
-        </a>
-  
-        <div class="header__right">
-          <span class="header__menu">Меню</span>
-          <button class="header__burger hamburger hamburger__collapse js-burger" type="button">
-            <span class="hamburger__box">
-              <span class="hamburger__inner"></span>
-            </span>
-          </button>
-        </div>
-  
-        <nav class="nav header__nav">
-          <div class="nav__menu js-menu-wrap">
-            <ul class="nav__list list-reset">
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.index')}}">Главная</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('auth.register')}}">Регистрация</a></li>
-              <li class="nav__item"><a class="nav__link" href="{{url_for('main.categories')}}">Категории книг</a></li>
-            </ul>
-          </div>
-  
-        </nav>
-      </div>
-    </header>
-  
+    {% include "common/header.html" %}
+
     <main>
       <section class="main style-1">
         <div class="main__container container">
@@ -66,16 +38,16 @@
           <form class="form__wrap" action="" method="post">
             {{form.hidden_tag()}}
             <label class="form__label">
-              <span class="form__span">Ваш email</span>
-              {% if form.email.errors %}
-              {{form.email(class="form__input", placeholder='Введите email')}}
+              <span class="form__span">Ваш логин</span>
+              {% if form.email_or_login.errors %}
+              {{form.email_or_login(class="form__input", placeholder='Введите псевдоним или email')}}
               <span class="form__help">
-                {% for msg in form.email.errors %}
+                {% for msg in form.email_or_login.errors %}
                 {{ msg }}
                 {% endfor %}
               </span>
               {% else %}
-              {{form.email(class="form__input", placeholder='Введите email')}}
+              {{form.email_or_login(class="form__input", placeholder='Введите email или логин')}}
               {% endif %}
             </label>
   
@@ -100,8 +72,13 @@
   
             <button class="btn form__btn ">Войти</button>
 
-            <p class="form__span">Забыли пароль? <a class="form__forget" href="{{url_for('auth.change_password_try')}}">Нажмите здесь, чтобы
-              заменить его</a>.</p>
+            <p class="form__span">Забыли пароль?
+              <u><a class="form__forget" href="{{ url_for('auth.change_password_try') }}">Нажмите здесь для смены пароля.</a></u>
+            </p>
+            <p class="form__span">Еще не прошли регистрацию?
+              <u><a class="form__forget" href="{{ url_for('auth.register') }}">Нажмите здесь для регистрации.</a></u>
+            </p>
+
           </form>
           
         </div>

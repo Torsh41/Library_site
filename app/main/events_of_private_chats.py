@@ -5,7 +5,7 @@ from app import database
 from app.models import User, PrivateChatPost, PrivateChat, ChatInvitation
 from flask_login import current_user, login_required
 from app.decorators import check_actual_password
-from datetime import datetime
+import datetime
 
 
 @socketio.on('join', namespace='/private_chat')
@@ -39,7 +39,9 @@ def add_post(msg):
     last_page = len(posts_for_pagi) // ELEMS_COUNT
     if len(posts_for_pagi) % ELEMS_COUNT > 0:
         last_page += 1
-    posts_pagination = chat.posts.order_by(PrivateChatPost.id).paginate(last_page, per_page=ELEMS_COUNT, error_out=False)
+    posts_pagination = database.paginate(
+            chat.posts.order_by(PrivateChatPost.id),
+            page=last_page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     posts = list()
     for post in posts_pagination.items:
@@ -85,7 +87,9 @@ def post_delete(data):
     database.session.commit()
     if users_posts := chat.posts.all():
         has_elems = True
-        posts_pagination = chat.posts.order_by(PrivateChatPost.id).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        posts_pagination = database.paginate(
+                chat.posts.order_by(PrivateChatPost.id),
+                page=page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(posts_pagination.iter_pages())
         if not posts_pagination.items:
             page -= 1
@@ -104,7 +108,7 @@ def edit_post(data):
     room = int(data['chat_id'])
     post = PrivateChatPost.query.filter_by(id=data['post_id']).first()
     post.body = str(data['new_post']).strip().replace("'", "")
-    post.timestamp = datetime.now()
+    post.timestamp = datetime.datetime.now(datetime.timezone.utc)
     post_date = str(post.timestamp.date().day) + " " + months_dict[post.timestamp.date().month] + " " + str(post.timestamp.date().year)
     post.edited = True
     database.session.add(post)

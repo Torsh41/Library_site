@@ -1,14 +1,14 @@
 from . import main
 from .. import database
 from app.main import *
-from app.models import BookGrade, Book, Comment, Category, User, TopicPost, DiscussionTopic, Role, BooksMaintaining, PrivateChat, PrivateChatPost
-from flask import render_template, request, redirect, url_for, make_response, jsonify
+from app.models import *
+from flask import render_template, request, redirect, abort, url_for, make_response, jsonify
 from flask_login import current_user, login_required
-from app.decorators import admin_required, check_actual_password
+from app.decorators import *
 from app.parse_excel import *
 import copy
-from datetime import datetime
-
+import datetime
+from app.common.forms import BookSearchForm
 
 @main.app_context_processor
 def inject_roles():
@@ -24,7 +24,10 @@ def inject_months_dict():
 def cover(book_id):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
+    if not (book_passed_moderation(book) or 
+            current_user.username == book.user.username):
+        return abort(403)
     cover = make_response(book.cover)
     return cover
 
@@ -33,7 +36,7 @@ def cover(book_id):
 def post_screenshot(post_id):
     post = TopicPost.query.filter_by(id=post_id).first()
     if post is None:
-        return render_template('400.html')
+        return abort(400)
     file = make_response(post.file)
     return file
 
@@ -42,7 +45,7 @@ def post_screenshot(post_id):
 def post_screenshot_on_private_chat(post_id):
     post = PrivateChatPost.query.filter_by(id=post_id).first()
     if post is None:
-        return render_template('400.html')
+        return abort(400)
     file = make_response(post.file)
     return file
 
@@ -57,10 +60,14 @@ def book_page(book_id):
     list_id = request.args.get('list_id', None, type=int)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
-    pagination = (book.comments
-                        .order_by(Comment.timestamp.asc())
-                        .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+        return abort(400)
+    if not (book_passed_moderation(book) or 
+            (current_user.is_authenticated and
+             current_user.username == book.user.username)):
+        return abort(403)
+    pagination = database.paginate(
+            book.comments.order_by(Comment.timestamp.asc()),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     comments = pagination.items
     grades = book.grades.all()
     try:
@@ -86,14 +93,16 @@ def book_page(book_id):
 def get_comments_page(book_id, page):
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
-    comments_pagination = (book.comments
-                           .order_by(Comment.timestamp.asc())
-                           .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+        return abort(400)
+    if not book_passed_moderation(book):
+        return abort(403)
+    comments_pagination = database.paginate(
+            book.comments.order_by(Comment.timestamp.asc()),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
     users = list()
-    user_is_admin = True if (current_user.is_authenticated and current_user.role == Role.ADMIN) else False
+    user_is_admin = True if (current_user.is_authenticated and current_user.role_id == Role.ADMIN) else False
     name_of_current_user = current_user.username if (current_user.is_authenticated) else None
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
@@ -120,10 +129,12 @@ def get_comments_page(book_id, page):
 @check_actual_password
 def add_comment(username, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
+    if not book_passed_moderation(book):
+        return abort(403)
     comment = Comment(
         body=str(request.form.get('comment')).strip().replace("'", ""),
         book=book,
@@ -136,12 +147,12 @@ def add_comment(username, book_id):
     id_of_added_comment = comments[-1].id
     if len(comments) % ELEMS_COUNT > 0:
         last_page += 1
-    comments_pagination = (book.comments
-                           .order_by(Comment.timestamp.asc())
-                           .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
+    comments_pagination = database.paginate(
+            book.comments.order_by(Comment.timestamp.asc()),
+            page=last_page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(comments_pagination.iter_pages())
     comments = comments_pagination.items
-    user_is_admin = True if current_user.role == Role.ADMIN else False
+    user_is_admin = True if current_user.role_id == Role.ADMIN else False
     users = list()
     for comment in comments:
         users.append(User.query.filter_by(id=comment.user_id).first())
@@ -167,12 +178,17 @@ def add_comment(username, book_id):
 @check_actual_password
 def edit_comment(username, comment_id, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     comment = Comment.query.filter_by(id=comment_id).first()
     if comment is None:
-        return render_template('400.html')
+        return abort(400)
+    book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return abort(400)
+    if not book_passed_moderation(book):
+        return abort(403)
     comment.body = str(request.form.get('newComment')).strip().replace("'", "")
-    comment.timestamp = datetime.now()
+    comment.timestamp = datetime.datetime.now(datetime.timezone.utc)
     database.session.add(comment)
     database.session.commit()
     return jsonify(dict(
@@ -191,10 +207,12 @@ def edit_comment(username, comment_id, book_id):
 @check_actual_password
 def give_grade(username, book_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     book = Book.query.filter_by(id=book_id).first()
     if book is None:
-        return render_template('400.html')
+        return abort(400)
+    if not book_passed_moderation(book):
+        return abort(403)
     grade = int(request.args.get('grade'))
     previous_grade = BookGrade.query.filter_by(user=current_user, book=book).first()
     if previous_grade:
@@ -211,17 +229,21 @@ def give_grade(username, book_id):
 @check_actual_password
 def comment_delete(username, book_id, comment_id, page):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     page = int(page)
     book = Book.query.filter_by(id=book_id).first()
+    if book is None:
+        return abort(400)
+    if not book_passed_moderation(book):
+        return abort(403)
     comment = book.comments.filter_by(id=comment_id).first()
     database.session.delete(comment)
     database.session.commit()
     if book.comments.all():
         has_elems = True
-        comments_pagination = (book.comments
-                               .order_by(Comment.timestamp.asc())
-                               .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+        comments_pagination = database.paginate(
+                book.comments.order_by(Comment.timestamp.asc()),
+                page=page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(comments_pagination.iter_pages())
         if not comments_pagination.items:
             page -= 1
@@ -238,9 +260,9 @@ def comment_delete(username, book_id, comment_id, page):
 @main.route('/categories', methods=['GET'])
 def categories():
     list_id = request.args.get('list_id', None, type=int)
-    category_pagination = (Category.query
-                           .order_by()
-                           .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    category_pagination = database.paginate(
+            Category.query.order_by(),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     categories = category_pagination.items
     return render_template(
         'main/categories.html',
@@ -252,9 +274,9 @@ def categories():
 
 @main.route('/get_categories_page/<int:page>', methods=['GET'])
 def get_categories_page(page):
-    categories_pagination = (Category.query
-                             .order_by()
-                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    categories_pagination = database.paginate(
+            Category.query.order_by(),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
     return jsonify([
@@ -271,27 +293,34 @@ def get_categories_page(page):
 def category(id):
     category = Category.query.filter_by(id=id).first()
     if category is None:
-        return render_template('400.html')
+        return abort(400)
+    form = BookSearchForm()
+    if form.validate_on_submit():
+        pass
     list_id = request.args.get('list_id', None, type=int)
-    res = category.books.all()
+    books = database.session.execute(
+        database.select(Book)
+                .filter(Book.category_id==category.id)
+                .join(ModerationRequest, Book.moderation_request_id == ModerationRequest.id)
+                .filter(ModerationRequest._status==ModerationRequest.STATUS_ACCEPTED)
+    ).scalars().all()
     top_books = list(); new_books = list()
-    if res:
-        for book in res:
-            try:
-                top_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
-                new_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
-            except:
-                top_books.append([book, 0])
-                new_books.append([book, 0])
-           
-        if len(top_books) > TOP_BOOKS_COUNT:
-            top_books = sorted(top_books, key=lambda value: value[1], reverse=True)[:TOP_BOOKS_COUNT]
-            new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)[:TOP_BOOKS_COUNT]
-        else:
-            top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
-            new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
+    for book in books:
+        try:
+            top_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
+            new_books.append([book, round(sum([value.grade for value in book.grades.all()]) / len(book.grades.all()), 1)])
+        except:
+            top_books.append([book, 0])
+            new_books.append([book, 0])
+    if len(top_books) > TOP_BOOKS_COUNT:
+        top_books = sorted(top_books, key=lambda value: value[1], reverse=True)[:TOP_BOOKS_COUNT]
+        new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)[:TOP_BOOKS_COUNT]
+    else:
+        top_books = sorted(top_books, key=lambda value: value[1], reverse=True)
+        new_books = sorted(new_books, key=lambda value: value[0].timestamp, reverse=True)
     return render_template(
         'main/category_page.html',
+        form=form,
         top_books=top_books,
         new_books=new_books,
         name=category.name,
@@ -309,8 +338,14 @@ def search_by_category(id):
         current_user_is_auth = False; username = None
     category = Category.query.filter_by(id=id).first()
     if category is None:
-        return render_template('400.html')
-    res = category.books.order_by(Book.id).all()
+        return abort(400)
+    res = database.session.execute(
+        database.select(Book)
+                .filter(Book.category_id==category.id)
+                .join(ModerationRequest, Book.moderation_request_id == ModerationRequest.id)
+                .filter(ModerationRequest._status==ModerationRequest.STATUS_ACCEPTED)
+                .order_by(Book.id)
+    ).scalars().all()
     result = str(request.form.get('search_result')).strip().lower()
     if result == '*':
         search_result = res
@@ -364,17 +399,32 @@ def search_by_category(id):
     return jsonify(dict(result=False))
 
 
+@main.route('/book/search', methods=['GET'])
+def book_search():
+    return render_template(
+        'main/book_search.html',
+        form=BookSearchForm(),
+        top_books=[],
+        new_books=[],
+        name="category.name",
+        id="category.id",
+        list_id="list_id",
+        len=len
+    )
+
+
 @main.route('/forum')
 def forum():
-    category_pagination = (Category.query
-                           .order_by()
-                           .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    category_pagination = database.paginate(
+            Category.query.order_by(),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     categories = category_pagination.items
     pagination_for_topics_foreach_category = list()
     for category in categories:
-        pagination_for_topics_foreach_category.append(category.topics
-                            .order_by()
-                            .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+        pagination_for_topics_foreach_category.append(
+                database.paginate(
+                    category.topics.order_by(),
+                    page=1, per_page=ELEMS_COUNT, error_out=False))
     return render_template(
         'main/forum.html',
         pagination_for_topics_foreach_category=pagination_for_topics_foreach_category,
@@ -390,15 +440,15 @@ def forum():
 def topic(topic_id):
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
     if topic is None:
-        return render_template('400.html')
+        return abort(400)
     posts_page = request.args.get('posts_page', 1, type=int)
-    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+    if current_user.is_authenticated and current_user.role_id == Role.ADMIN:
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = (topic.posts
-                        .order_by(TopicPost.id)
-                        .paginate(posts_page, per_page=ELEMS_COUNT, error_out=False))
+    posts_pagination = database.paginate(
+            topic.posts.order_by(TopicPost.id),
+            page=posts_page, per_page=ELEMS_COUNT, error_out=False)
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
@@ -467,16 +517,16 @@ def topic(topic_id):
 
 @main.route('/get_categories_page_on_forum/<int:page>', methods=['GET'])
 def get_categories_page_on_forum(page):
-    categories_pagination = (Category.query
-                             .order_by()
-                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    categories_pagination = database.paginate(
+            Category.query.order_by(),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(categories_pagination.iter_pages())
     categories = categories_pagination.items
     categories_topics = dict()
     for category in categories:
-        topics_pagination = (category.topics
-                             .order_by()
-                             .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+        topics_pagination = database.paginate(
+                category.topics.order_by(),
+                page=1, per_page=ELEMS_COUNT, error_out=False)
         category_topics = [dict(
             id=topic.id,
             name=topic.name,
@@ -487,7 +537,7 @@ def get_categories_page_on_forum(page):
 
     if current_user.is_authenticated:
         username_of_cur_user = current_user.username
-        if current_user.role == Role.ADMIN:
+        if current_user.role_id == Role.ADMIN:
             is_admin = True
         else:
             is_admin = False
@@ -513,15 +563,15 @@ def get_categories_page_on_forum(page):
 def get_posts_page(topic_id, page):
     topic = DiscussionTopic.query.filter_by(id=topic_id).first()
     if topic is None:
-        return render_template('400.html')
-    posts_pagination = (topic.posts
-                        .order_by(TopicPost.id)
-                        .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+        return abort(400)
+    posts_pagination = database.paginate(
+            topic.posts.order_by(TopicPost.id),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     posts = list()
     if current_user.is_authenticated:
         username = current_user.username
-        if current_user.role == Role.ADMIN:
+        if current_user.role_id == Role.ADMIN:
             user_is_admin = True
         else:
             user_is_admin = False
@@ -702,16 +752,18 @@ def search_category_on_forum():
         page = 1
         cur_page_items = list()
         while True:
-            cur_page_items = (Category.query
-                              .order_by()
-                              .paginate(page, per_page=ELEMS_COUNT, error_out=False)).items
+            cur_page_items = database.paginate(
+                    Category.query.order_by(),
+                    page=page, per_page=ELEMS_COUNT, error_out=False).items
             if found_category in cur_page_items:
                 break
             page += 1
 
         categories_topics = dict()
         for category in cur_page_items:
-            topics_pagination = category.topics.order_by().paginate(1, per_page=ELEMS_COUNT, error_out=False)
+            topics_pagination = database.paginate(
+                    category.topics.order_by(),
+                    page=1, per_page=ELEMS_COUNT, error_out=False)
             category_topics = [dict(
                 id=topic.id,
                 name=topic.name,
@@ -721,7 +773,7 @@ def search_category_on_forum():
             categories_topics[category.id] = copy.deepcopy(category_topics)
 
         if current_user.is_authenticated:
-            if current_user.role == Role.ADMIN:
+            if current_user.role_id == Role.ADMIN:
                 is_admin = True
             else:
                 is_admin = False
@@ -749,10 +801,10 @@ def search_category_on_forum():
 @check_actual_password
 def add_topic(username, category_id):
     if current_user.username != username:
-        return render_template('403.html')
+        return abort(403)
     cur_category = Category.query.filter_by(id=category_id).first()
     if cur_category is None:
-        return render_template('400.html')
+        return abort(400)
     in_topic_name = str(request.form.get('topic_name')).strip().lower()
     result = True
     for topic in cur_category.topics.all():
@@ -768,12 +820,12 @@ def add_topic(username, category_id):
         if len(topics_for_cur_category) % ELEMS_COUNT > 0:
             last_page += 1
             
-        topics_pagination = (cur_category.topics
-                             .order_by()
-                             .paginate(last_page, per_page=ELEMS_COUNT, error_out=False))
+        topics_pagination = database.paginate(
+                cur_category.topics.order_by(),
+                page=last_page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(topics_pagination.iter_pages())
         topics_for_cur_category_by_page = topics_pagination.items
-        if current_user.role == Role.ADMIN:
+        if current_user.role_id == Role.ADMIN:
             is_admin = True
         else:
             is_admin = False
@@ -794,16 +846,16 @@ def add_topic(username, category_id):
 
 @main.route('/get_topics_page_on_forum/<int:category_id>/<int:page>', methods=['GET'])
 def get_topics_page_on_forum(category_id, page):
-    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+    if current_user.is_authenticated and current_user.role_id == Role.ADMIN:
         is_admin = True
     else:
         is_admin = False
     category = Category.query.filter_by(id=category_id).first()
     if category is None:
-        return render_template('400.html')
-    topics_pagination = (category.topics
-                         .order_by()
-                         .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+        return abort(400)
+    topics_pagination = database.paginate(
+            category.topics.order_by(),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(topics_pagination.iter_pages())
     topics = topics_pagination.items
     return jsonify([
@@ -827,13 +879,13 @@ def topic_delete(category_id, topic_id, page):
         database.session.delete(topic)
         database.session.commit()
     else:
-        return render_template('404.html')
+        return abort(404)
 
     if topics := category.topics.all():
         has_elems = True
-        topics_pagination = (category.topics
-                             .order_by()
-                             .paginate(page, per_page=ELEMS_COUNT, error_out=False))
+        topics_pagination = database.paginate(
+                category.topics.order_by(),
+                page=page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(topics_pagination.iter_pages())
         if not topics_pagination.items:
             page -= 1
@@ -853,9 +905,9 @@ def topic_delete(category_id, topic_id, page):
 @admin_required
 @check_actual_password
 def books_relevance():
-    pagination = (BooksMaintaining.query
-                  .order_by()
-                  .paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    pagination = database.paginate(
+            BooksMaintaining.query.order_by(),
+            page=1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     return render_template(
         'main/books_maintaining.html',
         info=pagination.items,
@@ -900,9 +952,9 @@ def add_new_books_info():
     if data_len % BOOKS_MAINTAINING_PER_PAGE > 0:
         pages += 1
     # pages - она же последняя страница
-    data_pagination = (BooksMaintaining.query
-                       .order_by()
-                       .paginate(pages, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    data_pagination = database.paginate(
+            BooksMaintaining.query.order_by(),
+            page=pages, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     pages_count_arr = list(data_pagination.iter_pages())
     data = data_pagination.items
     
@@ -950,8 +1002,9 @@ def search_book():
     if not book:
         return jsonify([dict(result=False)])
     
-    pagination = (BooksMaintaining.query
-                  .paginate(1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    pagination = database.paginate(
+            BooksMaintaining.query,
+            page=1, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     if book in pagination.items:
         pages_count_arr = list(pagination.iter_pages())
         return jsonify([
@@ -976,8 +1029,9 @@ def search_book():
             ) for book_info in pagination.items
         ])
     for page in range(2, pagination.pages + 1):  
-        items_pagination = (BooksMaintaining.query
-                            .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+        items_pagination = database.paginate(
+                BooksMaintaining.query,
+                page=page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
         items = items_pagination.items
         if book in items:
             pages_count_arr = list(items_pagination.iter_pages())
@@ -1008,9 +1062,9 @@ def search_book():
 @admin_required
 @check_actual_password
 def get_books_info_page(page):
-    data_pagination = (BooksMaintaining.query
-                       .order_by()
-                       .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+    data_pagination = database.paginate(
+            BooksMaintaining.query.order_by(),
+            page=page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
     pages_count_arr = list(data_pagination.iter_pages())
     data = data_pagination.items
     return jsonify([
@@ -1057,9 +1111,9 @@ def book_del():
         
         # получаем данные для перестройки пагинации
         if BooksMaintaining.query.all():
-            data_pagination = (BooksMaintaining.query
-                               .order_by()
-                               .paginate(page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False))
+            data_pagination = database.paginate(
+                    BooksMaintaining.query.order_by(),
+                    page=page, per_page=BOOKS_MAINTAINING_PER_PAGE, error_out=False)
             pages_count_arr = list(data_pagination.iter_pages())
             if not data_pagination.items:
                 page -= 1
@@ -1132,7 +1186,7 @@ def private_chats():
 def delete_private_chat(chat_id, page):
     private_chat = current_user.private_chats.filter_by(id=chat_id).first()
     if private_chat is None:
-        return render_template('400.html')
+        return abort(400)
     database.session.delete(private_chat)
     database.session.commit()
         
@@ -1227,19 +1281,19 @@ def get_chats_page(page):
 def private_chat(chat_id):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     if private_chat is None:
-        return render_template('400.html')
+        return abort(400)
     if (chat not in current_user.private_chats and
         not current_user.chats_invitations.filter_by(private_chat=chat).first()):
-        return render_template('403.html')
+        return abort(403)
 
     participants_count = chat.invitations.count() + 1
-    if current_user.is_authenticated and current_user.role == Role.ADMIN:
+    if current_user.is_authenticated and current_user.role_id == Role.ADMIN:
         user_is_admin = 1
     else:
         user_is_admin = 0
-    posts_pagination = (chat.posts
-                        .order_by(PrivateChatPost.id)
-                        .paginate(1, per_page=ELEMS_COUNT, error_out=False))
+    posts_pagination = database.paginate(
+            chat.posts.order_by(PrivateChatPost.id),
+            page=1, per_page=ELEMS_COUNT, error_out=False)
     posts = list()
     for post in posts_pagination.items:
         user = User.query.filter_by(id=post.user_id).first()
@@ -1315,14 +1369,14 @@ def private_chat(chat_id):
 def get_posts_page_on_chat_disc(chat_id, page):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     if chat is None:
-        return render_template('400.html')
+        return abort(400)
     posts = list()
-    posts_pagination = (chat.posts
-                        .order_by(PrivateChatPost.id).
-                        paginate(page, per_page=ELEMS_COUNT, error_out=False))
+    posts_pagination = database.paginate(
+            chat.posts.order_by(PrivateChatPost.id),
+            page=page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     username = current_user.username
-    if current_user.role == Role.ADMIN:
+    if current_user.role_id == Role.ADMIN:
         user_is_admin = True
     else:
         user_is_admin = False
@@ -1494,19 +1548,14 @@ def get_posts_page_on_chat_disc(chat_id, page):
 
 @main.route('/get_role_name/<int:role_id>', methods=['GET'])
 def get_role_name():
-    role = Role.by_id(role_id)
-    if role is None:
-        return render_template('500.html')
-    return role.name
+    if role_id not in Role.role_dict.keys():
+        return abort(500)
+    return Role(role_id).name
 
 
 @main.route('/get_role_name_list', methods=['GET'])
 def get_role_name_list():
-    role_list = database.session.scalars(database.select(Role)).all()
-    ret = {}
-    for role in role_list:
-        ret[role.id] = role.name
-    return jsonify(ret)
+    return jsonify(Role.role_dict)
 
 
 @main.route('/forum/private_chat/<int:chat_id>/get_users_page_to_invite/<int:page>', methods=['GET'])
@@ -1515,13 +1564,13 @@ def get_role_name_list():
 def get_users_page_to_invite(chat_id, page):
     chat = PrivateChat.query.filter_by(id=chat_id).first()
     if chat is None:
-        return render_template('400.html')
+        return abort(400)
     invited_users_id_to_cur_chat = [invitation.user.id for invitation in chat.invitations.all()]  
-    users_pagination = (User.query
-                        .filter(User.id != current_user.id)
-                        .filter(User.id != chat.creator.id)
-                        .filter(~User.id.in_(invited_users_id_to_cur_chat))
-                        .paginate(page, per_page=USERS_COUNT, error_out=False))
+    users_pagination = database.paginate(
+            (User.query.filter(User.id != current_user.id)
+                       .filter(User.id != chat.creator.id)
+                       .filter(~User.id.in_(invited_users_id_to_cur_chat))),
+            page=page, per_page=USERS_COUNT, error_out=False)
     if not users_pagination.items:
         return jsonify([dict(result=False)])
     pages_count = list(users_pagination.iter_pages())
@@ -1545,7 +1594,7 @@ def change_topic_name(category_id, topic_id):
     category = Category.query.filter_by(id=category_id).first()
     topic = category.topics.filter_by(id=topic_id).first()
     if chat is None or topic is None:
-        return render_template('400.html')
+        return abort(400)
     topic.name = str(request.form.get('topic_changed_name')).strip().replace("'", "")
     database.session.add(topic)
     database.session.commit()

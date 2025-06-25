@@ -5,7 +5,7 @@ from app import database
 from app.models import User, TopicPost, DiscussionTopic
 from flask_login import current_user, login_required
 from app.decorators import check_actual_password
-from datetime import datetime
+import datetime
 
 
 @socketio.on('send post')
@@ -29,7 +29,9 @@ def add_post(msg):
     last_page = len(posts_for_pagi) // ELEMS_COUNT
     if len(posts_for_pagi) % ELEMS_COUNT > 0:
         last_page += 1
-    posts_pagination = topic.posts.order_by(TopicPost.id).paginate(last_page, per_page=ELEMS_COUNT, error_out=False)
+    posts_pagination = database.paginate(
+            topic.posts.order_by(TopicPost.id),
+            page=last_page, per_page=ELEMS_COUNT, error_out=False)
     pages_count = list(posts_pagination.iter_pages())
     posts = list()
     for post in posts_pagination.items:
@@ -75,7 +77,9 @@ def post_delete(data):
     database.session.commit()
     if users_posts := topic.posts.all():
         has_elems = True
-        posts_pagination = topic.posts.order_by(TopicPost.id).paginate(page, per_page=ELEMS_COUNT, error_out=False)
+        posts_pagination = database.paginate(
+                topic.posts.order_by(TopicPost.id),
+                page=page, per_page=ELEMS_COUNT, error_out=False)
         pages_count = list(posts_pagination.iter_pages())
         if not posts_pagination.items:
             page -= 1
@@ -93,7 +97,7 @@ def post_delete(data):
 def edit_post(topic_id, post_id, new_comment):
     post = TopicPost.query.filter_by(id=post_id).first()
     post.body = str(new_comment).strip().replace("'", "")
-    post.timestamp = datetime.now()
+    post.timestamp = datetime.datetime.now(datetime.timezone.utc)
     post_date = str(post.timestamp.date().day) + " " + months_dict[post.timestamp.date().month] + " " + str(post.timestamp.date().year)
     post.edited = True
     database.session.add(post)
